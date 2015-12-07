@@ -1,0 +1,3 @@
+Event	Tags1	Tags2	Tags3
+1111	Event/Label/LeftPerturbOnset	Event/Long name/Vehicle | Perturbation | Left | Onset	Event/Description/Beginning  of a perturbation that moves the vehicle to the left via perpendicular force
+1112	Event/Label/RightPerturbOnset	Event/Long name/Vehicle | Perturbation | Right | Onset	Event/Description/Beginning  of a perturbation that moves the vehicle to the right via perpendicular force
