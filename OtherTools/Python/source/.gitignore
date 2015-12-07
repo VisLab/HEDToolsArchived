@@ -1,0 +1,7 @@
+test/
+hedlib_unittest
+HED_util_exe_dir/
+TODO.txt
+misc/cx_setup.py
+misc/cy_setup.py
+Makefile

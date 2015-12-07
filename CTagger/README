@@ -1,0 +1,28 @@
+The ctagger package provides interfaces for user to tag events using a
+user-expandable hierarcharical tagging ontology. The HED Specification
+hierarchy, developed by Nima Bigdely-Shamlo of UCSD is provided with the
+distribution for users wishing to tag events in EEG experiments.  
+
+MATLAB:
+       To run, make this directory the current directory and run setup.m.
+       If you did not unzip this into the EEGLAB plugins subdirectory,
+       you will will need to
+
+Unit tests:   
+       Add the ctagger directory and its subdirectories to the MATLAB path.  
+       In the tests directory, type runtests.
+
+GUI operation:
+
+To tag:    
+     Click on the event to be tagged.  Then click on the tags you want
+     to associate with this event.
+
+Other:
+     Change font size by hovering over top menu and clicking +/-
+
+Release notes:
+1)  The tagcsv function has been implemented which allows users to 
+    tag events specified in csv files. 
+2)  The deletedb and deletedbc functions have been implemented which allows
+    users to delete a particular community tagger database. 

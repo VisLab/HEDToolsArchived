@@ -1,0 +1,52 @@
+-------------------------HED txt to xml-------------------------
+This utility is meant to convert an HED hierarchy in plain text
+form into an XML tree. 'HED input' is a .txt file. This should
+be obtained by converting the HED hierarchy from google docs to
+plain text. No modifications to the plain text converted over
+from google docs is necessary. 'Output file'is a pathname, with
+the filename at the end that you would like the resulting
+xml file to have. If you are on Windows and you do not wish to
+use an xml viewer to look at the output, simply change the '.xml
+file extension to '.txt'.
+
+------------------------Validate HED xml------------------------
+This utility is used to validate the xml form of the HED
+hierarchy against an appropriate xml schema. 'XML schema'
+is of course the file which contains the xml schema you would 
+like to verify against. 'XML' is the file which contains the
+HED hierarchy in xml form. 'XML error file' is the file which
+will contain the result of the validation of the hierarchy
+against the given schema. If there are no errors, the file
+will contain the usual header, but with no errors reported.
+
+---------------------------Verify tags--------------------------
+This utility is used to check tags against a given HED
+hierarchy. 'HED input' is the plain text file containing 
+the HED hierarchy, as converted from the HED google doc
+to plain text. 'Tags file' is a tab-separated-value file,
+which contains the tags to be verified. 'Output' this will 
+be the path for the output files with the name of the 
+beginning of the output file names at the end. Note: there
+will always be two output files, one called a warning 
+report, another a error report. Items in the warning 
+report may be correct, but require further inspection. 
+Items in the error report are certainly incorrect. 
+'Column list' is a list of integers which correspond to
+the columns in the 'Tags file' which contain the tags to
+be tested. The first column of the 'Tags file' is column
+number one. So, column numbers cannnot be less than one,
+and no greater than the maximum number of columns in each
+line. Note: any single character can be used as a delimiter
+for the column list, and separating white space will be 
+ignored.
+
+---------------------------HED mapping--------------------------
+This utility prints out the full mapping, with comments, from 
+one HED hierarchy to another. 'HED source txt' is the HED
+hierarchy taken from a google doc, by converting from the google
+doc to plain text. 'Remap HED' is the file which contains the
+mapping itself. 'Map output' is the output file which contains
+the full mapping from the given HED to the other given by 
+'Remap HED'. The purpose of this utility is to check what has
+and has not been mapped, and to examine everything that has 
+been mapped between the two hierarchies.

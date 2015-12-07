@@ -1,0 +1,82 @@
+﻿/Time-Locked Event/Stimulus	/Participant/Effect			
+/Time-Locked Event/Stimulus/Visual	/Participant/Effect/Visual			
+/Time-Locked Event/Stimulus/Visual/Fixation Point	"/Participant/Effect/Visual, /Object/Fixation Point -> (/Object/Fixation Point~ /Participant/Effect/Visual)"			
+/Time-Locked Event/Stimulus/Visual/Shape/* (except rotated)	"/Participant/Effect/Visual, /Object/2D Shape/*"			
+/Time-Locked Event/Stimulus/Visual/Shape/Rotated/	"/Participant/Effect/Visual, /Object/2D Shape, /Attribute/Orientation/Rotated/"			
+/Time-Locked Event/Stimulus/Visual/Shape/Rotated/#	"/Object/2D Shape, /Attribute/Orientation/Rotated/Degrees/#"			
+/Time-Locked Event/Stimulus/Visual/Luminance	/Attribute/Luminance			
+/Time-Locked Event/Stimulus/Visual/Luminance/#	/Attribute/Luminance/#			
+/Time-Locked Event/Stimulus/Visual/Size	/Attribute/Size			
+/Time-Locked Event/Stimulus/Visual/Size/#	/Attribute/Size/Degrees/#			
+/Time-Locked Event/Stimulus/Visual/Checkerboard	"/Participant/Effect/Visual, /Object/Pattern/Checkerboard"			
+/Time-Locked Event/Stimulus/Visual/Uniform Color/*	/Attribute/Color/*			
+/Time-Locked Event/Stimulus/Visual/Achromatic/*	/Attribute/Color/Achromatic/*			
+/Time-Locked Event/Stimulus/Visual/Screen Location/*	/Attribute/Location/Screen/*			
+/Time-Locked Event/Stimulus/Visual/Up-down Separated/*	/Attribute/Visual/Up-down Separated/*			
+/Time-Locked Event/Stimulus/Visual/Bilateral/*	/Attribute/Visual/Bilateral/*			
+/Time-Locked Event/Stimulus/Visual/Foveal	/Participant/Effect/Visual/Foveal			
+/Time-Locked Event/Stimulus/Visual/Peripheral	/Participant/Effect/Visual/Peripheral			
+/Time-Locked Event/Stimulus/Visual/Clock Face/*	"/Participant/Effect/Visual, Object/Clock Face/*"			
+/Time-Locked Event/Stimulus/Visual/3D Object	"/Participant/Effect/Visual, /Object/3D Shape"			
+/Time-Locked Event/Stimulus/Visual/Abstract Pattern	"/Participant/Effect/Visual, /Object/Pattern/Abstract"			
+/Time-Locked Event/Stimulus/Visual/Non-Linguistic Symbol	"/Participant/Effect/Visual, /Object/Symbol/Non-Linguistic"			
+/Time-Locked Event/Stimulus/Visual/Non-Linguistic Symbol/Meaningful	"/Participant/Effect/Visual, /Object/Symbol/Non-Linguistic, /Participant/Effect/Cognitive/Meaningful"			
+/Time-Locked Event/Stimulus/Visual/Non-Linguistic Symbol/Not Meaningful	"/Participant/Effect/Visual, /Object/Symbol/Non-Linguistic, /Participant/Effect/Cognitive/Not Meaningful"			
+/Time-Locked Event/Stimulus/Visual/Non-Linguistic Symbol/Newly Learned Meaning	"/Participant/Effect/Visual, /Object/Symbol/Non-Linguistic, /Participant/Effect/Cognitive/Newly Learned Meaning"			
+/Time-Locked Event/Stimulus/Visual/Braille Character	"/Participant/Effect/Visual, /Object/Symbol/Braille Character"			
+/Time-Locked Event/Stimulus/Visual/Face/*	"/Participant/Effect/Visual, /Object/Face/*"			
+/Time-Locked Event/Stimulus/Visual/Movie	"/Participant/Effect/Visual, /Sensory Presentation/Visual/RenderingType/Screen/Movie"						
+/Time-Locked Event/Stimulus/Visual/Movie/Motion/On Screen/Down	"/Participant/Effect/Visual, /Sensory Presentation/Visual/RenderingType/Screen, Attribute/Visual/Motion/Down"			
+/Time-Locked Event/Stimulus/Visual/Movie/Motion/On Screen/Up	"/Participant/Effect/Visual, /Sensory Presentation/Visual/RenderingType/Screen, Attribute/Visual/Motion/Up"			
+/Time-Locked Event/Stimulus/Visual/Movie/Motion/On Screen/Horizontal/*	"/Participant/Effect/Visual, /Sensory Presentation/Visual/RenderingType/Screen, Attribute/Visual/Motion/Horizontal/*"			
+/Time-Locked Event/Stimulus/Visual/Movie/Motion/On Screen/Oblique/*	"/Participant/Effect/Visual, /Sensory Presentation/Visual/RenderingType/Screen, Attribute/Visual/Motion/Oblique/*"		
+/Time-Locked Event/Stimulus/Visual/Movie/Film Clip	"/Participant/Effect/Visual, /Sensory Presentation/Visual/RenderingType/Screen/Movie/Film Clip"			
+/Time-Locked Event/Stimulus/Visual/False Font	"/Participant/Effect/Visual, /Attribute/Visual/False Font"			
+/Time-Locked Event/Stimulus/Visual/Food	"/Participant/Effect/Visual, /Attribute/Visual/Food"			
+/Time-Locked Event/Stimulus/Visual/Fractal	"/Participant/Effect/Visual, /Attribute/Visual/Fractal"			
+/Time-Locked Event/Stimulus/Visual/LED	"/Participant/Effect/Visual, /Attribute/Visual/Rendering Type/LED"			
+/Time-Locked Event/Stimulus/Visual/Random Dot	"/Participant/Effect/Visual, /Attribute/Visual/Random Dot"			
+/Time-Locked Event/Stimulus/Visual/Language	"/Participant/Effect/Visual, /Attribute/Language"			
+/Time-Locked Event/Stimulus/Visual/Language/Asian	"/Participant/Effect/Visual, /Attribute/Language/Family/Asian"			
+/Time-Locked Event/Stimulus/Visual/Language/Asian/Chinese	"/Participant/Effect/Visual, /Attribute/Language/Family/Asian/Chinese"			
+/Time-Locked Event/Stimulus/Visual/Language/Asian/Japanese	"/Participant/Effect/Visual, /Attribute/Language/Family/Asian/Japanese"			
+/Time-Locked Event/Stimulus/Visual/Language/Latin	"/Participant/Effect/Visual, /Attribute/Language/Family/Latin"			
+/Time-Locked Event/Stimulus/Visual/Language/Latin/English	"/Participant/Effect/Visual, /Attribute/Language/Family/Latin/English"			
+/Time-Locked Event/Stimulus/Visual/Language/Latin/German	"/Participant/Effect/Visual, /Attribute/Language/Family/Latin/German"			
+/Time-Locked Event/Stimulus/Visual/Language/Latin/French	"/Participant/Effect/Visual, /Attribute/Language/Family/French"			
+/Time-Locked Event/Stimulus/Visual/Language/Character/*	"/Participant/Effect/Visual, Object/Symbol/Sign/Character/*"			
+/Time-Locked Event/Stimulus/Visual/Language/Word/*	"/Participant/Effect/Visual, /Attribute/Language/Word/*"			
+/Time-Locked Event/Stimulus/Visual/Language/Sentence/*	"/Participant/Effect/Visual, /Attribute/Language/Sentence/*"			
+/Time-Locked Event/Stimulus/Visual/Natural Scene	"/Participant/Effect/Visual, /Object/Natural Scene"			
+/Time-Locked Event/Stimulus/Visual/Drawing	"/Participant/Effect/Visual, /Object/Drawing"			
+/Time-Locked Event/Stimulus/Visual/Drawing/Line Drawing	"/Participant/Effect/Visual, /Object/Drawing/Line Drawing"			
+/Time-Locked Event/Stimulus/Visual/IAPS	"/Participant/Effect/Visual, /Object/IAPS"			
+/Time-Locked Event/Stimulus/Visual/Bistable	"/Participant/Effect/Visual, /Attribute/Visual/Bistable"			
+/Time-Locked Event/Stimulus/Visual/Background	"/Participant/Effect/Visual, /Attribute/Visual/Background"			
+/Time-Locked Event/Stimulus/Visual/Background/Uniform Color/*	"/Participant/Effect/Visual, Attribute/Visual/Background, Attribute/Visual/Color/*"			
+/Time-Locked Event/Stimulus/Auditory	/Participant/Effect/Auditory			
+/Time-Locked Event/Stimulus/Auditory/Reward	"/Participant/Effect/Auditory, /Participant/Effect/Reward"			
+/Time-Locked Event/Stimulus/Auditory/Reward/Cash Register	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nameable/Cash Register, /Participant/Effect/Reward"			
+/Time-Locked Event/Stimulus/Auditory/Reward/Ding	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nameable/Ding, /Participant/Effect/Reward"			
+/Time-Locked Event/Stimulus/Auditory/Warning	"/Participant/Effect/Auditory,  /Participant/Effect/Warning"			
+/Time-Locked Event/Stimulus/Auditory/Warning/Fire Alarm	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nameable/Fire Alarm, /Participant/Effect/Warning"			
+/Time-Locked Event/Stimulus/Auditory/Nameable	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nameable"			
+/Time-Locked Event/Stimulus/Auditory/Loudness	/Attribute/Auditory/Loudness			
+/Time-Locked Event/Stimulus/Auditory/Loudness/#	/Attribute/Auditory/Loudness/# in DB			
+/Time-Locked Event/Stimulus/Auditory/Music	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Music"			
+/Time-Locked Event/Stimulus/Auditory/Chord Sequence	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Music/Chord Sequence"			
+/Time-Locked Event/Stimulus/Auditory/Click/	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nameable/Click/"			
+/Time-Locked Event/Stimulus/Auditory/Click/ABR	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nameable/Click/ABR"			
+/Time-Locked Event/Stimulus/Auditory/Noise	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Noise"			
+/Time-Locked Event/Stimulus/Auditory/Noise/White	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Noise/White"			
+/Time-Locked Event/Stimulus/Auditory/Noise/Colored	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Noise/Colored"			
+/Time-Locked Event/Stimulus/Auditory/Syllable	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory, /Attribute/Language/Unit/Syllable"			
+/Time-Locked Event/Stimulus/Auditory/Tone/*	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Tone/*"			
+/Time-Locked Event/Stimulus/Auditory/Nonverbal Vocal Sound	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nonverbal Vocal"			
+/Time-Locked Event/Stimulus/Auditory/Nonvocal Sound	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Nonvocal"			
+/Time-Locked Event/Stimulus/Auditory/Language/*	"/Participant/Effect/Auditory, Attribute/Language/*"			
+/Time-Locked Event/Stimulus/Auditory/Animal Voice	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Animal Voice"			
+/Time-Locked Event/Stimulus/Auditory/Real world sounds	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Real world sounds"			
+/Time-Locked Event/Stimulus/Auditory/Emotional sounds	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory/Emotional sounds"			
+/Time-Locked Event/Stimulus/Auditory/File/*	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory, Attribute/File/*"			
+/Time-Locked Event/Stimulus/Auditory/Direction/*	"/Participant/Effect/Auditory, /Sensory Presentation/Auditory, Attribute/Location/Reference Frame/Relative to participant position/*"							

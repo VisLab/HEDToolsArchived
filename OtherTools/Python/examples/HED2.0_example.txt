@@ -1,0 +1,933 @@
+﻿Hey
+this
+is
+a
+test
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+!# start hed
+
+Event 
+* Category [this is meant to designate the reason this event was recorded]
+   * Initial context [the purpose is to set the starting context for the experiment --- and if there is no initial context event---this information would be stored as a dataset tag]
+   * Participant response [the purpose of this event was to record the state or response of a participant. Note: participant actions may occur in other kinds of events, such as the experimenter  records a terrain change as an event and the participant happens to be walking. In this case the event category would be ‘Environmental’. In contrast, if the participant started walking in response to an instruction or to some other stimulus, the event would be recorded as ‘Participant response’]
+   * Technical error [experimenters forgot to turn on something, the cord snagged, etc. and something may be wrong with the data]
+      * [Description as string]
+   * Participant failure [situation in which participant acts outside of the constraints of the experiment -- such as driving outside the boundary of a simulation experiment or using equipment incorrectly]
+      * [Description as string]
+   * Environmental [change in experimental context, e.g walking on dirt versus sidewalk]
+      * [Description as a string]
+   * Experimental stimulus
+      * Instruction
+         * Attend        
+         * Fixate        
+         * Recall
+         * Generate        
+         * Repeat
+         * Breath-Hold
+         * Imagine
+         * Rest
+         * Count
+         * Move
+            * Natural/constrained
+            * Walk
+            * Breathe
+            * Move upper torso
+            * Move lower torso
+            * Move whole body
+         * Speak
+         * Sing
+         * Detect
+         * Name
+         * Smile
+         * Discriminate
+         * Read
+         * Track
+         * Encode
+         * Eye-blink inhibition
+   * Experimental procedure [like doing a saliva swab on the person]
+   * Incidental [not a part of the task as perceived by/instructed to the participant, e.g. an airplane flew by and made noise, a random person showed up on the street]
+   * Miscellaneous [events that are only have informational value and cannot be put in other event categories]
+   * Experiment control [information about states and events of the software program that controls the experiment]
+      * Sequence
+         * Permutation ID
+            * # [permutation number/code used for permuted experiment parts]
+         * Experiment begins
+         * Experiment ends
+         * Block[each block has the same general context and contains several trials, use Attribute/Onset and Attribute/Offset to specify start and end]
+            * # [block number]
+         * Trial [use Attribute/Onset and Attribute/Offset to specify start and end
+            * # [trial number]
+         * Pause [use Attribute/Onset and Attribute/Offset to specify start and end]
+      * Task 
+         * #[Label here]
+      * Activity [experiment-specific actions, such as moving a piece in a chess game]
+         * Participant action [e.g moving a chess piece]
+            * Correct
+            * Time out
+               * Missed [they failed to have, or could not have, perceived the question due to their eyes being off-screen or a similar reason. Not easy to deduce this but it is possible] 
+            * Incorrect [wrong choice but not time out]
+            * Inappropriate [a choice that is not allowed or not being presented was selected, e.g. selected C while the choices where A and B, or moved the chess piece to a location it should not go based on game rules]
+      * Synchronization
+         * Display refresh
+         * Trigger
+         * Tag
+            * [actual tag: string or integer]
+      * Status
+         * Waiting for input
+         * Loading
+         * Error
+      * Setup
+         * Parameters
+            * (experiment parameters in some (quoted) string)
+
+
+* Sequence group ID  [a number that uniquely identifies a group of events associated with each other, e.g. answer to a question, possibly interleaved by other events.]
+   * Label
+* Duration [an offset is implicit after duration time passed from the onset
+* Description {required, transient}[same as HED 1.0 description for human-readable text]
+* Label {required, transient} [a short, e.g. less than 20 characters, label for the event. For example /Label/Accept Button. Please note that the information under this tag is primarily not for use in the analysis and is provided for the convenience in referring to events in the context of a single study. Please use Custom tag to define custom event hierarchies] 
+* Long name {recommended, transient} [A long name for the event which could be over 100 characters and could contain characters like vertical bars as separators. Long names are used for cases when one wants to encode a lot of information in a single string such as  ‘Scenario | VehiclePassing | TravelLaneBLocked | Onset’].
+
+
+Item
+* ID [optional] 
+   * Local [for IDs with localscore i.e. only defined in the scope of a single event (e.g. local ID 5 in events 1 and 2 may refer to two different objects, while global IDs, directly under ID/ tag refer to the same object through the whole experiment]
+* Group ID [optional]
+* Object
+   * Vehicle
+      * Bike
+      * Car
+      * Truck
+      * Aircraft
+   * Person
+      * Pedestrian
+      * Mother-child
+   * Animal
+   * Plant
+      * Tree
+   * Building
+   * Food
+   * Road sign
+   * Barrel
+   * Cone
+   * Speedometer
+   * Construction zone
+* 3D shape
+   * Sphere
+   * Box
+      * Cube
+* 2D shape [geometric shapes]
+   * Ellipse
+      * Circle
+   * Rectangle
+      * Square
+   * Star
+   * Triangle
+   * Gabor patch
+   * Cross [by default a vertical-horizontal cross, for rotated add /rotated/ tag]
+   * Single point
+   * Clock face [used to study things like hemispheric neglect, related to ‘Clock drawing test’]
+      * #  [hour:min]
+* Pattern
+   * Checkerboard
+   * Abstract
+   * Fractal
+   * LED
+   * Random dot
+   * Complex
+* Face
+   * Whole face with hair
+   * Whole face without hair
+   * Cut-out
+   * Parts only
+      * Nose
+      * Lips
+      * Chin
+      * Eyes
+         * Left only
+         * Right only
+* Symbolic [something that has a meaning, could be linguistic or not, a writing, stop signs, etc..]
+   * Braille Character
+   * Sign [like the icon on a stop sign, not to be confused with the actual object e.g. a stop sign itself] 
+      * Traffic
+         * Speed limit
+            * # [always give units e.g. mph or kph]
+   * Character 
+      * Digit
+      * Pseudo-character [alphabet-like but not really]
+      * Letter [Authograph, valid letters including numbers, e.g. A, B, 5...,]
+   * Composite [has multiple of the above on it, may need reconsideration] 
+* Natural scene
+   * Arial
+      * Satellite
+* Drawing [e.g. cartoons]
+   * Line Drawing
+* IAPS [International Affective Picture System]  
+* IADS [International Affective Digital Sounds]
+* SAM [The Self-Assessment Manikin]
+
+
+
+
+Sensory presentation [object manifestation]
+* Auditory [sound] 
+   * Nameable
+   * Cash register 
+   * Ding
+   * Fire alarm
+   * Click
+      * ABR [Auditory Brainstem Response]
+   * Tone
+   * Siren
+   * Music
+      * Chord sequence
+      * Vocal
+      * Instrumental
+   * Noise
+      * White
+      * Colored [not white, 1/f, spectrum]
+   * Human voice
+   * Animal voice
+   * Real world [people, machines, etc..]
+   * Nonverbal vocal
+      * Emotional
+         * Crying
+         * Sighing
+      * Gulp
+      * Gurgle
+      * Sneeze
+      * Cough
+      * Yawn
+* Olfactory [odor]
+* Tactile [pressure]
+* Visual 
+   * Rendering type
+      * Screen
+         * View port [e.g. two views on the same object, one from top one from street view]
+            * ID
+               * Label
+         * 2D
+         * 3D
+         * Movie
+            * Film clip 
+               * Commercial TV
+               * Animation
+            * Video-tape
+               * Social
+            * Motion-capture [e.g. stick figure of motion capture of someone else]
+            * Flickering
+            * Steady state
+      * Real-world
+      * LED [stimulus is turning on/off a one or a few LEDs]
+
+
+Attribute [default]
+* Object side [could be a person’s left and right sides, or a car’s passenger side]
+   * Reference object ID [place object ID after this]
+   * Right
+   * Left
+   * Front
+   * Back
+   * Top
+   * Bottom
+   * Starboard
+   * Port
+   * Passenger side [side of a car]
+   * Driver side [side of a car]
+   * Bow [front of a ship]
+   * Stern [back of the ship]
+* Onset [default]
+* Offset
+* State ID [this is used to identify a group of events that are changing the state of a varable, the onset of each means the offset of any other and a change in the state]
+   * [ID, could be a number or any string]
+* Repetition [when the same events, e.g. fixation on the exact same object, happnes multiple times it might be necessary to distinguish first look vs. others]
+   * # [number, starting from 1= first time it occurs, 2 = second time,...]
+* Direction [coordinate system is inferred from /Location, To specify a vector combine subnodes with number, e.g. Direction/Top/10, Direction/Left/5 to create a (10,5) vector]
+   * Top [ you can combine Top+Left to get UpperLeft and so on]
+   * Bottom
+   * Left
+   * Right 
+   * Angle [clockwise angle in degrees, from vertical]
+   * North
+   * South
+   * East
+   * West
+   * Forward [ like a car moving forward]
+   * Backward [like a car moving backward]
+* Velocity [a scalar, the amplitude]
+* Location
+   * Screen [specify displacements from each subnode in pixels, degrees  or meters. Specify a unit, e.g. Location/Screen/Top/12 px]
+      * Center
+      * Top [ you can combine Top+Left to get UpperLeft and so on]
+      * Bottom
+      * Left
+      * Right 
+      * Angle [clockwise angle in degrees, from vertical]
+      * Center Displacement
+         * #  [displacement from screen center, in any direction, in degrees]
+         * Horizontal
+            * #  [displacement from screen center, in any direction]
+         * Vertical
+            * #  [displacement from screen center, in any direction]
+   * Lane [e.g. car lane]
+      * Rightmost
+      * Leftmost
+      * Right of expected
+      * Left of expected
+      * Cruising 
+      * Passing [the lane that cars use to take over other cars]
+      * Oncoming
+   * Real-world coordinates
+      * Room
+         * xyz [have a subnode, e.g. /Room/xyz/10 50 30]
+   * Reference frame
+      * Specified absolute reference
+      * Relative to participant
+         * Participant ID
+            * #
+         * Left
+         * Front
+         * Right
+         * Back
+         * Azimuth
+            * # [preferably in degrees, clockwise]
+         * Elevation
+            * # [preferably in degrees]
+* Size 
+   * Degrees
+      * # [in degrees, e.g 5 deg] 
+   * Meters
+      * # [in meters, e.g. 5 meters] 
+* Object orientation
+   * Rotated
+      * Degrees
+         * # [in degrees, e.g 5 deg] 
+* Item count [number of items, e.g. 3 when there are 3 cars and they are identified as a single item]
+   * # [number of item equal to #]
+   * <=# [number of item less than or equal to #]
+   * >=# [number of item  more than or equal to #]
+* Auditory
+   * Frequency
+      * # in HZ
+   * Loudness
+      * # [in dB]
+   * Ramp up [increasing in amplitude]
+   * Ramp down [decreasing in amplitude]
+   * Nonvocal [ a car engine, gears grinding, everything that is not made by a human or an animal]
+* Visual
+   * Bistable
+   * Background
+   * Foreground
+   * Up-down Separated [stimuli presented both at the top and the bottom of fovea]
+      * #  [separation in degrees]
+   * Bilateral [for bilateral visual field stimulus presentations]
+      * # [separation in degrees]
+   * Motion
+      * Down   [e.g. /2 deg]
+      * Up
+      * Horizontal
+         * Right  [e.g. /3 deg]
+      * Oblique
+         * Clock Face
+            * #  (e.g.,  4:30)
+   * Fixation point
+   * Luminance 
+      * # [in candela, e.g 25 cd]
+   * Color
+      * Aqua [these are CSS 3 basic color names, available in Appendix 1]
+      * Black
+      * Blue
+      * Fuchsia 
+      * Gray
+      * Green 
+      * Lime 
+      * Maroon
+      * Navy
+      * Olive 
+      * Purple 
+      * Red 
+      * Silver 
+      * Teal 
+      * White 
+      * Yellow
+      * Red
+         * # [R value of RGB, between 0 and 1]
+      * Blue
+         * # [B value of RGB, between 0 and 1]
+      * Green
+         * # [G value of RGB, between 0 and 1]
+      * Hue
+         * # [H value of HSV, between 0 and 1]
+      * Saturation
+         * # [S value of HSV, between 0 and 1]
+      * Value
+         * # [V value of HSV, between 0 and 1]
+      * Achromatic [gray, is only in black, white or between]
+         * # [white intensity between 0 and 1]
+* Language
+   * Unit
+      * Phoneme
+      * Syllable
+      * Word
+         * Noun
+            * Proper [a proper noun,  refers to a unique entity, such as London, Jupiter, ...]
+            * Common [refers to a class of entities (cities, planets, persons, corporations), or non-unique instances of a certain class (a city, another planet, these persons, our corporation)].
+         * Verb
+         * Adjective
+         * Pseudoword
+         * # [number of words]
+      * Sentence
+         * Full
+         * Partial
+         * # [number of sentences]
+         * Paragraph
+            * # [number of paragraphs]
+            * Story
+   * Family
+      * Asian
+         * Chinese
+         * Japanese
+      * Latin
+         * English
+         * German
+         * French
+* Emotional
+   * Induced
+   * Arousal [only in the context of 2D emotion representation]
+      * # [between -1 and 1]
+   * Positive valence [since Valence by itself can be the name of an emotion, e.g. sadness is a type of valence, we place here two, positive valence and negative valence to make the language more clear]
+      * # [from 0 to 1]
+   * Negative valence
+      * # [from 0 to 1]
+* Priming
+   * Semantic
+   * Motoric
+   * Emotional
+   * Perceptual
+* Subliminal
+   * Unmasked
+   * Masked
+      * Forward
+      * Backward
+* Supraliminal [by default this is what assumed about each stimulus]
+* Liminal [at the 75%/25% perception threshold]
+* Probability [e.g. for oddball]
+* Path
+   * Onset velocity
+   * Peak velocity
+   * Offset velocity
+   * Onset acceleration
+   * Peak acceleration
+   * Offset acceleration
+   * Onset jerk
+   * Peak jerk
+   * Offset jerk
+* File [file name, size and other attributes]
+* Object control [ such as vehicle control]
+   * Perturb
+   * Collide
+   * Near miss [almost having an accident resulting in negative consequences]
+   * Correct position [e.g. after a lane deviation or side of the walkway]
+   * Halt [the time when speed  becomes exactly zero speed = 0]
+   * Brake
+   * Shift lane
+   * Cross [like crossing in front of another object, e.g., a vehicle]
+   * Pass by [passing by another object or the participant]
+
+
+Action [ may or may not be associated with a prior stimulus, can be extended]
+* Type
+   * Involuntary [like sneezing, tripping on something, hiccuping…]
+      * Hiccup
+      * Cough
+      * Sneeze
+      * Stumble [temporary and involuntary loss of balance]
+      * Fall
+      * Tether Jerk [when a tether attached to the subject is stuck/snagged and forces the participant to involuntary accommodate/react to it]
+   * Button press
+      * Touch screen
+      * Keyboard
+      * Mouse
+      * Joystick
+   * Button hold [press and keep pressed]
+   * Speech
+   * Eye saccade 
+      * Onset
+      * Middle [max velocity point]
+      * Offset
+   * Eye fixation
+   * Eye blink
+   * Eye close [and keep closed for > ~0.1 s]
+   * Eye open [and keep open for > ~0.1 s]
+   * Turn [change in direction of movement]
+   * Point
+   * Push
+   * Tap [when there is nothing to be pressed, like tapping a finger on a chair surface to follow a rhythm]
+   * Lift
+   * Reach [requires a goal, e.g. reach to touch a button or grab something. stretching your body does not count as reach]
+      * To Grab
+      * To Touch
+   * Course correction [e.g. change the direction of a reach in the middle to adjust for a moving target]
+   * Grab
+   * Stretch [body, e.g. when you wake up]
+   * Switch attention 
+      * Intramodal [in the same modality, but for example pay attention to read dots and not blue dots]
+         * Visual
+         * Auditory
+         * Tactile
+         * Taste 
+         * Smell
+      * Intermodal [between modalities]
+         * From modality
+            * Visual
+            * Auditory
+            * Tactile
+            * Taste 
+            * Smell
+         * To modality
+            * Visual
+            * Auditory
+            * Tactile
+            * Taste 
+            * Smell
+   * Walk
+      * Start stride
+         * Toe off
+         * Heel off
+      * Peak stride
+      * End stride
+         * Toe on
+         * Heel on
+   * Control vehicle [controlling an object that you are aboard] 
+      * Drive [driving a vehicle, e.g. car]
+         * Correct [e.g. correct for a perturbation]
+         * Near miss
+         * Collide
+      * Stop [e..g brake a car]
+      * Pilot [e.g. an airplane]
+   * Teleoperate [controlling an object that you are not aboard]
+
+
+
+
+
+
+Participant
+* ID [if not given assume 1]
+* Role (The role of the participant associated with the event, e.g. viewer, follower, leader, is placed at a lower level, e.g. Participant/Role/Leader)
+* Effect (stimulus effects the participants, e.g. perceived by her)
+   * Cognitive
+      * Meaningful
+      * Not meaningful
+      * Newly learned meaning
+      * Reward
+         * Low
+         * Medium
+         * High
+         * # [monetary values in some currency, for example $1, or the ratio of the reward to the maximum possible (3 of max 10 becomes 0.3), or x Points]
+      * Penalty
+         * Low
+         * Medium
+         * High
+         * # [absolute monetary values in some currency, for example $1, or the ratio of the reward to the maximum possible (3 of max 10 becomes 0.3), or x Points]
+      * Error
+         * Self originated
+         * Other originated
+            * Human
+            * Non-human
+         * Expected
+         * Unexpected  
+         * Planned [the error feedback was given regardless of the validity of subject response, e.g in a yoked design] 
+      * Threat
+         * To self
+         * To others
+            * Close
+      * Warning [e.g. ‘warning: you are getting too close to the shoulder’ in a driving task]
+      * Oddball [Unexpected or infrequent]
+         * One Stimulus [see http://dx.doi.org/10.1016/0167-8760(96)00030-X, only oddballs present but no frequenct estimuli exist]
+         * Two Stimuli [see http://dx.doi.org/10.1016/0167-8760(96)00030-X, in a Two Stimuli, there are non-targets and, targets]
+         * Three Stimuli [see http://dx.doi.org/10.1016/0167-8760(96)00030-X]
+            * Target [in a Three Stimuli, there are regular non-targets, targets and infrequent non-targets]
+         * With silent counting
+         * Button pressing for target
+         * Button pressing for all
+      * Target [something the subject is looking for]
+      * Novel [Genuine once or so per experiment event]
+      * Expected  [of low information value]
+         * Standard
+         * Distractor
+         * Non-Target
+      * Feedback
+         * Correct [confirm, something went well, last action was correct]
+         * Incorrect 
+         * Expected [feedback was expected, for example they were often correct and they are again correct]
+         * Unexpected [feedback was expected, for example they were often correct and they are again correct]
+         * On accuracy [feedback was provided by evaluating their accuracy]
+         * On reaction Time [feedback was provided by evaluating their reaction time]
+         * To self [default]
+         * To Other [observed feedback to another person, typically in a social paradigm]
+         * Deterministic [should have a fixed relationship to what happened before]
+         * Stochastic [non-deterministic, it does not have fixed relationship with what has happened before in the experiment]
+         * False feedback [feedback that was not honest, e.g. feedback of correct on an incorrect response or vice versa]
+            * Negative [negative feedback was provided when it was not deserved]
+            * Positive [positive feedback was provided when it was not deserved]
+   * Visual
+      * Foveal
+      * Peripheral        
+      * Perturbation [e.g. sudden movement/perturbation of the virtual environment in a car driving scenario]
+   * Auditory
+      * Stereo
+      * Mono
+         * Left
+         * Right
+   * TMS
+      * With SPGS  [SPGS = spatial position guiding system]
+      * Without SPGS [SPGS = spatial position guiding system]
+   * Tactile
+      * Vibration
+      * Acupuncture
+      * Eye puff
+   * Pain
+      * Heat
+      * Cold
+      * Pressure
+      * Electric shock
+      * Laser-evoked
+   * Taste
+   * Smell
+   * Body part
+      * Eye
+      * Arm
+         * Hand
+            * Finger
+               * Index
+               * Thumb
+               * Ring
+               * Middle
+               * Small[Pinkie, Little finger]
+      * Leg
+         * Feet
+            * Toes
+      * Head
+         * Face
+            * Eyebrow
+            * Lip
+            * Forehead
+            * Mouth
+            * Nose
+            * Chin
+            * Cheek
+      * Torso
+* State
+   * Level of consciousness 
+      * Awake
+      * Sleep
+      * Drunk
+      * Anesthesia
+      * Locked-in
+      * Coma
+      * Vegetative
+      * Brain-death
+   * Emotion
+      * Awe
+      * Frustration
+      * Joy
+      * Anger
+      * Happiness
+      * Sadness
+      * Love
+      * Fear
+      * Compassion
+      * Jealousy
+      * Contentment
+      * Grief
+      * Relief
+      * Excitement
+      * Disgust
+   * Sense of Community [primed to have e.g. patriotism]
+      * SCI [Sense of Community Index]
+   * Sense of social justice
+   * Stress level
+      * # (a number between 0 and 1)
+   * Task Lload
+      * # (a number between 0 and 1)
+   * Under time pressure
+      * Response Window
+      * Competitive [subject is competing against an opponent, for example when the faster respondent wins]
+   * Social interaction [social]
+      * pseudo [instructed so but actually not, the other person may not exist in real world, e.g. be a computer program agent]
+   * Passive [There is a stimulus presentation but no behavioral measurements are  collected (asked from the subject). The instruction is “Do not make any behavioral outputs”, for example carefully watch/listen/sense. Resting state is not considered Passive]
+   * Resting [Resting State, no stimulus presentation and no behavioral outputs]
+   * Attention
+      * Top-down [instructed to pay attention to something exlicitly]
+      * Bottom-up [automatic, something captures your attention, like a big bang or your name]
+         * Orienting [the lower state of the bottom-up, pre-bottom up state]
+      * Covert [Implicit]
+      * Overt [Explicit]
+      * Selective [if you have two circles but asked to pay attention to only one of them]
+         * Divided [attending to more than one objects/locations...]
+      * Focused [paying a lot of attention]
+      * Sustained [paying attention for a continuous time]
+      * Auditory
+      * Visual
+      * Tactile
+      * Taste
+      * Smell
+      * To a Location [Spatial, add the location attribute to specify to where]
+   * Arousal
+      * Alerting [keeping the arousal up in order to respond quickly]
+      * Drowsy
+      * Excited
+
+
+Custom                                                                                                                                    [This node can be used to organize events in an alternative (parallel) hierarchy: you can define your custom tags and hierarchies without any restriction under this node. These tags will still be matched to each other, for example /Custom/Dance/Waltz is considered a subtype of /Custom/Dance.                                                                                                                Example: /Initial Score/# [monetary values in some currency, for example $1, or the ratio of the reward to the maximum possible (3 of max 10 becomes 0.3), or x Points]
+
+
+Experiment Context [describes the context of the whole experiment or large portions of it, also includes tags that are common across all events, in the whole or large portions]
+* [add common tags across all stimuli/ and/or responses here, e.g if all experimental events share /State/Drowsy, you can place it here instead of tagging each event individually ]
+* With chin rest
+* Sitting
+* Standing
+* Prone  [e.g. on a bed]
+* Running
+   * Treadmill
+      * # Speed (meters per second)
+* Walking
+   * Treadmill
+      * # Speed (meters per second)
+* Indoors [default]
+   * Clinic [recording in a clinical setting, e.g. in a hospital or doctor’s office]
+   * Dim Room
+* Outdoors
+* Motion platform [subject is on a motion platform, e.g. simulated car movements]
+* Fixed screen
+   * Distance [assuming static subject]
+      * # [distance in meters from subject eyes to the presentation screen , e.g. 0.3 for 30 cm from subject eyes to the monitor]
+   * Width resolution [in pixels]
+   * Height resolution [in pixel]
+   * Width [in meters]
+   * Height [in meters]
+* Real world
+* Virtual world
+* [extend here]
+
+
+HED [Hierarchical Event Descriptor]
+* # [HED specification version number: normally there is no need to specify the version number in the HED string since it will be matched by default to the most recent compliant version, but this tag can be used to specify the exact HED version the HED string was based on.]
+
+
+Paradigm
+* Action imitation task
+* Action observation paradigm
+* Action observation task
+* Acupuncture task
+* Adult attachment interview
+* Alternating runs paradigm
+* Animal naming task
+* Antisaccade-prosaccade task
+* Attention networks test
+* Attentional blink task
+* Audio-visual target-detection task
+* Autism diagnostic observation schedule
+* Ax-cpt task  
+* Backward digit span task
+* Backward masking
+* Balloon analogue risk task (BART)
+* Behavioral investment allocation strategy (BIAS)
+* Behavioral rating inventory of executive function
+* Benton facial recognition test
+* Birmingham object recognition battery
+* Block design test
+* Block tapping test
+* Boston naming test
+* Braille reading task
+* Breath-holding
+* Breathhold paradigm
+* Brixton spatial anticipation test
+* California verbal learning test
+* California verbal learning test-ii
+* Cambridge face memory test
+* Cambridge gambling task
+* Cambridge neuropsychological test automated battery
+* Catbat task
+* Category fluency test
+* Cattell culture fair intelligence test
+* Chewing-swallowing
+* Chimeric animal stroop task
+* Choice reaction time task
+* Choice task between risky and non-risky options
+* Classical conditioning
+* Clinical evaluation of language fundamentals-3
+* Color trails test
+* Color-discrimination task
+* Color-word stroop task
+* Complex span test
+* Conditional stop signal task
+* Conditioning paradigm
+   * Behavioral conditioning paradigm
+   * Classical conditioning paradigm
+* Continuous performance task
+* Continuous recognition paradigm
+* Counting stroop task
+* Counting-calculation
+* Cued explicit recognition
+* Cups task
+* Deception task
+* Deductive reasoning paradigm
+* Deductive reasoning task
+* Delayed discounting task
+* Delayed match to sample task
+* Delayed nonmatch to sample task
+* Delayed recall test
+* Delayed response task
+   * Delayed matching to sample paradigm
+      * Sternberg paradigm
+* Devils task
+* Dichotic listening task
+* Digit cancellation task
+* Digit span task
+* Digit-symbol coding test
+* Directed forgetting task
+* Divided auditory attention
+* Divided auditory attention paradigm
+* Doors and people test
+* Dot pattern expectancy task
+* Drawing (Cognitive Atlas Term)
+* Drawing paradigm
+* Dual-task paradigm
+* Early social communications scales
+* Eating paradigm
+* Eating-drinking
+* Embedded figures test
+* Emotional regulation task
+* Encoding paradigm
+* Encoding task
+* Episodic recall
+* Episodic recall paradigm
+* Eriksen flanker task
+* Extradimensional shift task
+* Eye Saccade paradigm
+   * Anti saccade paradigm
+   * Simple saccade paradigm
+* Face monitor-discrimination
+* Face n-back task
+* Fagerstrom test for nicotine dependence (Cognitive Atlas Term)
+* Film viewing
+* Finger tapping task
+* Fixation task
+* Flashing checkerboard
+* Flexion-extension
+* Forward digit span task
+* Free word list recall
+* Glasgow coma scale
+* Go-no-go task
+* Grasping task
+* Gray oral reading test - 4
+* Haptic illusion task
+* Hayling sentence completion test
+* Heat sensitization-adaptation
+* Heat stimulation
+* Hooper visual organization test
+* Imagined movement
+* Imagined objects-scenes
+* Immediate recall test
+* Inductive reasoning aptitude
+* International affective picture system
+* Intradimensional shift task
+* Ishihara plates for color blindness
+* Isometric force
+* Item recognition paradigm
+   * Serial item recognition paradigm
+* Item recognition task
+* Kanizsa figures
+* Keep-track task
+* Letter comparison
+* Letter fluency test
+* Letter n-back task
+* Letter naming task
+* Letter number sequencing
+* Lexical decision task
+* Listening span task
+* Macauthur communicative development inventory
+* Matching familiar figures test
+* Matching pennies game
+* Maudsley obsessive compulsive inventory
+* Mechanical stimulation
+* Memory span test
+* Mental rotation task
+* Micturition task
+* Mini mental state examination (Cognitive Atlas Term)
+* Mirror tracing test
+* Mismatch negativity paradigm
+* Mixed gambles task
+* Modified erikson scale of communication attitudes
+* Morris water maze
+* Motor sequencing task
+* Music comprehension-production
+* N-back task
+* Naming (Covert)
+* Naming (Overt)
+* Nine-hole peg test
+* Non-choice task to study expected value and uncertainty
+* Non-painful electrical stimulation
+* Non-painful thermal stimulation
+* Nonword repetition task
+* Object alternation task
+* Object-discrimination task
+* Oculomotor delayed response
+* Oddball discrimination paradigm
+   * Auditory oddball paradigm
+   * Visual oddball paradigm
+      * Rapid Serial Visual Presentation
+* Oddball task
+* Olfactory monitor-discrimination
+* Operation span task
+* Orthographic discrimination
+* Paced auditory serial addition test
+* Pain monitor-discrimination task
+* Paired associate learning
+* Paired associate recall
+* Pantomime task
+* Parrott scale
+* Passive listening
+* Passive viewing
+* Pattern comparison
+* Phonological discrimination
+* Picture naming task
+* Picture set test
+* Picture-word stroop task
+* Pitch monitor-discrimination
+* Pointing
+* Porteus maze test
+* Positive and negative affect scale
+* Posner cueing task
+* Probabilistic classification task
+* Probabilistic gambling task
+* Probabilistic reversal learning
+* Pseudoword naming task
+* Pursuit rotor task
+* Pyramids and palm trees task
+* Rapid automatized naming test
+* Rapid serial object transformation
+* Reading (Covert)
+* Reading (Overt)
+* Reading paradigm
+   * Covert braille reading paradigm
+   * Covert visual reading paradigm
+* Reading span task
+* Recitation-repetition (Covert)
+* Recitation-repetition (Overt)
+* Remember-know task
+* Response mapping task
+* Rest
+* Retrieval-induced forgetting task
+* Reversal learning task
+* Reward task
+* Rey auditory verbal learning task
+* Rey-ostereith complex figure test
+* Reynell developmental language scales
+* Rhyme verification task
+* Risky gains task
+* Rivermead behavioural memory test
+* [extend here]
