@@ -1,2 +1,0 @@
-Event	Tags1
-1111	(Item/Object/Vehicle/Car ~ Attribute/Object control/Perturb ~ Attribute/Direction/Left)
