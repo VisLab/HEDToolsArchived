@@ -131,4 +131,4 @@ end
         fclose(fileId);
     end % writeWarningFile
 
-end % validatehed
+end % validateHED

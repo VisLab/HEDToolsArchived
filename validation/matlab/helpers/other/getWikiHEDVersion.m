@@ -1,13 +1,13 @@
-function wikiVersion = findWikiHEDVersion(hedWiki)
+function version = getWikiHEDVersion(hedWiki)
 p = parseArguments();
-wikiVersion = '';
+version = '';
 try
     fileId = fopen(p.hedWiki);
     wikiLine = fgetl(fileId);
     while ischar(wikiLine)
         if strfind(wikiLine, 'HED version:')
              numericIndexes = ismember(wikiLine, '0123456789.');
-             wikiVersion = wikiLine(numericIndexes);
+             version = wikiLine(numericIndexes);
             break;
         end
         wikiLine = fgetl(fileId);
@@ -29,5 +29,5 @@ end
         p = p.Results;
     end % parseArguments
 
-end % findWikiHEDVersion
+end % getWikiHEDVersion
 

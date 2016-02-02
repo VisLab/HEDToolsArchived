@@ -444,8 +444,14 @@ classdef vTagList < hgsetget
                 tstring = strtrim(telement{1});
                 telementLength = length(telement);
                 for k = 2:telementLength
-                    tstring = [tstring ',' ...
-                        strtrim(telement{k})]; %#ok<AGROW>
+                    if strcmp('~', telement{k-1}) || ...
+                            strcmp('~', telement{k})
+                        tstring = [tstring ' ' ...
+                            strtrim(telement{k})]; %#ok<AGROW>
+                    else
+                        tstring = [tstring ', ' ...
+                            strtrim(telement{k})]; %#ok<AGROW>
+                    end
                 end
             else
                 errormsg = 'element is not string or cellstr';

@@ -1,6 +1,6 @@
 function checkForUpdatesLayout(tab)
 versionCtrl = '';
-currentVersion = findXMLHEDVersion('HED.xml');
+currentVersion = getXMLHEDVersion('HED.xml');
 createPanel(tab);
 
     function createButtons(panel)
@@ -53,11 +53,11 @@ createPanel(tab);
     end % createPanel
 
     function updateCallback(src, evnt) %#ok<INUSD>
-        wikiVersion = downloadLatestHED();
-        if ~strcmp(currentVersion, wikiVersion)
-            [okay, success] = createUpdateAvailableLayout(wikiVersion);
+        latestVersion = downloadHED();
+        if ~strcmp(currentVersion, latestVersion)
+            [okay, success] = createUpdateAvailableLayout(latestVersion);
             if okay && success
-                currentVersion = wikiVersion;
+                currentVersion = latestVersion;
                 set(versionCtrl, 'String', ...
                     ['Current HED version: ' currentVersion]);
             end

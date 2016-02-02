@@ -71,17 +71,17 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions] = validateStructTags(eeg, varargin)
+function [errors, warnings, extensions, remap] = ...
+    validateStructTags(eeg, varargin)
 p = parseArguments();
-latestVersion = '2.027';
-version = findHEDVersion(p.hedXML);
-if ~isempty(version) && ~strcmp(version, latestVersion);
+hedMaps = loadHEDMap();
+mapVersion = hedMaps.version;
+xmlVersion = getXMLHEDVersion(p.hedXML);
+if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
-else
-    hedMaps = loadHEDMap();
 end
-[errors, warnings, extensions] = parseStructTags(hedMaps, p.eeg.event, ...
-    p.tagField, p.extensionAllowed);
+[errors, warnings, extensions, remap] = ...
+    parseStructTags(hedMaps, p.eeg.event, p.tagField, p.extensionAllowed);
 if p.writeOutput
     writeOutputFiles();
 end
@@ -101,8 +101,10 @@ end
             @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
         p.addParamValue('tagField', 'usertags', ...
             @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
-        p.addParamValue('hedXML', 'HED2.027.xml', ...
+        p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
+        p.addParamValue('remapFile', '', @(x) (~isempty(x) && ...
+            ischar(x))); %#ok<NVREPL>
         p.addParamValue('outputDirectory', pwd, ...
             @(x) ischar(x) && 7 == exist(x, 'dir')); %#ok<NVREPL>
         p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>
@@ -132,6 +134,63 @@ end
         fclose(fileId);
     end % writeExtensionFile
 
+    function writeMapFile(dir, file, ext)
+        % Writes the extensions to a file
+        if isempty(p.remapFile)
+            fileId = writeToNewMapFile(dir, file, ext);
+        else
+            fileId = writeToExistingMapFile(dir, ext);
+        end
+        fclose(fileId);
+    end % writeMapFile
+
+    function fileId = writeToNewMapFile(dir, file, ext)
+        % Writes to a new map file
+        numMapTags = size(remap, 1);
+        remapFile = fullfile(dir, [file '_remap' ext]);
+        fileId = fopen(remapFile,'w');
+        for a = 1:numMapTags
+            fprintf(fileId, '%s\n', remap{a});
+        end
+    end % writeToNewMapFile
+
+    function fileId = writeToExistingMapFile(dir, ext)
+        % Writes to an existing map file
+        numMapTags = size(remap, 1);
+        [mapFileDir, file]  = fileparts(p.remapFile);
+        remapFile = fullfile(dir, [file ext]);
+        mapTagMap = putMapFileInHash(remapFile);
+        if ~strcmp(dir, mapFileDir)
+            copyfile(p.remapFile, remapFile);
+        end
+        fileId = fopen(remapFile,'a');
+        for a = 1:numMapTags
+            if ~mapTagMap.isKey(lower(remap{a}))
+                fprintf(fileId, '\n%s', remap{a});
+            end
+        end
+    end % writeToExistingMapFile
+
+    function mapTagMap = putMapFileInHash(remapFile)
+        % Put map file tags in a hash map
+        mapTagMap = ...
+            containers.Map('KeyType', 'char', 'ValueType', 'any');
+        lineNumber = 1;
+        try
+            fileId = fopen(remapFile);
+            tsvLine = fgetl(fileId);
+            while ischar(tsvLine)
+                mapTagMap(lower(tsvLine)) = tsvLine;
+                lineNumber = lineNumber + 1;
+                tsvLine = fgetl(fileId);
+            end
+            fclose(fileId);
+        catch ME
+            fclose(fileId);
+            throw(MException('ValidateTags:cannotParse', ...
+                'Unable to parse TSV file on line %d', lineNumber));
+        end
+    end % putMapTagsInHash
 
     function writeOutputFiles()
         % Writes the errors, warnings, extension allowed warnings to
@@ -142,6 +201,7 @@ end
         writeErrorFile(dir, file, ext);
         writeWarningFile(dir, file, ext);
         writeExtensionFile(dir, file, ext);
+        writeMapFile(dir, file, ext);
     end % writeOutputFiles
 
     function writeWarningFile(dir, file, ext)

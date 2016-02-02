@@ -106,7 +106,7 @@ uiwait(fig);
     function okCallback(src, evnt) %#ok<INUSD>
         wb = waitbar(.5,'Updating...');
         try         
-            updateLatestHED();
+            replaceHED();
             close(wb);
             success = true;
             msgbox('Update complete', 'Success','modal');

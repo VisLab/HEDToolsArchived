@@ -223,9 +223,9 @@ createPanel(tab);
             try
                 remapTSVTags(mapFile, tsvFile, tsvTagColumns, ...
                     'OutputFile', outputFile);
-                msgbox('Tag update complete');
+                msgbox('Remap complete');
             catch
-                errordlg('Tag update failed');
+                errordlg('Remap failed');
             end
             close(wb);
         end

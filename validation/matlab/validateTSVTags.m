@@ -107,7 +107,7 @@ function [errors, warnings, extensions, remap] = ...
 p = parseArguments();
 hedMaps = loadHEDMap();
 mapVersion = hedMaps.version;
-xmlVersion = findXMLHEDVersion(p.hedXML);
+xmlVersion = getXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
@@ -136,7 +136,8 @@ end
         p.addParamValue('extensionAllowed', true, ...
             @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
         p.addParamValue('hasHeader', true, @islogical); %#ok<NVREPL>
-        p.addParamValue('remapFile', '', @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
+        p.addParamValue('remapFile', '', @(x) (~isempty(x) && ...
+            ischar(x))); %#ok<NVREPL>
         p.addParamValue('outputDirectory', fileparts(tsvFile), ...
             @(x) ischar(x) && 7 == exist(x, 'dir')); %#ok<NVREPL>
         p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>

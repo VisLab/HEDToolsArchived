@@ -57,7 +57,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function createhedmap(oldHed, newHed, remap, varargin)
+function createHEDMap(oldHed, newHed, remap, varargin)
 p = parseArguments();
 Maps = parsehed(newHed);
 tagMap = Maps.tags;
@@ -171,4 +171,4 @@ writeOutput(output);
         fclose(fileId);
     end % writeOutput
 
-end % createhedmap
+end % createHEDMap
