@@ -17,43 +17,42 @@
 %                   containing HED tags associated with a particular study.
 %
 %       tsvTagColumns
-%                   The columns that contain the HED study tags. The
-%                   columns can be a scalar value or a vector (e.g. 1 or
-%                   [1,2,3]).
+%                   The columns that contain the study or experiment HED
+%                   tags. The columns can be a scalar value or a vector
+%                   (e.g. 2 or [2,3,4]).
 %
 %       Optional:
 %
 %       'extensionAllowed'
-%                   True(default) if the validation accepts extension
-%                   allowed tags. There will be warnings generated for each
-%                   extension allowed tag that is present. If false, the
-%                   validation will not accept extension allowed tags and
-%                   errors will be generated for each tag present.
+%                   True(default) if descendants of extension allowed tags
+%                   are accepted which will generate warnings, False if 
+%                   they are not accepted which will generate errors.
 %
 %       'hasHeader'
-%                   True(default)if the tab-delimited text file containing
-%                   the HED study tags has a header line. This line will be
+%                   True(default)if the tab-delimited file containing
+%                   the HED study tags has a header. The header will be
 %                   skipped and not validated. False if the file doesn't
-%                   have a header row.
+%                   have a header.
 %
 %       'hedXML'
-%                   The name or the path of the HED XML file containing
-%                   all of the tags.
+%                   The name or the path of the XML file containing
+%                   all of the HED tags and their attributes.
 %
 %       'outputDirectory'
-%                   The directory where the validation output will be
-%                   written to if the 'writeOutput' argument is true.
-%                   There will be three separate files generated, one
+%                   A directory where the validation output is written to
+%                   if the 'writeOuput' argument is true.
+%                   There will be four separate files generated, one
 %                   containing the validation errors, one containing the
-%                   validation  warnings, and one containing the extension
-%                   allowed validation warnings. The default directory will
-%                   be the directory that contains the tab-delimited text
-%                  file.
+%                   validation  warnings, one containing the extension
+%                   allowed validation warnings, and a remap file. The
+%                   default directory will be the directory that contains
+%                   the tab-delimited 'tsvFile'.
 %
 %       'writeOutput'
-%                   If false(default) the validation output is not written
-%                   to separate files. If true the validation output is
-%                   written to separate files.
+%                  True if the validation output is written to the
+%                  workspace and a set of files in the same directory,
+%                  false (default) if the validation output is only written
+%                  to the workspace.
 %
 % Output:
 %
@@ -72,6 +71,10 @@
 %                   validation warnings. Each cell is associated with the
 %                   extension allowed validation warnings on a particular
 %                   line.
+%
+%       remap 
+%                   A cell array containing all of the unique validation 
+%                   error tags. 
 %
 % Examples:
 %                   To validate the HED study tags in file
@@ -99,7 +102,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions, remapTags] = ...
+function [errors, warnings, extensions, remap] = ...
     validateTSVTags(tsvFile, tsvTagColumns, varargin)
 p = parseArguments();
 hedMaps = loadHEDMap();
@@ -108,7 +111,7 @@ xmlVersion = findXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
-[errors, warnings, extensions, remapTags] = ...
+[errors, warnings, extensions, remap] = ...
     parseTSVTags(hedMaps, p.tsvFile, p.tsvTagColumns, p.hasHeader, ...
     p.extensionAllowed);
 if p.writeOutput
@@ -175,17 +178,17 @@ end
 
     function fileId = writeToNewMapFile(dir, file, ext)
         % Writes to a new map file
-        numMapTags = size(remapTags, 1);
+        numMapTags = size(remap, 1);
         remapFile = fullfile(dir, [file '_remap' ext]);
         fileId = fopen(remapFile,'w');
         for a = 1:numMapTags
-            fprintf(fileId, '%s\n', remapTags{a});
+            fprintf(fileId, '%s\n', remap{a});
         end
     end % writeToNewMapFile
 
     function fileId = writeToExistingMapFile(dir, ext)
         % Writes to an existing map file
-        numMapTags = size(remapTags, 1);
+        numMapTags = size(remap, 1);
         [mapFileDir, file]  = fileparts(p.remapFile);
         remapFile = fullfile(dir, [file ext]);
         mapTagMap = putMapFileInHash(remapFile);
@@ -194,8 +197,8 @@ end
         end
         fileId = fopen(remapFile,'a');
         for a = 1:numMapTags
-            if ~mapTagMap.isKey(lower(remapTags{a}))
-                fprintf(fileId, '\n%s', remapTags{a});
+            if ~mapTagMap.isKey(lower(remap{a}))
+                fprintf(fileId, '\n%s', remap{a});
             end
         end
     end % writeToExistingMapFile

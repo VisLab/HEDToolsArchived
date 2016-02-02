@@ -29,7 +29,7 @@
 
 function pop_hedtagvalidate()
 addJars();
-title = 'HED Conversion Utilities';
+title = 'HED Validation Utilities';
 fig = createFigure(title);
 tabGroup = uitabgroup(fig);
 tabs = createTabs(tabGroup);

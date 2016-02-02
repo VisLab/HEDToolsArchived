@@ -1,29 +1,31 @@
 % This function takes in a file containing the HED tags associated with a
 % particular study and replaces the old HED tags with the new HED tags
-% that are specified in a HED remap file.
+% that are specified in a remap file.
 %
 % Usage:
 %
-%   >>  updateTSVTags(remapFile, tsvFile, tsvTagColumns);
+%   >>  remapTSVTags(remapFile, tsvFile, tsvTagColumns);
 %
-%   >>  updateTSVTags(remapFile, tsvFile, tsvTagColumns, varargin);
+%   >>  remapTSVTags(remapFile, tsvFile, tsvTagColumns, varargin);
 %
 % Input:
 %
 %       remapFile
-%                   The name or the path of the HED remap file containing
+%                   The name or the path of the remap file containing
 %                   the mappings of old HED tags to new HED tags. This
 %                   file is a two column tab-delimited file with the old
-%                   HED tags in one column and the new HED tags in another
-%                   column.
+%                   HED tags in the first column and the new HED tags are 
+%                   in the second column.
 %
 %       tsvFile
 %                   The name or the path of a tab-delimited text file
-%                   containing HED tags associated with a particular study.
+%                   containing HED tags associated with a particular study
+%                   or experiment.
 %
 %       tsvTagColumns
-%                   The columns that contain the HED study tags. The
-%                   columns can be a scalar value or a vector.
+%                   The columns that contain the study or experiment HED
+%                   tags. The columns can be a scalar value or a vector
+%                   (e.g. 2 or [2,3,4]).
 %
 %       Optional:
 %
@@ -38,7 +40,7 @@
 %                   'Reward Two Back Study.txt' with new HED tags in the
 %                   fourth column using HED remap file 'HEDRemap.txt'.
 %
-%                   updateTSVTags('HEDRemap.txt', ...
+%                   remapTSVTags('HEDRemap.txt', ...
 %                   'Reward Two Back Study.txt', 4)
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
@@ -98,13 +100,13 @@ end
         numCols = size(splitLine{1}, 1);
         for a = 1:numCols
             if ismember(a, tagColumns)
-                splitTags = splitLine{a};
+                splitTags = splitLine{1}{a};
                 splitCellTags = str2cell(splitTags);
                 replacedTags = remapTags(splitCellTags);
                 replacedTags = cell2str(replacedTags);
                 output = sprintf('%s%s\t', output, replacedTags);
             else
-                output = sprintf('%s%s\t', output, splitLine{a});
+                output = sprintf('%s%s\t', output, splitLine{1}{a});
             end
         end
         output = sprintf('%s\n', output); 

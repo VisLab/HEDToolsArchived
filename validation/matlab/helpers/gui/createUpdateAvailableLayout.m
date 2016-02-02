@@ -1,9 +1,12 @@
-function okay = createUpdateAvailableLayout(version)
+function [okay, success] = createUpdateAvailableLayout(version)
 title = 'Update Available';
 okay = false;
+success = false;
 fig = createFigure(title);
 createPanel1();
 createPanel2();
+movegui(fig);
+uiwait(fig);
 
     function createButtons(panel)
         % Creates the buttons in the panel
@@ -33,7 +36,7 @@ createPanel2();
             'Name', title, ...
             'NextPlot', 'add', ...
             'NumberTitle','off', ...
-            'Position', [100, 100, 500, 200], ...
+            'Position', [750, 750, 500, 200], ...
             'Resize', 'on', ...
             'Tag', title, ...
             'Toolbar', 'none', ...
@@ -102,10 +105,18 @@ createPanel2();
 
     function okCallback(src, evnt) %#ok<INUSD>
         wb = waitbar(.5,'Updating...');
-        updateLatestHED();
+        try         
+            updateLatestHED();
+            close(wb);
+            success = true;
+            msgbox('Update complete', 'Success','modal');
+        catch
+            close(wb);
+            success = false;
+            msgbox('Update failed', 'Failure','modal');
+        end
         okay = true;
         close(fig);
-        close(wb);
     end % okCallback
 
     function skipCallback(src, evnt) %#ok<INUSD>

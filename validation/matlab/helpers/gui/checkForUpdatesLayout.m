@@ -1,6 +1,8 @@
 function checkForUpdatesLayout(tab)
+versionCtrl = '';
 currentVersion = findXMLHEDVersion('HED.xml');
 createPanel(tab);
+uiwait();
 
     function createButtons(panel)
         % Creates the buttons in the panel
@@ -10,7 +12,7 @@ createPanel(tab);
             'TooltipString', 'Press to choose old HED XML file', ...
             'Units','normalized',...
             'Callback', {@updateCallback}, ...
-            'Position', [0.775 0 0.2 0.1]);
+            'Position', [0.775 0.025 0.2 0.1]);
     end % createButtons
 
     function createLabels(panel)
@@ -28,10 +30,10 @@ createPanel(tab);
             'String', ['Checks the HED repository under' ...
             ' BigEEGConsortium for the latest HED XML schema. If the' ...
             ' repository has a newer schema version and you decide' ...
-            ' to downloadit then it will replace the local copy.'], ...
+            ' to download it then it will replace the local copy.'], ...
             'HorizontalAlignment', 'Left', ...
             'Position', [0 0.84 1 0.12]);
-        uicontrol('parent', panel, ...
+        versionCtrl = uicontrol('parent', panel, ...
             'Style', 'Text', ...
             'Units', 'normalized', ...
             'String', ['Current HED version: ' currentVersion], ...
@@ -54,17 +56,15 @@ createPanel(tab);
     function updateCallback(src, evnt) %#ok<INUSD>
         wikiVersion = downloadLatestHED();
         if ~strcmp(currentVersion, wikiVersion)
-            okay = createUpdateAvailableLayout(wikiVersion);
-            if okay
-                updateLatestHED();
+            [okay, success] = createUpdateAvailableLayout(wikiVersion);
+            if okay && success
                 currentVersion = wikiVersion;
-                refresh();
-                drawnow();
+                set(versionCtrl, 'String', ...
+                    ['Current HED version: ' currentVersion]);
             end
         else
             msgbox('The current version is up to date');
         end
     end % updateCallback
 
-end
-
+end % checkForUpdatesLayout
