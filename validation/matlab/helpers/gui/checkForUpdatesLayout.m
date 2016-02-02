@@ -2,7 +2,6 @@ function checkForUpdatesLayout(tab)
 versionCtrl = '';
 currentVersion = findXMLHEDVersion('HED.xml');
 createPanel(tab);
-uiwait();
 
     function createButtons(panel)
         % Creates the buttons in the panel
