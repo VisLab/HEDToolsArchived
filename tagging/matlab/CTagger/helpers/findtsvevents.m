@@ -64,8 +64,7 @@ readTabDelimitedEvents();
         % used to compute following event tag searches
         [eventTags, eventNonGroupTags, eventGroupTags] = ...
             formatTags(events(1).usertags);
-        str = createlogexp(p.matchtype, p.groupmatch, ...
-            length(eventGroupTags), p.tags);
+        str = createlogexp(length(eventGroupTags), p.tags);
         queryMap = containers.Map('KeyType','double','ValueType','char');
         queryMap(length(eventGroupTags)) = str;
         matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
@@ -84,8 +83,7 @@ readTabDelimitedEvents();
         try
             str = queryMap(length(eventGroupTags));
         catch
-            str = createlogexp(p.matchtype, p.groupmatch, ...
-                length(eventGroupTags), p.tags);
+            str = createlogexp(length(eventGroupTags), p.tags);
             queryMap(length(eventGroupTags)) = str;
         end
         matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
@@ -119,8 +117,6 @@ readTabDelimitedEvents();
         p.addParamValue('groupmatch', true, @islogical); %#ok<NVREPL>
         p.addParamValue('latencycolumn', 1, ...
             @(x) isnumeric(x) && numel(x) == 1) %#ok<NVREPL>
-        p.addParamValue('matchtype', 'Exact', ...
-            @(x) any(strcmpi({'Exact', 'Prefix'}, x))); %#ok<NVREPL>
         p.addParamValue('tagcolumns', 2, ...
             @(x) isnumeric(x)) %#ok<NVREPL>
         p.parse(events, tags, varargin{:});

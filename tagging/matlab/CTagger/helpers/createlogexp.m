@@ -3,24 +3,9 @@
 %
 % Usage:
 %
-%   >>  exp = createlogexp(matchtype, numGroups, search)
+%   >>  exp = createlogexp(numGroups, search)
 %
 % Inputs:
-%
-%   matchtype  The type of tag match. There are two tag matches;
-%                exact (default) and prefix. Exact match looks for an
-%                exact string match within the event tags. For example,
-%                searching for the tag "/item/2d shape/rectangle/square"
-%                will return all events that contain the tag
-%                "/item/2d shape/rectangle/square". An event containing
-%                "/item/2d shape/rectangle" will not be returned because it
-%                is not an exact match. Prefix match looks for event tags
-%                that start with a particular prefix. For example,
-%                searching for "/item/2d shape" will not only return events
-%                with the tag "/item/2d shape" but will return all events
-%                containing tags that start with the prefix such as
-%                "/item/2d shape/rectangle/square" or
-%                "/item/2d shape/ellipse/circle".
 %
 %   numgroups    The number of tag groups in the event.
 %
@@ -34,12 +19,9 @@
 %                contain the first tag but not the second tag. Groups can
 %                also be searched for by enclosing the tags in parentheses.
 %                The operators explained above also apply to tags in
-%                groups. Please read below in the "groupmatch" section of
-%                "Optional inputs" for further detail on how to search for
-%                tags that are contained in event tag groups. To nest or
-%                organize the search statements use square brackets.
-%                Nesting will change the order in which the search
-%                statements are evaluated. For example,
+%                groups. To nest or organize the search statements use
+%                square brackets. Nesting will change the order in which
+%                the search statements are evaluated. For example,
 %                "/attribute/visual/color/green AND
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]".
@@ -65,7 +47,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function exp = createlogexp(matchtype, numgroups, search)
+function exp = createlogexp(numgroups, search)
 inGroup = false;
 groupIndex = 1;
 tagsAndDelimiters = splitTagsAndDelimiters(search);
@@ -211,29 +193,14 @@ exp = translateSearchExpression(tagsAndDelimiters);
     function sequence = searchAllTags(search)
         % Searches for a tag in all event tags
         search = tagList.getCanonical(search);
-        switch lower(matchtype)
-            case 'exact'
-                sequence = ...
-                    sprintf('exactmatch(tags, ''%s'')', search);
-            case 'prefix'
-                sequence = ...
-                    sprintf('prefixmatch(tags, ''%s'')', search);
-        end
+        sequence = sprintf('exactmatch(tags, ''%s'')', search);
     end % searchAllTags
 
     function sequence = searchGroupTags(search)
         % Searches for a tag in all event tag groups
         search = tagList.getCanonical(search);
-        switch lower(matchtype)
-            case 'exact'
-                sequence = ...
-                    sprintf('exactmatch(groupTags{%d}, ''%s'')', ...
-                    groupIndex, search);
-            case 'prefix'
-                sequence = ...
-                    sprintf('prefixmatch(groupTags{%d}, ''%s'')', ...
-                    groupIndex, search);
-        end
+        sequence = sprintf('exactmatch(groupTags{%d}, ''%s'')', ...
+            groupIndex, search);
     end % searchGroupTags
 
 end % createlogexp

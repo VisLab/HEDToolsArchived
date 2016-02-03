@@ -19,22 +19,6 @@
 % search bar. When done click the "Ok" button and it will take you back to
 % the main epoching menu.
 %
-% Options:
-%
-%   Prefix       If unchecked (default), the tag search looks for an
-%                exact string match within the event tags. For example,
-%                searching for the tag "/item/2d shape/rectangle/square"
-%                will return all events that contain the tag
-%                "/item/2d shape/rectangle/square". An event containing the
-%                tag "/item/2d shape/rectangle" will not be returned
-%                because it is not an exact match. If checked, the tag
-%                search looks for events whose tags start with a particular
-%                prefix. For example, searching for "/item/2d shape" will
-%                not only return events with the tag "/item/2d shape" but
-%                will return all events containing tags that start with the
-%                prefix such as "/item/2d shape/rectangle/square" or
-%                "/item/2d shape/ellipse/circle".
-%
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
@@ -52,12 +36,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, tags, matchType] = hedsearch_input(uniquetags)
+function [canceled, tags] = hedsearch_input(uniquetags)
 canceled = true;
 tags = '';
 matches = '';
-matchTypes = {'Exact', 'Prefix'};
-matchType = 'Exact';
 title = 'Set search tag criteria';
 listbox = [];
 editbox = [];
@@ -124,11 +106,6 @@ end
             isListboxKey = true;
         end
     end
-
-    function prefixCallback(src, eventdata) %#ok<INUSD>
-        selectOption = get(src, 'Max') == get(src, 'Value');
-        matchType = matchTypes{selectOption + 1};
-    end % selectCallback
 
     function OkayCallback(src, eventdata) %#ok<INUSD>
         canceled = false;
@@ -214,24 +191,8 @@ end
             'Position', [0.01 0.22 0.95 0.22]);
     end % createLabels
 
-    function downCall(src, evnt)
+    function downCall(src, evnt) %#ok<INUSD>
         disp('yes');
-    end
-
-    function createCheckboxes(panel)
-        % Creates the labels in the panel
-        uicontrol('parent', panel, ...
-            'Style', 'checkbox', ...
-            'Units', 'normalized', ...
-            'String', 'Prefix', ...
-            'HorizontalAlignment', 'Left', ...
-            'tooltipstring', ...
-            ['If unchecked (default), the tag search looks for' ...
-            ' exact string matches within the event tags. If checked,' ...
-            ' the tag search looks for events whose tags start with ' ...
-            ' the specified prefixes.'], ...
-            'Callback', @prefixCallback, ...
-            'Position', [0.01 0.75 0.1 0.12]);
     end
 
     function createButtons(panel)
@@ -283,7 +244,6 @@ end
         createLabels(panel);
         createEditBoxes();
         createListBoxes(panel);
-        createCheckboxes(panel);
         createButtons(panel);
     end % createPanel
 

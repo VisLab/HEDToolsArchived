@@ -44,24 +44,19 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, tags, matchType, newName, timeLim, valueLim] = ...
+function [canceled, tags, newName, timeLim, valueLim] = ...
     hedepoch_input(setname, uniquetags)
 
     function searchCallback(src, event) %#ok<INUSD>
-        [searchCanceled, searchtags, searchmatchType] ...
-            = hedsearch_input(uniquetags); ...
+        [searchCanceled, searchtags] = hedsearch_input(uniquetags); ...
             if ~searchCanceled
             tagsObj = findobj('tag', 'tags'); ...
                 set(tagsObj, 'string', searchtags); ...
-                matchtypeObj = findobj('tag', 'matchtype'); ...
-                set(matchtypeObj, 'string', searchmatchType);
             end
     end
-geometry = { [2 1 0 0.5] [2 1 0.5] [2 1.5] [2 1 0.5] };
+geometry = { [2 1 0.5] [2 1 0.5] [2 1.5] [2 1 0.5] };
 uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
     { 'style' 'edit'       'string' '' 'tag' 'tags' } ...
-    { 'style' 'edit'       'string' '' 'tag' 'matchtype' ...
-    'visible', 'off'} ...
     { 'style' 'pushbutton' 'string' '...' 'callback' @searchCallback } ...
     { 'style' 'text'       ...
     'string' 'Epoch limits [start, end] in seconds' } ...
@@ -77,7 +72,6 @@ result = inputgui( geometry, uilist, 'pophelp(''hedepoch_input'')', ...
     'Extract data epochs - pop_hedepoch()');
 if isempty(result)
     tags = '';
-    matchType = '';
     timeLim = '';
     newName = '';
     valueLim = '';
@@ -87,20 +81,15 @@ end
 canceled = false;
 tags = result{1};
 if isempty(result{2})
-    matchType = 'Exact';
-else
-    matchType = result{2};
-end
-if isempty(result{3})
     timeLim = [-1 2];
 else
-    timeLim = str2num(result{3});  %#ok<ST2NM>
+    timeLim = str2num(result{2});  %#ok<ST2NM>
 end
-newName = result{4};
-if isempty(result{5})
+newName = result{3};
+if isempty(result{4})
     valueLim = [-Inf Inf];
 else
-    valueLim = str2num(result{5});  %#ok<ST2NM>
+    valueLim = str2num(result{4});  %#ok<ST2NM>
 end
 
 end % hedepoch_input

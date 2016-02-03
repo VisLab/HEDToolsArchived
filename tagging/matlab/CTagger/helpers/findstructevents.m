@@ -89,7 +89,7 @@ readEEGEvents();
         % used to compute following event tag searches
         [eventTags, eventNonGroupTags, eventGroupTags] = ...
             formatTags(events(1).usertags);
-        str = createlogexp(p.matchtype, length(eventGroupTags), p.tags);
+        str = createlogexp(length(eventGroupTags), p.tags);
         queryMap = containers.Map('KeyType','double','ValueType','char');
         queryMap(length(eventGroupTags)) = str;
         matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
@@ -108,16 +108,11 @@ readEEGEvents();
         try
             str = queryMap(length(eventGroupTags));
         catch
-            str = createlogexp(p.matchtype, length(eventGroupTags), p.tags);
+            str = createlogexp(length(eventGroupTags), p.tags);
             queryMap(length(eventGroupTags)) = str;
         end
-        %         matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
-        %             eventGroupTags);
         matchedIndecies(index) = evallogexp(str, eventTags, ...
             eventGroupTags);
-        %         if matchFound
-        %             matchedIndecies(index) = true;
-        %         end
     end % findTagMatch
 
     function [tags, eventLevelTags, groupTags] = formatTags(tags)
@@ -130,9 +125,9 @@ readEEGEvents();
             tags = [tags{:}];
         end
         tags =  tagList.getUnsortedCanonical(tags);
-        eventLevelTags =  tagList.getUnsortedCanonical(eventLevelTags);
+        eventLevelTags = tagList.getUnsortedCanonical(eventLevelTags);
         for a = 1:length(groupTags)
-            groupTags{a} =  tagList.getUnsortedCanonical(groupTags{a});
+            groupTags{a} = tagList.getUnsortedCanonical(groupTags{a});
         end
     end % formatTags
 
