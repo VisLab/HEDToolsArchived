@@ -46,6 +46,8 @@
 
 function error = generateErrorMessage(type, line, tag, prefix, units)
 switch(type)
+    case 'cell'
+        error = sprintf('Errors in cell %s:\n', num2str(line));
     case 'comma'
         error = sprintf(['\t"%s" may contain a comma when no commas' ...
             ' are allowed in tags'], tag);
@@ -58,7 +60,7 @@ switch(type)
         error = sprintf('Errors on line %s:\n', num2str(line));
     case 'required'
         error = sprintf(['\tA tag with the prefix "%s" is required in' ...
-            ' every tag group but was not found in this tag group\n'], ...
+            ' every event but was not found in this event\n'], ...
             tag);
     case 'requireChild'
         error = sprintf('\t"%s" should have a child string\n', tag);

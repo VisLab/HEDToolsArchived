@@ -59,7 +59,7 @@ checkTakesValueTags(original, canonical, false);
         tagName = getTagName(canonical{numericalIndex});
         if ~all(ismember(tagName, '<>=.0123456789'))
             generateErrorMessages(original, numericalIndex, isGroup, ...
-                'isNumeric');
+                'isNumeric', '');
         end
     end % checkNumericalTag
 
@@ -78,7 +78,7 @@ checkTakesValueTags(original, canonical, false);
                 hedMaps.unitClasses(unitClasses{a})]; %#ok<AGROW>
         end
         unitsRegexp = buildUnitsRegexp(unitClassUnits);
-        if ~all(ismember(tagName, '<>=.0123456789'))
+        if all(ismember(tagName, '<>=.0123456789'))
             generateWarningMessages(original, unitIndex, isGroup, ...
                 'unitClass', unitClassDefault)
         end
@@ -96,33 +96,21 @@ checkTakesValueTags(original, canonical, false);
             tagString = [original{valueIndex}, ' in group (' ,...
                 vTagList.stringifyElement(original),')'];
         end
-        if strcmpi(errorType, 'unitClass')
-            errors = [errors, generateErrorMessage('unitClass', '', ...
-                tagString, '', unitClassUnits)];
-        else
-            errors = [errors, generateErrorMessage('isNumeric', '', ...
-                tagString, '', '')];
-        end
+        errors = [errors, generateErrorMessage(errorType, '', ...
+            tagString, '', unitClassUnits)];
         errorTags{end+1} = original{valueIndex};
     end % generateErrorMessages
 
     function generateWarningMessages(original, valueIndex, isGroup, ...
-            errorType, unitClassDefault)
+            warningType, unitClassDefault)
         % Generates takes value and unit class tag errors
         tagString = original{valueIndex};
         if isGroup
             tagString = [original{valueIndex}, ' in group (' ,...
                 vTagList.stringifyElement(original),')'];
         end
-        if strcmpi(errorType, 'unitClass')
-            warnings = [warnings, ...
-                generateWarningMessage('unitClass', '', ...
-                tagString, unitClassDefault)];
-        else
-            warnings = [warnings, ...
-                generateWarningMessage('unitClass', '', ...
-                tagString, unitClassDefault)];
-        end
+        warnings = [warnings, generateWarningMessage(warningType, ...
+            '', tagString, unitClassDefault)];
         warningTags{end+1} = original{valueIndex};
     end % generateErrorMessages
 

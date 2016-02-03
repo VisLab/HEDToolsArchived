@@ -72,7 +72,7 @@
 %                   extension allowed validation warnings on a particular
 %                   line.
 %
-%       remap 
+%       uniqueErrorTags 
 %                   A cell array containing all of the unique validation 
 %                   error tags. 
 %
@@ -102,7 +102,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions, remap] = ...
+function [errors, warnings, extensions, uniqueErrorTags] = ...
     validateTSVTags(tsvFile, tsvTagColumns, varargin)
 p = parseArguments();
 hedMaps = loadHEDMap();
@@ -111,7 +111,7 @@ xmlVersion = getXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
-[errors, warnings, extensions, remap] = ...
+[errors, warnings, extensions, uniqueErrorTags] = ...
     parseTSVTags(hedMaps, p.tsvFile, p.tsvTagColumns, p.hasHeader, ...
     p.extensionAllowed);
 if p.writeOutput
@@ -179,17 +179,17 @@ end
 
     function fileId = writeToNewMapFile(dir, file, ext)
         % Writes to a new map file
-        numMapTags = size(remap, 1);
+        numMapTags = size(uniqueErrorTags, 1);
         remapFile = fullfile(dir, [file '_remap' ext]);
         fileId = fopen(remapFile,'w');
         for a = 1:numMapTags
-            fprintf(fileId, '%s\n', remap{a});
+            fprintf(fileId, '%s\n', uniqueErrorTags{a});
         end
     end % writeToNewMapFile
 
     function fileId = writeToExistingMapFile(dir, ext)
         % Writes to an existing map file
-        numMapTags = size(remap, 1);
+        numMapTags = size(uniqueErrorTags, 1);
         [mapFileDir, file]  = fileparts(p.remapFile);
         remapFile = fullfile(dir, [file ext]);
         mapTagMap = putMapFileInHash(remapFile);
@@ -198,8 +198,8 @@ end
         end
         fileId = fopen(remapFile,'a');
         for a = 1:numMapTags
-            if ~mapTagMap.isKey(lower(remap{a}))
-                fprintf(fileId, '\n%s', remap{a});
+            if ~mapTagMap.isKey(lower(uniqueErrorTags{a}))
+                fprintf(fileId, '\n%s', uniqueErrorTags{a});
             end
         end
     end % writeToExistingMapFile

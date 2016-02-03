@@ -1,39 +1,45 @@
-% This function takes in a EEG structure containing HED tags
+% This function takes in a cell array containing HED tags
 % associated with a particular study and validates them based on the
 % tags and attributes in the HED XML file.
 %
 % Usage:
-%   >>  [errors, warnings, extensions] = validateStructTags(eeg);
-%   >>  [errors, warnings, extensions] = validateStructTags(eeg, varargin);
+%
+%   >>  [errors, warnings, extensions] = validateCellTags(cells);
+%
+%   >>  [errors, warnings, extensions] = validateCellTags(cells, varargin);
 %
 % Input:
-%       eeg         The EEG dataset structure containing HED tags in the
-%                   .event field.
+%
+%       cells
+%                   A cellstr containing HED tags that are validated.
+%
 %
 %       Optional:
 %
-%       'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
+%       'extensionAllowed'
+%                   True(default) if descendants of extension allowed tags
+%                   are accepted which will generate warnings, False if
+%                   they are not accepted which will generate errors.
 %
 %       'hedXML'
-%                   The name or the path of the HED XML file containing
-%                   all of the tags.
+%                   The name or the path of the XML file containing
+%                   all of the HED tags and their attributes.
 %
 %       'outputDirectory'
-%                   The directory where the validation output will be
-%                   written to if the 'writeOutput' argument is true.
-%                   There will be three separate files generated, one
+%                   A directory where the validation output is written to
+%                   if the 'writeOuput' argument is true.
+%                   There will be four separate files generated, one
 %                   containing the validation errors, one containing the
-%                   validation  warnings, and one containing the extension
-%                   allowed validation warnings. The default directory will
-%                   be the directory that contains the tab-delimited text
-%                  file.
+%                   validation  warnings, one containing the extension
+%                   allowed validation warnings, and a remap file. The
+%                   default directory will be the directory that contains
+%                   the tab-delimited 'tsvFile'.
 %
 %       'writeOutput'
-%                   If false(default) the validation output is not written
-%                   to separate files. If true the validation output is
-%                   written to separate files.
+%                  True if the validation output is written to the
+%                  workspace and a set of files in the same directory,
+%                  false (default) if the validation output is only written
+%                  to the workspace.
 %
 % Output:
 %
@@ -53,6 +59,11 @@
 %                   extension allowed validation warnings on a particular
 %                   line.
 %
+% Examples:
+%                   To validate the HED study tags in cellstr 'hedTags'.
+%
+%                   validateCellTags(hedTags);
+%
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
@@ -70,7 +81,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions] = validateStructTags(eeg, varargin)
+function [errors, warnings, extensions] = validateCellTags(cells, varargin)
 p = parseArguments();
 hedMaps = loadHEDMap();
 mapVersion = hedMaps.version;
@@ -78,8 +89,8 @@ xmlVersion = getXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
-[errors, warnings, extensions] = ...
-    parseStructTags(hedMaps, p.eeg.event, p.tagField, p.extensionAllowed);
+[errors, warnings, extensions] = parseCellTags(hedMaps, p.cells, ...
+    p.extensionAllowed);
 if p.writeOutput
     writeOutputFiles();
 end
@@ -94,17 +105,15 @@ end
     function p = parseArguments()
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('eeg', @(x) (~isempty(x) && isstruct(x)));
-        p.addParamValue('extensionAllowed', true, ...
-            @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
-        p.addParamValue('tagField', 'usertags', ...
-            @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
+        p.addRequired('cells', @iscellstr);
         p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
+        p.addParamValue('extensionAllowed', true, ...
+            @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
         p.addParamValue('outputDirectory', pwd, ...
             @(x) ischar(x) && 7 == exist(x, 'dir')); %#ok<NVREPL>
         p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>
-        p.parse(eeg, varargin{:});
+        p.parse(cells, varargin{:});
         p = p.Results;
     end % parseArguments
 
@@ -134,7 +143,7 @@ end
         % Writes the errors, warnings, extension allowed warnings to
         % the output files
         dir = p.outputDirectory;
-        [~, file] = fileparts(p.eeg.filename);
+        [~, file] = fileparts(p.tsvFile);
         ext = '.txt';
         writeErrorFile(dir, file, ext);
         writeWarningFile(dir, file, ext);
@@ -152,4 +161,4 @@ end
         fclose(fileId);
     end % writeWarningFile
 
-end % validateStructTags
+end % validateCellTags

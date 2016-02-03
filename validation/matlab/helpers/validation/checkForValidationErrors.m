@@ -44,6 +44,9 @@
 %       errors
 %                   A string containing the validation errors.
 %
+%       errorTags
+%                   A cell array containing validation error tags. 
+%
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
@@ -61,7 +64,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, mapTags] = checkForValidationErrors(hedMaps, ...
+function [errors, errorTags] = checkForValidationErrors(hedMaps, ...
     originalTags, formattedTags, extensionAllowed, ...
     extensionAllowedTags, takesValueTags)
 errors = '';
@@ -71,7 +74,7 @@ errors = [errors checkRequireChildTags(hedMaps, originalTags, ...
 errors = [errors checkTakeValueTags(hedMaps, originalTags, formattedTags)];
 errors = [errors checkGroupTildes(originalTags)];
 errors = [errors checkUniqueTags(hedMaps, originalTags, formattedTags)];
-[validationErrors, mapTags] = checkValidTags(hedMaps, originalTags, formattedTags, ...
-    extensionAllowed, extensionAllowedTags, takesValueTags);
+[validationErrors, errorTags] = checkValidTags(hedMaps, originalTags, ...
+    formattedTags, extensionAllowed, extensionAllowedTags, takesValueTags);
 errors = [errors validationErrors];
 end % checkForValidationErrors

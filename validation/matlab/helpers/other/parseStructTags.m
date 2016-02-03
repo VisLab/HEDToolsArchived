@@ -80,12 +80,12 @@ validateStructureTags();
     function checkForTSVLineErrors(originalTags, formattedTags, ...
             eventNumber)
         % Errors will be generated for the line if found
-        lineErrors = checkForValidationErrors(p.hedMaps, originalTags, ...
+        eventErrors = checkForValidationErrors(p.hedMaps, originalTags, ...
             formattedTags, p.extensionAllowed);
-        if ~isempty(lineErrors)
-            lineErrors = [generateErrorMessage('event', eventNumber, ...
-                '', '', ''), lineErrors];
-            errors{errorCount} = lineErrors;
+        if ~isempty(eventErrors)
+            eventErrors = [generateErrorMessage('event', eventNumber, ...
+                '', '', ''), eventErrors];
+            errors{errorCount} = eventErrors;
             errorCount = errorCount + 1;
         end
     end % checkForTSVLineErrors
@@ -93,12 +93,12 @@ validateStructureTags();
     function checkForTSVLineExtensions(originalTags, formattedTags, ...
             eventNumber)
         % Errors will be generated for the line if found
-        lineExtensions = checkForValidationExtensions(p.hedMaps, ...
+        eventExtensions = checkForValidationExtensions(p.hedMaps, ...
             originalTags, formattedTags, p.extensionAllowed);
-        if ~isempty(lineExtensions)
-            lineExtensions = [generateExtensionMessage('event', ...
-                eventNumber, '', ''), lineExtensions];
-            extensions{extensionCount} = lineExtensions;
+        if ~isempty(eventExtensions)
+            eventExtensions = [generateExtensionMessage('event', ...
+                eventNumber, '', ''), eventExtensions];
+            extensions{extensionCount} = eventExtensions;
             extensionCount = extensionCount + 1;
         end
     end % checkForTSVLineExtensions
@@ -106,12 +106,12 @@ validateStructureTags();
     function checkForTSVLineWarnings(originalTags, formattedTags, ...
             eventNumber)
         % Warnings will be generated for the line if found
-        lineWarnings = checkForValidationWarnings(p.hedMaps, ...
+        eventWarnings = checkForValidationWarnings(p.hedMaps, ...
             originalTags, formattedTags);
-        if ~isempty(lineWarnings)
-            lineWarnings = [generateWarningMessage('event', eventNumber, ...
-                '', ''), lineWarnings];
-            warnings{warningCount} = lineWarnings;
+        if ~isempty(eventWarnings)
+            eventWarnings = [generateWarningMessage('event', ...
+                eventNumber, '', ''), eventWarnings];
+            warnings{warningCount} = eventWarnings;
             warningCount = warningCount + 1;
         end
     end % checkForTSVLineWarnings

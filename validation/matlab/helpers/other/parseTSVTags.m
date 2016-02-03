@@ -62,6 +62,10 @@
 %                   extension allowed validation warnings on a particular
 %                   line.
 %
+%       uniqueErrorTags
+%                   A cell array containing all of the unique validation 
+%                   error tags. 
+%
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
@@ -79,14 +83,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions, mapTags] = ...
+function [errors, warnings, extensions, uniqueErrorTags] = ...
     parseTSVTags(hedMaps, tsvFile, tsvTagColumns, hasHeaderRow, ...
     extensionAllowed)
 p = parseArguments();
 errors = {};
 warnings = {};
 extensions = {};
-mapTags = {};
+uniqueErrorTags = {};
 errorCount = 1;
 warningCount = 1;
 extensionCount = 1;
@@ -106,7 +110,7 @@ parseTSVLines();
 
     function checkForTSVLineErrors(originalTags, formattedTags, lineNumber)
         % Errors will be generated for the line if found
-        [lineErrors, lineMapTags] = ...
+        [lineErrors, lineErrorTags] = ...
             checkForValidationErrors(p.hedMaps, originalTags, ...
             formattedTags, p.extensionAllowed, extensionAllowedTags, ...
             takesValueTags);
@@ -114,7 +118,7 @@ parseTSVLines();
             lineErrors = [generateErrorMessage('line', lineNumber, ...
                 '', '', ''), lineErrors];
             errors{errorCount} = lineErrors;
-            mapTags = union(mapTags, lineMapTags);
+            uniqueErrorTags = union(uniqueErrorTags, lineErrorTags);
             errorCount = errorCount + 1;
         end
     end % checkForTSVLineErrors
