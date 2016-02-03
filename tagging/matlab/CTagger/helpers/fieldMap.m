@@ -90,8 +90,8 @@
 
 classdef fieldMap < hgsetget
     properties (Constant = true)
-        DefaultXml = 'HED2.026.xml';
-        DefaultSchema = 'HEDSchema2.026.xsd';
+        DefaultXml = 'HED.xml';
+        DefaultSchema = 'HED.xsd';
     end % constant
     
     properties (Access = private)
