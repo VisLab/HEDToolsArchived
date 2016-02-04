@@ -30,35 +30,25 @@
 %
 % Optional inputs:
 %
-%   'matchtype'  The type of tag match. There are two tag matches;
-%                exact (default) and prefix. Exact match looks for an
-%                exact string match within the event tags. For example,
-%                searching for the tag "/item/2d shape/rectangle/square"
-%                will return all events that contain the tag
-%                "/item/2d shape/rectangle/square". An event containing
-%                "/item/2d shape/rectangle" will not be returned because it
-%                is not an exact match. Prefix match looks for event tags
-%                that start with a particular prefix. For example,
-%                searching for "/item/2d shape" will not only return events
-%                with the tag "/item/2d shape" but will return all events
-%                containing tags that start with the prefix such as
-%                "/item/2d shape/rectangle/square" or
-%                "/item/2d shape/ellipse/circle".
 %   'newname'    New dataset name. The default is "[old_dataset] epochs"
+%
 %   'timelim'    Epoch latency limits [start end] in seconds relative to
 %                the time-locking event. The default is [-1 2].
 %   'valuelim'   [min max] data limits. If one positive value is given,
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50] to remove artifactual epoch. The default is
 %                [-Inf Inf].
+%
 %   'verbose'    ['on'|'off']. The default is 'on'.
 %
 % deprecated
+%
 %   'timeunit'   Time unit ['seconds'|'points'] If 'seconds,' consider
 %                events times to be in seconds. If 'points,' consider
 %                events as indices into the data array. The default is
 %                'points'.
 % Outputs:
+%
 %   EEG          Output dataset that has extracted data epochs.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
