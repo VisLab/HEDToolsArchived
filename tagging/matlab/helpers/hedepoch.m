@@ -71,8 +71,7 @@
 
 function EEG = hedepoch(EEG, tags, varargin)
 p = parseArguments();
-[~, matchedLatencies, allLatencies] = findstructevents(EEG.event, tags, ...
-    'matchtype', p.matchtype);
+[~, matchedLatencies, allLatencies] = findstructevents(EEG.event, tags);
 % matchedLatencies = allLatencies(matchedLatencies);
 [newtimelimts, acceptedEventIndecies, epochevent] = epochData();
 updateFields();
