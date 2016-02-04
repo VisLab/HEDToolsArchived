@@ -29,9 +29,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function found = exactmatch(tags, search)
+function found = tagmatch(tags, search)
 parseArguments();
-found = any(strcmpi(tags, search));
+found = any(strncmpi(tags, search, length(search)));
 
     function p = parseArguments()
         % Parses the input arguments and returns the results 

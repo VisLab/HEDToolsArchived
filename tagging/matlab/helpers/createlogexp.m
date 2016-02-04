@@ -193,13 +193,13 @@ exp = translateSearchExpression(tagsAndDelimiters);
     function sequence = searchAllTags(search)
         % Searches for a tag in all event tags
         search = tagList.getCanonical(search);
-        sequence = sprintf('exactmatch(tags, ''%s'')', search);
+        sequence = sprintf('tagmatch(tags, ''%s'')', search);
     end % searchAllTags
 
     function sequence = searchGroupTags(search)
         % Searches for a tag in all event tag groups
         search = tagList.getCanonical(search);
-        sequence = sprintf('exactmatch(groupTags{%d}, ''%s'')', ...
+        sequence = sprintf('tagmatch(groupTags{%d}, ''%s'')', ...
             groupIndex, search);
     end % searchGroupTags
 
