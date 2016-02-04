@@ -3,11 +3,7 @@
 %
 % Usage:
 %
-%   >> [matchedEvents, matchedLatencies, latencies] =
-%       findevents(events, tags)
-%
-%   >> [matchedEvents, matchedLatencies, latencies] =
-%       findevents(events, tags, varargin)
+%   >> positions = findTagMatchEvents(events, tags);
 %
 % Inputs:
 %
@@ -31,33 +27,12 @@
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]"
 %
-% Optional inputs:
-%
-%   'matchtype'  The type of tag match. There are two tag matches;
-%                exact (default) and prefix. Exact match looks for an
-%                exact string match within the event tags. For example,
-%                searching for the tag "/item/2d shape/rectangle/square"
-%                will return all events that contain the tag
-%                "/item/2d shape/rectangle/square". An event containing
-%                "/item/2d shape/rectangle" will not be returned because it
-%                is not an exact match. Prefix match looks for event tags
-%                that start with a particular prefix. For example,
-%                searching for "/item/2d shape" will not only return events
-%                with the tag "/item/2d shape" but will return all events
-%                containing tags that start with the prefix such as
-%                "/item/2d shape/rectangle/square" or
-%                "/item/2d shape/ellipse/circle".
-%
 % Outputs:
 %
-%   matchedEvents
-%                A structure array of the events that found tag matches.
+%   positions
+%                A logical array containing the positions of the events
+%                that found tag matches.
 %
-%   matchedLatencies
-%                An array of latencies belonging to events that found tag
-%                matches.
-%
-%   latencies    An array of latencies belonging to all of the events.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -76,11 +51,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [matchedEvents, matchedLatencies, allLatencies] = ...
-    findstructevents(events, tags, varargin)
+function positions = findTagMatchEvents(events, tags)
 p = parseArguments();
-matchedEvents = [];
-matchedLatencies = [];
+positions = false(1,length(events));
 readEEGEvents();
 
     function [queryMap, matchedIndecies] = createQueryMap(matchedIndecies)
@@ -136,23 +109,16 @@ readEEGEvents();
         p = inputParser();
         p.addRequired('events', @(x) ~isempty(x) && isstruct(x));
         p.addRequired('tags', @(x) ischar(x));
-        p.addParamValue('matchtype', 'Exact', ...
-            @(x) any(strcmpi({'Exact', 'Prefix'}, x))); %#ok<NVREPL>
-        p.parse(events, tags, varargin{:});
+        p.parse(events, tags);
         p = p.Results;
     end % parseArguments
 
     function readEEGEvents()
         % This function reads EEG events in from a EEG structure
-        matchedIndecies = false(1,length(events));
-        allLatencies = [events.latency];
-        [queryMap, matchedIndecies] = createQueryMap(matchedIndecies);
+        [queryMap, positions] = createQueryMap(positions);
         for a = 2:length(events)
-            [queryMap, matchedIndecies] = findTagMatch(queryMap, ...
-                matchedIndecies, a);
+            [queryMap, positions] = findTagMatch(queryMap, positions, a);
         end
-        matchedEvents = events(matchedIndecies);
-        matchedLatencies = allLatencies(matchedIndecies);
     end % readEEGEvents
 
 end % findevents
