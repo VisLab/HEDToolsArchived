@@ -15,5 +15,7 @@ function teardown(values) %#ok<INUSD,DEFNU>
 function testTagSearch(values) %#ok<DEFNU>
 % Unit test for fieldMap adding structure events
 fprintf('\nUnit tests for tag search in event structure\n');
+numMatches = 2;
 tags = 'a/b, b/c';
 positions = findTagMatchEvents(values.events, tags);
+assertEqual(sum(positions), numMatches);
