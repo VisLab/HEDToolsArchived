@@ -1,7 +1,7 @@
 % This function looks for a exact tag match in a list of tags.
 %
 % Usage:
-%   >>  found = exactmatch(tags, search)
+%   >>  found = tagmatch(tags, search)
 %
 % Inputs:
 %   tags         A cell array containing the event tags. 
