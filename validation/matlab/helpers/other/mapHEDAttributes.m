@@ -118,7 +118,7 @@ processNodeElements(rootElement, '');
             attribute = theAttributes.item(count-1);
             attributeName = strtrim(char(attribute.getName));
             attributeValue = strtrim(char(attribute.getValue));
-            addNodeAttributeToMaps(nodePath, attributeName, ...
+            addNodeAttributeToMaps(lower(nodePath), attributeName, ...
                 attributeValue);
         end
     end % processAttributes
@@ -138,7 +138,7 @@ processNodeElements(rootElement, '');
                 nodeName = ...
                     strtrim(char(nodeNameElement.getFirstChild.getData));
                 nodePath = [parentPath,nodeName];
-                hedMaps.tags(nodePath) = nodePath;
+                hedMaps.tags(lower(nodePath)) = nodePath;
                 processAttributes(childElement, nodePath);
                 processNodeElements(childElement, [nodePath,'/']);
             elseif ~isempty(childElement) && strcmpi('unitClasses', ...
@@ -147,7 +147,7 @@ processNodeElements(rootElement, '');
             end
         end
         if ~nodesFound
-            hedMaps.extensionAllowed(parentPath) = parentPath;
+            hedMaps.extensionAllowed(lower(parentPath)) = parentPath;
         end
     end % processNodeElements
 
@@ -169,7 +169,7 @@ processNodeElements(rootElement, '');
                 unitsElement = unitsDoc.item(0);
                 units = strtrim(char(unitsElement.getFirstChild.getData));
                 processAttributes(unitClassElement, unitClassName);
-                hedMaps.unitClasses(unitClassName) = units;
+                hedMaps.unitClasses(lower(unitClassName)) = units;
             end
         end
     end % processUnitClassElements

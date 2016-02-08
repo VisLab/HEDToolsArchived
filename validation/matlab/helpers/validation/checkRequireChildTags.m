@@ -12,7 +12,7 @@ checkTags(original, canonical, false);
             if ~ischar(originalTags{a})
                 checkTags(originalTags{a}, formattedTags{a}, true);
                 return;
-            elseif requireChildTags.isKey(formattedTags{a})
+            elseif requireChildTags.isKey(lower(formattedTags{a}))
                 generateErrorMessages(originalTags, a, isGroup);
             end
         end

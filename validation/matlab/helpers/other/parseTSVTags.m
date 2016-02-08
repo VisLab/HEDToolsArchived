@@ -63,8 +63,8 @@
 %                   line.
 %
 %       uniqueErrorTags
-%                   A cell array containing all of the unique validation 
-%                   error tags. 
+%                   A cell array containing all of the unique validation
+%                   error tags.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -114,7 +114,7 @@ parseTSVLines();
             checkForValidationErrors(p.hedMaps, originalTags, ...
             formattedTags, p.extensionAllowed, extensionAllowedTags, ...
             takesValueTags);
-        if ~isempty(lineErrors)
+        if ~isempty(lineErrorTags)
             lineErrors = [generateErrorMessage('line', lineNumber, ...
                 '', '', ''), lineErrors];
             errors{errorCount} = lineErrors;

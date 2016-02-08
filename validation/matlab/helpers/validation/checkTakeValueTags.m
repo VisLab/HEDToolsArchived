@@ -28,7 +28,7 @@ checkTakesValueTags(original, canonical, false);
     function isNumeric = isNumericTag(tag)
         % Returns true if the tag is a numeric tag
         valueTag = convertToValueTag(tag);
-        isNumeric = hedMaps.isNumeric.isKey(valueTag);
+        isNumeric = hedMaps.isNumeric.isKey(lower(valueTag));
     end % isNumericTag
 
     function unitsRegexp = buildUnitsRegexp(units)
@@ -67,15 +67,15 @@ checkTakesValueTags(original, canonical, false);
             unitClassTag)
         % Checks the unit class tag
         tagName = getTagName(canonical{unitIndex});
-        unitClasses = hedMaps.unitClass(unitClassTag);
+        unitClasses = hedMaps.unitClass(lower(unitClassTag));
         unitClasses = textscan(unitClasses, '%s', 'delimiter', ',', ...
             'multipleDelimsAsOne', 1)';
-        unitClassDefault = hedMaps.default(unitClasses{1}{1});
-        unitClassUnits = hedMaps.unitClasses(unitClasses{1}{1});
-        numUnitClasses = size(unitClasses, 2);
+        unitClassDefault = hedMaps.default(lower(unitClasses{1}{1}));
+        unitClassUnits = hedMaps.unitClasses(lower(unitClasses{1}{1}));
+        numUnitClasses = size(unitClasses{1}, 1);
         for a = 2:numUnitClasses
             unitClassUnits = [unitClassUnits, ',', ...
-                hedMaps.unitClasses(unitClasses{a})]; %#ok<AGROW>
+                hedMaps.unitClasses(lower(unitClasses{1}{a}))]; %#ok<AGROW>
         end
         unitsRegexp = buildUnitsRegexp(unitClassUnits);
         if all(ismember(tagName, '<>=.0123456789'))
@@ -126,7 +126,7 @@ checkTakesValueTags(original, canonical, false);
     function [isUnitClass, unitClassTag] = isUnitClassTag(tag)
         % Returns true if the tag requires a unit class
         unitClassTag = convertToValueTag(tag);
-        isUnitClass = hedMaps.unitClass.isKey(unitClassTag);
+        isUnitClass = hedMaps.unitClass.isKey(lower(unitClassTag));
     end % isUnitClassTag
 
     function tagName = getTagName(tag)

@@ -42,7 +42,7 @@ checkTagCaps(originalTags, formattedTags, false);
         slashPositions = strfind(originalTag, '/');
         if ~isempty(slashPositions)
             valueTag = [originalTag(1:slashPositions(end)) '#'];
-            if hedMaps.takesValue.isKey(valueTag)
+            if hedMaps.takesValue.isKey(lower(valueTag))
                 return;
             end
         end

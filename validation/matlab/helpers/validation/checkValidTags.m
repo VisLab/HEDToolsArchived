@@ -19,7 +19,7 @@ checkValidTags(originalTags, formattedTags, false);
             end
             if isTilde(formattedTags{a}) || ...
                     tagTakesValue(formattedTags{a}) || ...
-                    Maps.tags.isKey(formattedTags{a})
+                    Maps.tags.isKey(lower(formattedTags{a}))
                 continue;
             end
             [isExtensionTag, extensionIndex] = ...
@@ -101,7 +101,7 @@ checkValidTags(originalTags, formattedTags, false);
         isValueTag = false;
         valueTag = convertToValueTag(tag);
         while ~strncmp(valueTag, '/#', 2)
-            if any(strcmp(takesValueTags, valueTag))
+            if any(strcmpi(takesValueTags, valueTag))
                 isValueTag = true;
                 break;
             end
