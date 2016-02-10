@@ -50,13 +50,16 @@
 function exp = createlogexp(numgroups, search)
 inGroup = false;
 groupIndex = 1;
-commaIndexes = strfind(search, ',');
-if ~isempty(commaIndexes)
-    tagsAndDelimiters = splitCommaSearch(search);
-else
-    tagsAndDelimiters = splitBooleanSearch(search);
+exp = '';
+if ~isempty(strtrim(search))
+    commaIndexes = strfind(search, ',');
+    if ~isempty(commaIndexes)
+        tagsAndDelimiters = splitCommaSearch(search);
+    else
+        tagsAndDelimiters = splitBooleanSearch(search);
+    end
+    exp = translateSearchExpression(tagsAndDelimiters);
 end
-exp = translateSearchExpression(tagsAndDelimiters);
 
     function str = translateSearchExpression(tagsAndDelimiters)
         % Creates a tag search expression that will be evaluated

@@ -35,3 +35,8 @@ assertEqual(sum(positions), numMatches);
 tags = 'a/b, , , b/c';
 positions = findTagMatchEvents(values.events, tags);
 assertEqual(sum(positions), numMatches);
+
+numMatches = 0;
+tags = ' ';
+positions = findTagMatchEvents(values.events, tags);
+assertEqual(sum(positions), numMatches);

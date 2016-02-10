@@ -41,9 +41,11 @@ tagsFound = evaluateExpression(exp);
     function tagsFound = evaluateExpression(expression)
         % This function evaluates an expression using eval
         tagsFound = false;
-        try
-            tagsFound = eval(expression);
-        catch
+        if ~isempty(expression)
+            try
+                tagsFound = eval(expression);
+            catch
+            end
         end
     end  % evaluateExpression
 
