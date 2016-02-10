@@ -50,7 +50,12 @@
 function exp = createlogexp(numgroups, search)
 inGroup = false;
 groupIndex = 1;
-tagsAndDelimiters = splitTagsAndDelimiters(search);
+commaIndexes = strfind(search, ',');
+if ~isempty(commaIndexes)
+    tagsAndDelimiters = splitCommaSearch(search);
+else
+    tagsAndDelimiters = splitBooleanSearch(search);
+end
 exp = translateSearchExpression(tagsAndDelimiters);
 
     function str = translateSearchExpression(tagsAndDelimiters)
@@ -62,9 +67,9 @@ exp = translateSearchExpression(tagsAndDelimiters);
         end
     end % translateSearchExpression
 
-    function tagsAndDelimiters = splitTagsAndDelimiters(boolean)
-        % Splits the search string into a cell array containing all tags,
-        % operators, and delimiters
+    function tagsAndDelimiters = splitBooleanSearch(boolean)
+        % Splits the boolean search string into a cell array containing all
+        % tags, operators, and delimiters
         tagsAndDelimiters = {};
         delimAndOperators = {',', '(', ')', '[', ']', 'AND', 'OR', 'NOT'};
         [cellTags, cellDelimiters] = strsplit(boolean, ...
@@ -88,6 +93,23 @@ exp = translateSearchExpression(tagsAndDelimiters);
         end
         tagsAndDelimiters = putGroupsInCells(tagsAndDelimiters);
     end % splitTagsAndDelimiters
+
+    function tagsAndDelimiters = splitCommaSearch(search)
+        % Splits the comma search string into a cell array containing all
+        % tags, operators, and delimiters
+        splitStr = textscan(search, '%s', 'delimiter', ',', ...
+            'multipleDelimsAsOne', 1);
+        numTags = size(splitStr{1}, 1);
+        tagsAndDelimiters = cell(1, numTags + numTags-1);
+        tagsAndDelimiters{1} = splitStr{1}{1};
+        index = 2;
+        for a = 2:numTags
+            tagsAndDelimiters{index} = ',';
+            index = index+1;
+            tagsAndDelimiters{index} = splitStr{1}{a};
+            index = index+1;
+        end
+    end
 
     function groupTagsAndDelimiters = putGroupsInCells(tagsAndDelimiters)
         % Puts tag groups in cellstrs
