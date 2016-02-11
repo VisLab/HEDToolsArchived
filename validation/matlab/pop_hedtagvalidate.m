@@ -1,13 +1,12 @@
-% This function calls the HED conversion utilities pop-up gui menu. The
-% pop-up gui menu contains five tools separated through tabs. The five
-% tabs are 'Wiki to HED' which calls the 'wiki2hed' function,
-% 'Validate HED' which calls the 'validatehed' function, 'Validate Tags'
-% which calls the 'validatetags' function, 'HED Mapping' which calls the
-% 'createhedmap' function, and 'Replace Tags' which calls the 'replacetags'
-% function.
+% This function calls the HED validation utilities pop-up gui menu. The
+% pop-up gui menu contains three tools separated through tabs. The three
+% tabs are 'Validate Tab-Delimited HED Tags' which calls the
+% 'validateTSVTags' function, 'Remap Tab-Delimited HED Tags' which calls
+% the 'remapTSVTags' function, and 'Check for Updates' which calls the
+% 'updateHED' function.
 %
 % Usage:
-%   >>  pop_hedconversion()
+%   >>  pop_hedtagvalidate();
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -58,9 +57,11 @@ createTabLayouts(tabs);
 
     function tabs = createTabs(tabGroup)
         % Creates the tab panels in the figure
-        tabs.tab1 = uitab(tabGroup, 'title', 'Validate Tab-Delimited HED Tags');
-        tabs.tab2 = uitab(tabGroup, 'title', 'Remap Tab-Delimited HED Tags');
+        tabs.tab1 = uitab(tabGroup, 'title', ...
+            'Validate Tab-Delimited HED Tags');
+        tabs.tab2 = uitab(tabGroup, 'title', ...
+            'Remap Tab-Delimited HED Tags');
         tabs.tab3 = uitab(tabGroup, 'title', 'Check for Updates');
     end % createTabs
 
-end % pop_hedconversion
+end % pop_hedtagvalidate
