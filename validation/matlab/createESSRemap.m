@@ -27,12 +27,12 @@
 %
 % Output:
 %
-%       uniqueTags 
+%       uniqueTags
 %                   A cell array containing all of the unique tags in a
-%                   ESS file. 
+%                   ESS file.
 %
 % Examples:
-%                   Get all of the unique tags from the Five-Box task 
+%                   Get all of the unique tags from the Five-Box task
 %                   ESS file.
 %
 %                   uniqueTags = ...
@@ -77,14 +77,14 @@ end
                 uniqueTags = union(uniqueTags, cellTags);
             end
         end
-    end
+    end % getUniqueTags
 
     function studyTitle = getStudyTitle(xDoc)
         % Gets the title tag from the XML file
         thisList = xDoc.getElementsByTagName('title');
         thisElement = thisList.item(0);
         studyTitle = strtrim(char(thisElement.getFirstChild.getData));
-    end
+    end % getStudyTitle
 
     function p = parseArguments()
         % Parses the input arguments and returns the results
