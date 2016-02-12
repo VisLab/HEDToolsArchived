@@ -231,10 +231,11 @@ end
         dir = p.outputDirectory;
         [~, file] = fileparts(p.tsvFile);
         ext = '.txt';
+        mapExt = '.tsv';
         writeErrorFile(dir, file, ext);
         writeWarningFile(dir, file, ext);
         writeExtensionFile(dir, file, ext);
-        writeMapFile(dir, file, ext);
+        writeMapFile(dir, file, mapExt);
     end % writeOutputFiles
 
     function writeWarningFile(dir, file, ext)

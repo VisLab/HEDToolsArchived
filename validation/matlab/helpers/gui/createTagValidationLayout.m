@@ -18,7 +18,7 @@ createPanel(tab);
     function browseHedXMLCallback(src, eventdata, hedCtrl, ...
             myTitle) %#ok<INUSL>
         % Callback for 'Browse' button that sets the 'HED' editbox
-        [tFile, tPath] = uigetfile({'*.xml', 'xml Files (*.xml)'}, ...
+        [tFile, tPath] = uigetfile({'*.xml', 'XML files (*.xml)'}, ...
             myTitle);
         if tFile ~= 0
             hedXML = fullfile(tPath, tFile);
@@ -42,8 +42,8 @@ createPanel(tab);
     function browseTSVFileCallback(src, eventdata, tagsCtrl, ...
             myTitle) %#ok<INUSL>
         % Callback for 'Browse' button that sets the 'Tags' editbox
-        [tFile, tPath] = uigetfile({'*.txt', 'txt Files (*.txt)'}, ...
-            myTitle);
+        [tFile, tPath] = uigetfile({'*.tsv', 'Tab-delimited files'; ...
+            '*.txt', 'Text files'}, myTitle);
         if tFile ~= 0
             tsvFile = fullfile(tPath, tFile);
             set(tagsCtrl, 'String', tsvFile);
@@ -54,8 +54,8 @@ createPanel(tab);
     function browseReMapFileCallback(src, eventdata, remapCtrl, ...
             myTitle) %#ok<INUSL>
         % Callback for 'Browse' button that sets the 'Tags' editbox
-        [tFile, tPath] = uigetfile({'*.txt', 'txt Files (*.txt)'}, ...
-            myTitle);
+        [tFile, tPath] = uigetfile({'*.tsv', 'Tab-delimited files'; ...
+            '*.txt', 'Text files'}, myTitle);
         if tFile ~= 0
             remapFile = fullfile(tPath, tFile);
             set(remapCtrl, 'String', remapFile);

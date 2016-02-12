@@ -71,6 +71,7 @@ end
             eventCode = allEventCodes.item(k);
             thisList = eventCode.getElementsByTagName('tag');
             thisElement = thisList.item(0);
+            fprintf('Event %d\n', k+1);
             tags = strtrim(char(thisElement.getFirstChild.getData));
             if ~isempty(tags)
                 cellTags = vTagList.deStringify(tags);
@@ -102,8 +103,8 @@ end
         dir = p.outputDirectory;
         studyTitle = getStudyTitle(xDoc);
         file = [studyTitle '_remap'];
-        ext = '.txt';
-        numRemapTags = size(uniqueTags, 1);
+        ext = '.tsv';
+        numRemapTags = length(uniqueTags);
         remapFile = fullfile(dir, [file ext]);
         fileId = fopen(remapFile,'w');
         if numRemapTags > 0
