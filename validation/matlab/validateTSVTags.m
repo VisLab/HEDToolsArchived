@@ -179,7 +179,7 @@ end
 
     function fileId = writeToNewMapFile(dir, file, ext)
         % Writes to a new map file
-        numMapTags = size(uniqueErrorTags, 1);
+        numMapTags = length(uniqueErrorTags);
         remapFile = fullfile(dir, [file '_remap' ext]);
         fileId = fopen(remapFile,'w');
         for a = 1:numMapTags
