@@ -271,6 +271,9 @@ classdef vTagList < hgsetget
             elseif ischar(tgroup)
                 tsorted = strrep(tgroup, '"','');
                 tsorted = strtrim(tsorted);
+                if strcmp(tsorted(1), '/')
+                    tsorted = tsorted(2:end);
+                end
                 if strcmp(tsorted(end), '/')
                     tsorted = tsorted(1:end-1);
                 end
@@ -283,6 +286,9 @@ classdef vTagList < hgsetget
             empties = cellfun(@isempty, tgroup);
             tgroup(empties) = [];   % remove empties
             for k = 1:length(tgroup)
+                if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(1), '/')
+                    tgroup{k} = tgroup{k}(2:end);
+                end
                 if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(end), '/')
                     tgroup{k} = tgroup{k}(1:end - 1);
                 end
@@ -309,6 +315,9 @@ classdef vTagList < hgsetget
             elseif ischar(tgroup)
                 tCanonical = strrep(tgroup, '"','');
                 tCanonical = strtrim(tCanonical);
+                if strcmp(tCanonical(1), '/')
+                    tCanonical = tCanonical(2:end);
+                end
                 if strcmp(tCanonical(end), '/')
                     tCanonical = tCanonical(1:end-1);
                 end
@@ -321,6 +330,9 @@ classdef vTagList < hgsetget
             empties = cellfun(@isempty, tgroup);
             tgroup(empties) = [];   % remove empties
             for k = 1:length(tgroup)
+                if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(1), '/')
+                    tgroup{k} = tgroup{k}(2:end);
+                end
                 if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(end), '/')
                     tgroup{k} = tgroup{k}(1:end - 1);
                 end

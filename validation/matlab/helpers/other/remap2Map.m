@@ -77,6 +77,9 @@ putInMap();
         % Parses the map file line
         [originalTag, replacementTag] = strtok(tLine, char(9));
         originalTag = strtrim(originalTag);
+        if originalTag(1) == '/'
+            originalTag = originalTag(2:end);
+        end
         replacementTag = strtrim(replacementTag);
     end % parseLine
 
