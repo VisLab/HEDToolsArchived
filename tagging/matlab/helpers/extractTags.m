@@ -5,6 +5,7 @@ values = {EEG.event.(field)};
 usertags = {EEG.event.('usertags')};
 uniqueValues = unique(cellfun(@num2str, values, 'UniformOutput', false));  % sample data 'rt' and 'square' for 'type'
 uniqueValues = uniqueValues(~cellfun(@isempty, uniqueValues));
+values = cellfun(@num2str, values, 'UniformOutput', false);
 % leftoverTags = TagList();
 for k = 1:length(uniqueValues)
     theseValues = strcmpi(uniqueValues{k}, values); % events with this type

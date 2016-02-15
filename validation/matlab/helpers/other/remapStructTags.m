@@ -4,9 +4,9 @@
 %
 % Usage:
 %
-%   >>  remapTSVTags(remapFile, tsvFile, tsvTagColumns);
+%   >>  outStruct = remapStructTags(remapFile, essStruct);
 %
-%   >>  remapTSVTags(remapFile, tsvFile, tsvTagColumns, varargin);
+%   >>  outStruct = remapStructTags(remapFile, essStruct, varargin);
 %
 % Input:
 %
@@ -17,31 +17,20 @@
 %                   HED tags in the first column and the new HED tags are
 %                   in the second column.
 %
-%       tsvFile
-%                   The name or the path of a tab-delimited text file
-%                   containing HED tags associated with a particular study
-%                   or experiment.
+%       essStruct
+%                   An ESS structure containing HED tags.
 %
-%       tsvTagColumns
-%                   The columns that contain the study or experiment HED
-%                   tags. The columns can be a scalar value or a vector
-%                   (e.g. 2 or [2,3,4]).
+% Output:
 %
-%       Optional:
-%
-%       'outputFile'
-%                   The name or the path to the file that the output is
-%                   written to. The output file will be a tab-delimited
-%                   text file consisting of the new HED tags which replaced
-%                   the old HED tags in each specified columns.
+%       outStruct
+%                   An ESS structure containing the remapped HED tags.
 %
 % Examples:
-%                   To replace the old HED tags in file
-%                   'Reward Two Back Study.txt' with new HED tags in the
-%                   fourth column using HED remap file 'HEDRemap.txt'.
+%                   To replace the old HED tags in Five-Box task ESS 
+%                   structure with new HED tags in the .
 %
 %                   remapTSVTags('HEDRemap.txt', ...
-%                   'Reward Two Back Study.txt', 4)
+%                   'Five-Box Task_remap.tsv')
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
