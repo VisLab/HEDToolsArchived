@@ -4,9 +4,9 @@
 %
 % Usage:
 %
-%   >>  outStruct = remapStructTags(remapFile, essStruct);
+%   >>  essStruct = remapStructTags(remapFile, essStruct);
 %
-%   >>  outStruct = remapStructTags(remapFile, essStruct, varargin);
+%   >>  essStruct = remapStructTags(remapFile, essStruct, varargin);
 %
 % Input:
 %
@@ -22,7 +22,7 @@
 %
 % Output:
 %
-%       outStruct
+%       essStruct
 %                   An ESS structure containing the remapped HED tags.
 %
 % Examples:
@@ -49,11 +49,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function outStruct = remapStructTags(remapFile, essStruct)
+function essStruct = remapStructTags(remapFile, essStruct)
 p = parseArguments();
-outStruct = essStruct;
 remapMap = remap2Map(p.remapFile);
-outStruct.eventCodes.eventCode = ...
+essStruct.eventCodes.eventCode = ...
     readEventCodes(essStruct.eventCodes.eventCode);
 
     function p = parseArguments()
