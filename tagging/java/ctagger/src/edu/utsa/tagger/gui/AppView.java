@@ -670,13 +670,13 @@ public class AppView extends ConstraintContainer {
 					@Override
 					public void insertUpdate(DocumentEvent e) {
 						if (!collapseLevel.getJTextArea().getText().isEmpty()) {
-							int level = -1;
+							int level = 0;
 							try {
 								level = Integer.parseInt(collapseLevel
 										.getJTextArea().getText());
 							} catch (NumberFormatException ex) {
 							}
-							if (level > -1) {
+							if (level > 0) {
 								autoCollapseDepth = level;
 								autoCollapse = true;
 								updateTags();
@@ -687,13 +687,13 @@ public class AppView extends ConstraintContainer {
 					@Override
 					public void removeUpdate(DocumentEvent e) {
 						if (!collapseLevel.getJTextArea().getText().isEmpty()) {
-							int level = -1;
+							int level = 0;
 							try {
 								level = Integer.parseInt(collapseLevel
 										.getJTextArea().getText());
 							} catch (NumberFormatException ex) {
 							}
-							if (level > -1) {
+							if (level > 0) {
 								autoCollapseDepth = level;
 								autoCollapse = true;
 								updateTags();
@@ -704,7 +704,7 @@ public class AppView extends ConstraintContainer {
 		collapseAll.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				autoCollapseDepth = 0;
+				autoCollapseDepth = 1;
 				autoCollapse = true;
 				collapseLevel.getJTextArea().setText(
 						Integer.toString(autoCollapseDepth));

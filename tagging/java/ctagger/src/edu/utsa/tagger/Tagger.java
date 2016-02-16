@@ -71,14 +71,15 @@ public class Tagger {
 	 */
 	private static List<String> splitPath(String path) {
 		String pathTokens[] = path.split("[/]");
-		if ((pathTokens.length < 2 || !pathTokens[0].isEmpty())
-				&& !"~".equals(pathTokens[0])) {
-			System.err.println("invalid path: [" + path + "]");
-			return null;
-		}
+		// if (pathTokens.length < 1 && !"~".equals(pathTokens[0])) {
+		// System.err.println("invalid path: [" + path + "]");
+		// return null;
+		// }
 		List<String> pathAsList = new ArrayList<String>();
-		for (int i = 1; i < pathTokens.length; i++) {
-			pathAsList.add(pathTokens[i]);
+		if (pathTokens.length > 0) {
+			for (int i = 1; i < pathTokens.length; i++) {
+				pathAsList.add(pathTokens[i]);
+			}
 		}
 		return pathAsList;
 	}
@@ -153,8 +154,7 @@ public class Tagger {
 	 * @param loader
 	 *            loads the tagger GUI
 	 */
-	public Tagger(String xmlData, boolean isPrimary, IFactory factory,
-			Loader loader) {
+	public Tagger(String xmlData, boolean isPrimary, IFactory factory, Loader loader) {
 		this.isPrimary = isPrimary;
 		this.factory = factory;
 		this.loader = loader;
@@ -167,13 +167,10 @@ public class Tagger {
 		// Unmarshal XML String
 		TaggerDataXmlModel savedDataXmlModel = null;
 		try {
-			JAXBContext context = JAXBContext
-					.newInstance(TaggerDataXmlModel.class);
-			savedDataXmlModel = (TaggerDataXmlModel) context
-					.createUnmarshaller().unmarshal(new StringReader(xmlData));
+			JAXBContext context = JAXBContext.newInstance(TaggerDataXmlModel.class);
+			savedDataXmlModel = (TaggerDataXmlModel) context.createUnmarshaller().unmarshal(new StringReader(xmlData));
 		} catch (JAXBException e) {
-			throw new RuntimeException("Unable to read XML data: "
-					+ e.getMessage());
+			throw new RuntimeException("Unable to read XML data: " + e.getMessage());
 		}
 		if (savedDataXmlModel == null) {
 			throw new RuntimeException("Unable to read XML data");
@@ -195,8 +192,7 @@ public class Tagger {
 	 * @param loader
 	 *            loads the tagger GUI
 	 */
-	public Tagger(String hedXmlString, String egtString, boolean isPrimary,
-			IFactory factory, Loader loader) {
+	public Tagger(String hedXmlString, String egtString, boolean isPrimary, IFactory factory, Loader loader) {
 		this.factory = factory;
 		this.loader = loader;
 		this.isPrimary = isPrimary;
@@ -211,8 +207,7 @@ public class Tagger {
 				Set<EventJsonModel> eventJsonModels = readEventJsonString(egtString);
 				populateEventsFromJson(eventJsonModels);
 			} else {
-				BufferedReader egtReader = new BufferedReader(new StringReader(
-						egtString));
+				BufferedReader egtReader = new BufferedReader(new StringReader(egtString));
 				populateEventsFromTabDelimitedText(egtReader);
 			}
 		} catch (Exception e) {
@@ -297,8 +292,7 @@ public class Tagger {
 	 *            The set of tags to add to the event.
 	 * @return True if the add was successful, false otherwise.
 	 */
-	public boolean addGroupBase(TaggedEvent taggedEvent, Integer groupId,
-			TaggerSet<AbstractTagModel> tags) {
+	public boolean addGroupBase(TaggedEvent taggedEvent, Integer groupId, TaggerSet<AbstractTagModel> tags) {
 		if (!taggedEvent.addGroup(groupId)) {
 			return false;
 		}
@@ -318,8 +312,7 @@ public class Tagger {
 	 * @return The TaggedEvent created.
 	 */
 	public TaggedEvent addNewEvent(String code, String label) {
-		GuiEventModel eventModel = (GuiEventModel) factory
-				.createAbstractEventModel(this);
+		GuiEventModel eventModel = (GuiEventModel) factory.createAbstractEventModel(this);
 		eventModel.setCode(code);
 		eventModel.setLabel(label);
 		TaggedEvent taggedEvent = new TaggedEvent(eventModel, this);
@@ -412,8 +405,7 @@ public class Tagger {
 		Highlight[] highlights = GuiTagModel.Highlight.values();
 		if (parent != null) {
 			parentPath = parent.getPath();
-			int parentHighlightPosition = findHighlightPosition(highlights,
-					parentTag.getHighlight());
+			int parentHighlightPosition = findHighlightPosition(highlights, parentTag.getHighlight());
 			if (parentHighlightPosition >= 0) {
 				int childHighlightPosition = parentHighlightPosition + 1;
 				newTag.setHighlight(highlights[childHighlightPosition]);
@@ -505,8 +497,7 @@ public class Tagger {
 	 * @param groupIds
 	 *            The set of group IDs to associate the tag to.
 	 */
-	public void associate(AbstractTagModel tagModel, int index,
-			Set<Integer> groupIds) {
+	public void associate(AbstractTagModel tagModel, int index, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = associateBase(tagModel, index, groupIds);
 		if (!affectedGroups.isEmpty()) {
 			HistoryItem historyItem = new HistoryItem();
@@ -527,8 +518,7 @@ public class Tagger {
 	 * @param groupIds
 	 *            The set of group IDs to associate the tag to.
 	 */
-	public void associate(HistoryItem historyItem, AbstractTagModel tagModel,
-			Set<Integer> groupIds) {
+	public void associate(HistoryItem historyItem, AbstractTagModel tagModel, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = associateBase(tagModel, groupIds);
 		if (!affectedGroups.isEmpty()) {
 			historyItem.type = TaggerHistory.Type.ASSOCIATED;
@@ -548,8 +538,7 @@ public class Tagger {
 	 * @param groupIds
 	 *            The set of group IDs to associate the tag to.
 	 */
-	public Set<Integer> associateBase(AbstractTagModel tagModel, int index,
-			Set<Integer> groupIds) {
+	public Set<Integer> associateBase(AbstractTagModel tagModel, int index, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = new HashSet<Integer>();
 		for (Integer groupId : groupIds) {
 			TaggedEvent taggedEvent = getTaggedEventFromGroupId(groupId);
@@ -568,8 +557,7 @@ public class Tagger {
 	 * @param groupIds
 	 *            The set of group IDs to associate the tag to.
 	 */
-	public Set<Integer> associateBase(AbstractTagModel tagModel,
-			Set<Integer> groupIds) {
+	public Set<Integer> associateBase(AbstractTagModel tagModel, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = new HashSet<Integer>();
 		for (Integer groupId : groupIds) {
 			TaggedEvent taggedEvent = getTaggedEventFromGroupId(groupId);
@@ -591,8 +579,7 @@ public class Tagger {
 			EventJsonModel jsonEvent = new EventJsonModel();
 			jsonEvent.setCode(event.getEventModel().getCode());
 			List<List<String>> tags = new ArrayList<List<String>>();
-			for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event
-					.getTagGroups().entrySet()) {
+			for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
 				if (entry.getKey() == event.getEventGroupId()) {
 					// Event level tags
 					for (AbstractTagModel tag : entry.getValue()) {
@@ -657,14 +644,12 @@ public class Tagger {
 		for (int i = 0; i < colNums.length; i++) {
 			try {
 				if (!cols[colNums[i] - 1].trim().isEmpty())
-					combinedCols += delimiter
-							+ cols[colNums[i] - 1].trim()
-									.replaceAll("~", ",~,");
+					combinedCols += delimiter + cols[colNums[i] - 1].trim().replaceAll("~", ",~,");
 			} catch (Exception ex) {
 				continue;
 			}
 		}
-		combinedCols.replaceFirst(delimiter, "");
+		combinedCols = combinedCols.replaceFirst(delimiter, "");
 		return combinedCols;
 	}
 
@@ -677,8 +662,7 @@ public class Tagger {
 	 * @return TaggedEvent with code and tag groupID set.
 	 */
 	private TaggedEvent createNewEvent(String code) {
-		GuiEventModel eventModel = (GuiEventModel) factory
-				.createAbstractEventModel(this);
+		GuiEventModel eventModel = (GuiEventModel) factory.createAbstractEventModel(this);
 		eventModel.setCode(code);
 		eventModel.setLabel(new String());
 		TaggedEvent taggedEvent = new TaggedEvent(eventModel, this);
@@ -711,34 +695,28 @@ public class Tagger {
 	 * @param level
 	 *            The level of the tag.
 	 */
-	private int createTagSetRecursive(String path,
-			Set<TagXmlModel> tagXmlModels, int level) {
+	private int createTagSetRecursive(String path, Set<TagXmlModel> tagXmlModels, int level) {
 		tagLevel = Math.max(tagLevel, level);
 		level++;
-		Object[] highlights = Arrays.copyOfRange(
-				GuiTagModel.Highlight.values(), 4,
+		Object[] highlights = Arrays.copyOfRange(GuiTagModel.Highlight.values(), 4,
 				GuiTagModel.Highlight.values().length);
 		AbstractTagModel parentTag = tagFound(path);
 		for (TagXmlModel tagXmlModel : tagXmlModels) {
 			AbstractTagModel tagModel = factory.createAbstractTagModel(this);
-			if ("~".equals(tagXmlModel.getName())) {
+			if (path.isEmpty())
 				tagModel.setPath(tagXmlModel.getName());
-			} else {
+			else
 				tagModel.setPath(path + "/" + tagXmlModel.getName());
-			}
 			tagModel.setDescription(tagXmlModel.getDescription());
 			tagModel.setChildRequired(tagXmlModel.isChildRequired());
 			tagModel.setTakesValue(tagXmlModel.takesValue());
 			tagModel.setRecommended(tagXmlModel.isRecommended());
 			tagModel.setRequired(tagXmlModel.isRequired());
 			tagModel.setUnique(tagXmlModel.isUnique());
-			if (parentTag != null
-					&& PredicateType.PROPERTYOF.equals(parentTag
-							.getPredicateType())) {
+			if (parentTag != null && PredicateType.PROPERTYOF.equals(parentTag.getPredicateType())) {
 				tagModel.setPredicateType(PredicateType.PROPERTYOF);
 			} else {
-				tagModel.setPredicateType(PredicateType.valueOf(tagXmlModel
-						.getPredicateType().toUpperCase()));
+				tagModel.setPredicateType(PredicateType.valueOf(tagXmlModel.getPredicateType().toUpperCase()));
 			}
 			tagModel.setPosition(tagXmlModel.getPosition());
 			tagModel.setIsNumeric(tagXmlModel.isNumeric());
@@ -754,8 +732,10 @@ public class Tagger {
 			if (tagModel.isUnique()) {
 				uniqueTags.add(tagModel);
 			}
-			createTagSetRecursive(path + "/" + tagXmlModel.getName(),
-					tagXmlModel.getTags(), level);
+			if (path.isEmpty())
+				createTagSetRecursive(tagXmlModel.getName(), tagXmlModel.getTags(), level);
+			else
+				createTagSetRecursive(path + "/" + tagXmlModel.getName(), tagXmlModel.getTags(), level);
 		}
 		return level;
 	}
@@ -771,8 +751,7 @@ public class Tagger {
 	 *            The value associated with the tag.
 	 * @return A AbstractTagModel representing the transient tag.
 	 */
-	public AbstractTagModel createTransientTagModel(AbstractTagModel valueTag,
-			String value) {
+	public AbstractTagModel createTransientTagModel(AbstractTagModel valueTag, String value) {
 		AbstractTagModel tag = factory.createAbstractTagModel(this);
 		String valueStr = valueTag.getName().replace("#", value);
 		tag.setPath(valueTag.getParentPath() + "/" + valueStr);
@@ -785,14 +764,10 @@ public class Tagger {
 	 * @param unitClassesXmlModels
 	 *            A UnitClassesXmlModel that represents the tag unit classes.
 	 */
-	private void createUnitClassHashMapFromXml(
-			UnitClassesXmlModel unitClassesXmlModels) {
-		for (UnitClassXmlModel unitClassXmlModel : unitClassesXmlModels
-				.getUnitClasses()) {
-			unitClasses.put(unitClassXmlModel.getName(),
-					unitClassXmlModel.getUnits());
-			unitClassDefaults.put(unitClassXmlModel.getName(),
-					unitClassXmlModel.getDefault());
+	private void createUnitClassHashMapFromXml(UnitClassesXmlModel unitClassesXmlModels) {
+		for (UnitClassXmlModel unitClassXmlModel : unitClassesXmlModels.getUnitClasses()) {
+			unitClasses.put(unitClassXmlModel.getName(), unitClassXmlModel.getUnits());
+			unitClassDefaults.put(unitClassXmlModel.getName(), unitClassXmlModel.getDefault());
 		}
 	}
 
@@ -871,8 +846,7 @@ public class Tagger {
 	 * @return A copy of the event model with the original (replaced) event
 	 *         code.
 	 */
-	public AbstractEventModel editEventCodeBase(AbstractEventModel event,
-			String code) {
+	public AbstractEventModel editEventCodeBase(AbstractEventModel event, String code) {
 		AbstractEventModel copy = factory.createAbstractEventModel(this);
 		copy.setCode(event.getCode());
 		event.setCode(code);
@@ -892,10 +866,8 @@ public class Tagger {
 	 * @param label
 	 *            The new event label.
 	 */
-	public void editEventCodeLabel(TaggedEvent taggedEvent,
-			AbstractTagModel tag, String code, String label) {
-		AbstractEventModel copy = editEventCodeLabelBase(
-				taggedEvent.getEventModel(), code, label);
+	public void editEventCodeLabel(TaggedEvent taggedEvent, AbstractTagModel tag, String code, String label) {
+		AbstractEventModel copy = editEventCodeLabelBase(taggedEvent.getEventModel(), code, label);
 		HistoryItem historyItem = new HistoryItem();
 		historyItem.event = taggedEvent;
 		historyItem.eventModel = taggedEvent.getEventModel();
@@ -907,13 +879,11 @@ public class Tagger {
 			historyItem.tagModelCopy = (GuiTagModel) tag;
 			history.add(historyItem);
 		} else if (tag != null && label.trim().isEmpty()) {
-			TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups = taggedEvent
-					.getTagGroups();
+			TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups = taggedEvent.getTagGroups();
 			unassociate(historyItem, tag, tagGroups.keySet());
 		} else if (tag == null && !label.trim().isEmpty()) {
 			AbstractTagModel labelTag = getTagModel("/Event/Label/" + label);
-			TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups = taggedEvent
-					.getTagGroups();
+			TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups = taggedEvent.getTagGroups();
 			if (taggedEvent.isInFirstEdit()) {
 				associateBase(labelTag, tagGroups.keySet());
 			} else {
@@ -933,8 +903,7 @@ public class Tagger {
 	 * @param label
 	 *            The new event label.
 	 */
-	public AbstractEventModel editEventCodeLabelBase(AbstractEventModel event,
-			String code, String label) {
+	public AbstractEventModel editEventCodeLabelBase(AbstractEventModel event, String code, String label) {
 		AbstractEventModel copy = factory.createAbstractEventModel(this);
 		copy.setCode(event.getCode());
 		event.setCode(code);
@@ -972,8 +941,7 @@ public class Tagger {
 	 * @return A copy of the event model with the original (replaced) event
 	 *         label.
 	 */
-	public AbstractEventModel editEventLabelBase(AbstractEventModel event,
-			String label) {
+	public AbstractEventModel editEventLabelBase(AbstractEventModel event, String label) {
 		AbstractEventModel copy = factory.createAbstractEventModel(this);
 		copy.setLabel(event.getLabel());
 		event.setLabel(label);
@@ -1006,13 +974,11 @@ public class Tagger {
 	 * @param position
 	 *            The tag position.
 	 */
-	public void editTag(GuiTagModel tag, String name, String description,
-			boolean childRequired, boolean takesValue, boolean isNumeric,
-			boolean required, boolean recommended, boolean unique,
-			Integer position, PredicateType predicateType) {
-		GuiTagModel copy = editTagBase(tag, name, description, childRequired,
-				takesValue, isNumeric, required, recommended, unique, position,
-				predicateType);
+	public void editTag(GuiTagModel tag, String name, String description, boolean childRequired, boolean takesValue,
+			boolean isNumeric, boolean required, boolean recommended, boolean unique, Integer position,
+			PredicateType predicateType) {
+		GuiTagModel copy = editTagBase(tag, name, description, childRequired, takesValue, isNumeric, required,
+				recommended, unique, position, predicateType);
 		if (!tag.isFirstEdit()) {
 			HistoryItem historyItem = new HistoryItem();
 			historyItem.type = TaggerHistory.Type.TAG_EDITED;
@@ -1048,10 +1014,9 @@ public class Tagger {
 	 *            The tag position.
 	 * @return A copy of the tag model with the original (replaced) information.
 	 */
-	public GuiTagModel editTagBase(GuiTagModel tag, String name,
-			String description, boolean childRequired, boolean takesValue,
-			boolean isNumeric, boolean required, boolean recommended,
-			boolean unique, Integer position, PredicateType predicateType) {
+	public GuiTagModel editTagBase(GuiTagModel tag, String name, String description, boolean childRequired,
+			boolean takesValue, boolean isNumeric, boolean required, boolean recommended, boolean unique,
+			Integer position, PredicateType predicateType) {
 		GuiTagModel copy = (GuiTagModel) factory.createAbstractTagModel(this);
 		copy.setPath(tag.getPath());
 		copy.setDescription(tag.getDescription());
@@ -1106,10 +1071,8 @@ public class Tagger {
 	 *            The tag position.
 	 * @return A copy of the tag model with the original (replaced) information.
 	 */
-	public GuiTagModel editTagBase(GuiTagModel tag, String path, String name,
-			String description, boolean childRequired, boolean takesValue,
-			boolean required, boolean recommended, boolean unique,
-			Integer position) {
+	public GuiTagModel editTagBase(GuiTagModel tag, String path, String name, String description, boolean childRequired,
+			boolean takesValue, boolean required, boolean recommended, boolean unique, Integer position) {
 		GuiTagModel copy = (GuiTagModel) factory.createAbstractTagModel(this);
 		copy.setPath(tag.getPath());
 		copy.setDescription(tag.getDescription());
@@ -1147,8 +1110,7 @@ public class Tagger {
 	 * @param path
 	 *            The tag path.
 	 */
-	public void editTagPath(TaggedEvent taggedEvent, GuiTagModel tag,
-			String path) {
+	public void editTagPath(TaggedEvent taggedEvent, GuiTagModel tag, String path) {
 		HistoryItem historyItem = new HistoryItem();
 		historyItem.type = TaggerHistory.Type.TAG_PATH_EDITED;
 		historyItem.tagModelCopy = editTagPathBase(tag, path);
@@ -1198,8 +1160,7 @@ public class Tagger {
 			currentEvent = new EventXmlModel();
 			currentEvent.setCode(currentEventModel.getEventModel().getCode());
 			eventSetModel.addEvent(currentEvent);
-			for (Entry<Integer, TaggerSet<AbstractTagModel>> tagGroup : currentEventModel
-					.getTagGroups().entrySet()) {
+			for (Entry<Integer, TaggerSet<AbstractTagModel>> tagGroup : currentEventModel.getTagGroups().entrySet()) {
 				if (tagGroup.getKey() == currentEventModel.getEventGroupId()) {
 					// Add event-level tags
 					for (AbstractTagModel tag : tagGroup.getValue()) {
@@ -1241,8 +1202,7 @@ public class Tagger {
 	 * @return The index position containing the highlight if found, -1 if
 	 *         otherwise.
 	 */
-	public int findHighlightPosition(Highlight[] highlights,
-			Highlight highlightValue) {
+	public int findHighlightPosition(Highlight[] highlights, Highlight highlightValue) {
 		for (int i = 0; i < highlights.length; i++) {
 			if (highlightValue.equals(highlights[i])) {
 				return i;
@@ -1262,8 +1222,7 @@ public class Tagger {
 		for (TaggedEvent event : taggedEventSet) {
 			for (AbstractTagModel tag : requiredTags) {
 				if (event.getRRValue(tag) == null) {
-					result.add(new EventModel(event, event.getEventGroupId(),
-							tag));
+					result.add(new EventModel(event, event.getEventGroupId(), tag));
 				}
 			}
 		}
@@ -1278,15 +1237,16 @@ public class Tagger {
 	 * @return An array of formatted tags.
 	 */
 	private String[] formatTags(String[] tags) {
-		for (int i = 0; i < tags.length; i++) {
-			tags[i] = tags[i].replaceAll("\"", "");
-			if (tags[i].trim().matches("^\\([^/].*"))
-				tags[i] = tags[i].trim().replaceFirst("\\(", "(/");
-			if (tags[i].trim().matches("^[^(/].*")
-					&& !"~".equals(tags[i].trim()))
-				tags[i] = "/" + tags[i].trim();
+		List<String> tagsList = Arrays.asList(tags);
+		for (int i = 0; i < tagsList.size(); i++) {
+			if (tagsList.get(i) == null) {
+				tagsList.remove(i);
+			} else {
+				tagsList.set(i, tagsList.get(i).trim().replaceAll("^/", ""));
+				tagsList.set(i, tagsList.get(i).replaceAll("\"", ""));
+			}
 		}
-		return tags;
+		return tagsList.toArray(new String[tagsList.size()]);
 	}
 
 	/**
@@ -1303,8 +1263,7 @@ public class Tagger {
 		int count = 0;
 		AbstractTagModel valueTag = null;
 		for (AbstractTagModel t : tagList) {
-			if (t.getDepth() > tagModel.getDepth()
-					&& t.getPath().startsWith(tagModel.getPath() + "/")) {
+			if (t.getDepth() > tagModel.getDepth() && t.getPath().startsWith(tagModel.getPath() + "/")) {
 				count++;
 				if (t.takesValue()) {
 					valueTag = t;
@@ -1337,8 +1296,7 @@ public class Tagger {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(hedModel, sw);
 		} catch (JAXBException e) {
-			throw new RuntimeException("Unable to marshal HED XML String: "
-					+ e.getMessage());
+			throw new RuntimeException("Unable to marshal HED XML String: " + e.getMessage());
 		}
 		return sw.toString();
 	}
@@ -1480,19 +1438,18 @@ public class Tagger {
 		AbstractTagModel valueTag = null;
 		if (!"~".equals(path)) {
 			List<String> pathAsList = splitPath(path);
-			String parentPath = path.substring(0, path.lastIndexOf('/'));
-			if (pathAsList == null) {
-				throw new RuntimeException("invalid path: " + path);
-			}
-			for (AbstractTagModel tagModel : tagList) {
-				if (tagModel.getPath().equals(path)) {
-					return tagModel;
-				} else if (tagModel.takesValue()
-						&& tagModel.getParentPath().equals(parentPath)) {
-					if (matchTakesValueTag(tagModel.getName(),
-							path.substring(path.lastIndexOf('/')))) {
-						valueTag = tagModel;
-						break;
+
+			if (pathAsList.size() > 0) {
+				// throw new RuntimeException("invalid path: " + path);
+				String parentPath = path.substring(0, path.lastIndexOf('/'));
+				for (AbstractTagModel tagModel : tagList) {
+					if (tagModel.getPath().equals(path)) {
+						return tagModel;
+					} else if (tagModel.takesValue() && tagModel.getParentPath().equals(parentPath)) {
+						if (matchTakesValueTag(tagModel.getName(), path.substring(path.lastIndexOf('/')))) {
+							valueTag = tagModel;
+							break;
+						}
 					}
 				}
 			}
@@ -1528,8 +1485,7 @@ public class Tagger {
 		try {
 			br.close();
 		} catch (IOException e) {
-			System.err.println("Error writing events to string: "
-					+ e.getMessage());
+			System.err.println("Error writing events to string: " + e.getMessage());
 			return null;
 		}
 		return sw.toString();
@@ -1580,14 +1536,12 @@ public class Tagger {
 		StringWriter sw = new StringWriter();
 		TaggerDataXmlModel savedDataModel = buildSavedDataModel();
 		try {
-			JAXBContext context = JAXBContext
-					.newInstance(TaggerDataXmlModel.class);
+			JAXBContext context = JAXBContext.newInstance(TaggerDataXmlModel.class);
 			Marshaller marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(savedDataModel, sw);
 		} catch (JAXBException e) {
-			throw new RuntimeException("Unable to marshal XML data: "
-					+ e.getMessage());
+			throw new RuntimeException("Unable to marshal XML data: " + e.getMessage());
 		}
 		return sw.toString();
 	}
@@ -1601,8 +1555,7 @@ public class Tagger {
 	 */
 	public boolean hasChildTags(AbstractTagModel tagModel) {
 		for (AbstractTagModel t : tagList) {
-			if (t.getDepth() > tagModel.getDepth()
-					&& t.getPath().startsWith(tagModel.getPath() + "/")) {
+			if (t.getDepth() > tagModel.getDepth() && t.getPath().startsWith(tagModel.getPath() + "/")) {
 				return true;
 			}
 		}
@@ -1675,17 +1628,14 @@ public class Tagger {
 		// Unmarshal saved data from file
 		TaggerDataXmlModel savedDataXmlModel = null;
 		try {
-			JAXBContext context = JAXBContext
-					.newInstance(TaggerDataXmlModel.class);
-			savedDataXmlModel = (TaggerDataXmlModel) context
-					.createUnmarshaller().unmarshal(savedData);
+			JAXBContext context = JAXBContext.newInstance(TaggerDataXmlModel.class);
+			savedDataXmlModel = (TaggerDataXmlModel) context.createUnmarshaller().unmarshal(savedData);
 		} catch (Exception e) {
 			System.err.println("Unable to read XML file: " + e.getMessage());
 			return false;
 		}
 		if (savedDataXmlModel == null) {
-			System.err.println("Unable to read XML file "
-					+ "- unmarshal returned null");
+			System.err.println("Unable to read XML file " + "- unmarshal returned null");
 			return false;
 		}
 		return processXmlData(savedDataXmlModel);
@@ -1727,19 +1677,15 @@ public class Tagger {
 		return true;
 	}
 
-	public boolean loadTabDelimited(File egtFile, File hedFile, int header,
-			int[] eventCodeColumn, int[] tagColumns) {
+	public boolean loadTabDelimited(File egtFile, File hedFile, int header, int[] eventCodeColumn, int[] tagColumns) {
 		try {
-			BufferedReader egtReader = new BufferedReader(new FileReader(
-					egtFile));
-			populateEventsFromTabDelimitedText(egtReader, header,
-					eventCodeColumn, tagColumns);
+			BufferedReader egtReader = new BufferedReader(new FileReader(egtFile));
+			populateEventsFromTabDelimitedText(egtReader, header, eventCodeColumn, tagColumns);
 			egtReader.close();
 			HedXmlModel hedXmlModel = ReadHEDXml(hedFile);
 			populateTagList(hedXmlModel);
 		} catch (Exception e) {
-			System.err.println("Unable to read delimited file: "
-					+ egtFile.getPath() + ": " + e.getMessage());
+			System.err.println("Unable to read delimited file: " + egtFile.getPath() + ": " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -1762,17 +1708,13 @@ public class Tagger {
 	 *            The event tag column(s).
 	 * @return True if the data loaded successfully, false if an error occurred.
 	 */
-	public boolean loadTabDelimitedEvents(File egtFile, int header,
-			int[] eventCodeColumn, int[] tagColumns) {
+	public boolean loadTabDelimitedEvents(File egtFile, int header, int[] eventCodeColumn, int[] tagColumns) {
 		try {
-			BufferedReader egtReader = new BufferedReader(new FileReader(
-					egtFile));
-			populateEventsFromTabDelimitedText(egtReader, header,
-					eventCodeColumn, tagColumns);
+			BufferedReader egtReader = new BufferedReader(new FileReader(egtFile));
+			populateEventsFromTabDelimitedText(egtReader, header, eventCodeColumn, tagColumns);
 			egtReader.close();
 		} catch (Exception e) {
-			System.err.println("Unable to read delimited file: "
-					+ egtFile.getPath() + ": " + e.getMessage());
+			System.err.println("Unable to read delimited file: " + egtFile.getPath() + ": " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -1790,8 +1732,7 @@ public class Tagger {
 	 * @return The tag matched in the given sub-hierarchy if found, null if
 	 *         otherwise.
 	 */
-	private AbstractTagModel matchSubhierarchy(String parentPath,
-			AbstractTagModel tag) {
+	private AbstractTagModel matchSubhierarchy(String parentPath, AbstractTagModel tag) {
 		TaggerSet<AbstractTagModel> takesValueTags = new TaggerSet<AbstractTagModel>();
 		for (AbstractTagModel childTag : getSubHierarchy(parentPath)) {
 			if (childTag.takesValue()) {
@@ -1821,8 +1762,7 @@ public class Tagger {
 	 */
 	private boolean matchTakesValueTag(String valueString, String tagName) {
 		String before = valueString.substring(0, valueString.indexOf('#'));
-		String after = valueString.substring(valueString.indexOf('#') + 1,
-				valueString.length());
+		String after = valueString.substring(valueString.indexOf('#') + 1, valueString.length());
 		if (tagName.startsWith(before) && tagName.endsWith(after)) {
 			return true;
 		}
@@ -1848,12 +1788,9 @@ public class Tagger {
 			for (; j < tagList.size(); j++) {
 				AbstractTagModel currentTag = tagList.get(j);
 				// Match tag that takes value
-				if (currentTag.takesValue()
-						&& i == path.size() - 1
-						&& currentTag.getParentPath().equals(
-								tag.getParentPath())) {
-					AbstractTagModel match = matchSubhierarchy(
-							currentTag.getParentPath(), tag);
+				if (currentTag.takesValue() && i == path.size() - 1
+						&& currentTag.getParentPath().equals(tag.getParentPath())) {
+					AbstractTagModel match = matchSubhierarchy(currentTag.getParentPath(), tag);
 					if (match != null) {
 						((GuiTagModel) currentTag).setCollapsed(false);
 						lastOpened = match;
@@ -1917,8 +1854,7 @@ public class Tagger {
 					}
 				}
 			}
-			if (eventJsonModel.getCode() == null
-					|| eventJsonModel.getCode().isEmpty()) {
+			if (eventJsonModel.getCode() == null || eventJsonModel.getCode().isEmpty()) {
 				return false;
 			}
 			// // Add tags given in JSON fields if not already present
@@ -2012,8 +1948,7 @@ public class Tagger {
 	 *            The event tag column(s).
 	 * @return True if the data loaded successfully, false otherwise.
 	 */
-	private boolean populateEventsFromTabDelimitedText(
-			BufferedReader egtReader, int header, int[] eventCodeColumns,
+	private boolean populateEventsFromTabDelimitedText(BufferedReader egtReader, int header, int[] eventCodeColumns,
 			int[] tagColumns) {
 		TaggerSet<TaggedEvent> taggerSetTemp = new TaggerSet<TaggedEvent>();
 		groupIdCounter = 0;
@@ -2027,8 +1962,7 @@ public class Tagger {
 				if (line.trim().isEmpty() || lineCount <= header)
 					continue;
 				// combine columns
-				String eventCode = combineColumns(" ", cols, eventCodeColumns)
-						.trim();
+				String eventCode = combineColumns(" ", cols, eventCodeColumns).trim();
 				// event check
 				if (eventCode.isEmpty())
 					continue;
@@ -2038,8 +1972,7 @@ public class Tagger {
 					// Add tags to event
 					int groupId = event.getEventGroupId();
 					boolean endGroup;
-					String[] tags = formatTags(combineColumns(",", cols,
-							tagColumns).split(","));
+					String[] tags = formatTags(combineColumns(",", cols, tagColumns).split(","));
 					for (String tag : tags) {
 						if (tag.trim().isEmpty()) {
 							continue;
@@ -2090,8 +2023,7 @@ public class Tagger {
 			// Add individual tags to event
 			for (String tagPath : eventXmlModel.getTags()) {
 				AbstractTagModel tagModel = getTagModel(tagPath);
-				taggedEvent.addTagToGroup(taggedEvent.getEventGroupId(),
-						tagModel);
+				taggedEvent.addTagToGroup(taggedEvent.getEventGroupId(), tagModel);
 			}
 			// Add tag groups for event
 			int groupId;
@@ -2104,8 +2036,7 @@ public class Tagger {
 				}
 			}
 			// Default code
-			if (taggedEvent.getEventModel().getCode() == null
-					|| taggedEvent.getEventModel().getCode().isEmpty()) {
+			if (taggedEvent.getEventModel().getCode() == null || taggedEvent.getEventModel().getCode().isEmpty()) {
 				return false;
 			}
 			taggerSetTemp.add(taggedEvent);
@@ -2124,8 +2055,8 @@ public class Tagger {
 	 *             If an error occurs.
 	 */
 	private Set<EventJsonModel> populateJSONList(File egtFile) throws Exception {
-		Set<EventJsonModel> eventJsonModels = new ObjectMapper().readValue(
-				egtFile, new TypeReference<LinkedHashSet<EventJsonModel>>() {
+		Set<EventJsonModel> eventJsonModels = new ObjectMapper().readValue(egtFile,
+				new TypeReference<LinkedHashSet<EventJsonModel>>() {
 				});
 		return eventJsonModels;
 	}
@@ -2163,8 +2094,7 @@ public class Tagger {
 			requiredTags = new TaggerSet<AbstractTagModel>();
 			recommendedTags = new TaggerSet<AbstractTagModel>();
 			uniqueTags = new TaggerSet<AbstractTagModel>();
-			createUnitClassHashMapFromXml(xmlData.getHedXmlModel()
-					.getUnitClasses());
+			createUnitClassHashMapFromXml(xmlData.getHedXmlModel().getUnitClasses());
 			createTagSetFromXml(xmlData.getHedXmlModel().getTags());
 			succeed = true;
 		}
@@ -2178,10 +2108,9 @@ public class Tagger {
 	 *            JSON string containing events and associated tags.
 	 * @return Set<EventJsonModel> containing a model for each event read.
 	 */
-	private Set<EventJsonModel> readEventJsonString(String egtString)
-			throws Exception {
-		Set<EventJsonModel> eventJsonModels = new ObjectMapper().readValue(
-				egtString, new TypeReference<LinkedHashSet<EventJsonModel>>() {
+	private Set<EventJsonModel> readEventJsonString(String egtString) throws Exception {
+		Set<EventJsonModel> eventJsonModels = new ObjectMapper().readValue(egtString,
+				new TypeReference<LinkedHashSet<EventJsonModel>>() {
 				});
 		return eventJsonModels;
 	}
@@ -2197,8 +2126,7 @@ public class Tagger {
 	 */
 	private HedXmlModel ReadHEDXml(File hedFile) throws Exception {
 		JAXBContext context = JAXBContext.newInstance(HedXmlModel.class);
-		HedXmlModel hedXmlModel = (HedXmlModel) context.createUnmarshaller()
-				.unmarshal(hedFile);
+		HedXmlModel hedXmlModel = (HedXmlModel) context.createUnmarshaller().unmarshal(hedFile);
 		return hedXmlModel;
 	}
 
@@ -2212,8 +2140,7 @@ public class Tagger {
 	private HedXmlModel readHedXmlString(String hedXmlString) throws Exception {
 		StringReader hedStringReader = new StringReader(hedXmlString);
 		JAXBContext context = JAXBContext.newInstance(HedXmlModel.class);
-		HedXmlModel hedXmlModel = (HedXmlModel) context.createUnmarshaller()
-				.unmarshal(hedStringReader);
+		HedXmlModel hedXmlModel = (HedXmlModel) context.createUnmarshaller().unmarshal(hedStringReader);
 		return hedXmlModel;
 	}
 
@@ -2260,8 +2187,7 @@ public class Tagger {
 	 */
 	public void removeGroup(int groupId) {
 		TaggedEvent taggedEvent = getTaggedEventFromGroupId(groupId);
-		TaggerSet<AbstractTagModel> tagsRemoved = removeGroupBase(taggedEvent,
-				groupId);
+		TaggerSet<AbstractTagModel> tagsRemoved = removeGroupBase(taggedEvent, groupId);
 		if (tagsRemoved != null) {
 			HistoryItem historyItem = new HistoryItem();
 			historyItem.type = TaggerHistory.Type.GROUP_REMOVED;
@@ -2281,8 +2207,7 @@ public class Tagger {
 	 *            The group ID to remove from the event
 	 * @return The set of tags in the group removed from the event
 	 */
-	public TaggerSet<AbstractTagModel> removeGroupBase(TaggedEvent event,
-			Integer groupId) {
+	public TaggerSet<AbstractTagModel> removeGroupBase(TaggedEvent event, Integer groupId) {
 		return event.removeGroup(groupId);
 	}
 
@@ -2307,20 +2232,18 @@ public class Tagger {
 				FileWriter fw = new FileWriter(egtFile);
 				writer.writeValue(fw, eventJsonModels);
 			} catch (Exception ex) {
-				System.err.println("Unable to save event JSON data to file "
-						+ egtFile.getPath() + ": " + ex.getMessage());
+				System.err.println(
+						"Unable to save event JSON data to file " + egtFile.getPath() + ": " + ex.getMessage());
 				return false;
 			}
 		} else {
 			// Save tab-delimited text to file
 			try {
-				BufferedWriter egtWriter = new BufferedWriter(new FileWriter(
-						egtFile));
+				BufferedWriter egtWriter = new BufferedWriter(new FileWriter(egtFile));
 				writeTabDelimitedTextFromEgt(egtWriter);
 				egtWriter.close();
 			} catch (IOException e) {
-				System.err.println("Error writing tab-delimited text to file: "
-						+ e.getMessage());
+				System.err.println("Error writing tab-delimited text to file: " + e.getMessage());
 				return false;
 			}
 		}
@@ -2335,8 +2258,7 @@ public class Tagger {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(hedModel, hedFile);
 		} catch (JAXBException e) {
-			System.err.println("Unable to save HED XML data to file "
-					+ hedFile.getPath() + ": " + e.getMessage());
+			System.err.println("Unable to save HED XML data to file " + hedFile.getPath() + ": " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -2353,14 +2275,12 @@ public class Tagger {
 	public boolean saveEventsAndHED(File savedData) {
 		TaggerDataXmlModel savedDataModel = buildSavedDataModel();
 		try {
-			JAXBContext context = JAXBContext
-					.newInstance(TaggerDataXmlModel.class);
+			JAXBContext context = JAXBContext.newInstance(TaggerDataXmlModel.class);
 			Marshaller marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(savedDataModel, savedData);
 		} catch (JAXBException e) {
-			System.err.println("Unable to save to file " + savedData.getPath()
-					+ ": " + e.getMessage());
+			System.err.println("Unable to save to file " + savedData.getPath() + ": " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -2378,8 +2298,7 @@ public class Tagger {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(hedModel, hedFile);
 		} catch (JAXBException e) {
-			System.err.println("Unable to save HED XML data to file "
-					+ hedFile.getPath() + ": " + e.getMessage());
+			System.err.println("Unable to save HED XML data to file " + hedFile.getPath() + ": " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -2387,13 +2306,11 @@ public class Tagger {
 
 	public boolean saveTabDelimitedEvents(File egtFile) {
 		try {
-			BufferedWriter egtWriter = new BufferedWriter(new FileWriter(
-					egtFile));
+			BufferedWriter egtWriter = new BufferedWriter(new FileWriter(egtFile));
 			writeTabDelimitedTextFromEgt(egtWriter);
 			egtWriter.close();
 		} catch (IOException e) {
-			System.err.println("Error writing tab-delimited text to file: "
-					+ e.getMessage());
+			System.err.println("Error writing tab-delimited text to file: " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -2459,9 +2376,7 @@ public class Tagger {
 	public void setChildToPropertyOf() {
 		for (AbstractTagModel tag : tagList) {
 			AbstractTagModel parentTag = tagFound(tag.getParentPath());
-			if (parentTag != null
-					&& PredicateType.PROPERTYOF.equals(parentTag
-							.getPredicateType())) {
+			if (parentTag != null && PredicateType.PROPERTYOF.equals(parentTag.getPredicateType())) {
 				tag.setPredicateType(PredicateType.PROPERTYOF);
 			}
 		}
@@ -2498,8 +2413,7 @@ public class Tagger {
 	/**
 	 * Helper method to build hierarchical tag structure recursively.
 	 */
-	private AbstractTagModel tagsToXmlModelHelper(TagXmlModel parent,
-			String prefix, Iterator<AbstractTagModel> iter) {
+	private AbstractTagModel tagsToXmlModelHelper(TagXmlModel parent, String prefix, Iterator<AbstractTagModel> iter) {
 		if (!iter.hasNext()) {
 			return null;
 		}
@@ -2539,11 +2453,10 @@ public class Tagger {
 	 *         no ancestor or descendant tags were found, or if the preserve
 	 *         prefix option is set to true.
 	 */
-	public ToggleTagMessage toggleTag(AbstractTagModel tagModel,
-			Set<Integer> groupIds) {
+	public ToggleTagMessage toggleTag(AbstractTagModel tagModel, Set<Integer> groupIds) {
 		AbstractTagModel uniqueKey = getUniqueKey(tagModel);
-		if (!loader.testFlag(Loader.PRESERVE_PREFIX) || uniqueKey != null
-				|| tagModel.isRecommended() || tagModel.isRequired()) {
+		if (!loader.testFlag(Loader.PRESERVE_PREFIX) || uniqueKey != null || tagModel.isRecommended()
+				|| tagModel.isRequired()) {
 			return toggleTagReplacePrefix(tagModel, groupIds, uniqueKey);
 		}
 		boolean found;
@@ -2593,26 +2506,23 @@ public class Tagger {
 	 *         descendant tags found in the desired tag groups. Returns null if
 	 *         no ancestor or descendant tags were found.
 	 */
-	private ToggleTagMessage toggleTagReplacePrefix(AbstractTagModel tagModel,
-			Set<Integer> groupIds, AbstractTagModel uniqueKey) {
+	private ToggleTagMessage toggleTagReplacePrefix(AbstractTagModel tagModel, Set<Integer> groupIds,
+			AbstractTagModel uniqueKey) {
 		ToggleTagMessage result = new ToggleTagMessage(tagModel, groupIds);
 		boolean missingTag = false;
 		boolean rrTag = isRRValue(tagModel);
 		for (Integer groupId : groupIds) {
 			for (TaggedEvent currentEventModel : taggedEventSet) {
 				if (currentEventModel.containsGroup(groupId)) {
-					if (rrTag
-							&& (groupId != currentEventModel.getEventGroupId())) {
+					if (rrTag && (groupId != currentEventModel.getEventGroupId())) {
 						// Attempt to add required/recommended tag to group
 						result.rrError = true;
 						return result;
 					}
-					AbstractTagModel tagFound = currentEventModel
-							.findTagSharedPath(groupId, tagModel);
+					AbstractTagModel tagFound = currentEventModel.findTagSharedPath(groupId, tagModel);
 					AbstractTagModel uniqueFound = null;
 					if (uniqueKey != null) {
-						uniqueFound = currentEventModel.findDescendant(groupId,
-								uniqueKey);
+						uniqueFound = currentEventModel.findDescendant(groupId, uniqueKey);
 						result.uniqueKey = uniqueKey;
 					}
 					if (tagFound != null || uniqueFound != null) {
@@ -2621,21 +2531,15 @@ public class Tagger {
 							String tagPathFound = tagFound.getPath();
 							if (tagPathFound.compareTo(tagModel.getPath()) > 0) {
 								// Descendant tag found in tag group
-								result.addDescendant(currentEventModel,
-										groupId, tagFound);
-							} else if (tagPathFound.compareTo(tagModel
-									.getPath()) < 0) {
+								result.addDescendant(currentEventModel, groupId, tagFound);
+							} else if (tagPathFound.compareTo(tagModel.getPath()) < 0) {
 								// Parent tag found in tag group
-								result.addAncestor(currentEventModel, groupId,
-										tagFound);
+								result.addAncestor(currentEventModel, groupId, tagFound);
 							}
 						}
-						if (uniqueFound != null
-								&& !uniqueFound.getPath().equals(
-										tagModel.getPath())
+						if (uniqueFound != null && !uniqueFound.getPath().equals(tagModel.getPath())
 								&& uniqueFound != tagFound) {
-							result.addUniqueValue(currentEventModel, groupId,
-									uniqueFound);
+							result.addUniqueValue(currentEventModel, groupId, uniqueFound);
 						}
 					} else {
 						// Group does not contain any conflicting tags
@@ -2644,8 +2548,7 @@ public class Tagger {
 				}
 			}
 		}
-		if (result.ancestors.size() > 0 || result.descendants.size() > 0
-				|| result.uniqueValues.size() > 0) {
+		if (result.ancestors.size() > 0 || result.descendants.size() > 0 || result.uniqueValues.size() > 0) {
 			return result;
 		}
 		if (missingTag || "~".equals(tagModel.getName())) {
@@ -2685,8 +2588,7 @@ public class Tagger {
 	 * @param groupIds
 	 *            The set of group IDs to unassociate the tag from.
 	 */
-	public void unassociate(GuiEventModel eventModel,
-			AbstractTagModel tagModel, Set<Integer> groupIds) {
+	public void unassociate(GuiEventModel eventModel, AbstractTagModel tagModel, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = unassociateBase(tagModel, groupIds);
 		if (!affectedGroups.isEmpty()) {
 			HistoryItem historyItem = new HistoryItem();
@@ -2708,8 +2610,7 @@ public class Tagger {
 	 * @param groupIds
 	 *            The set of group IDs to unassociate the tag from.
 	 */
-	public void unassociate(HistoryItem historyItem, AbstractTagModel tagModel,
-			Set<Integer> groupIds) {
+	public void unassociate(HistoryItem historyItem, AbstractTagModel tagModel, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = unassociateBase(tagModel, groupIds);
 		if (!affectedGroups.isEmpty()) {
 			historyItem.type = TaggerHistory.Type.UNASSOCIATED;
@@ -2728,8 +2629,7 @@ public class Tagger {
 	 *            The set of group IDs to unassociate the tag from.
 	 * @return The set of group IDs that the tag was unassociated from
 	 */
-	public Set<Integer> unassociateBase(AbstractTagModel tagModel,
-			Set<Integer> groupIds) {
+	public Set<Integer> unassociateBase(AbstractTagModel tagModel, Set<Integer> groupIds) {
 		Set<Integer> affectedGroups = new HashSet<Integer>();
 		for (Integer groupId : groupIds) {
 			for (TaggedEvent currentTaggedEvent : taggedEventSet) {
@@ -2796,9 +2696,7 @@ public class Tagger {
 						tag.setMissing(false);
 						return;
 					}
-					if (childTag.takesValue()
-							&& matchTakesValueTag(childTag.getName(),
-									tag.getName())) {
+					if (childTag.takesValue() && matchTakesValueTag(childTag.getName(), tag.getName())) {
 						tag.setMissing(false);
 						return;
 					}
@@ -2868,8 +2766,7 @@ public class Tagger {
 			AbstractTagModel currentTag = tagList.get(i);
 			String currentPath = currentTag.getPath();
 			if (currentPath.startsWith(prefix)) {
-				String updatedPath = currentPath
-						.replaceFirst(prefix, newPrefix);
+				String updatedPath = currentPath.replaceFirst(prefix, newPrefix);
 				currentTag.setPath(updatedPath);
 			} else {
 				break;
@@ -2877,13 +2774,11 @@ public class Tagger {
 		}
 		// Update event tags not represented in hierarchy (i.e. transient tags)
 		for (TaggedEvent taggedEvent : taggedEventSet) {
-			for (TaggerSet<AbstractTagModel> tags : taggedEvent.getTagGroups()
-					.values()) {
+			for (TaggerSet<AbstractTagModel> tags : taggedEvent.getTagGroups().values()) {
 				for (AbstractTagModel tag : tags) {
 					String currentPath = tag.getPath();
 					if (currentPath.startsWith(prefix)) {
-						String updatedPrefix = currentPath.replaceFirst(prefix,
-								newPrefix);
+						String updatedPrefix = currentPath.replaceFirst(prefix, newPrefix);
 						tag.setPath(updatedPrefix);
 					}
 				}
@@ -2906,8 +2801,7 @@ public class Tagger {
 				// Write event code
 				egtWriter.write(event.getEventModel().getCode() + "\t");
 				// Write tags
-				for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event
-						.getTagGroups().entrySet()) {
+				for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
 					first = true;
 					if (entry.getKey() == event.getEventGroupId()) {
 						// Event level tags
@@ -2933,15 +2827,13 @@ public class Tagger {
 					}
 				}
 			} catch (IOException e) {
-				System.err.println("Error writing tab-delimited text: "
-						+ e.getMessage());
+				System.err.println("Error writing tab-delimited text: " + e.getMessage());
 				return false;
 			}
 			try {
 				egtWriter.newLine();
 			} catch (IOException e) {
-				System.err.println("Error writing tab-delimited text: "
-						+ e.getMessage());
+				System.err.println("Error writing tab-delimited text: " + e.getMessage());
 				return false;
 			}
 		}

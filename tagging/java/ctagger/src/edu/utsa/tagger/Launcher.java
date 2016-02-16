@@ -12,7 +12,7 @@ import edu.utsa.tagger.gui.GuiModelFactory;
 public class Launcher {
 	public static void main(String[] args) {
 
-		Loader.load(Loader.TAG_EDIT_ALL, 0, "CTAGGER", 2,
+		Loader.load(Loader.TAG_EDIT_ALL, 0, "CTAGGER", 3,
 				new GuiModelFactory(), true, true);
 
 	}

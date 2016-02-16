@@ -145,13 +145,13 @@ public abstract class AbstractTagModel implements Comparable<AbstractTagModel> {
 	public void setPath(String pathArg) {
 		path = pathArg;
 		name = path.substring(path.lastIndexOf('/') + 1);
-		depth = 0;
+		depth = 2;
 		for (int i = 0; i < path.length(); i++) {
 			if (path.charAt(i) == '/') {
 				depth++;
 			}
 		}
-		if (depth == 0) {
+		if (depth == 2) {
 			parentPath = null;
 		} else {
 			parentPath = path.substring(0, path.lastIndexOf('/'));

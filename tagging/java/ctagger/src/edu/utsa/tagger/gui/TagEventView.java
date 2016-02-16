@@ -45,8 +45,7 @@ public class TagEventView extends JComponent implements MouseListener {
 	private boolean pressed = false;
 	private boolean highlight = false;
 
-	public TagEventView(Tagger tagger, AppView appView, Integer groupId,
-			GuiTagModel model, boolean nameOnly) {
+	public TagEventView(Tagger tagger, AppView appView, Integer groupId, GuiTagModel model, boolean nameOnly) {
 		this.tagger = tagger;
 		this.appView = appView;
 		this.groupId = groupId;
@@ -83,8 +82,7 @@ public class TagEventView extends JComponent implements MouseListener {
 				map.put("add ~ before", new ContextMenuAction() {
 					@Override
 					public void doAction() {
-						TaggedEvent taggedEvent = tagger
-								.getEventByGroupId(groupId);
+						TaggedEvent taggedEvent = tagger.getEventByGroupId(groupId);
 						int index = taggedEvent.findTagIndex(groupId, model);
 						addTilde(index);
 					}
@@ -92,8 +90,7 @@ public class TagEventView extends JComponent implements MouseListener {
 				map.put("add ~ after", new ContextMenuAction() {
 					@Override
 					public void doAction() {
-						TaggedEvent taggedEvent = tagger
-								.getEventByGroupId(groupId);
+						TaggedEvent taggedEvent = tagger.getEventByGroupId(groupId);
 						int index = taggedEvent.findTagIndex(groupId, model) + 1;
 						addTilde(index);
 					}
@@ -110,13 +107,11 @@ public class TagEventView extends JComponent implements MouseListener {
 			map.put("remove", new ContextMenuAction() {
 				@Override
 				public void doAction() {
-					if ("/Event/Label".equals(model.getParentPath())) {
-						TaggerSet<TaggedEvent> taggedEvents = tagger
-								.getEgtSet();
+					if ("Event/Label".equals(model.getParentPath())) {
+						TaggerSet<TaggedEvent> taggedEvents = tagger.getEgtSet();
 						for (TaggedEvent taggedEvent : taggedEvents) {
 							if (taggedEvent.containsTagInGroup(groupId, model)) {
-								tagger.editEventCodeLabel(taggedEvent, model,
-										taggedEvent.getEventModel().getCode(),
+								tagger.editEventCodeLabel(taggedEvent, model, taggedEvent.getEventModel().getCode(),
 										new String());
 							}
 						}
@@ -139,8 +134,7 @@ public class TagEventView extends JComponent implements MouseListener {
 			numTildes = taggedEvent.findNumTildes(groupId);
 		}
 		if (numTildes < MAX_GROUP_TILDES) {
-			GuiTagModel newTag = (GuiTagModel) tagger.getFactory()
-					.createAbstractTagModel(tagger);
+			GuiTagModel newTag = (GuiTagModel) tagger.getFactory().createAbstractTagModel(tagger);
 			newTag.setPath("~");
 			newTag.setAppView(appView);
 			Set<Integer> groupSet = new HashSet<Integer>();
@@ -149,8 +143,7 @@ public class TagEventView extends JComponent implements MouseListener {
 			appView.updateEgt();
 			appView.scrollToEventTag(newTag);
 		} else {
-			appView.showTaggerMessageDialog(MessageConstants.TILDE_ERROR,
-					"Okay", null, null);
+			appView.showTaggerMessageDialog(MessageConstants.TILDE_ERROR, "Okay", null, null);
 		}
 	}
 
@@ -182,8 +175,7 @@ public class TagEventView extends JComponent implements MouseListener {
 	protected void paintComponent(Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
 		Color bg;
 		Color fg;
@@ -191,14 +183,11 @@ public class TagEventView extends JComponent implements MouseListener {
 
 		bg = FontsAndColors.EVENTTAG_BG_NORMAL;
 		if (pressed && hover) {
-			fg = model.isMissing() ? FontsAndColors.EVENTTAG_FG_MISSING_PRESSED
-					: FontsAndColors.EVENTTAG_FG_PRESSED;
+			fg = model.isMissing() ? FontsAndColors.EVENTTAG_FG_MISSING_PRESSED : FontsAndColors.EVENTTAG_FG_PRESSED;
 		} else if (!pressed && hover) {
-			fg = model.isMissing() ? FontsAndColors.EVENTTAG_FG_MISSING_HOVER
-					: FontsAndColors.EVENTTAG_FG_HOVER;
+			fg = model.isMissing() ? FontsAndColors.EVENTTAG_FG_MISSING_HOVER : FontsAndColors.EVENTTAG_FG_HOVER;
 		} else {
-			fg = model.isMissing() ? FontsAndColors.EVENTTAG_FG_MISSING_NORMAL
-					: FontsAndColors.EVENTTAG_FG_NORMAL;
+			fg = model.isMissing() ? FontsAndColors.EVENTTAG_FG_MISSING_NORMAL : FontsAndColors.EVENTTAG_FG_NORMAL;
 		}
 
 		if (highlight) {
