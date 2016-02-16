@@ -68,7 +68,6 @@ essStruct.eventCodes.eventCode = ...
         % Reads the tag columns from a tab-delimited row
         numEvents = size(eventCodes, 1);
         for a = 1:numEvents
-            fprintf('a: %d\n', a);
             strTags = eventCodes(a).condition.tag;
             if ~isempty(strTags)
                 cellTags = str2cell(strTags);
