@@ -10,7 +10,7 @@ checkRequiredTags();
         % Checks the tags that are required
         numTags = size(requiredTags, 2);
         for a = 1:numTags
-            requiredIndexes = strncmp(eventLevelTags, requiredTags{a}, ...
+            requiredIndexes = strncmpi(eventLevelTags, requiredTags{a}, ...
                 size(requiredTags{a}, 2));
             if sum(requiredIndexes) == 0
                 generateErrorMessages(a);
