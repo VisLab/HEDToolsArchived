@@ -46,7 +46,7 @@ checkTagCaps(originalTags, formattedTags, false);
                 return;
             end
         end
-        capExp = '(/[a-z])|([^|]\s+[A-Z])*';
+        capExp = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
         if ~isempty(regexp(originalTag, capExp, 'once'))
             capsFound = true;
         end
