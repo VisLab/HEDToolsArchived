@@ -6,8 +6,7 @@ warningsIndex = 1;
 checkTagSlashes(originalTags, false);
 
     function checkTagSlashes(originalTags, isGroup)
-        % Checks if the tags doesn't start with a slash or ends with a
-        % slash
+        % Checks if the tags ends with a slash
         numTags = length(originalTags);
         for a = 1:numTags
             if ~ischar(originalTags{a})
@@ -20,8 +19,7 @@ checkTagSlashes(originalTags, false);
     end % checkTagCaps
 
     function generateWarning(originalTags, tagIndex, isGroup)
-        % Generates capitalization tag warnings if the tag doesn't start
-        % with a slash or ends with a slash
+        % Generates tag warnings if the tag ends with a slash
         try
             tagString = originalTags{tagIndex};
             if isGroup
