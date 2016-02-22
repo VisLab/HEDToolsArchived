@@ -1,4 +1,4 @@
-function test_suite = test_checkunique%#ok<STOUT>
+function test_suite = test_checkUniqueTags%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>

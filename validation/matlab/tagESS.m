@@ -38,10 +38,10 @@
 
 function essStruct = tagESS(essStruct)
 eegStruct = struct('event', []);
-eegStruct.event = copyESSTags(essStruct.eventCodes.eventCode);
+eegStruct.event = copyESSTags(essStruct.eventCodesInfo);
 eegStruct = tageeg(eegStruct);
-essStruct.eventCodes.eventCode = ...
-    copyEEGTags(essStruct.eventCodes.eventCode, eegStruct.event);
+essStruct.eventCodesInfo = ...
+    copyEEGTags(essStruct.eventCodesInfo, eegStruct.event);
 
     function eegEventsStruct = copyESSTags(essEvents)
         % Copy tags from ESS events structure into EEG events structure 
