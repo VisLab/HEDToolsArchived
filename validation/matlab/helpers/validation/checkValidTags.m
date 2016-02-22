@@ -1,6 +1,5 @@
 function [errors, errorTags, extensions, extensionTags] = ...
-    checkValidTags(Maps, originalTags, formattedTags, extensionAllowed, ...
-    extensionAllowedTags, takesValueTags)
+    checkValidTags(Maps, originalTags, formattedTags, extensionAllowed)
 errors = '';
 extensions = '';
 errorTags = {};
@@ -22,10 +21,10 @@ checkValidTags(originalTags, formattedTags, false);
                     Maps.tags.isKey(lower(formattedTags{a}))
                 continue;
             end
-            [isExtensionTag, extensionIndex] = ...
+            [isExtensionTag, extensionParentTag] = ...
                 tagAllowExtensions(formattedTags{a});
             if extensionAllowed && isExtensionTag
-                generateExtensions(originalTags, a, extensionIndex, ...
+                generateExtensions(originalTags, a, extensionParentTag, ...
                     isGroup);
             else
                 generateError(originalTags, a, isGroup);
@@ -63,7 +62,7 @@ checkValidTags(originalTags, formattedTags, false);
         errorsIndex = errorsIndex + 1;
     end % generateErrorMessages
 
-    function generateExtensions(originalTags, tagIndex, extensionIndex, ...
+    function generateExtensions(originalTags, tagIndex, extensionParentTag, ...
             isGroup)
         % Generates extension warnings for tags that are children of
         % extension allowed tags
@@ -74,22 +73,25 @@ checkValidTags(originalTags, formattedTags, false);
         end
         extensions = [extensions, ...
             generateExtensionMessage('extensionAllowed', '', tagString, ...
-            extensionAllowedTags{extensionIndex})];
+            extensionParentTag)];
         extensionTags{extensionsIndex} = originalTags{tagIndex};
         extensionsIndex = extensionsIndex + 1;
     end % generateExtensions
 
-    function [isExtensionTag, extensionIndex] = tagAllowExtensions(tag)
+    function [isExtensionTag, extensionParentTag] = tagAllowExtensions(tag)
         % Checks if the tag has the extensionAllowed attribute
         isExtensionTag = false;
-        extensionIndex = 0;
+        extensionParentTag = '';
+%         extensionIndex = 0;
         slashIndexes = strfind(tag, '/');
         while size(slashIndexes, 2) > 1
             parent = tag(1:slashIndexes(end)-1);
-            foundIndex = find(strcmp(parent, extensionAllowedTags));
-            if ~isempty(foundIndex)
+%             foundIndex = find(strcmp(parent, extensionAllowedTags));
+            if Maps.extensionAllowed.isKey(lower(parent))
+                extensionParentTag = parent;
+%             if ~isempty(foundIndex)
                 isExtensionTag = true;
-                extensionIndex = foundIndex;
+%                 extensionIndex = foundIndex;
                 break;
             end
             slashIndexes = strfind(parent, '/');
@@ -101,7 +103,8 @@ checkValidTags(originalTags, formattedTags, false);
         isValueTag = false;
         valueTag = convertToValueTag(tag);
         while ~strncmp(valueTag, '/#', 2)
-            if any(strcmpi(takesValueTags, valueTag))
+            if Maps.takesValue.isKey(lower(valueTag))
+%             if any(strcmpi(takesValueTags, valueTag))
                 isValueTag = true;
                 break;
             end
