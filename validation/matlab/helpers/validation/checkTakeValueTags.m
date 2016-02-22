@@ -8,7 +8,7 @@ checkTakesValueTags(original, canonical, false);
 
     function checkTakesValueTags(originalTags, formattedTags, isGroup)
         % Checks the tags that take values
-        numTags = size(originalTags, 2);
+        numTags = length(originalTags);
         for a = 1:numTags
             if ~ischar(originalTags{a})
                 checkTakesValueTags(originalTags{a}, formattedTags{a}, ...
