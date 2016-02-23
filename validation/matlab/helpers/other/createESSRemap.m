@@ -71,9 +71,8 @@ end
             eventCode = allEventCodes.item(k);
             thisList = eventCode.getElementsByTagName('tag');
             thisElement = thisList.item(0);
-            fprintf('Event %d\n', k+1);
-            tags = strtrim(char(thisElement.getFirstChild.getData));
-            if ~isempty(tags)
+            if ~isempty(thisElement.getFirstChild)
+                tags = strtrim(char(thisElement.getFirstChild.getData));
                 cellTags = vTagList.deStringify(tags);
                 uniqueTags = union(uniqueTags, cellTags);
             end
