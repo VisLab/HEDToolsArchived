@@ -63,8 +63,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function extensions = checkForValidationExtensions(hedMaps, ...
-    originalTags, formattedTags, extensionAllowed, ...
-    extensionAllowedTags, takesValueTags)
+    originalTags, formattedTags, extensionAllowed)
 [~, ~, extensions] = checkValidTags(hedMaps, originalTags, ...
-    formattedTags, extensionAllowed, extensionAllowedTags, takesValueTags);
+    formattedTags, extensionAllowed);
 end % checkForValidationExtensions
