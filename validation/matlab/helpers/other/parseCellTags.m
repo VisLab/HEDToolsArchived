@@ -74,16 +74,13 @@ uniqueErrorTags = {};
 errorCount = 1;
 warningCount = 1;
 extensionCount = 1;
-extensionAllowedTags = p.hedMaps.extensionAllowed.values;
-takesValueTags = p.hedMaps.takesValue.values;
 parseCells();
 
     function checkForCellErrors(originalTags, formattedTags, cellNumber)
         % Errors will be generated for the cell if found
         [cellErrors, cellErrorTags] = ...
             checkForValidationErrors(p.hedMaps, originalTags, ...
-            formattedTags, p.extensionAllowed, extensionAllowedTags, ...
-            takesValueTags);
+            formattedTags, p.extensionAllowed);
         if ~isempty(cellErrors)
             cellErrors = [generateErrorMessage('cell', cellNumber, ...
                 '', '', ''), cellErrors];
@@ -97,8 +94,7 @@ parseCells();
             cellNumber)
         % Errors will be generated for the cell if found
         cellExtensions = checkForValidationExtensions(p.hedMaps, ...
-            originalTags, formattedTags, p.extensionAllowed, ...
-            extensionAllowedTags, takesValueTags);
+            originalTags, formattedTags, p.extensionAllowed);
         if ~isempty(cellExtensions)
             cellExtensions = [generateExtensionMessage('cell', ...
                 cellNumber, '', ''), cellExtensions];

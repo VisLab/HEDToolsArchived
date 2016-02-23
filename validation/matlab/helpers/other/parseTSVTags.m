@@ -94,8 +94,6 @@ uniqueErrorTags = {};
 errorCount = 1;
 warningCount = 1;
 extensionCount = 1;
-extensionAllowedTags = p.hedMaps.extensionAllowed.values;
-takesValueTags = p.hedMaps.takesValue.values;
 parseTSVLines();
 
     function [tLine, currentRow] = checkForHeader(fileId)
@@ -112,8 +110,7 @@ parseTSVLines();
         % Errors will be generated for the line if found
         [lineErrors, lineErrorTags] = ...
             checkForValidationErrors(p.hedMaps, originalTags, ...
-            formattedTags, p.extensionAllowed, extensionAllowedTags, ...
-            takesValueTags);
+            formattedTags, p.extensionAllowed);
         if ~isempty(lineErrorTags)
             lineErrors = [generateErrorMessage('line', lineNumber, ...
                 '', '', ''), lineErrors];
@@ -127,8 +124,7 @@ parseTSVLines();
             lineNumber)
         % Errors will be generated for the line if found
         lineExtensions = checkForValidationExtensions(p.hedMaps, ...
-            originalTags, formattedTags, p.extensionAllowed, ...
-            extensionAllowedTags, takesValueTags);
+            originalTags, formattedTags, p.extensionAllowed);
         if ~isempty(lineExtensions)
             lineExtensions = [generateExtensionMessage('line', ...
                 lineNumber, '', ''), lineExtensions];
