@@ -1,12 +1,10 @@
-% This function takes in a file containing the HED tags associated with a
-% particular study and replaces the old HED tags with the new HED tags
-% that are specified in a remap file.
+% This function remaps the tags in a ESS structure object.
 %
 % Usage:
 %
-%   >>  essStruct = remapStructTags(remapFile, essStruct);
+%   >>  essStruct = remapESSTags(remapFile, essStruct);
 %
-%   >>  essStruct = remapStructTags(remapFile, essStruct, varargin);
+%   >>  essStruct = remapESSTags(remapFile, essStruct, varargin);
 %
 % Input:
 %
@@ -29,8 +27,8 @@
 %                   To replace the old HED tags in Five-Box task ESS 
 %                   structure with new HED tags in the .
 %
-%                   remapTSVTags('HEDRemap.txt', ...
-%                   'Five-Box Task_remap.tsv')
+%                   remapESSTags('Five-Box_remap.tsv', ...
+%                   'study_description.xml');
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -49,24 +47,23 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function essStruct = remapStructTags(remapFile, essStruct)
+function essStruct = remapESSTags(remapFile, essStruct)
 p = parseArguments();
 remapMap = remap2Map(p.remapFile);
-essStruct.eventCodes.eventCode = ...
-    readEventCodes(essStruct.eventCodes.eventCode);
+essStruct.eventCodesInfo = readEventCodes(essStruct.eventCodesInfo);
 
     function p = parseArguments()
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
-        p.addRequired('essStruct', @(x) ~isempty(x) && isstruct(x));
+        p.addRequired('essStruct', @(x) ~isempty(x));
         p.parse(remapFile, essStruct);
         p = p.Results;
     end % parseArguments
 
     function eventCodes = readEventCodes(eventCodes)
         % Reads the tag columns from a tab-delimited row
-        numEvents = size(eventCodes, 1);
+        numEvents = length(eventCodes);
         for a = 1:numEvents
             strTags = eventCodes(a).condition.tag;
             if ~isempty(strTags)
@@ -138,4 +135,4 @@ essStruct.eventCodes.eventCode = ...
         groupStr = [groupStr ')'];
     end % joinTagGroup
 
-end % remapStructTags
+end % remapESSTags
