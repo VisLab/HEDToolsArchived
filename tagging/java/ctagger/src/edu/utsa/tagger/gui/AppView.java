@@ -1050,18 +1050,20 @@ public class AppView extends ConstraintContainer {
 			AbstractTagModel rrTag = event.findRRParentTag(tag);
 			RRTagView rrTagView = event.getRRTagViewByKey(rrTag);
 			TagEventView tagEgtView = rrTagView.getTagEgtViewByKey(tag);
-			if (tagEgtView != null) {
-				int y = Math.max(0, tagEgtView.getY() - offset);
+			if (rrTagView != null) {
+				int y = Math.max(0, rrTagView.getY() - offset);
 				layout.scrollTo(y);
-				tagEgtView.highlight();
+				if (tagEgtView != null)
+					tagEgtView.highlight();
 			}
 		} else if (event.getEventGroupId() != lastSelectedGroup) {
 			GroupView groupView = event.getGroupViewByKey(lastSelectedGroup);
 			TagEventView tagEgtView = groupView.getTagEgtViewByKey(tag);
-			if (tagEgtView != null) {
-				int y = Math.max(0, tagEgtView.getY() - offset);
+			if (groupView != null) {
+				int y = Math.max(0, groupView.getY() - offset);
 				layout.scrollTo(y);
-				tagEgtView.highlight();
+				if (tagEgtView != null)
+					tagEgtView.highlight();
 			}
 		} else {
 			TagEventView tagEgtView = event.getTagEgtViewByKey(tag);
