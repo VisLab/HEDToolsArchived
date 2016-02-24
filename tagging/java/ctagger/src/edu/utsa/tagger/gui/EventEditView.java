@@ -43,6 +43,7 @@ import edu.utsa.tagger.guisupport.XTextBox;
 public class EventEditView extends ConstraintContainer {
 
 	public static final int HEIGHT = 135;
+	private static final String LabelTag = "Event/Label/";
 	private final TaggedEvent taggedEvent;
 	private final AppView appView;
 	private final Tagger tagger;
@@ -53,40 +54,29 @@ public class EventEditView extends ConstraintContainer {
 		this.taggedEvent = taggedEvent;
 
 		int position = 15;
-		add(codeLabel, new Constraint("top:" + position
-				+ " height:20 left:15 width:150"));
+		add(codeLabel, new Constraint("top:" + position + " height:20 left:15 width:150"));
 		position += 23;
-		add(code, new Constraint("top:" + position
-				+ " height:26 left:15 right:200"));
+		add(code, new Constraint("top:" + position + " height:26 left:15 right:200"));
 		position += 31;
-		add(eventLabel, new Constraint("top:" + position
-				+ " height:20 left:15 width:80"));
+		add(eventLabel, new Constraint("top:" + position + " height:20 left:15 width:80"));
 		position += 23;
-		add(label, new Constraint("top:" + position
-				+ " height:26 left:15 right:200"));
+		add(label, new Constraint("top:" + position + " height:26 left:15 right:200"));
 
 		add(cancel, new Constraint("top:10 height:20 right:26 width:45"));
 		add(saveButton, new Constraint("top:10 height:20 right:76 width:35"));
 
 		codeLabel.setBackground(FontsAndColors.EDITTAG_BG);
 		code.setForeground(FontsAndColors.GREY_DARK);
-		code.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
-		code.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("TAB"), "doNothing");
-		code.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
-		code.getJTextArea().getDocument()
-				.addDocumentListener(new CodeFieldListener());
+		code.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
+		code.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		code.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
+		code.getJTextArea().getDocument().addDocumentListener(new CodeFieldListener());
 
 		eventLabel.setBackground(FontsAndColors.EDITTAG_BG);
 		label.setForeground(FontsAndColors.GREY_DARK);
-		label.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
-		label.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("TAB"), "doNothing");
-		label.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
+		label.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
+		label.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		label.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
 		cancel.setNormalBackground(FontsAndColors.TRANSPARENT);
 		cancel.setNormalForeground(FontsAndColors.SOFT_BLUE);
 		cancel.setHoverBackground(FontsAndColors.TRANSPARENT);
@@ -205,11 +195,9 @@ public class EventEditView extends ConstraintContainer {
 	public void handleSave() {
 		if (saveButton.isEnabled()) {
 			if (!code.getJTextArea().getText().isEmpty()) {
-				AbstractTagModel tagModel = taggedEvent
-						.findTagModel("/Event/Label/" + taggedEvent.getLabel());
-				tagger.editEventCodeLabel(taggedEvent, tagModel, code
-						.getJTextArea().getText(), label.getJTextArea()
-						.getText());
+				AbstractTagModel tagModel = taggedEvent.findTagModel(LabelTag + taggedEvent.getLabel());
+				tagger.editEventCodeLabel(taggedEvent, tagModel, code.getJTextArea().getText(),
+						label.getJTextArea().getText());
 			}
 			taggedEvent.setInEdit(false);
 			taggedEvent.setInFirstEdit(false);
@@ -280,8 +268,7 @@ public class EventEditView extends ConstraintContainer {
 		@Override
 		public Font getFont() {
 			Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
-			fontAttributes.put(TextAttribute.UNDERLINE,
-					TextAttribute.UNDERLINE_ON);
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 			return FontsAndColors.contentFont.deriveFont(fontAttributes);
 		}
 	};
@@ -290,8 +277,7 @@ public class EventEditView extends ConstraintContainer {
 		@Override
 		public Font getFont() {
 			Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
-			fontAttributes.put(TextAttribute.UNDERLINE,
-					TextAttribute.UNDERLINE_ON);
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 			return FontsAndColors.contentFont.deriveFont(fontAttributes);
 		}
 	};
@@ -308,18 +294,15 @@ public class EventEditView extends ConstraintContainer {
 	protected void paintComponent(Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		double scale = ConstraintLayout.scale;
 
 		g2d.setColor(FontsAndColors.EDITTAG_BG);
-		g2d.fill(new Polygon(new int[] { (int) (scale * 24),
-				(int) (scale * 24 + scale * 10),
-				(int) (scale * 24 + scale * 20) }, new int[] {
-				(int) (scale * 10), 0, (int) (scale * 10) }, 3));
-		g2d.fill(new Rectangle2D.Double(5 * scale, 10 * scale, getWidth() - 26
-				* scale, getHeight() - 15 * scale));
+		g2d.fill(new Polygon(
+				new int[] { (int) (scale * 24), (int) (scale * 24 + scale * 10), (int) (scale * 24 + scale * 20) },
+				new int[] { (int) (scale * 10), 0, (int) (scale * 10) }, 3));
+		g2d.fill(new Rectangle2D.Double(5 * scale, 10 * scale, getWidth() - 26 * scale, getHeight() - 15 * scale));
 
 	}
 

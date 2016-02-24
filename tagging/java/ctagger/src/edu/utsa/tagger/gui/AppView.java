@@ -86,8 +86,7 @@ public class AppView extends ConstraintContainer {
 	 * Handles the loading of the data.
 	 */
 	private int handleLoad() {
-		FileFormatDialog dialog = new FileFormatDialog(frame,
-				MessageConstants.OPEN_DATA_TYPE_Q);
+		FileFormatDialog dialog = new FileFormatDialog(frame, MessageConstants.OPEN_DATA_TYPE_Q);
 		int option = dialog.showDialog();
 		switch (option) {
 		case 1:
@@ -132,8 +131,7 @@ public class AppView extends ConstraintContainer {
 	 */
 	private int handleSave() {
 		// Get data type to save as
-		FileFormatDialog dialog = new FileFormatDialog(frame,
-				MessageConstants.SAVE_DATA_TYPE_Q);
+		FileFormatDialog dialog = new FileFormatDialog(frame, MessageConstants.SAVE_DATA_TYPE_Q);
 		int option = dialog.showDialog();
 		switch (option) {
 		case 1:
@@ -165,8 +163,7 @@ public class AppView extends ConstraintContainer {
 			return -1;
 		}
 		if (!saveSuccess) {
-			AppView.this.showTaggerMessageDialog(MessageConstants.SAVE_ERROR,
-					"Okay", null, null);
+			AppView.this.showTaggerMessageDialog(MessageConstants.SAVE_ERROR, "Okay", null, null);
 			return -1;
 		}
 		return option;
@@ -188,8 +185,7 @@ public class AppView extends ConstraintContainer {
 		if (loadFile == null)
 			return -1;
 		if (!loadSuccess) {
-			AppView.this.showTaggerMessageDialog(MessageConstants.LOAD_ERROR,
-					"Okay", null, null);
+			AppView.this.showTaggerMessageDialog(MessageConstants.LOAD_ERROR, "Okay", null, null);
 			return -1;
 		}
 		refreshPanels();
@@ -205,8 +201,8 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int saveTaggerDataXMLDialog(int option) {
 		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save Combined events + HED XML",
-				"Save", "Save .xml file", "XML files", new String[] { "xml" });
+		File saveFile = showFileChooserDialog("Save Combined events + HED XML", "Save", "Save .xml file", "XML files",
+				new String[] { "xml" });
 		if (saveFile != null)
 			saveSuccess = tagger.saveEventsAndHED(saveFile);
 		return checkSaveSuccess(option, saveFile, saveSuccess);
@@ -221,8 +217,8 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int loadTaggerDataXMLDialog(int option) {
 		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog("Load Combined events + HED XML",
-				"Load", "Load .xml file", "XML files", new String[] { "xml" });
+		File loadFile = showFileChooserDialog("Load Combined events + HED XML", "Load", "Load .xml file", "XML files",
+				new String[] { "xml" });
 		if (loadFile != null)
 			loadSuccess = tagger.loadEventsAndHED(loadFile);
 		return checkLoadSuccess(option, loadFile, loadSuccess);
@@ -237,8 +233,8 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int saveHEDXMLDialog(int option) {
 		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save HED XML", "Save",
-				"Save .xml file", "XML files", new String[] { "xml" });
+		File saveFile = showFileChooserDialog("Save HED XML", "Save", "Save .xml file", "XML files",
+				new String[] { "xml" });
 		if (saveFile != null)
 			saveSuccess = tagger.saveHED(saveFile);
 		return checkLoadSuccess(option, saveFile, saveSuccess);
@@ -253,8 +249,8 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int loadHEDXMLDialog(int option) {
 		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog("Load HED XML", "Load",
-				"Load .xml file", "XML files", new String[] { "xml" });
+		File loadFile = showFileChooserDialog("Load HED XML", "Load", "Load .xml file", "XML files",
+				new String[] { "xml" });
 		if (loadFile != null)
 			loadSuccess = tagger.loadHED(loadFile);
 		return checkLoadSuccess(option, loadFile, loadSuccess);
@@ -269,8 +265,8 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int saveTSVDialog(int option) {
 		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save Events, tab-delimited text",
-				"Save", "Save .xml file", "XML files", new String[] { "xml" });
+		File saveFile = showFileChooserDialog("Save Events, tab-delimited text", "Save", "Save .xml file", "XML files",
+				new String[] { "xml" });
 		if (saveFile != null)
 			saveSuccess = tagger.saveTabDelimitedEvents(saveFile);
 		return checkSaveSuccess(option, saveFile, saveSuccess);
@@ -285,16 +281,13 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int loadTSVDialog(int option) {
 		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog(
-				"Load Events, tab-delimited text", "Load", "Load .txt file",
-				"TSV files", new String[] { "tsv", "txt" });
+		File loadFile = showFileChooserDialog("Load Events, tab-delimited text", "Load", "Load .txt file", "TSV files",
+				new String[] { "tsv", "txt" });
 		if (loadFile != null) {
 			String[] tabSeparatedOptions = showTabSeparatedOptions();
 			if (tabSeparatedOptions.length == 3)
-				loadSuccess = tagger.loadTabDelimitedEvents(loadFile,
-						Integer.parseInt(tabSeparatedOptions[0].trim()),
-						StringToIntArray(tabSeparatedOptions[1]),
-						StringToIntArray(tabSeparatedOptions[2]));
+				loadSuccess = tagger.loadTabDelimitedEvents(loadFile, Integer.parseInt(tabSeparatedOptions[0].trim()),
+						StringToIntArray(tabSeparatedOptions[1]), StringToIntArray(tabSeparatedOptions[2]));
 		}
 		return checkLoadSuccess(option, loadFile, loadSuccess);
 	}
@@ -338,8 +331,7 @@ public class AppView extends ConstraintContainer {
 			}
 			updateEgt();
 			updateTags();
-			hoverText = undo ? tagger.getUndoMessage() : tagger
-					.getRedoMessage();
+			hoverText = undo ? tagger.getUndoMessage() : tagger.getRedoMessage();
 			hoverMessage.setText(hoverText);
 			if (item != null) {
 				historyScroll(item);
@@ -386,8 +378,7 @@ public class AppView extends ConstraintContainer {
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			super.mouseEntered(e);
-			hoverText = undo ? tagger.getUndoMessage() : tagger
-					.getRedoMessage();
+			hoverText = undo ? tagger.getUndoMessage() : tagger.getRedoMessage();
 			hoverMessage.setText(hoverText);
 			Point point = this.getLocation();
 			int top = point.y + 50;
@@ -571,8 +562,7 @@ public class AppView extends ConstraintContainer {
 	 * @param tagger
 	 * @param frameTitle
 	 */
-	public AppView(Loader loader, final Tagger tagger, String frameTitle,
-			boolean isStandAloneVersion) {
+	public AppView(Loader loader, final Tagger tagger, String frameTitle, boolean isStandAloneVersion) {
 		this.loader = loader;
 		this.tagger = tagger;
 
@@ -584,24 +574,20 @@ public class AppView extends ConstraintContainer {
 		okay.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				List<EventModel> missingReqTags = tagger
-						.findMissingRequiredTags();
+				List<EventModel> missingReqTags = tagger.findMissingRequiredTags();
 				boolean exit = true;
 				if (missingReqTags != null && !missingReqTags.isEmpty()) {
-					exit = AppView.this
-							.showRequiredMissingDialog(missingReqTags);
+					exit = AppView.this.showRequiredMissingDialog(missingReqTags);
 				}
 				if (exit) {
 					AppView.this.loader.setSubmitted(true);
 					if (tagger.hedEdited()) {
-						ExitSaveDialog dialog = new ExitSaveDialog(frame,
-								MessageConstants.HED_XML_SAVE_Q);
+						ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.HED_XML_SAVE_Q);
 						int option = dialog.showDialog();
 						if (option == 0)
 							saveHEDXMLDialog(option);
 					}
-					frame.dispatchEvent(new WindowEvent(frame,
-							WindowEvent.WINDOW_CLOSING));
+					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				}
 			}
 		});
@@ -609,15 +595,13 @@ public class AppView extends ConstraintContainer {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (tagger.hedEdited()) {
-					ExitSaveDialog dialog = new ExitSaveDialog(frame,
-							MessageConstants.HED_XML_SAVE_Q);
+					ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.HED_XML_SAVE_Q);
 					int option = dialog.showDialog();
 					if (option == 0)
 						saveHEDXMLDialog(option);
 				}
 				AppView.this.loader.setSubmitted(false);
-				frame.dispatchEvent(new WindowEvent(frame,
-						WindowEvent.WINDOW_CLOSING));
+				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 
 			}
 		});
@@ -651,8 +635,7 @@ public class AppView extends ConstraintContainer {
 		addGroup.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Set<Integer> newSelectedGroups = tagger
-						.addNewGroups(selectedGroups);
+				Set<Integer> newSelectedGroups = tagger.addNewGroups(selectedGroups);
 				if (newSelectedGroups.size() > 0) {
 					selectedGroups.clear();
 					selectedGroups.addAll(newSelectedGroups);
@@ -661,53 +644,49 @@ public class AppView extends ConstraintContainer {
 			}
 		});
 
-		collapseLevel.getJTextArea().getDocument()
-				.addDocumentListener(new DocumentListener() {
-					@Override
-					public void changedUpdate(DocumentEvent e) {
-					}
+		collapseLevel.getJTextArea().getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+			}
 
-					@Override
-					public void insertUpdate(DocumentEvent e) {
-						if (!collapseLevel.getJTextArea().getText().isEmpty()) {
-							int level = 0;
-							try {
-								level = Integer.parseInt(collapseLevel
-										.getJTextArea().getText());
-							} catch (NumberFormatException ex) {
-							}
-							if (level > 0) {
-								autoCollapseDepth = level;
-								autoCollapse = true;
-								updateTags();
-							}
-						}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				if (!collapseLevel.getJTextArea().getText().isEmpty()) {
+					int level = 0;
+					try {
+						level = Integer.parseInt(collapseLevel.getJTextArea().getText());
+					} catch (NumberFormatException ex) {
 					}
+					if (level > 0) {
+						autoCollapseDepth = level;
+						autoCollapse = true;
+						updateTags();
+					}
+				}
+			}
 
-					@Override
-					public void removeUpdate(DocumentEvent e) {
-						if (!collapseLevel.getJTextArea().getText().isEmpty()) {
-							int level = 0;
-							try {
-								level = Integer.parseInt(collapseLevel
-										.getJTextArea().getText());
-							} catch (NumberFormatException ex) {
-							}
-							if (level > 0) {
-								autoCollapseDepth = level;
-								autoCollapse = true;
-								updateTags();
-							}
-						}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				if (!collapseLevel.getJTextArea().getText().isEmpty()) {
+					int level = 0;
+					try {
+						level = Integer.parseInt(collapseLevel.getJTextArea().getText());
+					} catch (NumberFormatException ex) {
 					}
-				});
+					if (level > 0) {
+						autoCollapseDepth = level;
+						autoCollapse = true;
+						updateTags();
+					}
+				}
+			}
+		});
 		collapseAll.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				autoCollapseDepth = 1;
 				autoCollapse = true;
-				collapseLevel.getJTextArea().setText(
-						Integer.toString(autoCollapseDepth));
+				collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
 				updateTags();
 			}
 		});
@@ -716,37 +695,26 @@ public class AppView extends ConstraintContainer {
 			public void mouseClicked(MouseEvent e) {
 				autoCollapseDepth = tagger.getTagLevel();
 				autoCollapse = true;
-				collapseLevel.getJTextArea().setText(
-						Integer.toString(autoCollapseDepth));
+				collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
 				updateTags();
 			}
 		});
 
-		notification.getToggleDetailsButton().addMouseListener(
-				new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						if (notification.getToggleDetailsButton().getText()
-								.equals("hide details")) {
-							notification.getToggleDetailsButton().setText(
-									"show details");
-							setTopHeight(notification, 10.0, Unit.PX, 30.0,
-									Unit.PX);
-							setLeftRight(notification, 305.0, Unit.PX, 245.0,
-									Unit.PX);
-						} else if (notification.getToggleDetailsButton()
-								.getText().equals("show details")) {
-							notification.getToggleDetailsButton().setText(
-									"hide details");
-							double detailsHeight = notification.getDetails()
-									.getLineCount()
-									* FontsAndColors.BASE_CONTENT_FONT
-											.getSize2D() + 20;
-							setTopHeight(notification, 10.0, Unit.PX,
-									30.0 + detailsHeight, Unit.PX);
-						}
-					}
-				});
+		notification.getToggleDetailsButton().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (notification.getToggleDetailsButton().getText().equals("hide details")) {
+					notification.getToggleDetailsButton().setText("show details");
+					setTopHeight(notification, 10.0, Unit.PX, 30.0, Unit.PX);
+					setLeftRight(notification, 305.0, Unit.PX, 245.0, Unit.PX);
+				} else if (notification.getToggleDetailsButton().getText().equals("show details")) {
+					notification.getToggleDetailsButton().setText("hide details");
+					double detailsHeight = notification.getDetails().getLineCount()
+							* FontsAndColors.BASE_CONTENT_FONT.getSize2D() + 20;
+					setTopHeight(notification, 10.0, Unit.PX, 30.0 + detailsHeight, Unit.PX);
+				}
+			}
+		});
 		notification.getHideButton().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -757,8 +725,7 @@ public class AppView extends ConstraintContainer {
 		addEvent.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				TaggedEvent event = tagger.addNewEvent(new String(),
-						new String());
+				TaggedEvent event = tagger.addNewEvent(new String(), new String());
 				event.setInEdit(true);
 				event.setInFirstEdit(true);
 				updateEgt();
@@ -779,22 +746,21 @@ public class AppView extends ConstraintContainer {
 				}
 			}
 		});
-		searchTags.getJTextArea().getDocument()
-				.addDocumentListener(new DocumentListener() {
-					@Override
-					public void changedUpdate(DocumentEvent e) {
-					}
+		searchTags.getJTextArea().getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+			}
 
-					@Override
-					public void insertUpdate(DocumentEvent e) {
-						updateSearch();
-					}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				updateSearch();
+			}
 
-					@Override
-					public void removeUpdate(DocumentEvent e) {
-						updateSearch();
-					}
-				});
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				updateSearch();
+			}
+		});
 
 	}
 
@@ -818,8 +784,7 @@ public class AppView extends ConstraintContainer {
 		zoomPercent.setFont(FontsAndColors.contentFont);
 		zoomPercent.setForeground(FontsAndColors.GREY_DARK);
 
-		eventsScrollPane.setLayout(new ScrollLayout(eventsScrollPane,
-				eventsPanel));
+		eventsScrollPane.setLayout(new ScrollLayout(eventsScrollPane, eventsPanel));
 		tagsPanel.setBackground(Color.WHITE);
 		tagsScrollLayout = new ScrollLayout(tagsScrollPane, tagsPanel);
 		tagsScrollPane.setLayout(tagsScrollLayout);
@@ -855,12 +820,9 @@ public class AppView extends ConstraintContainer {
 		addTag.setPressedBackground(FontsAndColors.TRANSPARENT);
 		addTag.setPressedForeground(FontsAndColors.GREY_MEDIUM);
 
-		searchTags.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
-		searchTags.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
-		searchTags.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		searchTags.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
+		searchTags.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
+		searchTags.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
 		searchTags.getJTextArea().setText("search for tags ...");
 
 		searchTags.getJTextArea().addFocusListener(new FocusListener() {
@@ -880,8 +842,7 @@ public class AppView extends ConstraintContainer {
 		searchResults.setLayout(new ListLayout(1, 1, 0, 1));
 
 		JLayeredPane splitContainer = new JLayeredPane();
-		VerticalSplitLayout splitLayout = new VerticalSplitLayout(
-				splitContainer, splitPaneLeft, splitPaneRight, 400);
+		VerticalSplitLayout splitLayout = new VerticalSplitLayout(splitContainer, splitPaneLeft, splitPaneRight, 400);
 		splitContainer.setLayout(splitLayout);
 
 		collapseLabel.setBackground(FontsAndColors.TRANSPARENT);
@@ -901,41 +862,25 @@ public class AppView extends ConstraintContainer {
 		expandAll.setPressedBackground(FontsAndColors.TRANSPARENT);
 		expandAll.setPressedForeground(FontsAndColors.GREY_MEDIUM);
 
-		collapseLevel.getJTextArea().setText(
-				Integer.toString(loader.getInitialDepth()));
-		collapseLevel.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
+		collapseLevel.getJTextArea().setText(Integer.toString(loader.getInitialDepth()));
+		collapseLevel.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
 
-		splitPaneLeft.add(eventsTitle, new Constraint(
-				"top:0 height:50 left:10 width:100"));
-		splitPaneLeft.add(addEvent, new Constraint(
-				"top:0 height:50 right:10 width:115"));
-		splitPaneLeft.add(deselectAll, new Constraint(
-				"top:50 height:30 left:10 width:150"));
-		splitPaneLeft.add(addGroup, new Constraint(
-				"top:50 height:30 right:20 width:150"));
-		splitPaneLeft.add(eventsScrollPane, new Constraint(
-				"top:85 bottom:0 left:0 right:5"));
+		splitPaneLeft.add(eventsTitle, new Constraint("top:0 height:50 left:10 width:100"));
+		splitPaneLeft.add(addEvent, new Constraint("top:0 height:50 right:10 width:115"));
+		splitPaneLeft.add(deselectAll, new Constraint("top:50 height:30 left:10 width:150"));
+		splitPaneLeft.add(addGroup, new Constraint("top:50 height:30 right:20 width:150"));
+		splitPaneLeft.add(eventsScrollPane, new Constraint("top:85 bottom:0 left:0 right:5"));
 
-		splitPaneRight.add(tagsTitle, new Constraint(
-				"top:0 height:50 left:5 width:100"));
-		splitPaneRight.add(searchTags, new Constraint(
-				"top:12 height:26 left:90 right:100"));
-		splitPaneRight.add(searchResults, new Constraint(
-				"top:40 height:0 left:90 right:0"));
-		splitPaneRight.add(addTag, new Constraint(
-				"top:12 height:26 right:0 width:80"));
+		splitPaneRight.add(tagsTitle, new Constraint("top:0 height:50 left:5 width:100"));
+		splitPaneRight.add(searchTags, new Constraint("top:12 height:26 left:90 right:100"));
+		splitPaneRight.add(searchResults, new Constraint("top:40 height:0 left:90 right:0"));
+		splitPaneRight.add(addTag, new Constraint("top:12 height:26 right:0 width:80"));
 		splitPaneRight.setLayer(searchResults, 1);
-		splitPaneRight.add(collapseAll, new Constraint(
-				"top:52 height:30 left:85 width:100"));
-		splitPaneRight.add(expandAll, new Constraint(
-				"top:52 height:30 left:215 width:100"));
-		splitPaneRight.add(collapseLabel, new Constraint(
-				"top:50 height:30 left:315 width:115"));
-		splitPaneRight.add(collapseLevel, new Constraint(
-				"top:48 height:30 left:415 width:30"));
-		splitPaneRight.add(tagsScrollPane, new Constraint(
-				"top:85 bottom:0 left:5 right:10"));
+		splitPaneRight.add(collapseAll, new Constraint("top:52 height:30 left:85 width:100"));
+		splitPaneRight.add(expandAll, new Constraint("top:52 height:30 left:215 width:100"));
+		splitPaneRight.add(collapseLabel, new Constraint("top:50 height:30 left:315 width:115"));
+		splitPaneRight.add(collapseLevel, new Constraint("top:48 height:30 left:415 width:30"));
+		splitPaneRight.add(tagsScrollPane, new Constraint("top:85 bottom:0 left:5 right:10"));
 
 		if (!isStandAloneVersion) {
 			add(okay, new Constraint("top:0 height:50 left:10 width:55"));
@@ -1046,15 +991,24 @@ public class AppView extends ConstraintContainer {
 		ScrollLayout layout = (ScrollLayout) tagsScrollPane.getLayout();
 		if (tag == null && original != null) {
 			layout.scrollTo(5);
-			updateNotification("No related tags found in hierarchy.",
-					"For tag: " + original.getPath());
+			updateNotification("No related tags found in hierarchy.", "For tag: " + original.getPath());
 		} else {
 			updateNotification(null, null);
 			GuiTagModel gtm = (GuiTagModel) tag;
+			expandToLevel(gtm.getDepth());
 			TagView tagView = gtm.getTagView();
 			int y = Math.max(0, tagView.getY() - offset);
 			layout.scrollTo(y);
 			tagView.highlight();
+		}
+	}
+
+	public void expandToLevel(int depth) {
+		if (Integer.valueOf(collapseLevel.getJTextArea().getText()) < depth) {
+			autoCollapseDepth = depth;
+			autoCollapse = true;
+			collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
+			updateTags();
 		}
 	}
 
@@ -1130,8 +1084,7 @@ public class AppView extends ConstraintContainer {
 	}
 
 	public void scrollToEventGroup(TaggedEvent event) {
-		int offset = event.getEventView().getHeight()
-				+ event.findNumberOfTagsInEvents() * 27;
+		int offset = event.getEventView().getHeight() + event.findNumberOfTagsInEvents() * 27;
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
 		updateNotification(null, null);
 		int y = Math.max(0, event.getEventView().getY() + offset);
@@ -1139,8 +1092,7 @@ public class AppView extends ConstraintContainer {
 	}
 
 	public void scrollToNewGroup(TaggedEvent event, int groupId) {
-		int offset = event.getEventView().getHeight()
-				+ event.findNumberOfTagsInEvents() * 27;
+		int offset = event.getEventView().getHeight() + event.findNumberOfTagsInEvents() * 27;
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
 		updateNotification(null, null);
 		GroupView groupView = event.getGroupViewByKey(Integer.valueOf(groupId));
@@ -1157,17 +1109,13 @@ public class AppView extends ConstraintContainer {
 		AddEventDialog dialog = new AddEventDialog(frame);
 		String[] eventFields = dialog.showDialog();
 		if (eventFields != null) {
-			TaggedEvent event = tagger.addNewEvent(eventFields[0],
-					eventFields[1]);
+			TaggedEvent event = tagger.addNewEvent(eventFields[0], eventFields[1]);
 			updateEgt();
 			if (event == null) {
-				showTaggerMessageDialog(MessageConstants.ADD_EVENT_ERROR,
-						"Okay", null, null);
+				showTaggerMessageDialog(MessageConstants.ADD_EVENT_ERROR, "Okay", null, null);
 			} else {
-				ScrollLayout eventScrollLayout = (ScrollLayout) eventsScrollPane
-						.getLayout();
-				eventScrollLayout.scrollTo(event.getEventView()
-						.getCurrentPosition());
+				ScrollLayout eventScrollLayout = (ScrollLayout) eventsScrollPane.getLayout();
+				eventScrollLayout.scrollTo(event.getEventView().getCurrentPosition());
 			}
 		}
 	}
@@ -1180,8 +1128,7 @@ public class AppView extends ConstraintContainer {
 	 * @param message
 	 */
 	public void showAncestorDialog(ToggleTagMessage message) {
-		TagDisplayDialog dialog = new TagDisplayDialog(frame,
-				message.ancestors, MessageConstants.ANCESTOR,
+		TagDisplayDialog dialog = new TagDisplayDialog(frame, message.ancestors, MessageConstants.ANCESTOR,
 				MessageConstants.REPLACE_TAGS_Q, true, "Replace", "Warning");
 		boolean replace = dialog.showDialog();
 		if (replace) {
@@ -1244,9 +1191,8 @@ public class AppView extends ConstraintContainer {
 	 * @param message
 	 */
 	public void showDescendantDialog(ToggleTagMessage message) {
-		TagDisplayDialog dialog = new TagDisplayDialog(frame,
-				message.descendants, MessageConstants.DESCENDANT, null, false,
-				"Okay", "Warning");
+		TagDisplayDialog dialog = new TagDisplayDialog(frame, message.descendants, MessageConstants.DESCENDANT, null,
+				false, "Okay", "Warning");
 		dialog.showDialog();
 	}
 
@@ -1256,15 +1202,13 @@ public class AppView extends ConstraintContainer {
 	 * @param message
 	 * @return The File chosen, or null if no file was chosen.
 	 */
-	public File showFileChooserDialog(String dialogTitle, String approveButton,
-			String approveButtonToolTip, String fileExtensionType,
-			String[] fileExtenstions) {
+	public File showFileChooserDialog(String dialogTitle, String approveButton, String approveButtonToolTip,
+			String fileExtensionType, String[] fileExtenstions) {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle(dialogTitle);
 		fileChooser.setApproveButtonText(approveButton);
 		fileChooser.setApproveButtonToolTipText(approveButtonToolTip);
-		FileFilter imageFilter = new FileNameExtensionFilter(fileExtensionType,
-				fileExtenstions);
+		FileFilter imageFilter = new FileNameExtensionFilter(fileExtensionType, fileExtenstions);
 		fileChooser.setFileFilter(imageFilter);
 		int returnVal = fileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -1283,9 +1227,8 @@ public class AppView extends ConstraintContainer {
 	 *         chooses cancel.
 	 */
 	public boolean showRequiredMissingDialog(List<EventModel> missingReqTags) {
-		TagDisplayDialog dialog = new TagDisplayDialog(frame, missingReqTags,
-				MessageConstants.MISSING_REQUIRED, MessageConstants.EXIT_Q,
-				true, "Okay", "Warning");
+		TagDisplayDialog dialog = new TagDisplayDialog(frame, missingReqTags, MessageConstants.MISSING_REQUIRED,
+				MessageConstants.EXIT_Q, true, "Okay", "Warning");
 		return dialog.showDialog();
 	}
 
@@ -1310,15 +1253,12 @@ public class AppView extends ConstraintContainer {
 		boolean validInput = false;
 		int result = 0;
 		while (!validInput) {
-			result = JOptionPane.showConfirmDialog(null, panel,
-					"Tab Separated Options", JOptionPane.OK_CANCEL_OPTION,
+			result = JOptionPane.showConfirmDialog(null, panel, "Tab Separated Options", JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.PLAIN_MESSAGE);
-			validInput = validateTabSeparatedOptions(result, field1.getText(),
-					field2.getText(), field3.getText());
+			validInput = validateTabSeparatedOptions(result, field1.getText(), field2.getText(), field3.getText());
 		}
 		if (result == JOptionPane.OK_OPTION) {
-			tabSeparatedOptions = new String[] { field1.getText(),
-					field2.getText(), field3.getText() };
+			tabSeparatedOptions = new String[] { field1.getText(), field2.getText(), field3.getText() };
 			return tabSeparatedOptions;
 		}
 		return tabSeparatedOptions;
@@ -1332,10 +1272,8 @@ public class AppView extends ConstraintContainer {
 	 * @return The tag model for the tag chosen, or null if no tag was chosen.
 	 */
 	public AbstractTagModel showTagChooserDialog(AbstractTagModel baseTag) {
-		TaggerSet<AbstractTagModel> tags = tagger.getSubHierarchy(baseTag
-				.getPath());
-		TagChooserDialog dialog = new TagChooserDialog(frame, this, tagger,
-				tags);
+		TaggerSet<AbstractTagModel> tags = tagger.getSubHierarchy(baseTag.getPath());
+		TagChooserDialog dialog = new TagChooserDialog(frame, this, tagger, tags);
 		AbstractTagModel result = dialog.showDialog();
 		updateTags();
 		updateEgt();
@@ -1369,10 +1307,8 @@ public class AppView extends ConstraintContainer {
 	 * @return The option the user chose (0, 1, or 2), or -1 if no option was
 	 *         chosen
 	 */
-	public int showTaggerMessageDialog(String message, String opt0,
-			String opt1, String opt2) {
-		TaggerMessageDialog dialog = new TaggerMessageDialog(frame, message,
-				opt0, opt1, opt2);
+	public int showTaggerMessageDialog(String message, String opt0, String opt1, String opt2) {
+		TaggerMessageDialog dialog = new TaggerMessageDialog(frame, message, opt0, opt1, opt2);
 		return dialog.showDialog();
 	}
 
@@ -1384,10 +1320,9 @@ public class AppView extends ConstraintContainer {
 	 * @param message
 	 */
 	public void showUniqueDialog(ToggleTagMessage message) {
-		String text = MessageConstants.UNIQUE + message.uniqueKey.getPath()
-				+ ":";
-		TagDisplayDialog dialog = new TagDisplayDialog(frame,
-				message.uniqueValues, text, null, false, "Okay", "Warning");
+		String text = MessageConstants.UNIQUE + message.uniqueKey.getPath() + ":";
+		TagDisplayDialog dialog = new TagDisplayDialog(frame, message.uniqueValues, text, null, false, "Okay",
+				"Warning");
 		dialog.showDialog();
 	}
 
@@ -1424,47 +1359,40 @@ public class AppView extends ConstraintContainer {
 			} else {
 				ev.setSelected(false);
 			}
-			eventsPanel.add(ev, new Constraint("top:" + top
-					+ " height:30 left:0 width:"
-					+ (eventsPanel.getWidth() - 15)));
+			eventsPanel.add(ev,
+					new Constraint("top:" + top + " height:30 left:0 width:" + (eventsPanel.getWidth() - 15)));
 			ev.setCurrentPosition(top);
 			top += 31;
 			if (taggedEvent.isInEdit()) {
 				EventEditView eev = taggedEvent.getEventEditView();
 				eev.update();
-				eventsPanel.add(eev, new Constraint("top:" + top + " height:"
-						+ EventEditView.HEIGHT));
+				eventsPanel.add(eev, new Constraint("top:" + top + " height:" + EventEditView.HEIGHT));
 				top += EventEditView.HEIGHT;
 			}
-			if (tagger.isPrimary() && taggedEvent.showInfo()
-					&& tagger.hasRRTags()) {
+			if (tagger.isPrimary() && taggedEvent.showInfo() && tagger.hasRRTags()) {
 				// Show required/recommended tags
 				for (AbstractTagModel tag : tagger.getRequiredTags()) {
 					RRTagView rrtv = taggedEvent.getRRTagView(tag);
 					taggedEvent.addRRTagView(tag, rrtv);
 					int size = rrtv.getConstraintHeight();
-					eventsPanel.add(rrtv, new Constraint("top:" + top
-							+ " height:" + size));
+					eventsPanel.add(rrtv, new Constraint("top:" + top + " height:" + size));
 					top += size;
 				}
 				for (AbstractTagModel tag : tagger.getRecommendedTags()) {
 					RRTagView rrtv = taggedEvent.getRRTagView(tag);
 					taggedEvent.addRRTagView(tag, rrtv);
 					int size = rrtv.getConstraintHeight();
-					eventsPanel.add(rrtv, new Constraint("top:" + top
-							+ " height:" + size));
+					eventsPanel.add(rrtv, new Constraint("top:" + top + " height:" + size));
 					top += size;
 				}
 				JSeparator separator = new JSeparator();
 				separator.setForeground(Color.black);
 				separator.setBackground(Color.black);
-				eventsPanel.add(separator, new Constraint("top:" + top
-						+ " height:1 left:15 right:20"));
+				eventsPanel.add(separator, new Constraint("top:" + top + " height:1 left:15 right:20"));
 				top += 5;
 			}
 			// Show other tags
-			for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> tagGroup : taggedEvent
-					.getTagGroups().entrySet()) {
+			for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> tagGroup : taggedEvent.getTagGroups().entrySet()) {
 				// Show tag group
 				if (tagGroup.getKey() != taggedEvent.getEventGroupId()) {
 					Integer groupId = tagGroup.getKey();
@@ -1473,45 +1401,37 @@ public class AppView extends ConstraintContainer {
 					if (selectedGroups.contains(groupId)) {
 						groupView.setSelected(true);
 					}
-					Integer numTagsInGroup = taggedEvent
-							.getNumTagsInGroup(groupId);
+					Integer numTagsInGroup = taggedEvent.getNumTagsInGroup(groupId);
 					if (numTagsInGroup == 0) {
-						eventsPanel.add(groupView, new Constraint("top:" + top
-								+ " height:27 left:0 width:30"));
+						eventsPanel.add(groupView, new Constraint("top:" + top + " height:27 left:0 width:30"));
 						top += 27;
 					} else {
-						eventsPanel.add(groupView, new Constraint("top:" + top
-								+ " height:" + numTagsInGroup * 27
-								+ " left:0 width:30"));
+						eventsPanel.add(groupView,
+								new Constraint("top:" + top + " height:" + numTagsInGroup * 27 + " left:0 width:30"));
 					}
 				}
 				TaggerSet<AbstractTagModel> tags = tagGroup.getValue();
 				for (AbstractTagModel tag : tags) {
-					if (tagGroup.getKey() != taggedEvent.getEventGroupId()
-							|| !tagger.isRRValue(tag) || !tagger.isPrimary()) {
+					if (tagGroup.getKey() != taggedEvent.getEventGroupId() || !tagger.isRRValue(tag)
+							|| !tagger.isPrimary()) {
 						GuiTagModel guiTagModel = (GuiTagModel) tag;
 						guiTagModel.setAppView(this);
 						guiTagModel.updateMissing();
-						TagEventView tagEgtView = guiTagModel
-								.getTagEgtView(tagGroup.getKey());
-						GroupView groupView = taggedEvent
-								.getGroupViewByKey(tagGroup.getKey());
+						TagEventView tagEgtView = guiTagModel.getTagEgtView(tagGroup.getKey());
+						GroupView groupView = taggedEvent.getGroupViewByKey(tagGroup.getKey());
 						if (groupView == null) {
 							taggedEvent.addTagEgtView(tag, tagEgtView);
 						} else {
 							groupView.addTagEgtView(tag, tagEgtView);
 						}
-						eventsPanel.add(tagEgtView, new Constraint("top:" + top
-								+ " height:26 left:30 right:0"));
+						eventsPanel.add(tagEgtView, new Constraint("top:" + top + " height:26 left:30 right:0"));
 						top += 27;
 						if (guiTagModel.isInEdit()) {
-							TagEventEditView teev = guiTagModel
-									.getTagEgtEditView(taggedEvent);
+							TagEventEditView teev = guiTagModel.getTagEgtEditView(taggedEvent);
 							teev.setAppView(this);
 							teev.update();
-							eventsPanel.add(teev, new Constraint("top:" + top
-									+ " height:" + TagEventEditView.HEIGHT
-									+ " left:30 right:0"));
+							eventsPanel.add(teev, new Constraint(
+									"top:" + top + " height:" + TagEventEditView.HEIGHT + " left:30 right:0"));
 							top += TagEventEditView.HEIGHT;
 						}
 					}
@@ -1552,8 +1472,7 @@ public class AppView extends ConstraintContainer {
 	 */
 	private void updateSearch() {
 		searchResults.removeAll();
-		Set<GuiTagModel> tagModels = tagger.getSearchTags(searchTags
-				.getJTextArea().getText());
+		Set<GuiTagModel> tagModels = tagger.getSearchTags(searchTags.getJTextArea().getText());
 		if (tagModels == null || tagModels.isEmpty()) {
 			searchResults.setVisible(false);
 			return;
@@ -1562,9 +1481,8 @@ public class AppView extends ConstraintContainer {
 			searchResults.add(tag.getTagSearchView());
 		}
 		searchResults.revalidate();
-		splitPaneRight.setTopHeight(searchResults, 40.0, Unit.PX, searchResults
-				.getPreferredSize().getHeight() / ConstraintLayout.scale,
-				Unit.PX);
+		splitPaneRight.setTopHeight(searchResults, 40.0, Unit.PX,
+				searchResults.getPreferredSize().getHeight() / ConstraintLayout.scale, Unit.PX);
 		searchResults.setVisible(true);
 	}
 
@@ -1582,15 +1500,12 @@ public class AppView extends ConstraintContainer {
 			guiTagModel.setAppView(this);
 			guiTagModel.setCollapsable(tagger.hasChildTags(guiTagModel));
 			if (guiTagModel.isCollapsable() && autoCollapse) {
-				guiTagModel
-						.setCollapsed(guiTagModel.getDepth() > autoCollapseDepth);
+				guiTagModel.setCollapsed(guiTagModel.getDepth() > autoCollapseDepth);
 			}
-			if (lastVisibleTagPath != null
-					&& tagModel.getPath().startsWith(lastVisibleTagPath)) {
+			if (lastVisibleTagPath != null && tagModel.getPath().startsWith(lastVisibleTagPath)) {
 				continue;
 			}
-			lastVisibleTagPath = guiTagModel.isCollapsed() ? guiTagModel
-					.getPath() : null;
+			lastVisibleTagPath = guiTagModel.isCollapsed() ? guiTagModel.getPath() : null;
 			guiTagModel.getTagView().update();
 			tagsPanel.add(guiTagModel.getTagView());
 			if (guiTagModel.isInEdit()) {
@@ -1631,17 +1546,14 @@ public class AppView extends ConstraintContainer {
 	 *            the tag column in the file
 	 * @return true if the arguments are valid, false if otherwise
 	 */
-	public boolean validateTabSeparatedOptions(int result, String headerLines,
-			String eventCodeColumn, String TagColumn) {
+	public boolean validateTabSeparatedOptions(int result, String headerLines, String eventCodeColumn,
+			String TagColumn) {
 		String message = new String();
 		if (!headerLines.trim().matches("\\s*[0-9]+"))
 			message += "* header lines must be a single number greater than or equal to 0\n";
-		if (!eventCodeColumn.trim().matches(
-				"\\s*[1-9][0-9]*(\\s*,\\s*[1-9][0-9]*)*"))
+		if (!eventCodeColumn.trim().matches("\\s*[1-9][0-9]*(\\s*,\\s*[1-9][0-9]*)*"))
 			message += "* event code column must be a single number greater than or equal to 1 or a comma-separted list of numbers\n";
-		if (!TagColumn.trim().matches("0")
-				&& !TagColumn.trim().matches(
-						"\\s*[1-9][0-9]*(\\s*,\\s*[1-9][0-9]*)*"))
+		if (!TagColumn.trim().matches("0") && !TagColumn.trim().matches("\\s*[1-9][0-9]*(\\s*,\\s*[1-9][0-9]*)*"))
 			message += "* tag column must be a single number greater than or equal to 0 or a comma-separted list of numbers\n";
 		if (result == JOptionPane.OK_OPTION && !message.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Error(s):\n" + message);

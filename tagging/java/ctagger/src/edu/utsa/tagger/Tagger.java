@@ -107,6 +107,7 @@ public class Tagger {
 	private TaggerSet<TaggedEvent> taggedEventSet = new TaggerSet<TaggedEvent>();
 	// Counter to create unique group IDs
 	private static int groupIdCounter = 0;
+	private static final String LabelTag = "Event/Label/";
 	private String version = "2.01";
 	// Lists of required, recommended, and unique tags from the hierarchy
 	private TaggerSet<AbstractTagModel> requiredTags = new TaggerSet<AbstractTagModel>();
@@ -875,14 +876,14 @@ public class Tagger {
 		if (tag != null && !label.trim().isEmpty()) {
 			historyItem.type = TaggerHistory.Type.EVENT_EDITED;
 			historyItem.tagModel = tag;
-			tag.setPath("/Event/Label/" + label);
+			tag.setPath(LabelTag + label);
 			historyItem.tagModelCopy = (GuiTagModel) tag;
 			history.add(historyItem);
 		} else if (tag != null && label.trim().isEmpty()) {
 			TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups = taggedEvent.getTagGroups();
 			unassociate(historyItem, tag, tagGroups.keySet());
 		} else if (tag == null && !label.trim().isEmpty()) {
-			AbstractTagModel labelTag = getTagModel("/Event/Label/" + label);
+			AbstractTagModel labelTag = getTagModel(LabelTag + label);
 			TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups = taggedEvent.getTagGroups();
 			if (taggedEvent.isInFirstEdit()) {
 				associateBase(labelTag, tagGroups.keySet());
