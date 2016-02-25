@@ -16,6 +16,7 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1037,40 +1038,38 @@ public class AppView extends ConstraintContainer {
 	}
 
 	public void scrollToEventTag(GuiTagModel tag) {
-		int offset = 100;
-		Iterator<Integer> selectedGroupsIterator = selectedGroups.iterator();
-		int lastSelectedGroup = 0;
-		while (selectedGroupsIterator.hasNext()) {
-			lastSelectedGroup = selectedGroupsIterator.next().intValue();
-		}
-		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
-		updateNotification(null, null);
-		TaggedEvent event = tagger.getTaggedEventFromGroupId(lastSelectedGroup);
-		if (event.isRRTagDescendant(tag)) {
-			AbstractTagModel rrTag = event.findRRParentTag(tag);
-			RRTagView rrTagView = event.getRRTagViewByKey(rrTag);
-			TagEventView tagEgtView = rrTagView.getTagEgtViewByKey(tag);
-			if (rrTagView != null) {
-				int y = Math.max(0, rrTagView.getY() - offset);
-				layout.scrollTo(y);
-				if (tagEgtView != null)
+		if (selectedGroups.size() > 0) {
+			int offset = 100;
+			int lastSelectedGroup = Collections.max(selectedGroups);
+			ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
+			updateNotification(null, null);
+			TaggedEvent event = tagger.getTaggedEventFromGroupId(lastSelectedGroup);
+			if (event.isRRTagDescendant(tag)) {
+				AbstractTagModel rrTag = event.findRRParentTag(tag);
+				RRTagView rrTagView = event.getRRTagViewByKey(rrTag);
+				TagEventView tagEgtView = rrTagView.getTagEgtViewByKey(tag);
+				if (rrTagView != null) {
+					int y = Math.max(0, rrTagView.getY() - offset);
+					layout.scrollTo(y);
+					if (tagEgtView != null)
+						tagEgtView.highlight();
+				}
+			} else if (event.getEventGroupId() != lastSelectedGroup) {
+				GroupView groupView = event.getGroupViewByKey(lastSelectedGroup);
+				TagEventView tagEgtView = groupView.getTagEgtViewByKey(tag);
+				if (groupView != null) {
+					int y = Math.max(0, groupView.getY() - offset);
+					layout.scrollTo(y);
+					if (tagEgtView != null)
+						tagEgtView.highlight();
+				}
+			} else {
+				TagEventView tagEgtView = event.getTagEgtViewByKey(tag);
+				if (tagEgtView != null) {
+					int y = Math.max(0, tagEgtView.getY() - offset);
+					layout.scrollTo(y);
 					tagEgtView.highlight();
-			}
-		} else if (event.getEventGroupId() != lastSelectedGroup) {
-			GroupView groupView = event.getGroupViewByKey(lastSelectedGroup);
-			TagEventView tagEgtView = groupView.getTagEgtViewByKey(tag);
-			if (groupView != null) {
-				int y = Math.max(0, groupView.getY() - offset);
-				layout.scrollTo(y);
-				if (tagEgtView != null)
-					tagEgtView.highlight();
-			}
-		} else {
-			TagEventView tagEgtView = event.getTagEgtViewByKey(tag);
-			if (tagEgtView != null) {
-				int y = Math.max(0, tagEgtView.getY() - offset);
-				layout.scrollTo(y);
-				tagEgtView.highlight();
+				}
 			}
 		}
 	}

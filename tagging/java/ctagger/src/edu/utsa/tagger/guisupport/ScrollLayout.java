@@ -19,8 +19,7 @@ import javax.swing.JPanel;
 public class ScrollLayout implements LayoutManager {
 
 	@SuppressWarnings("serial")
-	public class ScrollBar extends JPanel implements MouseListener,
-			MouseMotionListener {
+	public class ScrollBar extends JPanel implements MouseListener, MouseMotionListener {
 
 		public ScrollBar() {
 			addMouseListener(this);
@@ -39,8 +38,8 @@ public class ScrollLayout implements LayoutManager {
 				return;
 			}
 
-			int new_vert_pos = (int) ((p.getY() / scrollContainer.getHeight()) * (content
-					.getHeight() + scrollContainer.getHeight() / 2));
+			int new_vert_pos = (int) ((p.getY() / scrollContainer.getHeight())
+					* (content.getHeight() + scrollContainer.getHeight()));
 			scroll(new_vert_pos - top);
 		}
 
@@ -70,6 +69,7 @@ public class ScrollLayout implements LayoutManager {
 	private JLayeredPane scrollContainer;
 	private JComponent content;
 	private ScrollBar scrollBar;
+	private JPanel p;
 
 	private int top;
 
@@ -80,13 +80,15 @@ public class ScrollLayout implements LayoutManager {
 		top = 0;
 
 		if (scrollContainer.getComponentCount() != 0) {
-			throw new RuntimeException(
-					"ScrollLayout requires empty JLayeredPane.");
+			throw new RuntimeException("ScrollLayout requires empty JLayeredPane.");
 		}
-
+		p = new JPanel();
+		p.setBackground(new Color(230, 230, 230));
 		scrollContainer.add(content);
 		scrollContainer.add(scrollBar);
-		scrollContainer.setLayer(scrollBar, 1);
+		scrollContainer.setLayer(scrollBar, 3);
+		scrollContainer.add(p);
+		scrollContainer.setLayer(p, 1);
 		scrollContainer.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -102,8 +104,7 @@ public class ScrollLayout implements LayoutManager {
 
 	@Override
 	public void addLayoutComponent(String str, Component comp) {
-		throw new RuntimeException(
-				"ScrollLayout can only have content and scrollBar.");
+		throw new RuntimeException("ScrollLayout can only have content and scrollBar.");
 	}
 
 	public JComponent getContentPane() {
@@ -126,8 +127,9 @@ public class ScrollLayout implements LayoutManager {
 		content.setLocation(0, -top);
 
 		// double sb_top = (top / contentHeight) * targetHeight;
-		double sb_top = (top / contentHeight)
-				* (targetHeight - scrollBar.getHeight());
+		double sb_top = (top / contentHeight) * (targetHeight - scrollBar.getHeight());
+		p.setSize(15, scrollContainer.getHeight());
+		p.setLocation(target.getWidth() - 15, (int) sb_top);
 		scrollBar.setSize(15, 120);
 		scrollBar.setLocation(target.getWidth() - 15, (int) sb_top);
 	}
