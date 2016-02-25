@@ -19,9 +19,9 @@ import javax.swing.JPanel;
 public class ScrollLayout implements LayoutManager {
 
 	@SuppressWarnings("serial")
-	public class ScrollBar extends JPanel implements MouseListener, MouseMotionListener {
+	public class Knob extends JPanel implements MouseListener, MouseMotionListener {
 
-		public ScrollBar() {
+		public Knob() {
 			addMouseListener(this);
 			addMouseMotionListener(this);
 			setBackground(new Color(150, 150, 150));
@@ -68,35 +68,37 @@ public class ScrollLayout implements LayoutManager {
 
 	private JLayeredPane scrollContainer;
 	private JComponent content;
-	private ScrollBar scrollBar;
-	private JPanel p;
+	private Knob knob;
+	private JPanel track;
 
 	private int top;
 
 	public ScrollLayout(JLayeredPane scrollContainerArg, JComponent contentArg) {
 		scrollContainer = scrollContainerArg;
 		content = contentArg;
-		scrollBar = new ScrollBar();
+		knob = new Knob();
 		top = 0;
 
 		if (scrollContainer.getComponentCount() != 0) {
 			throw new RuntimeException("ScrollLayout requires empty JLayeredPane.");
 		}
-		p = new JPanel();
-		p.setBackground(new Color(230, 230, 230));
+		track = new JPanel();
+		track.setBackground(new Color(230, 230, 230));
+		track.setOpaque(true);
 		scrollContainer.add(content);
-		scrollContainer.add(scrollBar);
-		scrollContainer.setLayer(scrollBar, 3);
-		scrollContainer.add(p);
-		scrollContainer.setLayer(p, 1);
+		scrollContainer.add(track);
+		scrollContainer.setLayer(track, 1);
+		scrollContainer.add(knob);
+		scrollContainer.setLayer(knob, 2);
+
 		scrollContainer.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int rotation = e.getWheelRotation();
 				if (rotation < 0) {
-					scroll(-40);
+					scroll(-80);
 				} else {
-					scroll(40);
+					scroll(80);
 				}
 			}
 		});
@@ -116,9 +118,8 @@ public class ScrollLayout implements LayoutManager {
 
 		double targetHeight = target.getHeight();
 		double contentHeight = content.getPreferredSize().height;
-
-		if (top > contentHeight - targetHeight + scrollBar.getHeight()) {
-			top = (int) (contentHeight - targetHeight + scrollBar.getHeight());
+		if (top > contentHeight) {
+			top = (int) (contentHeight);
 		}
 		if (top < 0) {
 			top = 0;
@@ -126,12 +127,11 @@ public class ScrollLayout implements LayoutManager {
 		content.setSize(target.getWidth(), (int) contentHeight);
 		content.setLocation(0, -top);
 
-		// double sb_top = (top / contentHeight) * targetHeight;
-		double sb_top = (top / contentHeight) * (targetHeight - scrollBar.getHeight());
-		p.setSize(15, scrollContainer.getHeight());
-		p.setLocation(target.getWidth() - 15, (int) sb_top);
-		scrollBar.setSize(15, 120);
-		scrollBar.setLocation(target.getWidth() - 15, (int) sb_top);
+		double sb_top = (top / contentHeight) * (targetHeight - knob.getHeight());
+		track.setSize(15, scrollContainer.getHeight());
+		track.setLocation(target.getWidth() - 15, 0);
+		knob.setSize(15, 120);
+		knob.setLocation(target.getWidth() - 15, (int) sb_top);
 	}
 
 	@Override
@@ -140,11 +140,11 @@ public class ScrollLayout implements LayoutManager {
 	}
 
 	public void pageDown() {
-		scroll((int) (scrollContainer.getHeight() * .95));
+		scroll((int) (scrollContainer.getHeight()));
 	}
 
 	public void pageUp() {
-		scroll((int) (scrollContainer.getHeight() * -.95));
+		scroll((int) (scrollContainer.getHeight()));
 	}
 
 	@Override

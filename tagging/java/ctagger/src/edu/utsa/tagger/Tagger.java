@@ -2364,8 +2364,9 @@ public class Tagger {
 	 */
 	public AbstractTagModel tagFound(String tagPath) {
 		for (AbstractTagModel tag : tagList) {
-			if (tag.getPath().toUpperCase().equals(tagPath.toUpperCase())) {
-				return tag;
+			if (tagPath != null) {
+				if (tag.getPath().toUpperCase().equals(tagPath.toUpperCase()))
+					return tag;
 			}
 		}
 		return null;

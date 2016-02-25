@@ -685,6 +685,8 @@ public class AppView extends ConstraintContainer {
 		collapseAll.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				ScrollLayout layout = (ScrollLayout) tagsScrollPane.getLayout();
+				layout.scrollTo(0);
 				autoCollapseDepth = 1;
 				autoCollapse = true;
 				collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
@@ -694,6 +696,8 @@ public class AppView extends ConstraintContainer {
 		expandAll.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				ScrollLayout layout = (ScrollLayout) tagsScrollPane.getLayout();
+				layout.scrollTo(0);
 				autoCollapseDepth = tagger.getTagLevel();
 				autoCollapse = true;
 				collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
@@ -881,7 +885,7 @@ public class AppView extends ConstraintContainer {
 		splitPaneRight.add(expandAll, new Constraint("top:52 height:30 left:215 width:100"));
 		splitPaneRight.add(collapseLabel, new Constraint("top:50 height:30 left:315 width:115"));
 		splitPaneRight.add(collapseLevel, new Constraint("top:48 height:30 left:415 width:30"));
-		splitPaneRight.add(tagsScrollPane, new Constraint("top:85 bottom:0 left:5 right:10"));
+		splitPaneRight.add(tagsScrollPane, new Constraint("top:85 bottom:0 left:5 right:0"));
 
 		if (!isStandAloneVersion) {
 			add(okay, new Constraint("top:0 height:50 left:10 width:55"));
