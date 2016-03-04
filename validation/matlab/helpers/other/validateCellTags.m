@@ -83,16 +83,21 @@
 
 function [errors, warnings, extensions] = validateCellTags(cells, varargin)
 p = parseArguments();
+errors = '';
+warnings = '';
+extensions = '';
 hedMaps = loadHEDMap();
 mapVersion = hedMaps.version;
 xmlVersion = getXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
-[errors, warnings, extensions] = parseCellTags(hedMaps, p.cells, ...
-    p.extensionAllowed);
-if p.writeOutput
-    writeOutputFiles();
+if ~all(cellfun(@isempty,cells))
+    [errors, warnings, extensions] = parseCellTags(hedMaps, p.cells, ...
+        p.extensionAllowed);
+    if p.writeOutput
+        writeOutputFiles();
+    end
 end
 
     function hedMaps = loadHEDMap()
@@ -105,7 +110,7 @@ end
     function p = parseArguments()
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('cells', @iscellstr);
+        p.addRequired('cells', @iscell);
         p.addParamValue('extensionAllowed', true, ...
             @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
         p.addParamValue('hedXML', 'HED.xml', ...

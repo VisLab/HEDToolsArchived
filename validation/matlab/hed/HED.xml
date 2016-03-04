@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="2.1">
+<HED version="2.2">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1602,6 +1602,10 @@
       <node>
          <name>Probability</name>
          <description>Use to specify the level of certainty</description>
+      </node>
+      <node>
+         <name>Presentation fraction</name>
+         <description>the fraction of presentation of an Oddball or Expected stimuli to the total number of same-class presentations, e.g. 10% of images in an RSVP being targets</description>
          <node isNumeric="true" takesValue="true">
             <name>#</name>
          </node>
@@ -2134,11 +2138,7 @@
                </node>
                <node>
                   <name>Three stimuli</name>
-                  <description>See http://dx.doi.org/10.1016/0167-8760(96)00030-X</description>
-                  <node>
-                     <name>Target</name>
-                     <description>There are regular non-targets and targets and infrequent non-targets</description>
-                  </node>
+                  <description>There are regular non-targets and targets and infrequent non-targets, see http://dx.doi.org/10.1016/0167-8760(96)00030-X</description>
                </node>
                <node>
                   <name>Silent counting</name>
@@ -2155,20 +2155,21 @@
                <description>Something the subject is looking for</description>
             </node>
             <node>
+               <name>Non-target</name>
+               <description>Make sure to tag Expected if the Non-target is frequent</description>
+            </node>
+            <node>
                <name>Novel</name>
                <description>Genuinely novel such as an event occurring once or so per experiment</description>
             </node>
             <node>
                <name>Expected</name>
-               <description>Of low information value</description>
+               <description>Of low information value, for example frequent Non-targets in an RSVP paradigm</description>
                <node>
                   <name>Standard</name>
                </node>
                <node>
                   <name>Distractor</name>
-               </node>
-               <node>
-                  <name>Non-Target</name>
                </node>
             </node>
             <node>
