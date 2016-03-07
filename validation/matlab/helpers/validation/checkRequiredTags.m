@@ -8,10 +8,10 @@ checkRequiredTags();
 
     function checkRequiredTags()
         % Checks the tags that are required
-        numTags = size(requiredTags, 2);
+        numTags = length(requiredTags);
         for a = 1:numTags
             requiredIndexes = strncmpi(eventLevelTags, requiredTags{a}, ...
-                size(requiredTags{a}, 2));
+                length(requiredTags{a}));
             if sum(requiredIndexes) == 0
                 generateErrorMessages(a);
             end

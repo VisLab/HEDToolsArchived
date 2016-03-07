@@ -9,13 +9,14 @@ uniqueTags = Maps.unique.values();
 [originalGroupTags, canonicalGroupTags] = ...
     getGroupTags(original, canonical);
 checkUniqueTags(originalEventTags, canonicalEventTags, false);
-for a = 1:length(originalGroupTags)
+originalGroupTagsLength = length(originalGroupTags);
+for a = 1:originalGroupTagsLength
     checkUniqueTags(originalGroupTags{a}, canonicalGroupTags{a}, true);
 end
 
     function checkUniqueTags(original, canonical, isGroup)
         % Looks for two or more tags that are descendants of a unique tag
-        numTags = size(uniqueTags, 2);
+        numTags = length(uniqueTags);
         for uniqueTagsIndex = 1:numTags
             foundIndexes = strncmp(original, ...
                 uniqueTags{uniqueTagsIndex}, ...
@@ -32,7 +33,7 @@ end
             canonical, isGroup)
         % Generates a unique tag error if two or more tags are descendants
         % of a unique tag
-        numIndexes = size(foundIndexes, 2);
+        numIndexes = length(foundIndexes);
         for foundIndex = 1:numIndexes
             tagString = canonical{foundIndexes(foundIndex)};
             if isGroup

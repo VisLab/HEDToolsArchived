@@ -10,7 +10,7 @@ checkValidTags(originalTags, formattedTags, false);
 
     function checkValidTags(originalTags, formattedTags, isGroup)
         % Checks if the tags are valid
-        numTags = size(originalTags, 2);
+        numTags = length(originalTags);
         for a = 1:numTags
             if ~ischar(originalTags{a})
                 checkValidTags(originalTags{a}, formattedTags{a}, true);
@@ -62,8 +62,8 @@ checkValidTags(originalTags, formattedTags, false);
         errorsIndex = errorsIndex + 1;
     end % generateErrorMessages
 
-    function generateExtensions(originalTags, tagIndex, extensionParentTag, ...
-            isGroup)
+    function generateExtensions(originalTags, tagIndex, ...
+            extensionParentTag, isGroup)
         % Generates extension warnings for tags that are children of
         % extension allowed tags
         tagString = originalTags{tagIndex};
@@ -82,16 +82,12 @@ checkValidTags(originalTags, formattedTags, false);
         % Checks if the tag has the extensionAllowed attribute
         isExtensionTag = false;
         extensionParentTag = '';
-%         extensionIndex = 0;
         slashIndexes = strfind(tag, '/');
         while size(slashIndexes, 2) > 1
             parent = tag(1:slashIndexes(end)-1);
-%             foundIndex = find(strcmp(parent, extensionAllowedTags));
             if Maps.extensionAllowed.isKey(lower(parent))
                 extensionParentTag = parent;
-%             if ~isempty(foundIndex)
                 isExtensionTag = true;
-%                 extensionIndex = foundIndex;
                 break;
             end
             slashIndexes = strfind(parent, '/');
@@ -104,7 +100,6 @@ checkValidTags(originalTags, formattedTags, false);
         valueTag = convertToValueTag(tag);
         while ~strncmp(valueTag, '/#', 2)
             if Maps.takesValue.isKey(lower(valueTag))
-%             if any(strcmpi(takesValueTags, valueTag))
                 isValueTag = true;
                 break;
             end

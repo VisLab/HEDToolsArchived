@@ -5,7 +5,7 @@ checkTildeTags(original);
 
     function checkTildeTags(originalTags)
         % Checks if the tags in the group have no more than 2 tildes
-        numTags = size(originalTags, 2);
+        numTags = length(originalTags);
         for a = 1:numTags
             if ~ischar(originalTags{a}) && ...
                     sum(strncmp('~',originalTags{a}, 1)) > 2
