@@ -224,10 +224,8 @@ public class TaggerHistory {
 
 	private void redoAddGroups(HistoryItem item) {
 		if (item.groupIds != null && item.tags != null && item.events != null) {
-			TaggedEvent[] events = (TaggedEvent[]) item.events
-					.toArray(new TaggedEvent[item.events.size()]);
-			Integer[] groupIds = (Integer[]) item.groupIds
-					.toArray(new Integer[item.groupIds.size()]);
+			TaggedEvent[] events = (TaggedEvent[]) item.events.toArray(new TaggedEvent[item.events.size()]);
+			Integer[] groupIds = (Integer[]) item.groupIds.toArray(new Integer[item.groupIds.size()]);
 			for (int i = 0; i < events.length; i++) {
 				tagger.addGroupBase(events[i], groupIds[i], item.tags);
 			}
@@ -244,8 +242,7 @@ public class TaggerHistory {
 
 	private void redoAssociate(HistoryItem item) {
 		if (item.tagModel != null && item.groupsIds != null) {
-			if ("/Event/Label".equals(item.tagModel.getParentPath())
-					&& item.eventModel != null) {
+			if ("Event/Label".equals(item.tagModel.getParentPath()) && item.eventModel != null) {
 				item.eventModel.setLabel(item.tagModel.getPath());
 			}
 			tagger.associateBase(item.tagModel, item.groupsIds);
@@ -255,13 +252,11 @@ public class TaggerHistory {
 
 	private void redoEventEdited(HistoryItem item) {
 		if (item.eventModel != null && item.eventModelCopy != null) {
-			AbstractEventModel copy = tagger.editEventCodeLabelBase(
-					item.eventModel, item.eventModelCopy.getCode(),
+			AbstractEventModel copy = tagger.editEventCodeLabelBase(item.eventModel, item.eventModelCopy.getCode(),
 					item.eventModelCopy.getLabel());
 			item.eventModelCopy = copy;
 			if (item.tagModel != null)
-				item.tagModel.setPath("/Event/Label/"
-						+ item.eventModel.getLabel());
+				item.tagModel.setPath("Event/Label/" + item.eventModel.getLabel());
 			addToUndo(item);
 		}
 	}
@@ -284,8 +279,7 @@ public class TaggerHistory {
 
 	private void redoRemoveTag(HistoryItem item) {
 		if (item.tagModel != null && item.tags != null) {
-			TaggerSet<AbstractTagModel> deleted = tagger
-					.deleteTagBase(item.tagModel);
+			TaggerSet<AbstractTagModel> deleted = tagger.deleteTagBase(item.tagModel);
 			item.tags = deleted;
 			addToUndo(item);
 		}
@@ -294,12 +288,10 @@ public class TaggerHistory {
 	private void redoTagEdited(HistoryItem item) {
 		if (item.tagModelCopy != null && item.tagModel != null) {
 			GuiTagModel original = item.tagModelCopy;
-			GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel,
-					original.getName(), original.getDescription(),
-					original.isChildRequired(), original.takesValue(),
-					original.isNumeric(), original.isRequired(),
-					original.isRecommended(), original.isUnique(),
-					original.getPosition(), original.getPredicateType());
+			GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel, original.getName(),
+					original.getDescription(), original.isExtensionAllowed(), original.isChildRequired(),
+					original.takesValue(), original.isNumeric(), original.isRequired(), original.isRecommended(),
+					original.isUnique(), original.getPosition(), original.getPredicateType());
 			item.tagModelCopy = copy;
 			addToUndo(item);
 		}
@@ -307,23 +299,20 @@ public class TaggerHistory {
 
 	private void redoTagPathEdited(HistoryItem item) {
 		GuiTagModel original = item.tagModelCopy;
-		if ("/Event/Label".equals(item.tagModelCopy.getParentPath())) {
+		if ("Event/Label".equals(item.tagModelCopy.getParentPath())) {
 			item.eventModel.setLabel(original.getName());
 		}
-		GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel,
-				original.getPath(), item.tagModelCopy.getName(),
-				original.getDescription(), original.isChildRequired(),
-				original.takesValue(), item.tagModelCopy.isRequired(),
-				original.isRecommended(), original.isUnique(),
-				original.getPosition());
+		GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel, original.getPath(),
+				item.tagModelCopy.getName(), original.getDescription(), original.isExtensionAllowed(),
+				original.isChildRequired(), original.takesValue(), item.tagModelCopy.isRequired(),
+				original.isRecommended(), original.isUnique(), original.getPosition());
 		item.tagModelCopy = copy;
 		addToUndo(item);
 	}
 
 	private void redoUnassociate(HistoryItem item) {
 		if (item.tagModel != null && item.groupsIds != null) {
-			if ("/Event/Label".equals(item.tagModel.getParentPath())
-					&& item.eventModel != null) {
+			if ("Event/Label".equals(item.tagModel.getParentPath()) && item.eventModel != null) {
 				item.eventModel.setLabel(new String());
 			}
 			tagger.unassociateBase(item.tagModel, item.groupsIds);
@@ -398,10 +387,8 @@ public class TaggerHistory {
 
 	private void undoAddGroups(HistoryItem item) {
 		if (item.groupIds != null && item.events != null) {
-			TaggedEvent[] events = (TaggedEvent[]) item.events
-					.toArray(new TaggedEvent[item.events.size()]);
-			Integer[] groupIds = (Integer[]) item.groupIds
-					.toArray(new Integer[item.groupIds.size()]);
+			TaggedEvent[] events = (TaggedEvent[]) item.events.toArray(new TaggedEvent[item.events.size()]);
+			Integer[] groupIds = (Integer[]) item.groupIds.toArray(new Integer[item.groupIds.size()]);
 			for (int i = 0; i < events.length; i++) {
 				tagger.removeGroupBase(events[i], groupIds[i]);
 			}
@@ -418,8 +405,7 @@ public class TaggerHistory {
 
 	private void undoAssociate(HistoryItem item) {
 		if (item.tagModel != null && item.groupsIds != null) {
-			if ("/Event/Label".equals(item.tagModel.getParentPath())
-					&& item.eventModel != null) {
+			if ("Event/Label".equals(item.tagModel.getParentPath()) && item.eventModel != null) {
 				item.eventModel.setLabel(item.tagModel.getPath());
 			}
 			tagger.unassociateBase(item.tagModel, item.groupsIds);
@@ -429,13 +415,11 @@ public class TaggerHistory {
 
 	private void undoEventEdited(HistoryItem item) {
 		if (item.eventModel != null && item.eventModelCopy != null) {
-			AbstractEventModel copy = tagger.editEventCodeLabelBase(
-					item.eventModel, item.eventModelCopy.getCode(),
+			AbstractEventModel copy = tagger.editEventCodeLabelBase(item.eventModel, item.eventModelCopy.getCode(),
 					item.eventModelCopy.getLabel());
 			item.eventModelCopy = copy;
 			if (item.tagModel != null)
-				item.tagModel.setPath("/Event/Label/"
-						+ item.eventModel.getLabel());
+				item.tagModel.setPath("Event/Label/" + item.eventModel.getLabel());
 			addToRedo(item);
 		}
 	}
@@ -471,12 +455,10 @@ public class TaggerHistory {
 	private void undoTagEdited(HistoryItem item) {
 		if (item.tagModelCopy != null && item.tagModel != null) {
 			GuiTagModel original = item.tagModelCopy;
-			GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel,
-					original.getName(), original.getDescription(),
-					original.isChildRequired(), original.takesValue(),
-					original.isNumeric(), original.isRequired(),
-					original.isRecommended(), original.isUnique(),
-					original.getPosition(), original.getPredicateType());
+			GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel, original.getName(),
+					original.getDescription(), original.isExtensionAllowed(), original.isChildRequired(),
+					original.takesValue(), original.isNumeric(), original.isRequired(), original.isRecommended(),
+					original.isUnique(), original.getPosition(), original.getPredicateType());
 			item.tagModelCopy = copy;
 			addToRedo(item);
 		}
@@ -484,24 +466,20 @@ public class TaggerHistory {
 
 	private void undoTagPathEdited(HistoryItem item) {
 		GuiTagModel original = item.tagModelCopy;
-		if ("/Event/Label".equals(item.tagModelCopy.getParentPath())
-				&& item.eventModel != null) {
+		if ("Event/Label".equals(item.tagModelCopy.getParentPath()) && item.eventModel != null) {
 			item.eventModel.setLabel(original.getName());
 		}
-		GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel,
-				original.getPath(), item.tagModelCopy.getName(),
-				original.getDescription(), original.isChildRequired(),
-				original.takesValue(), item.tagModelCopy.isRequired(),
-				original.isRecommended(), original.isUnique(),
-				original.getPosition());
+		GuiTagModel copy = tagger.editTagBase((GuiTagModel) item.tagModel, original.getPath(),
+				item.tagModelCopy.getName(), original.getDescription(), original.isExtensionAllowed(),
+				original.isChildRequired(), original.takesValue(), item.tagModelCopy.isRequired(),
+				original.isRecommended(), original.isUnique(), original.getPosition());
 		item.tagModelCopy = copy;
 		addToRedo(item);
 	}
 
 	private void undoUnassociate(HistoryItem item) {
 		if (item.tagModel != null && item.groupsIds != null) {
-			if ("/Event/Label".equals(item.tagModel.getParentPath())
-					&& item.eventModel != null) {
+			if ("Event/Label".equals(item.tagModel.getParentPath()) && item.eventModel != null) {
 				item.eventModel.setLabel(new String());
 			}
 			tagger.associateBase(item.tagModel, item.groupsIds);

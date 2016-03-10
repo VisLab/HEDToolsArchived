@@ -357,10 +357,10 @@ public class AppView extends ConstraintContainer {
 				scrollToEventGroup(item.event);
 				break;
 			case TAG_ADDED:
-				scrollToTag(item.tagModel, null);
+				scrollToTag(item.tagModel);
 				break;
 			case TAG_EDITED:
-				scrollToTag(item.tagModel, null);
+				scrollToTag(item.tagModel);
 				break;
 			case TAG_PATH_EDITED:
 				scrollToEventTag((GuiTagModel) item.tagModel);
@@ -747,7 +747,7 @@ public class AppView extends ConstraintContainer {
 				if (newGuiTag != null) {
 					newGuiTag.setFirstEdit(true);
 					updateTags();
-					AppView.this.scrollToTag(newTag, null);
+					AppView.this.scrollToTag(newTag);
 				}
 			}
 		});
@@ -991,21 +991,25 @@ public class AppView extends ConstraintContainer {
 	 * 
 	 * @param tag
 	 */
-	public void scrollToTag(AbstractTagModel tag, AbstractTagModel original) {
+	public void scrollToTag(AbstractTagModel tag) {
 		int offset = 100;
 		ScrollLayout layout = (ScrollLayout) tagsScrollPane.getLayout();
-		if (tag == null && original != null) {
-			layout.scrollTo(5);
-			updateNotification("No related tags found in hierarchy.", "For tag: " + original.getPath());
+		updateNotification(null, null);
+		AbstractTagModel parent = tagger.getTagModel(tag.getParentPath() + "/#");
+		AbstractTagModel extensionAllowedAncestor = tagger.getExtensionAllowedAncestor(tag.getPath());
+		GuiTagModel gtm = null;
+		if (extensionAllowedAncestor != null) {
+			gtm = (GuiTagModel) extensionAllowedAncestor;
+		} else if (parent != null && parent.takesValue()) {
+			gtm = (GuiTagModel) parent;
 		} else {
-			updateNotification(null, null);
-			GuiTagModel gtm = (GuiTagModel) tag;
-			expandToLevel(gtm.getDepth());
-			TagView tagView = gtm.getTagView();
-			int y = Math.max(0, tagView.getY() - offset);
-			layout.scrollTo(y);
-			tagView.highlight();
+			gtm = (GuiTagModel) tag;
 		}
+		expandToLevel(gtm.getDepth());
+		TagView tagView = gtm.getTagView();
+		int y = Math.max(0, tagView.getY() - offset);
+		layout.scrollTo(y);
+		tagView.highlight();
 	}
 
 	public void expandToLevel(int depth) {

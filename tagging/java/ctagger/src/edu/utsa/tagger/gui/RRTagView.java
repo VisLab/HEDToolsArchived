@@ -77,8 +77,7 @@ public class RRTagView extends JComponent {
 	 * @param key
 	 *            The required/recommended tag
 	 */
-	public RRTagView(Tagger tagger, AppView appView, TaggedEvent taggedEvent,
-			AbstractTagModel key) {
+	public RRTagView(Tagger tagger, AppView appView, TaggedEvent taggedEvent, AbstractTagModel key) {
 		label = new JLabel(key.getPath()) {
 			@Override
 			public Font getFont() {
@@ -99,14 +98,10 @@ public class RRTagView extends JComponent {
 		}
 		valueField = new XScrollTextBox(new JTextArea());
 		valueField.setBorder(normalBorder);
-		valueField.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
-		valueField.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
-		valueField.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("TAB"), "doNothing");
-		valueField.getJTextArea().getDocument()
-				.addDocumentListener(new valueFieldListener());
+		valueField.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
+		valueField.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
+		valueField.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		valueField.getJTextArea().getDocument().addDocumentListener(new valueFieldListener());
 		editView = new RREditView();
 		// No value(s) for this RR tag - highlight label
 		if (key.isChildRequired() && values == null) {
@@ -180,9 +175,10 @@ public class RRTagView extends JComponent {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				GuiTagModel tagMatch = (GuiTagModel) tagger.openToClosest(key);
+				// GuiTagModel tagMatch = (GuiTagModel)
+				// tagger.openToClosest(key);
 				appView.updateTags();
-				appView.scrollToTag(tagMatch, key);
+				appView.scrollToTag(key);
 			}
 		}
 	}
@@ -243,8 +239,7 @@ public class RRTagView extends JComponent {
 			Color bg = FontsAndColors.TAG_BG_NORMAL;
 
 			Graphics2D g2d = (Graphics2D) g;
-			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-					RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
 			g2d.setColor(bg);
 			g2d.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
@@ -356,8 +351,7 @@ public class RRTagView extends JComponent {
 		@Override
 		public Font getFont() {
 			Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
-			fontAttributes.put(TextAttribute.UNDERLINE,
-					TextAttribute.UNDERLINE_ON);
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 			return FontsAndColors.contentFont.deriveFont(fontAttributes);
 		}
 	};
@@ -366,8 +360,7 @@ public class RRTagView extends JComponent {
 		@Override
 		public Font getFont() {
 			Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
-			fontAttributes.put(TextAttribute.UNDERLINE,
-					TextAttribute.UNDERLINE_ON);
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 			return FontsAndColors.contentFont.deriveFont(fontAttributes);
 		}
 	};
@@ -401,8 +394,7 @@ public class RRTagView extends JComponent {
 		if (!key.isUnique() && values != null) {
 			numTags = values.size();
 		}
-		return BASE_SIZE + TAG_SIZE * numTags + TagEventEditView.HEIGHT
-				* numEditTags;
+		return BASE_SIZE + TAG_SIZE * numTags + TagEventEditView.HEIGHT * numEditTags;
 	}
 
 	public AbstractTagModel getKey() {
@@ -421,8 +413,7 @@ public class RRTagView extends JComponent {
 	 *         field to remove an existing required/recommended tag).
 	 */
 	private AbstractTagModel getNewValue() {
-		if (valueField != null
-				&& !valueField.getJTextArea().getText().isEmpty()) {
+		if (valueField != null && !valueField.getJTextArea().getText().isEmpty()) {
 			String valueText = valueField.getJTextArea().getText().trim();
 			return tagger.createTransientTagModel(takesValueTag, valueText);
 		}
@@ -444,18 +435,15 @@ public class RRTagView extends JComponent {
 			if (valueTags != null && key.isUnique()) {
 				tagText = valueTags.get(0).getName();
 				String valueString = takesValueTag.getName();
-				String before = valueString.substring(0,
-						valueString.indexOf('#'));
-				String after = valueString
-						.substring(valueString.indexOf('#') + 1);
+				String before = valueString.substring(0, valueString.indexOf('#'));
+				String after = valueString.substring(valueString.indexOf('#') + 1);
 				tagText = tagText.replaceFirst(before, "");
 				tagText = tagText.replaceFirst(after + "$", "");
 			}
 			if (key.isUnique()) {
 				valueField.getJTextArea().setText(tagText);
 			}
-			add(valueField, new Constraint("top:" + top
-					+ " height:26 left:15 right:20"));
+			add(valueField, new Constraint("top:" + top + " height:26 left:15 right:20"));
 			add(cancel, new Constraint("top:5 height:20 right:20 width:45"));
 			add(save, new Constraint("top:5 height:20 right:70 width:35"));
 			SwingUtilities.invokeLater(new Runnable() {
@@ -466,8 +454,7 @@ public class RRTagView extends JComponent {
 				}
 			});
 		} else {
-			add(editView, new Constraint("top:" + top
-					+ " height:26 left:15 right:20"));
+			add(editView, new Constraint("top:" + top + " height:26 left:15 right:20"));
 		}
 		top += 29;
 		// Adds existing descendant tags to view
@@ -477,18 +464,15 @@ public class RRTagView extends JComponent {
 				GuiTagModel gtm = (GuiTagModel) valueTag;
 				gtm.setAppView(appView);
 				gtm.updateMissing();
-				TagEventView tagEgtView = gtm.getTagEgtView(taggedEvent
-						.getEventGroupId());
+				TagEventView tagEgtView = gtm.getTagEgtView(taggedEvent.getEventGroupId());
 				addTagEgtView(valueTag, tagEgtView);
-				add(tagEgtView, new Constraint("top:" + top
-						+ " height:26 left:30 right:0"));
+				add(tagEgtView, new Constraint("top:" + top + " height:26 left:30 right:0"));
 				top += TAG_SIZE;
 				if (gtm.isInEdit()) {
 					TagEventEditView teev = gtm.getTagEgtEditView(taggedEvent);
 					teev.setAppView(appView);
 					teev.update();
-					add(teev, new Constraint("top:" + top + " height:"
-							+ TagEventEditView.HEIGHT + " left:30 right:0"));
+					add(teev, new Constraint("top:" + top + " height:" + TagEventEditView.HEIGHT + " left:30 right:0"));
 					top += TagEventEditView.HEIGHT;
 					numEditTags++;
 				}
@@ -513,8 +497,7 @@ public class RRTagView extends JComponent {
 		idSet.add(taggedEvent.getEventGroupId());
 		// Unassociate old value if unique
 		if (values != null && key.isUnique()) {
-			tagger.unassociate(taggedEvent.getEventModel(), values.get(0),
-					idSet);
+			tagger.unassociate(taggedEvent.getEventModel(), values.get(0), idSet);
 		}
 		// Associate new value
 		GuiTagModel gtm = (GuiTagModel) newTag;
@@ -525,8 +508,7 @@ public class RRTagView extends JComponent {
 	private void updateTakesValueTag(AbstractTagModel newTag) {
 		// Unassociate old value if unique
 		if (values != null && key.isUnique()) {
-			String path = values.get(0).getParentPath() + "/"
-					+ valueField.getJTextArea().getText().trim();
+			String path = values.get(0).getParentPath() + "/" + valueField.getJTextArea().getText().trim();
 			tagger.editTagPath(taggedEvent, (GuiTagModel) values.get(0), path);
 		} else {
 			updateValue(newTag);

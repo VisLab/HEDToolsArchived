@@ -20,8 +20,7 @@ import javax.xml.bind.annotation.XmlType;
 public class TagXmlModel {
 
 	public enum PredicateType {
-		PASSTHROUGH("passThrough"), PROPERTYOF("propertyOf"), SUBCLASSOF(
-				"subClassOf");
+		PASSTHROUGH("passThrough"), PROPERTYOF("propertyOf"), SUBCLASSOF("subClassOf");
 		String value;
 
 		PredicateType(String value) {
@@ -42,8 +41,7 @@ public class TagXmlModel {
 		}
 
 		public boolean isPropertyOf(String value) {
-			return PredicateType.PROPERTYOF.value.toUpperCase().equals(
-					value.toUpperCase());
+			return PredicateType.PROPERTYOF.value.toUpperCase().equals(value.toUpperCase());
 		}
 	}
 
@@ -53,6 +51,8 @@ public class TagXmlModel {
 
 	@XmlAttribute
 	private boolean requireChild = false;
+	@XmlAttribute
+	private boolean extensionAllowed = false;
 	@XmlAttribute
 	private boolean takesValue = false;
 	@XmlAttribute
@@ -112,6 +112,10 @@ public class TagXmlModel {
 		return requireChild;
 	}
 
+	public boolean isExtensionAllowed() {
+		return extensionAllowed;
+	}
+
 	public boolean isRecommended() {
 		return recommended;
 	}
@@ -134,6 +138,10 @@ public class TagXmlModel {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setExtensionAllowed(boolean extensionAllowed) {
+		this.extensionAllowed = extensionAllowed;
 	}
 
 	public void setPosition(int position) {

@@ -130,8 +130,7 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 	 *         tag already exists in the group or the group does not exist in
 	 *         the event.
 	 */
-	public boolean addTagToGroup(int groupId, AbstractTagModel tagModel,
-			int index) {
+	public boolean addTagToGroup(int groupId, AbstractTagModel tagModel, int index) {
 		TaggerSet<AbstractTagModel> tags = tagGroups.get(groupId);
 		if (tags == null) {
 			return false;
@@ -236,8 +235,7 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 	 * @return The tag model for the descendant tag found, or null if no such
 	 *         tag exists in this group.
 	 */
-	public AbstractTagModel findDescendant(int groupId,
-			AbstractTagModel uniqueKey) {
+	public AbstractTagModel findDescendant(int groupId, AbstractTagModel uniqueKey) {
 		TaggerSet<AbstractTagModel> tags = tagGroups.get(groupId);
 		if (tags == null) {
 			return null;
@@ -245,9 +243,7 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 		String uniquePrefix = uniqueKey.getPath() + "/";
 		for (AbstractTagModel tag : tags) {
 			String path = tag.getPath();
-			if (path.equals(uniqueKey.getPath())
-					|| path.startsWith(uniquePrefix)
-					|| path.equals(uniqueKey.getPath())) {
+			if (path.equals(uniqueKey.getPath()) || path.startsWith(uniquePrefix) || path.equals(uniqueKey.getPath())) {
 				return tag;
 			}
 		}
@@ -298,14 +294,12 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 	 * @return The path of the tag found, or null if no such tag exists in the
 	 *         given group.
 	 */
-	public AbstractTagModel findTagSharedPath(int groupId,
-			AbstractTagModel tagModel) {
+	public AbstractTagModel findTagSharedPath(int groupId, AbstractTagModel tagModel) {
 		TaggerSet<AbstractTagModel> tags = tagGroups.get(groupId);
 		if (tags != null) {
 			for (AbstractTagModel tag : tags) {
 				String path = tag.getPath();
-				if (path.startsWith(tagModel.getPath() + "/")
-						|| path.equals(tagModel.getPath())
+				if (path.startsWith(tagModel.getPath() + "/") || path.equals(tagModel.getPath())
 						|| tagModel.getPath().startsWith(path + "/")) {
 					return tag;
 				}
@@ -383,7 +377,7 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 	public String getLabel() {
 		String label = new String();
 		for (AbstractTagModel tag : tagGroups.get(eventGroupId)) {
-			if (tag.getPath().startsWith("/Event/Label/")) {
+			if (tag.getPath().startsWith("Event/Label/")) {
 				return tag.getName();
 			}
 		}
@@ -421,8 +415,7 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 		TaggerSet<AbstractTagModel> desc = new TaggerSet<AbstractTagModel>();
 		TaggerSet<AbstractTagModel> eventTags = tagGroups.get(eventGroupId);
 		for (AbstractTagModel tag : eventTags) {
-			if (tag.getPath().startsWith(tagModel.getPath() + "/")
-					|| tag.getPath().equals(tagModel.getPath())) {
+			if (tag.getPath().startsWith(tagModel.getPath() + "/") || tag.getPath().equals(tagModel.getPath())) {
 				desc.add(tag);
 			}
 		}

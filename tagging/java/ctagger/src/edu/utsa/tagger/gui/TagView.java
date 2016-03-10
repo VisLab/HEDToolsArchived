@@ -79,20 +79,19 @@ public class TagView extends JComponent implements MouseListener {
 				public void doAction() {
 					model.setInEdit(true);
 					appView.updateTags();
-					appView.scrollToTag(model, null);
+					appView.scrollToTag(model);
 				}
 			});
 			map.put("add tag", new ContextMenuAction() {
 				@Override
 				public void doAction() {
-					AbstractTagModel newTag = tagger.addNewTag(model,
-							new String());
+					AbstractTagModel newTag = tagger.addNewTag(model, new String());
 					GuiTagModel newGuiTag = (GuiTagModel) newTag;
 					if (newTag != null) {
 						newGuiTag.setFirstEdit(true);
 						model.setCollapsed(false);
 						appView.updateTags();
-						appView.scrollToTag(newTag, null);
+						appView.scrollToTag(newTag);
 					}
 				}
 			});
@@ -101,9 +100,8 @@ public class TagView extends JComponent implements MouseListener {
 				public void doAction() {
 					int delete = 0;
 					if (model.isCollapsable()) {
-						delete = appView.showTaggerMessageDialog(
-								MessageConstants.TAG_DELETE_WARNING, "Okay",
-								"Cancel", null);
+						delete = appView.showTaggerMessageDialog(MessageConstants.TAG_DELETE_WARNING, "Okay", "Cancel",
+								null);
 					}
 					if (delete == 0) {
 						tagger.deleteTag(model);
@@ -131,8 +129,7 @@ public class TagView extends JComponent implements MouseListener {
 	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isRightMouseButton(e)
-				&& !"~".equals(model.getName())) {
+		if (SwingUtilities.isRightMouseButton(e) && !"~".equals(model.getName())) {
 			displayContextMenu(e);
 		} else if (SwingUtilities.isLeftMouseButton(e)) {
 			if (model.isCollapsable() && collapserBounds.contains(e.getPoint())) {
@@ -184,15 +181,13 @@ public class TagView extends JComponent implements MouseListener {
 		// Set foreground
 		fg = FontsAndColors.TAG_FG_NORMAL;
 		try {
-			Field f = FontsAndColors.class.getField(model.getHighlight()
-					.toString().toUpperCase());
+			Field f = FontsAndColors.class.getField(model.getHighlight().toString().toUpperCase());
 			bg = (Color) f.get(bg);
 		} catch (Exception ex) {
 		}
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
 		g2d.setColor(bg);
 		g2d.fill(new Rectangle2D.Double(0, 0, getWidth() - 16, getHeight()));
@@ -208,17 +203,12 @@ public class TagView extends JComponent implements MouseListener {
 			double xBound;
 			if (model.isCollapsed()) {
 				g2d.drawString(COLLAPSED, (int) x, (int) y);
-				xBound = x
-						+ (g2d.getFontMetrics().stringWidth(COLLAPSED) - getHeight())
-						/ 2;
+				xBound = x + (g2d.getFontMetrics().stringWidth(COLLAPSED) - getHeight()) / 2;
 			} else {
 				g2d.drawString(UNCOLLAPSED, (int) x, (int) y);
-				xBound = x
-						+ (g2d.getFontMetrics().stringWidth(UNCOLLAPSED) - getHeight())
-						/ 2;
+				xBound = x + (g2d.getFontMetrics().stringWidth(UNCOLLAPSED) - getHeight()) / 2;
 			}
-			collapserBounds
-					.setBounds((int) xBound, 0, getHeight(), getHeight());
+			collapserBounds.setBounds((int) xBound, 0, getHeight(), getHeight());
 		} else {
 			collapserBounds.setBounds(0, 0, 0, 0);
 		}

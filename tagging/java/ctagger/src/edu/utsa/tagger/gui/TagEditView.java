@@ -64,87 +64,59 @@ public class TagEditView extends ConstraintContainer {
 		this.appView = appView;
 		this.tagModel = model;
 
-		add(nameLabel, new Constraint("top:" + top
-				+ " height:20 left:15 width:150"));
+		add(nameLabel, new Constraint("top:" + top + " height:20 left:15 width:150"));
 		top += 25;
 		add(name, new Constraint("top:" + top + " height:26 left:15 right:130"));
 		top += 26;
-		add(descriptionLabel, new Constraint("top:" + top
-				+ " height:20 left:15 width:100"));
+		add(descriptionLabel, new Constraint("top:" + top + " height:20 left:15 width:100"));
 		top += 25;
-		descriptionScrollLayout = new ScrollLayout(descriptionScrollPane,
-				descriptionField);
+		descriptionScrollLayout = new ScrollLayout(descriptionScrollPane, descriptionField);
 		descriptionScrollPane.setLayout(descriptionScrollLayout);
 		descriptionField.addCaretListener(new DescriptionCaretListener());
-		add(descriptionScrollPane, new Constraint("top:" + top
-				+ " height:45 left:15 right:20"));
+		add(descriptionScrollPane, new Constraint("top:" + top + " height:45 left:15 right:20"));
 		top += 50;
-		add(childRequired, new Constraint("top:" + top
-				+ " height:20 left:15 width:20"));
-		add(childRequiredLabel, new Constraint("top:" + top
-				+ " height:20 left:40 width:120"));
-		add(takesValue, new Constraint("top:" + top
-				+ " height:20 left:200 width:20"));
-		add(takesValueLabel, new Constraint("top:" + top
-				+ " height:20 left:230 width:120"));
-		add(positionLabel, new Constraint("top:" + top
-				+ " height:20 left:415 width:120"));
-		add(position, new Constraint("top:" + top
-				+ " height:26 left:475 width:40"));
+		add(childRequired, new Constraint("top:" + top + " height:20 left:15 width:20"));
+		add(childRequiredLabel, new Constraint("top:" + top + " height:20 left:40 width:120"));
+		add(takesValue, new Constraint("top:" + top + " height:20 left:200 width:20"));
+		add(takesValueLabel, new Constraint("top:" + top + " height:20 left:230 width:120"));
+		add(positionLabel, new Constraint("top:" + top + " height:20 left:415 width:120"));
+		add(position, new Constraint("top:" + top + " height:26 left:475 width:40"));
 		top += 25;
-		add(required, new Constraint("top:" + top
-				+ " height:20 left:15 width:20"));
-		add(requiredLabel, new Constraint("top:" + top
-				+ " height:20 left:40 width:120"));
-		add(recommended, new Constraint("top:" + top
-				+ " height:20 left:200 width:20"));
-		add(recommendedLabel, new Constraint("top:" + top
-				+ " height:20 left:230 width:120"));
-		add(predicateTypeLabel, new Constraint("top:" + top
-				+ " height:20 left:415 width:120"));
+		add(required, new Constraint("top:" + top + " height:20 left:15 width:20"));
+		add(requiredLabel, new Constraint("top:" + top + " height:20 left:40 width:120"));
+		add(recommended, new Constraint("top:" + top + " height:20 left:200 width:20"));
+		add(recommendedLabel, new Constraint("top:" + top + " height:20 left:230 width:120"));
+		add(predicateTypeLabel, new Constraint("top:" + top + " height:20 left:415 width:120"));
 		add(new JComponent() {
 		}, new Constraint("top:0 height:" + HEIGHT + " left:0 right:0"));
 
 		top += 25;
-		add(unique,
-				new Constraint("top:" + top + " height:20 left:15 width:20"));
-		add(uniqueLabel, new Constraint("top:" + top
-				+ " height:20 left:40 width:120"));
-		add(isNumeric, new Constraint("top:" + top
-				+ " height:20 left:200 width:20"));
-		add(isNumericLabel, new Constraint("top:" + top
-				+ " height:20 left:230 width:120"));
+		add(unique, new Constraint("top:" + top + " height:20 left:15 width:20"));
+		add(uniqueLabel, new Constraint("top:" + top + " height:20 left:40 width:120"));
+		add(isNumeric, new Constraint("top:" + top + " height:20 left:200 width:20"));
+		add(isNumericLabel, new Constraint("top:" + top + " height:20 left:230 width:120"));
 		populatePredicateTypeComboBox();
-		add(predicateTypes, new Constraint("top:" + top
-				+ " height:20 left:415 width:120"));
+		add(predicateTypes, new Constraint("top:" + top + " height:20 left:415 width:120"));
 
 		add(cancelButton, new Constraint("top:10 height:20 right:20 width:45"));
 		add(saveButton, new Constraint("top:10 height:20 right:70 width:35"));
 
 		nameLabel.setBackground(FontsAndColors.EDITTAG_BG);
 		name.setForeground(FontsAndColors.GREY_DARK);
-		name.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
-		name.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("TAB"), "doNothing");
-		name.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
+		name.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
+		name.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		name.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
 		descriptionLabel.setBackground(FontsAndColors.EDITTAG_BG);
 		descriptionField.setForeground(FontsAndColors.GREY_DARK);
 		descriptionField.setWrapStyleWord(true);
 		descriptionField.setLineWrap(true);
-		descriptionField.getInputMap().put(KeyStroke.getKeyStroke("TAB"),
-				"doNothing");
-		descriptionField.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),
-				"doNothing");
+		descriptionField.getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		descriptionField.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
 		childRequiredLabel.setBackground(FontsAndColors.EDITTAG_BG);
 
-		position.getJTextArea().getDocument()
-				.putProperty("filterNewlines", Boolean.TRUE);
-		position.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("TAB"), "doNothing");
-		position.getJTextArea().getInputMap()
-				.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
+		position.getJTextArea().getDocument().putProperty("filterNewlines", Boolean.TRUE);
+		position.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("TAB"), "doNothing");
+		position.getJTextArea().getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
 		saveButton.setEnabled(false);
 		saveButton.setVisible(false);
 
@@ -164,8 +136,7 @@ public class TagEditView extends ConstraintContainer {
 		cancelButton.setPressedBackground(FontsAndColors.TRANSPARENT);
 		cancelButton.setPressedForeground(FontsAndColors.SOFT_BLUE);
 
-		name.getJTextArea().getDocument()
-				.addDocumentListener(new NameFieldListener());
+		name.getJTextArea().getDocument().addDocumentListener(new NameFieldListener());
 
 		cancelButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -210,8 +181,7 @@ public class TagEditView extends ConstraintContainer {
 		isNumeric.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (isNumeric.isChecked()
-						&& SwingUtilities.isLeftMouseButton(e)) {
+				if (isNumeric.isChecked() && SwingUtilities.isLeftMouseButton(e)) {
 					takesValue.setChecked(true);
 					repaint();
 				}
@@ -221,8 +191,7 @@ public class TagEditView extends ConstraintContainer {
 		takesValue.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (isNumeric.isChecked() && !takesValue.isChecked()
-						&& SwingUtilities.isLeftMouseButton(e)) {
+				if (isNumeric.isChecked() && !takesValue.isChecked() && SwingUtilities.isLeftMouseButton(e)) {
 					isNumeric.setChecked(false);
 					repaint();
 				}
@@ -402,55 +371,38 @@ public class TagEditView extends ConstraintContainer {
 				try {
 					pos = Integer.parseInt(position.getJTextArea().getText());
 				} catch (NumberFormatException ex) {
-					appView.showTaggerMessageDialog(
-							MessageConstants.TAG_POSITION_ERROR, "Okay", null,
-							null);
+					appView.showTaggerMessageDialog(MessageConstants.TAG_POSITION_ERROR, "Okay", null, null);
 					return;
 				}
 			}
-			if (takesValue.isChecked()
-					&& !name.getJTextArea().getText().equals("#")) {
-				appView.showTaggerMessageDialog(
-						MessageConstants.TAKES_VALUE_ERROR, "Okay", null, null);
+			if (takesValue.isChecked() && !name.getJTextArea().getText().equals("#")) {
+				appView.showTaggerMessageDialog(MessageConstants.TAKES_VALUE_ERROR, "Okay", null, null);
 				return;
 			}
 			String nameStr = name.getJTextArea().getText();
 			if (nameStr.contains("/")) {
-				appView.showTaggerMessageDialog(
-						MessageConstants.TAG_NAME_INVALID, "Okay", null, null);
+				appView.showTaggerMessageDialog(MessageConstants.TAG_NAME_INVALID, "Okay", null, null);
 				return;
 			}
-			if (tagger.isDuplicate(tagModel.getParentPath() + "/" + nameStr,
-					tagModel)) {
-				appView.showTaggerMessageDialog(
-						MessageConstants.TAG_NAME_DUPLICATE, "Okay", null, null);
+			if (tagger.isDuplicate(tagModel.getParentPath() + "/" + nameStr, tagModel)) {
+				appView.showTaggerMessageDialog(MessageConstants.TAG_NAME_DUPLICATE, "Okay", null, null);
 				return;
 			}
 			if (required.isChecked() && recommended.isChecked()) {
-				appView.showTaggerMessageDialog(MessageConstants.TAG_RR_ERROR,
-						"Okay", null, null);
+				appView.showTaggerMessageDialog(MessageConstants.TAG_RR_ERROR, "Okay", null, null);
 				return;
 			}
-			tagger.editTag(
-					tagModel,
-					name.getJTextArea().getText(),
-					descriptionField.getText(),
-					childRequired.isChecked(),
-					takesValue.isChecked(),
-					isNumeric.isChecked(),
-					required.isChecked(),
-					recommended.isChecked(),
-					unique.isChecked(),
-					pos,
-					PredicateType.valueOf(predicateTypes.getSelectedItem()
-							.toString().toUpperCase()));
+			tagger.editTag(tagModel, name.getJTextArea().getText(), descriptionField.getText(),
+					tagModel.isExtensionAllowed(), childRequired.isChecked(), takesValue.isChecked(),
+					isNumeric.isChecked(), required.isChecked(), recommended.isChecked(), unique.isChecked(), pos,
+					PredicateType.valueOf(predicateTypes.getSelectedItem().toString().toUpperCase()));
 			tagger.setHedEdited(true);
 			tagModel.setInEdit(false);
 			tagModel.setFirstEdit(false);
 			tagger.setChildToPropertyOf();
 			appView.updateTags();
 			appView.updateEgt();
-			appView.scrollToTag(tagModel, null);
+			appView.scrollToTag(tagModel);
 		}
 	}
 
@@ -490,8 +442,8 @@ public class TagEditView extends ConstraintContainer {
 			return FontsAndColors.contentFont;
 		}
 	};
-	final XCheckBox childRequired = new XCheckBox(Color.WHITE, Color.BLACK,
-			Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK);
+	final XCheckBox childRequired = new XCheckBox(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
+			Color.BLACK);
 
 	final JLabel takesValueLabel = new JLabel("takes value") {
 		@Override
@@ -499,8 +451,8 @@ public class TagEditView extends ConstraintContainer {
 			return FontsAndColors.contentFont;
 		}
 	};
-	final XCheckBox takesValue = new XCheckBox(Color.WHITE, Color.BLACK,
-			Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK);
+	final XCheckBox takesValue = new XCheckBox(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
+			Color.BLACK);
 
 	final JLabel isNumericLabel = new JLabel("is numeric") {
 		@Override
@@ -508,8 +460,8 @@ public class TagEditView extends ConstraintContainer {
 			return FontsAndColors.contentFont;
 		}
 	};
-	final XCheckBox isNumeric = new XCheckBox(Color.WHITE, Color.BLACK,
-			Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK);
+	final XCheckBox isNumeric = new XCheckBox(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
+			Color.BLACK);
 
 	final JLabel requiredLabel = new JLabel("required") {
 		@Override
@@ -517,8 +469,8 @@ public class TagEditView extends ConstraintContainer {
 			return FontsAndColors.contentFont;
 		}
 	};
-	final XCheckBox required = new XCheckBox(Color.WHITE, Color.BLACK,
-			Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK);
+	final XCheckBox required = new XCheckBox(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
+			Color.BLACK);
 
 	final JLabel recommendedLabel = new JLabel("recommended") {
 		@Override
@@ -526,8 +478,8 @@ public class TagEditView extends ConstraintContainer {
 			return FontsAndColors.contentFont;
 		}
 	};
-	final XCheckBox recommended = new XCheckBox(Color.WHITE, Color.BLACK,
-			Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK);;
+	final XCheckBox recommended = new XCheckBox(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
+			Color.BLACK);;
 
 	final JLabel positionLabel = new JLabel("position") {
 		@Override
@@ -561,15 +513,14 @@ public class TagEditView extends ConstraintContainer {
 		}
 	};
 
-	final XCheckBox unique = new XCheckBox(Color.WHITE, Color.BLACK,
-			Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK);
+	final XCheckBox unique = new XCheckBox(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK, Color.WHITE,
+			Color.BLACK);
 
 	final XButton saveButton = new XButton("save") {
 		@Override
 		public Font getFont() {
 			Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
-			fontAttributes.put(TextAttribute.UNDERLINE,
-					TextAttribute.UNDERLINE_ON);
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 			return FontsAndColors.contentFont.deriveFont(fontAttributes);
 		}
 	};
@@ -578,8 +529,7 @@ public class TagEditView extends ConstraintContainer {
 		@Override
 		public Font getFont() {
 			Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
-			fontAttributes.put(TextAttribute.UNDERLINE,
-					TextAttribute.UNDERLINE_ON);
+			fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 			return FontsAndColors.contentFont.deriveFont(fontAttributes);
 		}
 	};
@@ -589,7 +539,7 @@ public class TagEditView extends ConstraintContainer {
 		if (tagModel.isFirstEdit()) {
 			AbstractTagModel parent = tagger.tagFound(tagModel.getParentPath());
 			if (parent != null) {
-				appView.scrollToTag(parent, null);
+				appView.scrollToTag(parent);
 			}
 			tagger.deleteTag(tagModel);
 		}
@@ -600,19 +550,17 @@ public class TagEditView extends ConstraintContainer {
 	protected void paintComponent(Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		double scale = ConstraintLayout.scale;
 
 		g2d.setColor(FontsAndColors.EDITTAG_BG);
 		int indent = tagModel.getDepth() + 3;
-		g2d.fill(new Polygon(new int[] { (int) (scale * 24 * indent),
-				(int) (scale * 24 * indent + scale * 10),
-				(int) (scale * 24 * indent + scale * 20) }, new int[] {
-				(int) (scale * 10), 0, (int) (scale * 10) }, 3));
-		g2d.fill(new Rectangle2D.Double(10 * scale, 10 * scale, getWidth() - 20
-				* scale, getHeight() - 15 * scale));
+		g2d.fill(new Polygon(
+				new int[] { (int) (scale * 24 * indent), (int) (scale * 24 * indent + scale * 10),
+						(int) (scale * 24 * indent + scale * 20) },
+				new int[] { (int) (scale * 10), 0, (int) (scale * 10) }, 3));
+		g2d.fill(new Rectangle2D.Double(10 * scale, 10 * scale, getWidth() - 20 * scale, getHeight() - 15 * scale));
 
 	}
 
@@ -643,8 +591,7 @@ public class TagEditView extends ConstraintContainer {
 				} else {
 					position.getJTextArea().setText(new String());
 				}
-				predicateTypes.setSelectedItem(tagModel.getPredicateType()
-						.toString());
+				predicateTypes.setSelectedItem(tagModel.getPredicateType().toString());
 				repaint();
 			}
 		});

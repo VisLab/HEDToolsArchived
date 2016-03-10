@@ -72,9 +72,9 @@ public class TagEventView extends JComponent implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			GuiTagModel tagMatch = (GuiTagModel) tagger.openToClosest(model);
+			// GuiTagModel tagMatch = (GuiTagModel) tagger.openToClosest(model);
 			appView.updateTags();
-			appView.scrollToTag(tagMatch, model);
+			appView.scrollToTag(model);
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			Map<String, ContextMenuAction> map = new LinkedHashMap<String, ContextMenuAction>();
 			TaggedEvent taggedEvent = tagger.getEventByGroupId(groupId);
@@ -107,7 +107,7 @@ public class TagEventView extends JComponent implements MouseListener {
 			map.put("remove", new ContextMenuAction() {
 				@Override
 				public void doAction() {
-					if ("Event/Label".equals(model.getParentPath())) {
+					if ("Event/Label/".equals(model.getParentPath())) {
 						TaggerSet<TaggedEvent> taggedEvents = tagger.getEgtSet();
 						for (TaggedEvent taggedEvent : taggedEvents) {
 							if (taggedEvent.containsTagInGroup(groupId, model)) {

@@ -113,6 +113,7 @@ public class Tagger {
 	private TaggerSet<AbstractTagModel> requiredTags = new TaggerSet<AbstractTagModel>();
 	private TaggerSet<AbstractTagModel> recommendedTags = new TaggerSet<AbstractTagModel>();
 	private TaggerSet<AbstractTagModel> uniqueTags = new TaggerSet<AbstractTagModel>();
+	private TaggerSet<AbstractTagModel> extensionAllowedTags = new TaggerSet<AbstractTagModel>();
 	// Highlighted tag in a GUI
 	public GuiTagModel highlightTag;
 	public Highlight currentHighlightType;
@@ -320,7 +321,7 @@ public class Tagger {
 		int groupId = groupIdCounter++;
 		taggedEvent.setEventGroupId(groupId);
 		if (!label.trim().isEmpty()) {
-			AbstractTagModel labelTag = getTagModel("/Event/Label/" + label);
+			AbstractTagModel labelTag = getTagModel("Event/Label/" + label);
 			taggedEvent.addTag(labelTag);
 		}
 		if (addEventBase(taggedEvent)) {
@@ -711,6 +712,7 @@ public class Tagger {
 			tagModel.setDescription(tagXmlModel.getDescription());
 			tagModel.setChildRequired(tagXmlModel.isChildRequired());
 			tagModel.setTakesValue(tagXmlModel.takesValue());
+			tagModel.setExtensionAllowed(tagXmlModel.isExtensionAllowed());
 			tagModel.setRecommended(tagXmlModel.isRecommended());
 			tagModel.setRequired(tagXmlModel.isRequired());
 			tagModel.setUnique(tagXmlModel.isUnique());
@@ -732,6 +734,9 @@ public class Tagger {
 			}
 			if (tagModel.isUnique()) {
 				uniqueTags.add(tagModel);
+			}
+			if (tagModel.isExtensionAllowed()) {
+				extensionAllowedTags.add(tagModel);
 			}
 			if (path.isEmpty())
 				createTagSetRecursive(tagXmlModel.getName(), tagXmlModel.getTags(), level);
@@ -975,11 +980,11 @@ public class Tagger {
 	 * @param position
 	 *            The tag position.
 	 */
-	public void editTag(GuiTagModel tag, String name, String description, boolean childRequired, boolean takesValue,
-			boolean isNumeric, boolean required, boolean recommended, boolean unique, Integer position,
-			PredicateType predicateType) {
-		GuiTagModel copy = editTagBase(tag, name, description, childRequired, takesValue, isNumeric, required,
-				recommended, unique, position, predicateType);
+	public void editTag(GuiTagModel tag, String name, String description, boolean extensionAllowed,
+			boolean childRequired, boolean takesValue, boolean isNumeric, boolean required, boolean recommended,
+			boolean unique, Integer position, PredicateType predicateType) {
+		GuiTagModel copy = editTagBase(tag, name, description, extensionAllowed, childRequired, takesValue, isNumeric,
+				required, recommended, unique, position, predicateType);
 		if (!tag.isFirstEdit()) {
 			HistoryItem historyItem = new HistoryItem();
 			historyItem.type = TaggerHistory.Type.TAG_EDITED;
@@ -1015,14 +1020,15 @@ public class Tagger {
 	 *            The tag position.
 	 * @return A copy of the tag model with the original (replaced) information.
 	 */
-	public GuiTagModel editTagBase(GuiTagModel tag, String name, String description, boolean childRequired,
-			boolean takesValue, boolean isNumeric, boolean required, boolean recommended, boolean unique,
-			Integer position, PredicateType predicateType) {
+	public GuiTagModel editTagBase(GuiTagModel tag, String name, String description, boolean extensionAllowed,
+			boolean childRequired, boolean takesValue, boolean isNumeric, boolean required, boolean recommended,
+			boolean unique, Integer position, PredicateType predicateType) {
 		GuiTagModel copy = (GuiTagModel) factory.createAbstractTagModel(this);
 		copy.setPath(tag.getPath());
 		copy.setDescription(tag.getDescription());
 		copy.setChildRequired(tag.isChildRequired());
 		copy.setTakesValue(tag.takesValue());
+		copy.setExtensionAllowed(tag.isExtensionAllowed());
 		copy.setIsNumeric(tag.isNumeric());
 		copy.setRequired(tag.isRequired());
 		copy.setRecommended(tag.isRecommended());
@@ -1037,6 +1043,7 @@ public class Tagger {
 		}
 		tag.setChildRequired(childRequired);
 		tag.setTakesValue(takesValue);
+		tag.setExtensionAllowed(extensionAllowed);
 		tag.setIsNumeric(isNumeric);
 		tag.setRequired(required);
 		tag.setRecommended(recommended);
@@ -1072,12 +1079,14 @@ public class Tagger {
 	 *            The tag position.
 	 * @return A copy of the tag model with the original (replaced) information.
 	 */
-	public GuiTagModel editTagBase(GuiTagModel tag, String path, String name, String description, boolean childRequired,
-			boolean takesValue, boolean required, boolean recommended, boolean unique, Integer position) {
+	public GuiTagModel editTagBase(GuiTagModel tag, String path, String name, String description,
+			boolean extensionAllowed, boolean childRequired, boolean takesValue, boolean required, boolean recommended,
+			boolean unique, Integer position) {
 		GuiTagModel copy = (GuiTagModel) factory.createAbstractTagModel(this);
 		copy.setPath(tag.getPath());
 		copy.setDescription(tag.getDescription());
 		copy.setChildRequired(tag.isChildRequired());
+		copy.setExtensionAllowed(tag.isExtensionAllowed());
 		copy.setTakesValue(tag.takesValue());
 		copy.setRequired(tag.isRequired());
 		copy.setRecommended(tag.isRecommended());
@@ -1090,6 +1099,7 @@ public class Tagger {
 		if (description != null) {
 			tag.setDescription(description);
 		}
+		tag.setExtensionAllowed(extensionAllowed);
 		tag.setChildRequired(childRequired);
 		tag.setTakesValue(takesValue);
 		tag.setRequired(required);
@@ -1118,9 +1128,9 @@ public class Tagger {
 		String[] paths = path.split("/");
 		tag.setPath(path);
 		historyItem.tagModel = tag;
-		if (path.startsWith("/Event/Label/")) {
+		if (path.startsWith("Event/Label/")) {
 			historyItem.eventModelCopy = taggedEvent.getEventModel();
-			if (path.equals("/Event/Label/")) {
+			if (path.equals("Event/Label/")) {
 				taggedEvent.getEventModel().setLabel(new String());
 			} else {
 				taggedEvent.getEventModel().setLabel(paths[paths.length - 1]);
@@ -1435,11 +1445,10 @@ public class Tagger {
 	 * @return A tag model from the hierarchy with the given path or a tag model
 	 *         not in the hierarchy with "missing" set to true.
 	 */
-	private AbstractTagModel getTagModel(String path) {
+	public AbstractTagModel getTagModel(String path) {
 		AbstractTagModel valueTag = null;
 		if (!"~".equals(path)) {
 			List<String> pathAsList = splitPath(path);
-
 			if (pathAsList.size() > 0) {
 				// throw new RuntimeException("invalid path: " + path);
 				String parentPath = path.substring(0, path.lastIndexOf('/'));
@@ -1456,9 +1465,10 @@ public class Tagger {
 			}
 		}
 		// Missing tag model
+		AbstractTagModel extensionAllowedAncestor = getExtensionAllowedAncestor(path);
 		AbstractTagModel tagModel = factory.createAbstractTagModel(this);
 		tagModel.setPath(path);
-		if (valueTag == null) {
+		if (extensionAllowedAncestor == null && valueTag == null) {
 			((GuiTagModel) tagModel).setMissing(true);
 		}
 		return tagModel;
@@ -2072,6 +2082,7 @@ public class Tagger {
 		requiredTags = new TaggerSet<AbstractTagModel>();
 		recommendedTags = new TaggerSet<AbstractTagModel>();
 		uniqueTags = new TaggerSet<AbstractTagModel>();
+		extensionAllowedTags = new TaggerSet<AbstractTagModel>();
 		tagList = new TaggerSet<AbstractTagModel>();
 		if (!hedXmlModel.getVersion().isEmpty())
 			version = hedXmlModel.getVersion();
@@ -2095,6 +2106,7 @@ public class Tagger {
 			requiredTags = new TaggerSet<AbstractTagModel>();
 			recommendedTags = new TaggerSet<AbstractTagModel>();
 			uniqueTags = new TaggerSet<AbstractTagModel>();
+			extensionAllowedTags = new TaggerSet<AbstractTagModel>();
 			createUnitClassHashMapFromXml(xmlData.getHedXmlModel().getUnitClasses());
 			createTagSetFromXml(xmlData.getHedXmlModel().getTags());
 			succeed = true;
@@ -2373,6 +2385,24 @@ public class Tagger {
 	}
 
 	/**
+	 * Looks for an ancestor tag that has the extension allowed attribute.
+	 * 
+	 * @param tagPath
+	 *            The path of the tag.
+	 * @return Returns the ancestor tag if it has the extension allowed
+	 *         attribute, null if otherwise.
+	 */
+	public AbstractTagModel getExtensionAllowedAncestor(String tagPath) {
+		for (AbstractTagModel tag : extensionAllowedTags) {
+			if (tagPath != null) {
+				if (tagPath.toUpperCase().startsWith(tag.getPath().toUpperCase()))
+					return tag;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Sets child tags to property of predicate type.
 	 */
 	public void setChildToPropertyOf() {
@@ -2426,6 +2456,7 @@ public class Tagger {
 			child.setName(next.getName());
 			child.setDescription(next.getDescription());
 			child.setChildRequired(next.isChildRequired());
+			child.setExtensionAllowed(next.isExtensionAllowed());
 			child.setTakesValue(next.takesValue());
 			child.setPredicateType(next.getPredicateType().toString());
 			child.setRequired(next.isRequired());
@@ -2637,7 +2668,7 @@ public class Tagger {
 			for (TaggedEvent currentTaggedEvent : taggedEventSet) {
 				if (currentTaggedEvent.removeTagFromGroup(groupId, tagModel)) {
 					affectedGroups.add(groupId);
-					if (tagModel.getPath().startsWith("/Event/label")) {
+					if (tagModel.getPath().startsWith("Event/label")) {
 
 					}
 				}

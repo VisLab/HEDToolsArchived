@@ -31,8 +31,7 @@ public class TagSearchView extends JComponent implements MouseListener {
 
 	private final GuiTagModel model;
 
-	public TagSearchView(final Tagger tagger, final AppView appView,
-			final GuiTagModel model) {
+	public TagSearchView(final Tagger tagger, final AppView appView, final GuiTagModel model) {
 
 		this.model = model;
 
@@ -51,7 +50,7 @@ public class TagSearchView extends JComponent implements MouseListener {
 					tagger.openToClosest(model);
 					appView.cancelSearch();
 					appView.updateTags();
-					appView.scrollToTag(model, null);
+					appView.scrollToTag(model);
 				}
 			}
 		});
@@ -59,8 +58,7 @@ public class TagSearchView extends JComponent implements MouseListener {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(0,
-				(int) (FontsAndColors.contentFont.getSize2D() * 1.5));
+		return new Dimension(0, (int) (FontsAndColors.contentFont.getSize2D() * 1.5));
 	}
 
 	@Override
@@ -94,8 +92,7 @@ public class TagSearchView extends JComponent implements MouseListener {
 	@Override
 	protected void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
 		Color fg;
 		Color bg;

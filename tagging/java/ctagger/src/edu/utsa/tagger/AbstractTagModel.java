@@ -20,6 +20,7 @@ public abstract class AbstractTagModel implements Comparable<AbstractTagModel> {
 	private Date creationDate;
 	private Date lastModified;
 	private boolean childRequired;
+	private boolean extensionAllowed;
 	private boolean takesValue;
 	private boolean isNumeric;
 	private boolean required;
@@ -109,6 +110,10 @@ public abstract class AbstractTagModel implements Comparable<AbstractTagModel> {
 		return childRequired;
 	}
 
+	public boolean isExtensionAllowed() {
+		return extensionAllowed;
+	}
+
 	public boolean isRecommended() {
 		return recommended;
 	}
@@ -180,6 +185,10 @@ public abstract class AbstractTagModel implements Comparable<AbstractTagModel> {
 
 	public void setTakesValue(boolean takesValue) {
 		this.takesValue = takesValue;
+	}
+
+	public void setExtensionAllowed(boolean extensionAllowed) {
+		this.extensionAllowed = extensionAllowed;
 	}
 
 	public void setIsNumeric(boolean isNumeric) {
