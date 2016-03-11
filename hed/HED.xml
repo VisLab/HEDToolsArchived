@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="2.2">
+<HED version="2.3">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -2209,7 +2209,10 @@
                   <description>Confirm something went well and last action was correct</description>
                </node>
                <node>
-                  <name>Incorrect</name>
+                  <name>Incorrect  Confirm something went wrong and last action was incorrect</name>
+               </node>
+               <node>
+                  <name>Non-informative Feedback that provides no information in regards to correct</name>
                </node>
                <node>
                   <name>Expected</name>
@@ -2255,6 +2258,10 @@
                      <description>Positive feedback was provided when it was not deserved</description>
                   </node>
                </node>
+            </node>
+            <node>
+               <name>Cue</name>
+               <description>An indicator of a future event, e.g. a sound cue that in 2-5 seconds a perturbation in driving will occur.</description>
             </node>
          </node>
          <node>
