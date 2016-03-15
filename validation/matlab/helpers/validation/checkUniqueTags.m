@@ -1,45 +1,46 @@
-function [errors, errorTags] = checkUniqueTags(Maps, original, canonical)
+function [errors, errorTags] = checkUniqueTags(Maps, originalTags, ...
+    formattedTags)
 % Checks to see if a row of tags contain two or more tags that are
 % descendants of a unique tag
 errors = '';
 errorTags = {};
 uniqueTags = Maps.unique.values();
 [originalEventTags, canonicalEventTags] = ...
-    getEventTags(original, canonical);
+    getEventTags(originalTags, formattedTags);
 [originalGroupTags, canonicalGroupTags] = ...
-    getGroupTags(original, canonical);
+    getGroupTags(originalTags, formattedTags);
 checkUniqueTags(originalEventTags, canonicalEventTags, false);
 originalGroupTagsLength = length(originalGroupTags);
 for a = 1:originalGroupTagsLength
     checkUniqueTags(originalGroupTags{a}, canonicalGroupTags{a}, true);
 end
 
-    function checkUniqueTags(original, canonical, isGroup)
+    function checkUniqueTags(originalTags, formattedTags, isGroup)
         % Looks for two or more tags that are descendants of a unique tag
         numTags = length(uniqueTags);
         for uniqueTagsIndex = 1:numTags
-            foundIndexes = strncmp(original, ...
+            foundIndexes = strncmp(formattedTags, ...
                 uniqueTags{uniqueTagsIndex}, ...
                 size(uniqueTags{uniqueTagsIndex},2));
             if sum(foundIndexes) > 1
                 foundIndexes = find(foundIndexes);
                 generateErrorMessage(uniqueTagsIndex, foundIndexes, ...
-                    canonical, isGroup);
+                    originalTags, isGroup);
             end
         end
     end % findUniqueTags
 
     function generateErrorMessage(uniqueTagsIndex, foundIndexes, ...
-            canonical, isGroup)
+            originalTags, isGroup)
         % Generates a unique tag error if two or more tags are descendants
         % of a unique tag
         numIndexes = length(foundIndexes);
         for foundIndex = 1:numIndexes
-            tagString = canonical{foundIndexes(foundIndex)};
+            tagString = originalTags{foundIndexes(foundIndex)};
             if isGroup
-                tagString = [canonical{foundIndexes(foundIndex)}, ...
+                tagString = [originalTags{foundIndexes(foundIndex)}, ...
                     ' in group (' ,...
-                    vTagList.stringifyElement(canonical),')'];
+                    vTagList.stringifyElement(originalTags),')'];
             end
             errors = [errors, generateerror('unique', '', ...
                 tagString, uniqueTags{uniqueTagsIndex})];     %#ok<AGROW>
@@ -47,19 +48,20 @@ end
         end
     end % generateErrorMessage
 
-    function [originalEventTags, canonicalEventTags] = ...
-            getEventTags(original, canonical)
+    function [originalEventTags, formattedEventTags] = ...
+            getEventTags(originalTags, formattedTags)
         % Retrieves the event level tags for the original and canonical
         % tags
-        originalEventTags = original(cellfun(@isstr, original));
-        canonicalEventTags = canonical(cellfun(@isstr, canonical));
+        originalEventTags = originalTags(cellfun(@isstr, originalTags));
+        formattedEventTags = formattedTags(cellfun(@isstr, formattedTags));
     end % getEventTags
 
     function [originalGroupTags, canonicalGroupTags] = ...
-            getGroupTags(original, canonical)
+            getGroupTags(originalTags, formattedTags)
         % Retrieves the tag groups for the original and canonical tags
-        originalGroupTags = original(~cellfun(@isstr, original));
-        canonicalGroupTags = canonical(~cellfun(@isstr, canonical));
+        originalGroupTags = originalTags(~cellfun(@isstr, originalTags));
+        canonicalGroupTags = formattedTags(~cellfun(@isstr, ...
+            formattedTags));
     end % getGroupTags
 
 end % checkUniqueTags

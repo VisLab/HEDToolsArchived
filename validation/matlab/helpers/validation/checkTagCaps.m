@@ -8,9 +8,9 @@ checkTagCaps(originalTags, formattedTags, false);
 
     function checkTagCaps(originalTags, formattedTags, isGroup)
         % Checks if the tags are capitalized correctly
-        numTags = length(originalTags);
+        numTags = length(formattedTags);
         for a = 1:numTags
-            if ~ischar(originalTags{a})
+            if ~ischar(formattedTags{a})
                 checkTagCaps(originalTags{a}, formattedTags{a}, true);
             elseif findCaps(formattedTags{a})
                 generateWarnings(originalTags, a, isGroup);

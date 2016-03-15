@@ -1,16 +1,16 @@
 function [errors, errorTags, warnings, warningTags] = ...
-    checkTakeValueTags(hedMaps, original, canonical)
+    checkTakeValueTags(hedMaps, originalTags, formattedTags)
 errors = '';
 errorTags = {};
 warnings = '';
 warningTags = {};
-checkTakesValueTags(original, canonical, false);
+checkTakesValueTags(originalTags, formattedTags, false);
 
     function checkTakesValueTags(originalTags, formattedTags, isGroup)
         % Checks the tags that take values
-        numTags = length(originalTags);
+        numTags = length(formattedTags);
         for a = 1:numTags
-            if ~ischar(originalTags{a})
+            if ~ischar(formattedTags{a})
                 checkTakesValueTags(originalTags{a}, formattedTags{a}, ...
                     true);
                 return;
@@ -53,20 +53,20 @@ checkTakesValueTags(original, canonical, false);
         unitsRegexp = [operators,unitsGroup,digits, unitsGroup, '$'];
     end % buildUnitsRegexp
 
-    function checkNumericalTag(original, canonical, numericalIndex, ...
-            isGroup)
+    function checkNumericalTag(originalTag, formattedTag, ...
+            numericalIndex, isGroup)
         % Checks the numerical tag
-        tagName = getTagName(canonical{numericalIndex});
+        tagName = getTagName(formattedTag{numericalIndex});
         if ~all(ismember(tagName, '<>=.0123456789'))
-            generateErrorMessages(original, numericalIndex, isGroup, ...
+            generateErrorMessages(originalTag, numericalIndex, isGroup, ...
                 'isNumeric', '');
         end
     end % checkNumericalTag
 
-    function checkUnitClassTag(original, canonical, unitIndex, isGroup, ...
-            unitClassTag)
+    function checkUnitClassTag(originalTag, formattedTag, unitIndex, ...
+            isGroup, unitClassTag)
         % Checks the unit class tag
-        tagName = getTagName(canonical{unitIndex});
+        tagName = getTagName(formattedTag{unitIndex});
         unitClasses = hedMaps.unitClass(lower(unitClassTag));
         unitClasses = textscan(unitClasses, '%s', 'delimiter', ',', ...
             'multipleDelimsAsOne', 1)';
@@ -79,39 +79,39 @@ checkTakesValueTags(original, canonical, false);
         end
         unitsRegexp = buildUnitsRegexp(unitClassUnits);
         if all(ismember(tagName, '<>=.0123456789'))
-            generateWarningMessages(original, unitIndex, isGroup, ...
+            generateWarningMessages(originalTag, unitIndex, isGroup, ...
                 'unitClass', unitClassDefault)
         end
         if isempty(regexpi(tagName, unitsRegexp))
-            generateErrorMessages(original, unitIndex, isGroup, ...
+            generateErrorMessages(originalTag, unitIndex, isGroup, ...
                 'unitClass', unitClassUnits);
         end
     end % checkUnitClassTags
 
-    function generateErrorMessages(original, valueIndex, isGroup, ...
+    function generateErrorMessages(originalTag, valueIndex, isGroup, ...
             errorType, unitClassUnits)
         % Generates takes value and unit class tag errors
-        tagString = original{valueIndex};
+        tagString = originalTag{valueIndex};
         if isGroup
-            tagString = [original{valueIndex}, ' in group (' ,...
-                vTagList.stringifyElement(original),')'];
+            tagString = [originalTag{valueIndex}, ' in group (' ,...
+                vTagList.stringifyElement(originalTag),')'];
         end
         errors = [errors, generateErrorMessage(errorType, '', ...
             tagString, '', unitClassUnits)];
-        errorTags{end+1} = original{valueIndex};
+        errorTags{end+1} = originalTag{valueIndex};
     end % generateErrorMessages
 
-    function generateWarningMessages(original, valueIndex, isGroup, ...
+    function generateWarningMessages(originalTag, valueIndex, isGroup, ...
             warningType, unitClassDefault)
         % Generates takes value and unit class tag errors
-        tagString = original{valueIndex};
+        tagString = originalTag{valueIndex};
         if isGroup
-            tagString = [original{valueIndex}, ' in group (' ,...
-                vTagList.stringifyElement(original),')'];
+            tagString = [originalTag{valueIndex}, ' in group (' ,...
+                vTagList.stringifyElement(originalTag),')'];
         end
         warnings = [warnings, generateWarningMessage(warningType, ...
             '', tagString, unitClassDefault)];
-        warningTags{end+1} = original{valueIndex};
+        warningTags{end+1} = originalTag{valueIndex};
     end % generateErrorMessages
 
     function valueTag = convertToValueTag(tag)

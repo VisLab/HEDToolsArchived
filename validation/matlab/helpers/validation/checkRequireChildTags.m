@@ -7,9 +7,9 @@ checkTags(original, canonical, false);
 
     function checkTags(originalTags, formattedTags, isGroup)
         % Checks the tags that require children
-        numTags = length(originalTags);
+        numTags = length(formattedTags);
         for a = 1:numTags
-            if ~ischar(originalTags{a})
+            if ~ischar(formattedTags{a})
                 checkTags(originalTags{a}, formattedTags{a}, true);
                 return;
             elseif requireChildTags.isKey(lower(formattedTags{a}))

@@ -1,9 +1,9 @@
-function [errors, errorTags] = checkRequiredTags(Maps, canonical)
+function [errors, errorTags] = checkRequiredTags(Maps, formattedTags)
 % Checks if all required tags are present in the tag list
 errors = '';
 errorTags = {};
 requiredTags = Maps.required.values();
-eventLevelTags = canonical(cellfun(@isstr, canonical));
+eventLevelTags = formattedTags(cellfun(@isstr, formattedTags));
 checkRequiredTags();
 
     function checkRequiredTags()
@@ -16,7 +16,7 @@ checkRequiredTags();
                 generateErrorMessages(a);
             end
         end
-    end % checkTags
+    end % checkRequiredTags
 
     function generateErrorMessages(requiredIndex)
         % Generates a required tag errors if the required tag isn't present

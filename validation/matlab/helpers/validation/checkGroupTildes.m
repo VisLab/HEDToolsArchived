@@ -1,7 +1,7 @@
-function [errors, errorTags] = checkGroupTildes(original)
+function [errors, errorTags] = checkGroupTildes(originalTags)
 errors = '';
 errorTags = {};
-checkTildeTags(original);
+checkTildeTags(originalTags);
 
     function checkTildeTags(originalTags)
         % Checks if the tags in the group have no more than 2 tildes

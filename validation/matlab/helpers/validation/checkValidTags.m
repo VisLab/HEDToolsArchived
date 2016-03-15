@@ -10,9 +10,9 @@ checkValidTags(originalTags, formattedTags, false);
 
     function checkValidTags(originalTags, formattedTags, isGroup)
         % Checks if the tags are valid
-        numTags = length(originalTags);
+        numTags = length(formattedTags);
         for a = 1:numTags
-            if ~ischar(originalTags{a})
+            if ~ischar(formattedTags{a})
                 checkValidTags(originalTags{a}, formattedTags{a}, true);
                 return;
             end

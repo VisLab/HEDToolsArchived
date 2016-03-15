@@ -240,7 +240,7 @@ classdef vTagList < hgsetget
                 tstring = strrep(tstring, '"','');
                 tlist = regexpi(tstring, ',(?![^\(]*\))', 'split');
                 % Remove empty cells
-                tlist(cellfun('isempty', tlist)) = [];
+                tlist = tlist(~cellfun(@isempty, tlist));
                 numElements = length(tlist);
                 for k = 1:numElements
                     if strfind(tlist{k}, '(')
@@ -251,8 +251,11 @@ classdef vTagList < hgsetget
                             tlist{k} = ...
                                 vTagList.splitTildesInGroup(tlist{k});
                         end
-                    end
-                    tlist{k} = strtrim(tlist{k});
+                        tlist{k} = strtrim(tlist{k});  
+                        tlist{k} = tlist{k}(~cellfun(@isempty, tlist{k}));
+                    else
+                        tlist{k} = strtrim(tlist{k});
+                    end                                   
                     msg = vTagList.validate(tlist{k});
                     if ~isempty(msg)
                         errormsg = [errormsg '[' msg ']']; %#ok<AGROW>
