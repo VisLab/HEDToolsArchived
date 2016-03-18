@@ -38,8 +38,7 @@ public class ScrollLayout implements LayoutManager {
 				return;
 			}
 
-			int new_vert_pos = (int) ((p.getY() / scrollContainer.getHeight())
-					* (content.getHeight() + scrollContainer.getHeight()));
+			int new_vert_pos = (int) ((p.getY() / scrollContainer.getHeight()) * (content.getHeight()));
 			scroll(new_vert_pos - top);
 		}
 
@@ -96,9 +95,9 @@ public class ScrollLayout implements LayoutManager {
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int rotation = e.getWheelRotation();
 				if (rotation < 0) {
-					scroll(-80);
+					scroll(-20);
 				} else {
-					scroll(80);
+					scroll(20);
 				}
 			}
 		});
