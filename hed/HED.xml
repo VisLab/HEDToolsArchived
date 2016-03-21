@@ -2209,10 +2209,12 @@
                   <description>Confirm something went well and last action was correct</description>
                </node>
                <node>
-                  <name>Incorrect  Confirm something went wrong and last action was incorrect</name>
+                  <name>Incorrect</name>
+                  <description>Confirm something went wrong and last action was incorrect</description>
                </node>
                <node>
-                  <name>Non-informative Feedback that provides no information in regards to correct</name>
+                  <name>Non-informative</name>
+                  <description>Feedback that provides no information in regards to correct, incorrect, etc.</description>
                </node>
                <node>
                   <name>Expected</name>
