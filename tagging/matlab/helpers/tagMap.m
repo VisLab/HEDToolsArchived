@@ -238,10 +238,15 @@ classdef tagMap < hgsetget
                     newTagList = tagList(eStruct(a).code);
                     tags = eStruct(a).tags;
                     if ischar(tags)
-                        newTagList.add(eStruct(a).tags);
+                        newTagList.add(tags);
                     else
                         for b = 1:length(tags)
-                            newTagList.add(eStruct(a).tags{b});
+                            if ischar(tags{b}) && all(size(tags{b}) > 1)
+                                tags{b} = strtrim(mat2cell(tags{b}, ...
+                                    ones(1, size(tags{b}, 1)), ...
+                                    size(tags{b}, 2)))';
+                            end
+                            newTagList.add(tags{b});
                         end
                     end
                     values(a) = newTagList; %#ok<AGROW>
