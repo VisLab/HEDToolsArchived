@@ -128,8 +128,9 @@ for k = 1:length(efields)
     if isempty(tValues)
         continue
     end
+    valueForm = tagList.empty(0,length(tValues));
     for j = 1:length(tValues)
-        valueForm(j) = tagList(num2str(tValues{j}));  %#ok<AGROW>
+        valueForm(j) = tagList(num2str(tValues{j})); 
     end
     fMap.addValues(efields{k}, valueForm);
 end
