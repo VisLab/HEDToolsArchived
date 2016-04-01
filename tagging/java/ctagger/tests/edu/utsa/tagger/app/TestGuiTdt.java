@@ -11,7 +11,7 @@ public class TestGuiTdt {
 
 	@Test
 	public void test() {
-		String hedXML = TestUtilities.getResourceAsString(TestUtilities.TestHed2FileName);
+		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String tdtData = TestUtilities.getResourceAsString(TestUtilities.DelimitedString);
 		String[] result = Loader.load(hedXML, tdtData, Loader.TAG_EDIT_ALL, 0, "Tagger Test - Tab-delimited Text data",
 				2, new GuiModelFactory(), true, true);

@@ -14,7 +14,7 @@ public class TestLoader {
 	@Test
 	public void testLoadDelimitedString() {
 		System.out.println("It should load the data from a delimited string " + "and HED XML");
-		String hedXml = TestUtilities.getResourceAsString(TestUtilities.TestHed2FileName);
+		String hedXml = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.DelimitedString);
 		String[] result = Loader.load(hedXml, events, 0, 0, "Test Tagger - Delimited String", 2, true, true);
 		assertNotNull(result);
@@ -24,7 +24,7 @@ public class TestLoader {
 
 	@Test
 	public void testLoaderJsonTagArrays() {
-		String hedXML = TestUtilities.getResourceAsString(TestUtilities.TestHed2FileName);
+		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		System.out.println("It should work with a JSON event String and " + "HED XML String");
 		String[] result = Loader.load(hedXML, events, Loader.USE_JSON, 0, "Tagger Test - JSON + XML", 3,
@@ -47,7 +47,7 @@ public class TestLoader {
 
 	@Test
 	public void testTagEditAll() {
-		String hedXML = TestUtilities.getResourceAsString(TestUtilities.TestHed2FileName);
+		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		System.out.println("It should work allowing all tags to be edited.");
 		String[] result = Loader.load(hedXML, events, Loader.TAG_EDIT_ALL | Loader.USE_JSON, 0,
@@ -58,7 +58,7 @@ public class TestLoader {
 
 	@Test
 	public void testTagEditNone() {
-		String hedXML = TestUtilities.getResourceAsString(TestUtilities.TestHed2FileName);
+		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		System.out.println("It should work allowing no tag " + "editing by default.");
 		String[] result = Loader.load(hedXML, events, Loader.USE_JSON, 0, "Tagger Test - Default editing", 2,

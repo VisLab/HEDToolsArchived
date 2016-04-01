@@ -28,15 +28,15 @@ public class TestTagger {
 	public static final int testEgtSetSize = 3;
 	public static final int[] groupsPerEvent = { 3, 1, 1 };
 	public static final int[] tagGroupSizes = { 5, 3, 2, 3, 4 };
-	public static final int testTagSetSize = 679;
+	public static final int testTagSetSize = 1057;
 	public static final int numRequired = 3;
-	public static final int numRecommended = 1;
-	public static final int numUnique = 4;
+	public static final int numRecommended = 0;
+	public static final int numUnique = 3;
 	public static final int[] groupsPerEventJson = { 3, 1, 1 };
 	public static final int[] tagGroupSizesJson = { 5, 3, 2, 3, 4 };
-	public static final int testTagSetSizeJson = 26;
-	public static final int numRequiredJson = 5;
-	public static final int numRecommendedJson = 2;
+	public static final int testTagSetSizeJson = 1057;
+	public static final int numRequiredJson = 3;
+	public static final int numRecommendedJson = 0;
 	public static final int numUniqueJson = 3;
 	private Tagger testTagger;
 	private File testLoadXml;
@@ -57,7 +57,7 @@ public class TestTagger {
 	public void setUp() throws URISyntaxException {
 		testLoadXml = TestUtilities.getResourceAsFile(TestUtilities.saveFileTest);
 		hedOld = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
-		hedRR = TestUtilities.getResourceAsString(TestUtilities.HedRequiredRecommended);
+		hedRR = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		eventsOld = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		factory = new GuiModelFactory();
 		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON, 0, "Tagger Test - JSON Events", 2, factory, true,
@@ -171,7 +171,7 @@ public class TestTagger {
 		Loader loader = new Loader(hedRR, eventsOld, Loader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		testTagger.loadJSON(TestUtilities.getResourceAsFile(TestUtilities.JsonEventsArrays),
-				TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended));
+				TestUtilities.getResourceAsFile(TestUtilities.HedFileName));
 		// Verify EGT set loaded correctly
 		assertEquals("Wrong EGT set size:", testEgtSetSize, testTagger.getEgtSet().size());
 		// Verify tag set loaded correctly
@@ -193,7 +193,7 @@ public class TestTagger {
 		int[] tagColumns = { 2 };
 		assertTrue("Tagger load success - tag-delimited text",
 				testTagger.loadTabDelimited(TestUtilities.getResourceAsFile(TestUtilities.DelimitedString),
-						TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended), headerLines, codeColumns,
+						TestUtilities.getResourceAsFile(TestUtilities.HedFileName), headerLines, codeColumns,
 						tagColumns));
 		// Verify EGT set loaded correctly
 		int groupIdx = 0;
@@ -225,8 +225,8 @@ public class TestTagger {
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		assertTrue("Tagger load success - tag-delimited text",
 				testTagger.loadTabDelimited(TestUtilities.getResourceAsFile(TestUtilities.DelimitedString2),
-						TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended), headerLines,
-						eventCodeColumn, tagColumns));
+						TestUtilities.getResourceAsFile(TestUtilities.HedFileName), headerLines, eventCodeColumn,
+						tagColumns));
 		// Verify EGT set loaded correctly
 		int groupIdx = 0;
 		int tagIdx = 0;
@@ -257,8 +257,8 @@ public class TestTagger {
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		assertTrue("Tagger load success - tag-delimited text",
 				testTagger.loadTabDelimited(TestUtilities.getResourceAsFile(TestUtilities.DelimitedString2),
-						TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended), headerLines,
-						eventCodeColumn, tagColumns));
+						TestUtilities.getResourceAsFile(TestUtilities.HedFileName), headerLines, eventCodeColumn,
+						tagColumns));
 		// Verify EGT set loaded correctly
 		int groupIdx = 0;
 		int tagIdx = 0;
@@ -291,8 +291,8 @@ public class TestTagger {
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		assertTrue("Tagger load success - tag-delimited text",
 				testTagger.loadTabDelimited(TestUtilities.getResourceAsFile(TestUtilities.DelimitedString2),
-						TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended), headerLines,
-						eventCodeColumn, tagColumns));
+						TestUtilities.getResourceAsFile(TestUtilities.HedFileName), headerLines, eventCodeColumn,
+						tagColumns));
 		// Verify EGT set loaded correctly
 		int groupIdx = 0;
 		int tagIdx = 0;
@@ -379,27 +379,17 @@ public class TestTagger {
 
 	@Test
 	public void testRequiredRecommended() {
-		String required0 = "/Event/Label";
-		String required1 = "/Event/B";
-		String required2 = "/Event/Long name";
-		String required3 = "/Event/Description";
-		String required4 = "/Event/Sequence group ID/A";
-		String recommended0 = "/D";
-		String recommended1 = "/Event/C";
+		String required0 = "Event/Label";
+		String required1 = "Event/Category";
+		String required2 = "Event/Description";
 		System.out.println("It should find the required and recommended tags "
 				+ "in the hierarchy and add them to the correct lists, sorted" + " by their position attributes.");
 		Loader loader = new Loader(hedRR, eventsOld, Loader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
 		testTagger = new Tagger(hedRR, eventsOld, true, factory, loader);
 		TaggerSet<AbstractTagModel> requiredTags = testTagger.getRequiredTags();
-		assertEquals("First required tag (label)", requiredTags.get(0).getPath(), required0);
-		assertEquals("Required tag (A)", requiredTags.get(1).getPath(), required1);
-		assertEquals("Required tag (B)", requiredTags.get(2).getPath(), required2);
-		assertEquals("Required tag (Description)", requiredTags.get(3).getPath(), required3);
-		assertEquals("Required tag (Long name)", requiredTags.get(4).getPath(), required4);
-		TaggerSet<AbstractTagModel> recommendedTags = testTagger.getRecommendedTags();
-		assertEquals("First recommended tag", recommendedTags.get(0).getPath(), recommended0);
-		assertEquals("Second recommended tag", recommendedTags.get(1).getPath(), recommended1);
-
+		assertEquals("First required tag (Label)", requiredTags.get(0).getPath(), required0);
+		assertEquals("Required tag (Category)", requiredTags.get(1).getPath(), required1);
+		assertEquals("Required tag (Description)", requiredTags.get(2).getPath(), required2);
 	}
 
 	@Test
@@ -447,7 +437,7 @@ public class TestTagger {
 		System.out.println("It should, after saving to JSON and XML, be able"
 				+ " to load the same information from the saved files.");
 		File jsonLoad = TestUtilities.getResourceAsFile(TestUtilities.JsonEventsArrays);
-		File xmlLoad = TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended);
+		File xmlLoad = TestUtilities.getResourceAsFile(TestUtilities.HedFileName);
 		File testJsonOut = testFolder.newFile("testSaveJson.txt");
 		File testXmlOut = testFolder.newFile("testSaveXml.xml");
 		testTagger.loadJSON(jsonLoad, xmlLoad);
@@ -466,9 +456,9 @@ public class TestTagger {
 		int recSize = testTagger.getRecommendedTags().size();
 		int uniqueSize = testTagger.getUniqueTags().size();
 		testTagger.save(testJsonOut, testXmlOut, true);
-		// Change data
-		testTagger.deleteTag(testTagger.getTagSet().first());
-		testTagger.removeEvent(testTagger.getEgtSet().first());
+		// // Change data
+		// testTagger.deleteTag(testTagger.getTagSet().first());
+		// testTagger.removeEvent(testTagger.getEgtSet().first());
 		// Reload from the saved output
 		testTagger.loadJSON(testJsonOut, testXmlOut);
 		// Verify EGT set
@@ -493,7 +483,7 @@ public class TestTagger {
 		System.out.println("It should, after saving to tab-delimited text "
 				+ "and XML, be able to load the same information from the " + "saved files.");
 		File tdtLoad = TestUtilities.getResourceAsFile(TestUtilities.DelimitedString);
-		File xmlLoad = TestUtilities.getResourceAsFile(TestUtilities.HedRequiredRecommended);
+		File xmlLoad = TestUtilities.getResourceAsFile(TestUtilities.HedFileName);
 		File testTdtOut = testFolder.newFile("testSaveTdt.txt");
 		File testXmlOut = testFolder.newFile("testSaveXml.xml");
 		int headerLines = 0;

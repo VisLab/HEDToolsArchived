@@ -11,7 +11,7 @@ public class TestGui {
 
 	@Test
 	public void testShowDialogJSONInput() {
-		String hedXML = TestUtilities.getResourceAsString(TestUtilities.TestHed2FileName);
+		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 
 		String[] result = Loader.load(hedXML, events, Loader.USE_JSON | Loader.TAG_EDIT_ALL, 0,

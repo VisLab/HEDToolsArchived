@@ -32,10 +32,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import edu.utsa.tagger.TagXmlModel.PredicateType;
 import edu.utsa.tagger.gui.GuiEventModel;
 import edu.utsa.tagger.gui.GuiTagModel;
 import edu.utsa.tagger.gui.GuiTagModel.Highlight;
-import edu.utsa.tagger.TagXmlModel.PredicateType;
 
 /**
  * This class keeps track of the tags, events, and associations, and provides
@@ -2437,20 +2437,19 @@ public class Tagger {
 	private TagXmlModel tagsToXmlModel() {
 		Iterator<AbstractTagModel> iter = tagList.iterator();
 		TagXmlModel dummy = new TagXmlModel();
-		String prefix = "";
-		tagsToXmlModelHelper(dummy, prefix, iter);
+		tagsToXmlModelHelper(new String(), dummy, iter);
 		return dummy;
 	}
 
 	/**
 	 * Helper method to build hierarchical tag structure recursively.
 	 */
-	private AbstractTagModel tagsToXmlModelHelper(TagXmlModel parent, String prefix, Iterator<AbstractTagModel> iter) {
+	private AbstractTagModel tagsToXmlModelHelper(String prefix, TagXmlModel parent, Iterator<AbstractTagModel> iter) {
 		if (!iter.hasNext()) {
 			return null;
 		}
 		AbstractTagModel next = iter.next(); // Potential child node
-		while (next != null && next.getPath().startsWith(prefix + "/")) {
+		while (next != null && next.getPath().startsWith(prefix)) {
 			// Create child XML model and link to parent
 			TagXmlModel child = new TagXmlModel();
 			child.setName(next.getName());
@@ -2465,7 +2464,7 @@ public class Tagger {
 			child.setPosition(next.getPosition());
 			parent.addChild(child);
 			// Process child node and get potential next child node
-			next = tagsToXmlModelHelper(child, next.getPath(), iter);
+			next = tagsToXmlModelHelper(next.getPath(), child, iter);
 		}
 		return next; // Prefix does not match
 	}
