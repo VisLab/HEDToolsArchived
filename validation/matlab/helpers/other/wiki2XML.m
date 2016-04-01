@@ -96,7 +96,7 @@ end
 
     function checkHEDVersion()
         % Checks the line for HED version attribute
-        versionexpression = '(?<=HED version:\s*)\d+(.\d+)?';
+        versionexpression = '(?<=HED version:\s*)\d+(.\d+)*';
         version = strtrim(regexpi(tLine, versionexpression, 'match'));
         if ~isempty(version)
             hedElement.setAttribute('version',version{1});

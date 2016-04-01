@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="2.3">
+<HED version="2.3.1">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -2263,7 +2263,23 @@
             </node>
             <node>
                <name>Cue</name>
-               <description>An indicator of a future event, e.g. a sound cue that in 2-5 seconds a perturbation in driving will occur.</description>
+               <description>An indicator of a future event, e.g. a sound cue that in 2-5 seconds a perturbation in driving will occur. Use (... Participant/Effect/Cognitive/Cue ~ hed tags for the event to follow, or main aspect of the event to follow) syntax.</description>
+               <node>
+                  <name>Constant delay</name>
+                  <description>The cue is for an event that will happen after a constant delay.</description>
+                  <node isNumeric="true" takesValue="true" unitClass="time">
+                     <name>#</name>
+                     <description>The delay, e.g. in seconds.</description>
+                  </node>
+               </node>
+               <node>
+                  <name>Variable delay</name>
+                  <description>The cue is for an event that will happen after a variable delay.</description>
+                  <node takesValue="true">
+                     <name>#</name>
+                     <description>The interval, e.g. between 2-5 seconds, of the variable delay.</description>
+                  </node>
+               </node>
             </node>
          </node>
          <node>

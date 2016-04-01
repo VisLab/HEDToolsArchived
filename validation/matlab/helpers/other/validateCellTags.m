@@ -92,7 +92,7 @@ xmlVersion = getXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
-if ~all(cellfun(@isempty,cells))
+if ~all(cellfun(@isempty, strtrim(cells)))
     [errors, warnings, extensions] = parseCellTags(hedMaps, p.cells, ...
         p.extensionAllowed);
     if p.writeOutput
