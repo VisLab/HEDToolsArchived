@@ -204,8 +204,10 @@ public class AppView extends ConstraintContainer {
 		boolean saveSuccess = true;
 		File saveFile = showFileChooserDialog("Save Combined events + HED XML", "Save", "Save .xml file", "XML files",
 				new String[] { "xml" });
-		if (saveFile != null)
+		if (saveFile != null) {
+			saveFile = addExtensionToFile(saveFile, "xml");
 			saveSuccess = tagger.saveEventsAndHED(saveFile);
+		}
 		return checkSaveSuccess(option, saveFile, saveSuccess);
 	}
 
@@ -236,8 +238,10 @@ public class AppView extends ConstraintContainer {
 		boolean saveSuccess = true;
 		File saveFile = showFileChooserDialog("Save HED XML", "Save", "Save .xml file", "XML files",
 				new String[] { "xml" });
-		if (saveFile != null)
+		if (saveFile != null) {
+			saveFile = addExtensionToFile(saveFile, "xml");
 			saveSuccess = tagger.saveHED(saveFile);
+		}
 		return checkLoadSuccess(option, saveFile, saveSuccess);
 	}
 
@@ -266,11 +270,25 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int saveTSVDialog(int option) {
 		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save Events, tab-delimited text", "Save", "Save .xml file", "XML files",
-				new String[] { "xml" });
-		if (saveFile != null)
-			saveSuccess = tagger.saveTabDelimitedEvents(saveFile);
+		File saveFile = showFileChooserDialog("Save Events, tab-delimited text", "Save", "Save .tsv file", "TSV files",
+				new String[] { "tsv" });
+		if (saveFile != null) {
+			saveFile = addExtensionToFile(saveFile, "tsv");
+			saveSuccess = tagger.saveTSVFile(saveFile);
+		}
 		return checkSaveSuccess(option, saveFile, saveSuccess);
+	}
+
+	/**
+	 * Adds a specified extension to a file.
+	 * 
+	 * @param file
+	 * @param extension
+	 * @return
+	 */
+	private File addExtensionToFile(File file, String extension) {
+		File fileWithExtension = new File(file.getAbsolutePath() + "." + extension);
+		return fileWithExtension;
 	}
 
 	/**
@@ -282,7 +300,7 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int loadTSVDialog(int option) {
 		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog("Load Events, tab-delimited text", "Load", "Load .txt file", "TSV files",
+		File loadFile = showFileChooserDialog("Load Events, tab-delimited text", "Load", "Load .tsv file", "TSV files",
 				new String[] { "tsv", "txt" });
 		if (loadFile != null) {
 			String[] tabSeparatedOptions = showTabSeparatedOptions();

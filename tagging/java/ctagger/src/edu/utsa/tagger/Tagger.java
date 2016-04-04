@@ -1493,7 +1493,7 @@ public class Tagger {
 	public String getTdtEventsString() {
 		StringWriter sw = new StringWriter();
 		BufferedWriter br = new BufferedWriter(sw);
-		writeTabDelimitedFile(br);
+		writeTSVFile(br);
 		try {
 			br.close();
 		} catch (IOException e) {
@@ -2254,7 +2254,7 @@ public class Tagger {
 			// Save tab-delimited text to file
 			try {
 				BufferedWriter egtWriter = new BufferedWriter(new FileWriter(egtFile));
-				writeTabDelimitedFile(egtWriter);
+				writeTSVFile(egtWriter);
 				egtWriter.close();
 			} catch (IOException e) {
 				System.err.println("Error writing tab-delimited text to file: " + e.getMessage());
@@ -2318,10 +2318,10 @@ public class Tagger {
 		return true;
 	}
 
-	public boolean saveTabDelimitedEvents(File egtFile) {
+	public boolean saveTSVFile(File tsvFile) {
 		try {
-			BufferedWriter egtWriter = new BufferedWriter(new FileWriter(egtFile));
-			writeTabDelimitedFile(egtWriter);
+			BufferedWriter egtWriter = new BufferedWriter(new FileWriter(tsvFile));
+			writeTSVFile(egtWriter);
 			egtWriter.close();
 		} catch (IOException e) {
 			System.err.println("Error writing tab-delimited text to file: " + e.getMessage());
@@ -2849,7 +2849,7 @@ public class Tagger {
 	 *            BufferedWriter used to write tab-delimited events
 	 * @return True if the write completed without errors, false otherwise
 	 */
-	private boolean writeTabDelimitedFile(BufferedWriter eventWriter) {
+	private boolean writeTSVFile(BufferedWriter eventWriter) {
 		writeHeader(eventWriter);
 		for (TaggedEvent event : taggedEventSet) {
 			writeEventCode(eventWriter, event);
