@@ -128,6 +128,7 @@ public class Tagger {
 	private int tagLevel = 0;
 	private boolean hedEdited = false;
 	private boolean editTags = false;
+	private String[] tsvHeader = { "Event code", "Event category", "Event label", "Event long name", "Event tags" };
 
 	/**
 	 * Constructor creates the Tagger with no data loaded.
@@ -1492,7 +1493,7 @@ public class Tagger {
 	public String getTdtEventsString() {
 		StringWriter sw = new StringWriter();
 		BufferedWriter br = new BufferedWriter(sw);
-		writeTabDelimitedTextFromEgt(br);
+		writeTabDelimitedFile(br);
 		try {
 			br.close();
 		} catch (IOException e) {
@@ -2253,7 +2254,7 @@ public class Tagger {
 			// Save tab-delimited text to file
 			try {
 				BufferedWriter egtWriter = new BufferedWriter(new FileWriter(egtFile));
-				writeTabDelimitedTextFromEgt(egtWriter);
+				writeTabDelimitedFile(egtWriter);
 				egtWriter.close();
 			} catch (IOException e) {
 				System.err.println("Error writing tab-delimited text to file: " + e.getMessage());
@@ -2320,7 +2321,7 @@ public class Tagger {
 	public boolean saveTabDelimitedEvents(File egtFile) {
 		try {
 			BufferedWriter egtWriter = new BufferedWriter(new FileWriter(egtFile));
-			writeTabDelimitedTextFromEgt(egtWriter);
+			writeTabDelimitedFile(egtWriter);
 			egtWriter.close();
 		} catch (IOException e) {
 			System.err.println("Error writing tab-delimited text to file: " + e.getMessage());
@@ -2819,56 +2820,251 @@ public class Tagger {
 	}
 
 	/**
-	 * Writes the tab-delimited text representing the current EGT data in the
+	 * Writes the tab-delimited text representing the current events in the
 	 * tagger to the given BufferedWriter
 	 * 
-	 * @param egtWriter
-	 *            BufferedWriter used to write tab-delimited EGT data
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
 	 * @return True if the write completed without errors, false otherwise
 	 */
-	private boolean writeTabDelimitedTextFromEgt(BufferedWriter egtWriter) {
+	private boolean writeHeader(BufferedWriter eventWriter) {
+		try {
+			eventWriter.write(tsvHeader[0]);
+			for (int i = 1; i < tsvHeader.length; i++) {
+				eventWriter.write("\t" + tsvHeader[i]);
+			}
+			eventWriter.newLine();
+		} catch (IOException e) {
+			System.err.println("Error writing tab-delimited text: " + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Writes the tab-delimited text representing the current events in the
+	 * tagger to the given BufferedWriter
+	 * 
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
+	 * @return True if the write completed without errors, false otherwise
+	 */
+	private boolean writeTabDelimitedFile(BufferedWriter eventWriter) {
+		writeHeader(eventWriter);
 		for (TaggedEvent event : taggedEventSet) {
+			writeEventCode(eventWriter, event);
+			writeEventCategory(eventWriter, event);
+			writeEventLabel(eventWriter, event);
+			writeEventLongName(eventWriter, event);
+			writeAllTags(eventWriter, event);
+		}
+		return true;
+	}
+
+	/**
+	 * Writes all of the tags belonging to an event to a tab-delimited file.
+	 * 
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
+	 * @param event
+	 *            The event that the tag belongs to.
+	 * @return True if the write completed without errors, false otherwise
+	 */
+	private boolean writeAllTags(BufferedWriter eventWriter, TaggedEvent event) {
+		// Write tags
+		String tagPath = new String();
+		try {
 			boolean first;
-			try {
-				// Write event code
-				egtWriter.write(event.getEventModel().getCode() + "\t");
-				// Write tags
-				for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
-					first = true;
-					if (entry.getKey() == event.getEventGroupId()) {
-						// Event level tags
-						for (AbstractTagModel tag : entry.getValue()) {
-							if (first) {
-								first = false;
-							} else {
-								egtWriter.append(',');
-							}
-							egtWriter.write(tag.getPath());
+			for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
+				first = true;
+				if (entry.getKey() == event.getEventGroupId()) {
+					// Event level tags
+					for (AbstractTagModel tag : entry.getValue()) {
+						if (first) {
+							first = false;
+						} else {
+							eventWriter.append(',');
 						}
-					} else {
-						// Tag group
-						for (AbstractTagModel tag : entry.getValue()) {
-							egtWriter.append(',');
-							if (first) {
-								egtWriter.append('(');
-								first = false;
-							}
-							egtWriter.write(tag.getPath());
+						tagPath = tag.getPath();
+						eventWriter.write(tag.getPath());
+					}
+				} else {
+					// Tag group
+					for (AbstractTagModel tag : entry.getValue()) {
+						eventWriter.append(',');
+						if (first) {
+							eventWriter.append('(');
+							first = false;
 						}
-						egtWriter.append(')');
+						tagPath = tag.getPath();
+						eventWriter.write(tag.getPath());
+					}
+					eventWriter.append(')');
+				}
+			}
+			eventWriter.newLine();
+		} catch (IOException e) {
+			System.err.println("Error writing tag: " + tagPath + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Writes the code belonging to an event.
+	 * 
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
+	 * @param event
+	 *            The event that the code belongs to.
+	 * @return True if the write completed without errors, false otherwise
+	 */
+	private boolean writeEventCode(BufferedWriter eventWriter, TaggedEvent event) {
+		try {
+			eventWriter.write(event.getEventModel().getCode() + "\t");
+		} catch (IOException e) {
+			System.err.println("Error writing event code: " + event.getEventModel().getCode() + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Writes the label belonging to an event.
+	 * 
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
+	 * @param event
+	 *            The event that the label belongs to.
+	 * @return True if the write completed without errors, false otherwise
+	 */
+	private boolean writeEventLabel(BufferedWriter eventWriter, TaggedEvent event) {
+		AbstractTagModel labelTag = getEventLabelTag(event);
+		try {
+			if (labelTag.getPath() == null)
+				eventWriter.write("\t");
+			else
+				eventWriter.write(labelTag.getPath() + "\t");
+		} catch (IOException e) {
+			System.err.println("Error writing event label: " + labelTag.getPath() + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Writes the long name belonging to an event.
+	 * 
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
+	 * @param event
+	 *            The event that the long name belongs to.
+	 * @return True if the write completed without errors, false otherwise
+	 */
+	private boolean writeEventLongName(BufferedWriter eventWriter, TaggedEvent event) {
+		AbstractTagModel longNameTag = getEventLongNameTag(event);
+		try {
+			if (longNameTag.getPath() == null)
+				eventWriter.write("\t");
+			else
+				eventWriter.write(longNameTag.getPath() + "\t");
+		} catch (IOException e) {
+			System.err.println("Error writing event long name: " + longNameTag.getPath() + e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Returns the long name tag in the event if found.
+	 * 
+	 * @param event
+	 *            The event that the tag belongs to.
+	 * @return The label tag if found, null if not found.
+	 */
+	private AbstractTagModel getEventLongNameTag(TaggedEvent event) {
+		AbstractTagModel defaultTagModel = factory.createAbstractTagModel(this);
+		for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
+			if (entry.getKey() == event.getEventGroupId()) {
+				for (AbstractTagModel tag : entry.getValue()) {
+					if (tag.getPath().toLowerCase().startsWith("event/long name")) {
+						return tag;
 					}
 				}
-			} catch (IOException e) {
-				System.err.println("Error writing tab-delimited text: " + e.getMessage());
-				return false;
-			}
-			try {
-				egtWriter.newLine();
-			} catch (IOException e) {
-				System.err.println("Error writing tab-delimited text: " + e.getMessage());
-				return false;
 			}
 		}
+		return defaultTagModel;
+	}
+
+	/**
+	 * Returns the label tag in the event if found.
+	 * 
+	 * @param event
+	 *            The event that the tag belongs to.
+	 * @return The label tag if found, null if not found.
+	 */
+	private AbstractTagModel getEventLabelTag(TaggedEvent event) {
+		AbstractTagModel defaultTagModel = factory.createAbstractTagModel(this);
+		for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
+			if (entry.getKey() == event.getEventGroupId()) {
+				for (AbstractTagModel tag : entry.getValue()) {
+					if (tag.getPath().toLowerCase().startsWith("event/label")) {
+						return tag;
+					}
+				}
+			}
+		}
+		return defaultTagModel;
+	}
+
+	/**
+	 * Returns the category tags in the event if found.
+	 * 
+	 * @param event
+	 *            The event that the tags belongs to.
+	 * @return The category tags if found, null if not found.
+	 */
+	private List<AbstractTagModel> getEventCategoryTags(TaggedEvent event) {
+		List<AbstractTagModel> categoryTags = new ArrayList<AbstractTagModel>();
+		for (Map.Entry<Integer, TaggerSet<AbstractTagModel>> entry : event.getTagGroups().entrySet()) {
+			if (entry.getKey() == event.getEventGroupId()) {
+				for (AbstractTagModel tag : entry.getValue()) {
+					if (tag.getPath().toLowerCase().startsWith("event/category")) {
+						categoryTags.add(tag);
+					}
+				}
+			}
+		}
+		return categoryTags;
+	}
+
+	/**
+	 * Writes the long name belonging to an event.
+	 * 
+	 * @param eventWriter
+	 *            BufferedWriter used to write tab-delimited events
+	 * @param event
+	 *            The event that the category name belongs to.
+	 * @return True if the write completed without errors, false otherwise
+	 */
+	private boolean writeEventCategory(BufferedWriter eventWriter, TaggedEvent event) {
+		String tagPath = new String();
+		List<AbstractTagModel> categoryTags = getEventCategoryTags(event);
+		try {
+			if (!categoryTags.isEmpty()) {
+				tagPath = categoryTags.get(0).getPath();
+				eventWriter.write(categoryTags.get(0).getPath());
+				for (int i = 1; i < categoryTags.size(); i++) {
+					tagPath = categoryTags.get(i).getPath();
+					eventWriter.write("," + categoryTags.get(i).getPath());
+				}
+			}
+			eventWriter.write("\t");
+		} catch (IOException e) {
+			System.err.println("Error writing event category: " + tagPath + e.getMessage());
+			return false;
+		}
+
 		return true;
 	}
 }
