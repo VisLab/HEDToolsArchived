@@ -153,7 +153,7 @@ public class TagEventEditView extends ConstraintContainer {
 						.getText());
 			}
 			tagModel.setInEdit(false);
-			appView.updateEgt();
+			appView.updateEventsPanel();
 		}
 	}
 
@@ -226,7 +226,7 @@ public class TagEventEditView extends ConstraintContainer {
 
 	private void handleCancel() {
 		tagModel.setInEdit(false);
-		appView.updateEgt();
+		appView.updateEventsPanel();
 	}
 
 	@Override

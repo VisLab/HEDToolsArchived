@@ -192,7 +192,7 @@ public class GuiTagModel extends AbstractTagModel {
 			}
 		}
 		// appView.updateTags();
-		appView.updateEgt();
+		appView.updateEventsPanel();
 	}
 
 	public void setAppView(AppView appView) {

@@ -64,7 +64,7 @@ public class FileFormatDialog extends JDialog {
 	 * @param frame
 	 * @param message
 	 */
-	public FileFormatDialog(JFrame frame, String message) {
+	public FileFormatDialog(JFrame frame, String message, boolean isStandalone) {
 		super(frame, true);
 
 		bgPanel.setLayout(new ConstraintLayout());
@@ -76,24 +76,25 @@ public class FileFormatDialog extends JDialog {
 		bgPanel.add(label, new Constraint("top:0 height:30 left:0 width:750"));
 		xmlButton = AppView.createMenuButton("Tag hierarchy in XML");
 		top += 60;
-		bgPanel.add(xmlButton, new Constraint("top:" + top
-				+ " height:30 left:10 right:10"));
+		bgPanel.add(xmlButton, new Constraint("top:" + top + " height:30 left:10 right:10"));
 		xmlButton.addMouseListener(new OptionButtonListener(1));
-		jsonButton = AppView
-				.createMenuButton("Event list as tab-delimited text");
+		jsonButton = AppView.createMenuButton("Event list as tab-delimited text");
 		top += 40;
-		bgPanel.add(jsonButton, new Constraint("top:" + top
-				+ " height:30 left:10 right:10"));
+		bgPanel.add(jsonButton, new Constraint("top:" + top + " height:30 left:10 right:10"));
 		jsonButton.addMouseListener(new OptionButtonListener(2));
-		tdtButton = AppView
-				.createMenuButton("Event list and tag hierarchy in XML");
-		top += 40;
-		bgPanel.add(tdtButton, new Constraint("top:" + top
-				+ " height:30 left:10 right:10"));
-		tdtButton.addMouseListener(new OptionButtonListener(3));
+		if (isStandalone) {
+			tdtButton = AppView.createMenuButton("Event list and tag hierarchy in XML");
+			top += 40;
+			bgPanel.add(tdtButton, new Constraint("top:" + top + " height:30 left:10 right:10"));
+			tdtButton.addMouseListener(new OptionButtonListener(3));
+		} else {
+			tdtButton = AppView.createMenuButton("Field map");
+			top += 40;
+			bgPanel.add(tdtButton, new Constraint("top:" + top + " height:30 left:10 right:10"));
+			tdtButton.addMouseListener(new OptionButtonListener(4));
+		}
 		cancelButton = AppView.createMenuButton("Cancel");
-		bgPanel.add(cancelButton, new Constraint(
-				"bottom:10 height:30 right:5 width:80"));
+		bgPanel.add(cancelButton, new Constraint("bottom:10 height:30 right:5 width:80"));
 		cancelButton.addMouseListener(new OptionButtonListener(0));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		getContentPane().add(bgPanel);

@@ -401,7 +401,7 @@ public class TagEditView extends ConstraintContainer {
 			tagModel.setFirstEdit(false);
 			tagger.setChildToPropertyOf();
 			appView.updateTags();
-			appView.updateEgt();
+			appView.updateEventsPanel();
 			appView.scrollToTag(tagModel);
 		}
 	}

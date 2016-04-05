@@ -13,9 +13,9 @@
 % fMap = editmaps(fMap, 'key1', 'value1', ...) specifies
 % optional name/value parameter pairs:
 %
-%   'EditXml'        If false (default), the HED XML cannot be modified 
+%   'EditXml'        If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can
-%                    be modified using the tagger GUI.  
+%                    be modified using the tagger GUI.
 %   'PreservePrefix' If false (default), tags of the same event type that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
@@ -32,7 +32,7 @@
 %
 %    doc editmaps
 %
-% See also: 
+% See also:
 %
 % Copyright (C) Kay Robbins, Jeremy Cockfield, and Thomas Rognon, UTSA,
 % 2011-2015, kay.robbins.utsa.edu jeremy.cockfield.utsa.edu
@@ -66,14 +66,17 @@ parser.addParamValue('Synchronize', false, @islogical);
 parser.parse(fMap, varargin{:});
 EditXml = parser.Results.EditXml;
 preservePrefix = parser.Results.PreservePrefix;
-syncThis = parser.Results.Synchronize;
+% syncThis = parser.Results.Synchronize;
 permissions = 0;
 initialDepth = 3;
 isStandAloneVersion = false;
 fields = fMap.getFields();
+cancel = false;
 for k = 1:length(fields)
-    fprintf('Tagging %s\n', fields{k});
-    editmap(fields{k});
+    if ~cancel
+        fprintf('Tagging %s\n', fields{k});
+        editmap(fields{k});
+    end
 end
 
     function editmap(field)
@@ -82,9 +85,43 @@ end
         if isempty(tMap)
             return;
         end
+        [loader, xml, taggedList] = executeTagger(tMap, field);
+        updateFieldMap(field, loader, xml, taggedList);
+    end % editmap
+
+    function [loader, xml, taggedList] = executeTagger(tMap, field)
+        % Executes the CTagger gui
+        [primary, tValues, xml, flags, eTitle] = ...
+            getTaggerParameters(tMap, field);
+        %         if syncThis
+        %             taggedList = edu.utsa.tagger.Loader.load(xml, tValues, ...
+        %                 flags, permissions, eTitle, initialDepth, ...
+        %                 primary, isStandAloneVersion);
+        %         else
+        loader = javaObjectEDT('edu.utsa.tagger.Loader', ...
+            xml, tValues, flags, permissions, eTitle, initialDepth, ...
+            primary, isStandAloneVersion);
+        notified = loader.isNotified();
+        while (~notified)
+            pause(0.5);
+            notified = loader.isNotified();
+        end
+        taggedList = loader.getXMLAndEvents();
+        %         end
+    end % executeTagger
+
+    function [primary, tValues, xml, flags, eTitle] = ...
+            getTaggerParameters(tMap, field)
+        % Gets the parameters that are passed into the CTagger
         primary = tMap.getPrimary();
         tValues = strtrim(char(tMap.getJsonValues()));
         xml = fMap.getXml();
+        flags = setFlags();
+        eTitle = ['Tagging ' field ' values'];
+    end % getTaggerParameters
+
+    function flags = setFlags()
+        % Sets the flags parameter based on the input arguments
         flags = 1;
         if EditXml
             flags = bitor(flags,8);
@@ -92,31 +129,22 @@ end
         if preservePrefix
             flags = bitor(flags,2);
         end
-        eTitle = ['Tagging ' field ' values'];     
-        if syncThis
-            taggedList = edu.utsa.tagger.Loader.load(xml, tValues, ...
-                flags, permissions, eTitle, initialDepth, ...
-                primary, isStandAloneVersion);
-        else
-            loader = javaObjectEDT('edu.utsa.tagger.Loader', ...
-                xml, tValues, flags, permissions, eTitle, initialDepth, ...
-                primary, isStandAloneVersion);
-            notified = loader.isNotified();
-            while (~notified)
-                pause(0.5);
-                notified = loader.isNotified();
+    end % setFlags
+
+    function updateFieldMap(field, loader, xml, taggedList)
+        % Updates fMap if CTagger is submitted
+        if loader.isSubmitted()
+            if ~isempty(taggedList)
+                tValues = strtrim(char(taggedList(2, :)));
             end
-            taggedList = ...
-                loader.getXMLAndEvents();
+            tValues = tagMap.json2Values(tValues);
+            fMap.mergeXml(strtrim(xml));
+            fMap.removeMap(field);
+            fMap.addValues(field, tValues);
+            fMap.updateXml();
+        else
+            cancel = true;
         end
-        if ~isempty(taggedList)
-            tValues = strtrim(char(taggedList(2, :)));
-        end
-        tValues = tagMap.json2Values(tValues);
-        fMap.mergeXml(strtrim(xml));
-        fMap.removeMap(field);
-        fMap.addValues(field, tValues);
-        fMap.updateXml();
-    end % editmap
+    end % updateFieldMap
 
 end % editmaps

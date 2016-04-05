@@ -328,7 +328,7 @@ public class RRTagView extends JComponent {
 				inAddValue = false;
 				refreshView();
 			}
-			appView.updateEgt();
+			appView.updateEventsPanel();
 		}
 	}
 
@@ -344,7 +344,7 @@ public class RRTagView extends JComponent {
 
 	public void handleCancel() {
 		inAddValue = false;
-		appView.updateEgt();
+		appView.updateEventsPanel();
 	}
 
 	private XButton save = new XButton("save") {

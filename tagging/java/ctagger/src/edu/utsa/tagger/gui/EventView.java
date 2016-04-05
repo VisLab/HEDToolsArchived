@@ -127,14 +127,14 @@ public class EventView extends JComponent implements MouseListener {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			appView.selectedGroups.clear();
 			appView.selectedGroups.add(groupId);
-			appView.updateEgt();
+			appView.updateEventsPanel();
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			Map<String, ContextMenuAction> map = new LinkedHashMap<String, ContextMenuAction>();
 			map.put("add group", new ContextMenuAction() {
 				@Override
 				public void doAction() {
 					int groupId = tagger.addNewGroup(taggedEvent);
-					appView.updateEgt();
+					appView.updateEventsPanel();
 					appView.scrollToNewGroup(taggedEvent, groupId);
 				}
 			});
@@ -143,7 +143,7 @@ public class EventView extends JComponent implements MouseListener {
 					@Override
 					public void doAction() {
 						taggedEvent.setShowInfo(true);
-						appView.updateEgt();
+						appView.updateEventsPanel();
 					}
 				});
 			} else {
@@ -151,7 +151,7 @@ public class EventView extends JComponent implements MouseListener {
 					@Override
 					public void doAction() {
 						taggedEvent.setShowInfo(false);
-						appView.updateEgt();
+						appView.updateEventsPanel();
 					}
 				});
 			}
@@ -160,7 +160,7 @@ public class EventView extends JComponent implements MouseListener {
 					@Override
 					public void doAction() {
 						taggedEvent.setInEdit(true);
-						appView.updateEgt();
+						appView.updateEventsPanel();
 					}
 				});
 			}
@@ -168,7 +168,7 @@ public class EventView extends JComponent implements MouseListener {
 				@Override
 				public void doAction() {
 					tagger.removeEvent(taggedEvent);
-					appView.updateEgt();
+					appView.updateEventsPanel();
 				}
 			});
 			appView.showContextMenu(map, 205);

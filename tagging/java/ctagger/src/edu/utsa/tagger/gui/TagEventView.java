@@ -100,7 +100,7 @@ public class TagEventView extends JComponent implements MouseListener {
 				map.put("edit", new ContextMenuAction() {
 					public void doAction() {
 						model.setInEdit(true);
-						appView.updateEgt();
+						appView.updateEventsPanel();
 					}
 				});
 			}
@@ -120,7 +120,7 @@ public class TagEventView extends JComponent implements MouseListener {
 						groupIds.add(groupId);
 						tagger.unassociate(model, groupIds);
 					}
-					appView.updateEgt();
+					appView.updateEventsPanel();
 				}
 			});
 			appView.showContextMenu(map);
@@ -140,7 +140,7 @@ public class TagEventView extends JComponent implements MouseListener {
 			Set<Integer> groupSet = new HashSet<Integer>();
 			groupSet.add(groupId);
 			tagger.associate(newTag, index, groupSet);
-			appView.updateEgt();
+			appView.updateEventsPanel();
 			appView.scrollToEventTag(newTag);
 		} else {
 			appView.showTaggerMessageDialog(MessageConstants.TILDE_ERROR, "Okay", null, null);

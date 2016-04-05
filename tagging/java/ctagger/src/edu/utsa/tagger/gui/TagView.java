@@ -107,7 +107,7 @@ public class TagView extends JComponent implements MouseListener {
 						tagger.deleteTag(model);
 						tagger.setHedEdited(true);
 						appView.updateTags();
-						appView.updateEgt();
+						appView.updateEventsPanel();
 					}
 				}
 			});

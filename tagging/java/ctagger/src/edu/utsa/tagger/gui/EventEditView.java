@@ -201,7 +201,7 @@ public class EventEditView extends ConstraintContainer {
 			}
 			taggedEvent.setInEdit(false);
 			taggedEvent.setInFirstEdit(false);
-			appView.updateEgt();
+			appView.updateEventsPanel();
 			appView.scrollToEvent(taggedEvent);
 		}
 	}
@@ -287,7 +287,7 @@ public class EventEditView extends ConstraintContainer {
 		if (taggedEvent.isInFirstEdit()) {
 			tagger.removeEvent(taggedEvent);
 		}
-		appView.updateEgt();
+		appView.updateEventsPanel();
 	}
 
 	@Override

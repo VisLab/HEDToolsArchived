@@ -119,7 +119,7 @@ public class GroupView extends JComponent implements MouseListener,
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			appView.selectedGroups.clear();
 			appView.selectedGroups.add(groupId);
-			appView.updateEgt();
+			appView.updateEventsPanel();
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			Map<String, ContextMenuAction> map = new LinkedHashMap<String, ContextMenuAction>();
 			map.put("add ~", new ContextMenuAction() {
@@ -134,7 +134,7 @@ public class GroupView extends JComponent implements MouseListener,
 				@Override
 				public void doAction() {
 					tagger.removeGroup(groupId);
-					appView.updateEgt();
+					appView.updateEventsPanel();
 				}
 			});
 			appView.showContextMenu(map, 105);
@@ -155,7 +155,7 @@ public class GroupView extends JComponent implements MouseListener,
 			Set<Integer> groupSet = new HashSet<Integer>();
 			groupSet.add(groupId);
 			tagger.associate(newTag, index, groupSet);
-			appView.updateEgt();
+			appView.updateEventsPanel();
 			appView.scrollToEventTag(newTag);
 		} else {
 			appView.showTaggerMessageDialog(MessageConstants.TILDE_ERROR,

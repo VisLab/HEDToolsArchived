@@ -34,6 +34,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
@@ -84,35 +85,6 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
-	 * Handles the loading of the data.
-	 */
-	private int handleLoad() {
-		FileFormatDialog dialog = new FileFormatDialog(frame, MessageConstants.OPEN_DATA_TYPE_Q);
-		int option = dialog.showDialog();
-		switch (option) {
-		case 1:
-			return loadHEDXMLDialog(option);
-		case 2:
-			return loadTSVDialog(option);
-		case 3:
-			return loadTaggerDataXMLDialog(option);
-		default:
-			dialog.dispose();
-			return 0;
-		}
-	}
-
-	/**
-	 * Refreshes the event and tag panels.
-	 */
-	private void refreshPanels() {
-		selectedGroups.clear();
-		updateEgt();
-		autoCollapse = true;
-		updateTags();
-	}
-
-	/**
 	 * When the save button is clicked, it shows a dialog to get the data type
 	 * to save to. It then shows one or more filechooser dialogs to get the
 	 * file(s) to save to.
@@ -125,190 +97,6 @@ public class AppView extends ConstraintContainer {
 				saveOption = handleSave();
 			}
 		}
-	}
-
-	/**
-	 * Handles the saving of the data.
-	 */
-	private int handleSave() {
-		// Get data type to save as
-		FileFormatDialog dialog = new FileFormatDialog(frame, MessageConstants.SAVE_DATA_TYPE_Q);
-		int option = dialog.showDialog();
-		switch (option) {
-		case 1:
-			return saveHEDXMLDialog(option);
-		case 2:
-			return saveTSVDialog(option);
-		case 3:
-			return saveTaggerDataXMLDialog(option);
-		default:
-			dialog.dispose();
-			return 0;
-		}
-	}
-
-	/**
-	 * Checks if the file save was successful.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @param saveFile
-	 *            The file selected from the file chooser.
-	 * @param saveSuccess
-	 *            True if the file was saved successful, false if otherwise.
-	 * @return -1 if a file was not selected or save failed, a different value
-	 *         if otherwise.
-	 */
-	private int checkSaveSuccess(int option, File saveFile, boolean saveSuccess) {
-		if (saveFile == null) {
-			return -1;
-		}
-		if (!saveSuccess) {
-			AppView.this.showTaggerMessageDialog(MessageConstants.SAVE_ERROR, "Okay", null, null);
-			return -1;
-		}
-		return option;
-	}
-
-	/**
-	 * Checks if the file load was successful.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @param loadFile
-	 *            The file selected from the file chooser.
-	 * @param loadSuccess
-	 *            True if the file was loaded successful, false if otherwise.
-	 * @return -1 if a file was not selected or load failed, a different value
-	 *         if otherwise.
-	 */
-	private int checkLoadSuccess(int option, File loadFile, boolean loadSuccess) {
-		if (loadFile == null)
-			return -1;
-		if (!loadSuccess) {
-			AppView.this.showTaggerMessageDialog(MessageConstants.LOAD_ERROR, "Okay", null, null);
-			return -1;
-		}
-		refreshPanels();
-		return option;
-	}
-
-	/**
-	 * Shows a file chooser to select a Tagger Data XML file.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @return The file returned from the file chooser.
-	 */
-	public int saveTaggerDataXMLDialog(int option) {
-		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save Combined events + HED XML", "Save", "Save .xml file", "XML files",
-				new String[] { "xml" });
-		if (saveFile != null) {
-			saveFile = addExtensionToFile(saveFile, "xml");
-			saveSuccess = tagger.saveEventsAndHED(saveFile);
-		}
-		return checkSaveSuccess(option, saveFile, saveSuccess);
-	}
-
-	/**
-	 * Shows a file chooser to select a Tagger Data XML file.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @return The file returned from the file chooser.
-	 */
-	public int loadTaggerDataXMLDialog(int option) {
-		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog("Load Combined events + HED XML", "Load", "Load .xml file", "XML files",
-				new String[] { "xml" });
-		if (loadFile != null)
-			loadSuccess = tagger.loadEventsAndHED(loadFile);
-		return checkLoadSuccess(option, loadFile, loadSuccess);
-	}
-
-	/**
-	 * Shows a file chooser to select a HED XML file.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @return The file returned from the file chooser.
-	 */
-	public int saveHEDXMLDialog(int option) {
-		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save HED XML", "Save", "Save .xml file", "XML files",
-				new String[] { "xml" });
-		if (saveFile != null) {
-			saveFile = addExtensionToFile(saveFile, "xml");
-			saveSuccess = tagger.saveHED(saveFile);
-		}
-		return checkLoadSuccess(option, saveFile, saveSuccess);
-	}
-
-	/**
-	 * Shows a file chooser to select a Tagger Data XML file.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @return The file returned from the file chooser.
-	 */
-	public int loadHEDXMLDialog(int option) {
-		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog("Load HED XML", "Load", "Load .xml file", "XML files",
-				new String[] { "xml" });
-		if (loadFile != null)
-			loadSuccess = tagger.loadHED(loadFile);
-		return checkLoadSuccess(option, loadFile, loadSuccess);
-	}
-
-	/**
-	 * Shows a file chooser to select a tab-delimited file.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @return The file returned from the file chooser.
-	 */
-	public int saveTSVDialog(int option) {
-		boolean saveSuccess = true;
-		File saveFile = showFileChooserDialog("Save Events, tab-delimited text", "Save", "Save .tsv file", "TSV files",
-				new String[] { "tsv" });
-		if (saveFile != null) {
-			saveFile = addExtensionToFile(saveFile, "tsv");
-			saveSuccess = tagger.saveTSVFile(saveFile);
-		}
-		return checkSaveSuccess(option, saveFile, saveSuccess);
-	}
-
-	/**
-	 * Adds a specified extension to a file.
-	 * 
-	 * @param file
-	 * @param extension
-	 * @return
-	 */
-	private File addExtensionToFile(File file, String extension) {
-		File fileWithExtension = new File(file.getAbsolutePath() + "." + extension);
-		return fileWithExtension;
-	}
-
-	/**
-	 * Shows a file chooser to select a Tagger Data XML file.
-	 * 
-	 * @param option
-	 *            The dialog option.
-	 * @return The file returned from the file chooser.
-	 */
-	public int loadTSVDialog(int option) {
-		boolean loadSuccess = true;
-		File loadFile = showFileChooserDialog("Load Events, tab-delimited text", "Load", "Load .tsv file", "TSV files",
-				new String[] { "tsv", "txt" });
-		if (loadFile != null) {
-			String[] tabSeparatedOptions = showTabSeparatedOptions();
-			if (tabSeparatedOptions.length == 3)
-				loadSuccess = tagger.loadTabDelimitedEvents(loadFile, Integer.parseInt(tabSeparatedOptions[0].trim()),
-						StringToIntArray(tabSeparatedOptions[1]), StringToIntArray(tabSeparatedOptions[2]));
-		}
-		return checkLoadSuccess(option, loadFile, loadSuccess);
 	}
 
 	/**
@@ -334,27 +122,6 @@ public class AppView extends ConstraintContainer {
 		@Override
 		public Font getFont() {
 			return FontsAndColors.headerFont;
-		}
-
-		/**
-		 * Performs the undo/redo action when the button is clicked.
-		 */
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			super.mouseClicked(e);
-			HistoryItem item = null;
-			if (undo) {
-				item = tagger.undo();
-			} else {
-				item = tagger.redo();
-			}
-			updateEgt();
-			updateTags();
-			hoverText = undo ? tagger.getUndoMessage() : tagger.getRedoMessage();
-			hoverMessage.setText(hoverText);
-			if (item != null) {
-				historyScroll(item);
-			}
 		}
 
 		private void historyScroll(HistoryItem item) {
@@ -388,6 +155,27 @@ public class AppView extends ConstraintContainer {
 				break;
 			default:
 				break;
+			}
+		}
+
+		/**
+		 * Performs the undo/redo action when the button is clicked.
+		 */
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			super.mouseClicked(e);
+			HistoryItem item = null;
+			if (undo) {
+				item = tagger.undo();
+			} else {
+				item = tagger.redo();
+			}
+			updateEventsPanel();
+			updateTags();
+			hoverText = undo ? tagger.getUndoMessage() : tagger.getRedoMessage();
+			hoverMessage.setText(hoverText);
+			if (item != null) {
+				historyScroll(item);
 			}
 		}
 
@@ -431,27 +219,7 @@ public class AppView extends ConstraintContainer {
 		return button;
 	}
 
-	private Loader loader;
-	private Tagger tagger;
-
-	private JFrame frame;
-	private JComponent shield = new JComponent() {
-	};
-
-	private JLabel eventsTitle = new JLabel("Events") {
-		@Override
-		public Font getFont() {
-			return FontsAndColors.headerFont;
-		}
-	};
 	private XButton addEvent = new XButton("add event") {
-		@Override
-		public Font getFont() {
-			return FontsAndColors.headerFont;
-		}
-	};
-
-	private XButton deselectAll = new XButton("deselect all") {
 		@Override
 		public Font getFont() {
 			return FontsAndColors.headerFont;
@@ -471,59 +239,22 @@ public class AppView extends ConstraintContainer {
 			return FontsAndColors.headerFont;
 		}
 	};
-	private JComponent eventsPanel = new JComponent() {
-	};
-	private JLayeredPane eventsScrollPane = new JLayeredPane();
-	private JLabel tagsTitle = new JLabel("Tags") {
+
+	private boolean autoCollapse = true;
+
+	private int autoCollapseDepth;
+
+	private XButton cancel = createMenuButton("cancel");
+
+	/**
+	 * Creates a collapse button.
+	 */
+	private XButton collapseAll = new XButton("collapse") {
 		@Override
 		public Font getFont() {
 			return FontsAndColors.headerFont;
 		}
 	};
-	private XScrollTextBox searchTags = new XScrollTextBox(new XTextBox()) {
-		@Override
-		public Font getFont() {
-			return FontsAndColors.contentFont;
-		}
-	};
-	private JPanel searchResults = new JPanel() {
-		@Override
-		protected void paintComponent(Graphics g) {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setColor(Color.white);
-			g2d.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
-			g2d.setColor(new Color(200, 200, 200));
-			g2d.draw(new Line2D.Double(6, 0, 6, getHeight() - 5));
-		}
-	};
-	private JPanel tagsPanel = new JPanel();
-	private JLabel hoverMessage = new JLabel();
-
-	private ScrollLayout tagsScrollLayout;
-
-	private JLayeredPane tagsScrollPane = new JLayeredPane();
-	private ContextMenu contextMenu;
-
-	private ConstraintContainer splitPaneLeft = new ConstraintContainer();
-	private ConstraintContainer splitPaneRight = new ConstraintContainer();
-
-	private XButton okay = createMenuButton("okay");
-	private XButton exit = createMenuButton("exit");
-	private XButton undo = new UndoRedoButton("undo", true);
-
-	private XButton redo = new UndoRedoButton("redo", false);
-	// private JFileChooser fileChooser = new JFileChooser();
-	private XButton load = createMenuButton("load");
-
-	private XButton save = createMenuButton("save");
-	private XButton zoomOut = createMenuButton("-");
-	private JLabel zoomPercent = new JLabel("100%", JLabel.CENTER) {
-		@Override
-		public Font getFont() {
-			return FontsAndColors.contentFont;
-		}
-	};
-	private XButton zoomIn = createMenuButton("+");
 
 	/**
 	 * Creates a collapse level label.
@@ -545,16 +276,27 @@ public class AppView extends ConstraintContainer {
 		}
 	};
 
-	/**
-	 * Creates a collapse button.
-	 */
-	private XButton collapseAll = new XButton("collapse") {
+	private ContextMenu contextMenu;
+
+	private XButton deselectAll = new XButton("deselect all") {
 		@Override
 		public Font getFont() {
 			return FontsAndColors.headerFont;
 		}
 	};
 
+	private JComponent eventsPanel = new JComponent() {
+	};
+
+	private JLayeredPane eventsScrollPane = new JLayeredPane();
+	private JLabel eventsTitle = new JLabel("Events") {
+		@Override
+		public Font getFont() {
+			return FontsAndColors.headerFont;
+		}
+	};
+
+	private XButton exit = createMenuButton("exit");
 	/**
 	 * Creates a expand button.
 	 */
@@ -565,13 +307,65 @@ public class AppView extends ConstraintContainer {
 		}
 	};
 
+	private JFrame frame;
+	private JLabel hoverMessage = new JLabel();
+
+	// private JFileChooser fileChooser = new JFileChooser();
+	private XButton load = createMenuButton("load");
+
+	private Loader loader;
+	private boolean isStandAloneVersion;
+
 	private Notification notification = new Notification();
-
-	private boolean autoCollapse = true;
-
-	private int autoCollapseDepth;
-
+	private XButton proceed = createMenuButton("proceed");
+	private XButton redo = new UndoRedoButton("redo", false);
+	private XButton save = createMenuButton("save");
+	private JPanel searchResults = new JPanel() {
+		@Override
+		protected void paintComponent(Graphics g) {
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setColor(Color.white);
+			g2d.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
+			g2d.setColor(new Color(200, 200, 200));
+			g2d.draw(new Line2D.Double(6, 0, 6, getHeight() - 5));
+		}
+	};
+	private XScrollTextBox searchTags = new XScrollTextBox(new XTextBox()) {
+		@Override
+		public Font getFont() {
+			return FontsAndColors.contentFont;
+		}
+	};
 	Set<Integer> selectedGroups = new HashSet<Integer>();
+	private JComponent shield = new JComponent() {
+	};
+
+	private ConstraintContainer splitPaneLeft = new ConstraintContainer();
+
+	private ConstraintContainer splitPaneRight = new ConstraintContainer();
+	private Tagger tagger;
+
+	private JPanel tagsPanel = new JPanel();
+	private String fMapPath;
+	private ScrollLayout tagsScrollLayout;
+
+	private JLayeredPane tagsScrollPane = new JLayeredPane();
+	private JLabel tagsTitle = new JLabel("Tags") {
+		@Override
+		public Font getFont() {
+			return FontsAndColors.headerFont;
+		}
+	};
+	private XButton undo = new UndoRedoButton("undo", true);
+	private XButton zoomIn = createMenuButton("+");
+
+	private XButton zoomOut = createMenuButton("-");
+	private JLabel zoomPercent = new JLabel("100%", JLabel.CENTER) {
+		@Override
+		public Font getFont() {
+			return FontsAndColors.contentFont;
+		}
+	};
 
 	/**
 	 * Constructor creates the GUI and sets up functionality of the buttons
@@ -584,13 +378,14 @@ public class AppView extends ConstraintContainer {
 	public AppView(Loader loader, final Tagger tagger, String frameTitle, boolean isStandAloneVersion) {
 		this.loader = loader;
 		this.tagger = tagger;
+		this.isStandAloneVersion = isStandAloneVersion;
 
 		autoCollapseDepth = loader.getInitialDepth();
 		createGui(isStandAloneVersion);
 
 		frame.setTitle(frameTitle);
 
-		okay.addMouseListener(new MouseAdapter() {
+		proceed.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				List<EventModel> missingReqTags = tagger.findMissingRequiredTags();
@@ -610,6 +405,21 @@ public class AppView extends ConstraintContainer {
 				}
 			}
 		});
+		cancel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (tagger.hedEdited()) {
+					ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.HED_XML_SAVE_Q);
+					int option = dialog.showDialog();
+					if (option == 0)
+						saveHEDXMLDialog(option);
+				}
+				AppView.this.loader.setSubmitted(false);
+				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+
+			}
+		});
+
 		exit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -647,7 +457,7 @@ public class AppView extends ConstraintContainer {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				selectedGroups.clear();
-				updateEgt();
+				updateEventsPanel();
 			}
 		});
 
@@ -659,7 +469,7 @@ public class AppView extends ConstraintContainer {
 					selectedGroups.clear();
 					selectedGroups.addAll(newSelectedGroups);
 				}
-				updateEgt();
+				updateEventsPanel();
 			}
 		});
 
@@ -751,7 +561,7 @@ public class AppView extends ConstraintContainer {
 				TaggedEvent event = tagger.addNewEvent(new String(), new String());
 				event.setInEdit(true);
 				event.setInFirstEdit(true);
-				updateEgt();
+				updateEventsPanel();
 				selectedGroups.clear();
 				selectedGroups.add(event.getEventGroupId());
 				AppView.this.scrollToEvent(event);
@@ -788,10 +598,68 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
+	 * Adds a specified extension to a file.
+	 * 
+	 * @param file
+	 * @param extension
+	 * @return
+	 */
+	private File addExtensionToFile(File file, String extension) {
+		File fileWithExtension = new File(file.getAbsolutePath() + "." + extension);
+		return fileWithExtension;
+	}
+
+	/**
 	 * Cancels the search, causing any search items displayed to disappear.
 	 */
 	public void cancelSearch() {
 		searchTags.getJTextArea().setText(new String());
+	}
+
+	/**
+	 * Checks if the file load was successful.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @param loadFile
+	 *            The file selected from the file chooser.
+	 * @param loadSuccess
+	 *            True if the file was loaded successful, false if otherwise.
+	 * @return -1 if a file was not selected or load failed, a different value
+	 *         if otherwise.
+	 */
+	private int checkLoadSuccess(int option, File loadFile, boolean loadSuccess) {
+		if (loadFile == null)
+			return -1;
+		if (!loadSuccess) {
+			AppView.this.showTaggerMessageDialog(MessageConstants.LOAD_ERROR, "Okay", null, null);
+			return -1;
+		}
+		refreshPanels();
+		return option;
+	}
+
+	/**
+	 * Checks if the file save was successful.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @param saveFile
+	 *            The file selected from the file chooser.
+	 * @param saveSuccess
+	 *            True if the file was saved successful, false if otherwise.
+	 * @return -1 if a file was not selected or save failed, a different value
+	 *         if otherwise.
+	 */
+	private int checkSaveSuccess(int option, File saveFile, boolean saveSuccess) {
+		if (saveFile == null) {
+			return -1;
+		}
+		if (!saveSuccess) {
+			AppView.this.showTaggerMessageDialog(MessageConstants.SAVE_ERROR, "Okay", null, null);
+			return -1;
+		}
+		return option;
 	}
 
 	/**
@@ -906,20 +774,20 @@ public class AppView extends ConstraintContainer {
 		splitPaneRight.add(tagsScrollPane, new Constraint("top:85 bottom:0 left:5 right:0"));
 
 		if (!isStandAloneVersion) {
-			add(okay, new Constraint("top:0 height:50 left:10 width:55"));
-			okay.setHoverForeground(Color.BLACK);
-			add(exit, new Constraint("top:0 height:50 left:70 width:80"));
-			exit.setHoverForeground(Color.BLACK);
-			add(load, new Constraint("top:0 height:50 left:175 width:55"));
+			add(proceed, new Constraint("top:0 height:50 left:0 width:120"));
+			proceed.setHoverForeground(Color.BLACK);
+			add(cancel, new Constraint("top:0 height:50 left:120 width:80"));
+			cancel.setHoverForeground(Color.BLACK);
+			add(load, new Constraint("top:0 height:50 left:290 width:55"));
 			load.setHoverForeground(Color.BLACK);
-			add(save, new Constraint("top:0 height:50 left:235 width:80"));
+			add(save, new Constraint("top:0 height:50 left:350 width:80"));
 			save.setHoverForeground(Color.BLACK);
 		} else {
-			add(exit, new Constraint("top:0 height:50 left:10 width:55"));
+			add(exit, new Constraint("top:0 height:50 left:0 width:55"));
 			exit.setHoverForeground(Color.BLACK);
-			add(load, new Constraint("top:0 height:50 left:70 width:80"));
+			add(load, new Constraint("top:0 height:50 left:290 width:55"));
 			load.setHoverForeground(Color.BLACK);
-			add(save, new Constraint("top:0 height:50 left:175 width:55"));
+			add(save, new Constraint("top:0 height:50 left:350 width:80"));
 			save.setHoverForeground(Color.BLACK);
 		}
 		add(undo, new Constraint("top:0 height:50 right:180 width:60"));
@@ -964,13 +832,65 @@ public class AppView extends ConstraintContainer {
 				super.dispose();
 			}
 		};
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frame.setSize(1024, 768);
 		frame.getContentPane().add(this);
 		frame.setVisible(true);
 
 		updateTags();
-		updateEgt();
+		updateEventsPanel();
+	}
+
+	public void expandToLevel(int depth) {
+		if (Integer.valueOf(collapseLevel.getJTextArea().getText()) < depth) {
+			autoCollapseDepth = depth;
+			autoCollapse = true;
+			collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
+			updateTags();
+		}
+	}
+
+	/**
+	 * Handles the loading of the data.
+	 */
+	private int handleLoad() {
+		FileFormatDialog dialog = new FileFormatDialog(frame, MessageConstants.OPEN_DATA_TYPE_Q, isStandAloneVersion);
+		int option = dialog.showDialog();
+		switch (option) {
+		case 1:
+			return loadHEDXMLDialog(option);
+		case 2:
+			return loadTSVDialog(option);
+		case 3:
+			return loadTaggerDataXMLDialog(option);
+		case 4:
+			return loadFieldMapDialog(option);
+		default:
+			dialog.dispose();
+			return 0;
+		}
+	}
+
+	/**
+	 * Handles the saving of the data.
+	 */
+	private int handleSave() {
+		// Get data type to save as
+		FileFormatDialog dialog = new FileFormatDialog(frame, MessageConstants.SAVE_DATA_TYPE_Q, isStandAloneVersion);
+		int option = dialog.showDialog();
+		switch (option) {
+		case 1:
+			return saveHEDXMLDialog(option);
+		case 2:
+			return saveTSVDialog(option);
+		case 3:
+			return saveTaggerDataXMLDialog(option);
+		case 4:
+			return saveFieldMapDialog(option);
+		default:
+			dialog.dispose();
+			return 0;
+		}
 	}
 
 	/**
@@ -979,6 +899,77 @@ public class AppView extends ConstraintContainer {
 	public void hideContextMenu() {
 		shield.remove(contextMenu);
 		shield.setVisible(false);
+	}
+
+	/**
+	 * Shows a file chooser to select a Tagger Data XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int loadHEDXMLDialog(int option) {
+		boolean loadSuccess = true;
+		File loadFile = showFileChooserDialog("Load HED XML", "Load", "Load .xml file", "XML files",
+				new String[] { "xml" });
+		if (loadFile != null)
+			loadSuccess = tagger.loadHED(loadFile);
+		return checkLoadSuccess(option, loadFile, loadSuccess);
+	}
+
+	/**
+	 * Shows a file chooser to select a Tagger Data XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int loadTaggerDataXMLDialog(int option) {
+		boolean loadSuccess = true;
+		File loadFile = showFileChooserDialog("Load Combined events + HED XML", "Load", "Load .xml file", "XML files",
+				new String[] { "xml" });
+		if (loadFile != null)
+			loadSuccess = tagger.loadEventsAndHED(loadFile);
+		return checkLoadSuccess(option, loadFile, loadSuccess);
+	}
+
+	/**
+	 * Shows a file chooser to select a Tagger Data XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int loadFieldMapDialog(int option) {
+		fMapPath = null;
+		File fMapFile = showFileChooserDialog("Load field map", "Load", "Load .mat file", ".m files",
+				new String[] { "m" });
+		if (fMapFile != null) {
+			fMapFile = addExtensionToFile(fMapFile, "mat");
+			fMapPath = fMapFile.getAbsolutePath();
+			loader.setNotified(true);
+		}
+		return option;
+	}
+
+	/**
+	 * Shows a file chooser to select a Tagger Data XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int loadTSVDialog(int option) {
+		boolean loadSuccess = true;
+		File loadFile = showFileChooserDialog("Load Events, tab-delimited text", "Load", "Load .tsv file", "TSV files",
+				new String[] { "tsv", "txt" });
+		if (loadFile != null) {
+			String[] tabSeparatedOptions = showTabSeparatedOptions();
+			if (tabSeparatedOptions.length == 3)
+				loadSuccess = tagger.loadTabDelimitedEvents(loadFile, Integer.parseInt(tabSeparatedOptions[0].trim()),
+						StringToIntArray(tabSeparatedOptions[1]), StringToIntArray(tabSeparatedOptions[2]));
+		}
+		return checkLoadSuccess(option, loadFile, loadSuccess);
 	}
 
 	/**
@@ -1003,64 +994,116 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
-	 * Scrolls to the position of the tag in the tags panel, if it exists. If
-	 * the tag is null, it displays a notification that the tag is not in the
-	 * hierarchy.
-	 * 
-	 * @param tag
+	 * Refreshes the event and tag panels.
 	 */
-	public void scrollToTag(AbstractTagModel tag) {
-		int offset = 100;
-		ScrollLayout layout = (ScrollLayout) tagsScrollPane.getLayout();
-		updateNotification(null, null);
-		AbstractTagModel parent = tagger.getTagModel(tag.getParentPath() + "/#");
-		AbstractTagModel extensionAllowedAncestor = tagger.getExtensionAllowedAncestor(tag.getPath());
-		GuiTagModel gtm = null;
-		if (extensionAllowedAncestor != null) {
-			gtm = (GuiTagModel) extensionAllowedAncestor;
-		} else if (parent != null && parent.takesValue()) {
-			gtm = (GuiTagModel) parent;
-		} else {
-			gtm = (GuiTagModel) tag;
-		}
-		expandToLevel(gtm.getDepth());
-		TagView tagView = gtm.getTagView();
-		int y = Math.max(0, tagView.getY() - offset);
-		layout.scrollTo(y);
-		tagView.highlight();
+	private void refreshPanels() {
+		selectedGroups.clear();
+		updateEventsPanel();
+		autoCollapse = true;
+		updateTags();
 	}
 
-	public void expandToLevel(int depth) {
-		if (Integer.valueOf(collapseLevel.getJTextArea().getText()) < depth) {
-			autoCollapseDepth = depth;
-			autoCollapse = true;
-			collapseLevel.getJTextArea().setText(Integer.toString(autoCollapseDepth));
-			updateTags();
-		}
+	public void repaintEventsPanel() {
+		eventsPanel.validate();
+		eventsPanel.repaint();
 	}
 
-	public void scrollToLastSelectedGroup() {
-		int offset = 100;
-		Iterator<Integer> selectedGroupsIterator = selectedGroups.iterator();
-		int lastSelectedGroup = 0;
-		while (selectedGroupsIterator.hasNext()) {
-			lastSelectedGroup = selectedGroupsIterator.next().intValue();
+	public void repaintEventsScrollPane() {
+		eventsScrollPane.repaint();
+	}
+
+	public void repaintTagsScrollPane() {
+		tagsScrollPane.repaint();
+	}
+
+	/**
+	 * Shows a file chooser to select a HED XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int saveHEDXMLDialog(int option) {
+		boolean saveSuccess = true;
+		File saveFile = showFileChooserDialog("Save HED XML", "Save", "Save .xml file", "XML files",
+				new String[] { "xml" });
+		if (saveFile != null) {
+			saveFile = addExtensionToFile(saveFile, "xml");
+			saveSuccess = tagger.saveHED(saveFile);
 		}
+		return checkSaveSuccess(option, saveFile, saveSuccess);
+	}
+
+	/**
+	 * Shows a file chooser to select a HED XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int saveFieldMapDialog(int option) {
+		fMapPath = null;
+		File fMapFile = showFileChooserDialog("Save field map", "Save", "Save .mat file", ".mat files",
+				new String[] { "xml" });
+		if (fMapFile != null) {
+			fMapFile = addExtensionToFile(fMapFile, "mat");
+			fMapPath = fMapFile.getAbsolutePath();
+		}
+		return option;
+	}
+
+	/**
+	 * Shows a file chooser to select a Tagger Data XML file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int saveTaggerDataXMLDialog(int option) {
+		boolean saveSuccess = true;
+		File saveFile = showFileChooserDialog("Save Combined events + HED XML", "Save", "Save .xml file", "XML files",
+				new String[] { "xml" });
+		if (saveFile != null) {
+			saveFile = addExtensionToFile(saveFile, "xml");
+			saveSuccess = tagger.saveEventsAndHED(saveFile);
+		}
+		return checkSaveSuccess(option, saveFile, saveSuccess);
+	}
+
+	/**
+	 * Shows a file chooser to select a tab-delimited file.
+	 * 
+	 * @param option
+	 *            The dialog option.
+	 * @return The file returned from the file chooser.
+	 */
+	public int saveTSVDialog(int option) {
+		boolean saveSuccess = true;
+		File saveFile = showFileChooserDialog("Save Events, tab-delimited text", "Save", "Save .tsv file", "TSV files",
+				new String[] { "tsv" });
+		if (saveFile != null) {
+			saveFile = addExtensionToFile(saveFile, "tsv");
+			saveSuccess = tagger.saveTSVFile(saveFile);
+		}
+		return checkSaveSuccess(option, saveFile, saveSuccess);
+	}
+
+	public void scrollToEvent(TaggedEvent event) {
+		int offset = 100;
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
 		updateNotification(null, null);
-		TaggedEvent event = tagger.getTaggedEventFromGroupId(lastSelectedGroup);
-		if (event.getEventGroupId() != lastSelectedGroup) {
-			GroupView groupView = event.getGroupViewByKey(lastSelectedGroup);
-			int y = Math.max(0, groupView.getY() - offset);
-			layout.scrollTo(y);
-			groupView.highlight();
-		} else {
-			EventView groupView = event.getEventView();
-			int y = Math.max(0, groupView.getY() - offset);
-			layout.scrollTo(y);
-			groupView.highlight();
-		}
+		EventView eventView = event.getEventView();
+		int y = Math.max(0, eventView.getY() - offset);
+		layout.scrollTo(y);
+		eventView.highlight();
+	}
 
+	public void scrollToEventGroup(TaggedEvent event) {
+		int offset = event.getEventView().getHeight() + event.findNumberOfTagsInEvents() * 27;
+		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
+		updateNotification(null, null);
+		int y = Math.max(0, event.getEventView().getY() + offset);
+		layout.scrollTo(y);
 	}
 
 	public void scrollToEventTag(GuiTagModel tag) {
@@ -1100,22 +1143,28 @@ public class AppView extends ConstraintContainer {
 		}
 	}
 
-	public void scrollToEvent(TaggedEvent event) {
+	public void scrollToLastSelectedGroup() {
 		int offset = 100;
+		Iterator<Integer> selectedGroupsIterator = selectedGroups.iterator();
+		int lastSelectedGroup = 0;
+		while (selectedGroupsIterator.hasNext()) {
+			lastSelectedGroup = selectedGroupsIterator.next().intValue();
+		}
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
 		updateNotification(null, null);
-		EventView eventView = event.getEventView();
-		int y = Math.max(0, eventView.getY() - offset);
-		layout.scrollTo(y);
-		eventView.highlight();
-	}
+		TaggedEvent event = tagger.getTaggedEventFromGroupId(lastSelectedGroup);
+		if (event.getEventGroupId() != lastSelectedGroup) {
+			GroupView groupView = event.getGroupViewByKey(lastSelectedGroup);
+			int y = Math.max(0, groupView.getY() - offset);
+			layout.scrollTo(y);
+			groupView.highlight();
+		} else {
+			EventView groupView = event.getEventView();
+			int y = Math.max(0, groupView.getY() - offset);
+			layout.scrollTo(y);
+			groupView.highlight();
+		}
 
-	public void scrollToEventGroup(TaggedEvent event) {
-		int offset = event.getEventView().getHeight() + event.findNumberOfTagsInEvents() * 27;
-		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
-		updateNotification(null, null);
-		int y = Math.max(0, event.getEventView().getY() + offset);
-		layout.scrollTo(y);
 	}
 
 	public void scrollToNewGroup(TaggedEvent event, int groupId) {
@@ -1129,6 +1178,34 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
+	 * Scrolls to the position of the tag in the tags panel, if it exists. If
+	 * the tag is null, it displays a notification that the tag is not in the
+	 * hierarchy.
+	 * 
+	 * @param tag
+	 */
+	public void scrollToTag(AbstractTagModel tag) {
+		int offset = 100;
+		ScrollLayout layout = (ScrollLayout) tagsScrollPane.getLayout();
+		updateNotification(null, null);
+		AbstractTagModel parent = tagger.getTagModel(tag.getParentPath() + "/#");
+		AbstractTagModel extensionAllowedAncestor = tagger.getExtensionAllowedAncestor(tag.getPath());
+		GuiTagModel gtm = null;
+		if (extensionAllowedAncestor != null) {
+			gtm = (GuiTagModel) extensionAllowedAncestor;
+		} else if (parent != null && parent.takesValue()) {
+			gtm = (GuiTagModel) parent;
+		} else {
+			gtm = (GuiTagModel) tag;
+		}
+		expandToLevel(gtm.getDepth());
+		TagView tagView = gtm.getTagView();
+		int y = Math.max(0, tagView.getY() - offset);
+		layout.scrollTo(y);
+		tagView.highlight();
+	}
+
+	/**
 	 * Shows a dialog for the user to enter basic event information (code and
 	 * label) and has the tagger create this event.
 	 */
@@ -1137,7 +1214,7 @@ public class AppView extends ConstraintContainer {
 		String[] eventFields = dialog.showDialog();
 		if (eventFields != null) {
 			TaggedEvent event = tagger.addNewEvent(eventFields[0], eventFields[1]);
-			updateEgt();
+			updateEventsPanel();
 			if (event == null) {
 				showTaggerMessageDialog(MessageConstants.ADD_EVENT_ERROR, "Okay", null, null);
 			} else {
@@ -1303,7 +1380,7 @@ public class AppView extends ConstraintContainer {
 		TagChooserDialog dialog = new TagChooserDialog(frame, this, tagger, tags);
 		AbstractTagModel result = dialog.showDialog();
 		updateTags();
-		updateEgt();
+		updateEventsPanel();
 		return result;
 	}
 
@@ -1370,10 +1447,10 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
-	 * Updates the EGT panel with the information currently represented by the
-	 * tagger.
+	 * Updates the events panel with the information currently represented by
+	 * the Tagger.
 	 */
-	public void updateEgt() {
+	public void updateEventsPanel() {
 		pruneSelectedGroups();
 		eventsPanel.removeAll();
 		int top = 0;
@@ -1473,11 +1550,6 @@ public class AppView extends ConstraintContainer {
 		repaint();
 	}
 
-	public void repaintEventsPanel() {
-		eventsPanel.validate();
-		eventsPanel.repaint();
-	}
-
 	/**
 	 * Updates the notification at the top of the GUI the the given preview and
 	 * details
@@ -1550,14 +1622,6 @@ public class AppView extends ConstraintContainer {
 		validate();
 		repaint();
 		autoCollapse = false;
-	}
-
-	public void repaintTagsScrollPane() {
-		tagsScrollPane.repaint();
-	}
-
-	public void repaintEventsScrollPane() {
-		eventsScrollPane.repaint();
 	}
 
 	/**
