@@ -103,12 +103,12 @@ public class AppView extends ConstraintContainer {
 	 * This class represents the undo and redo buttons.
 	 * 
 	 */
-	private class UndoRedoButton extends XButton implements MouseListener {
+	private class HistoryButton extends XButton implements MouseListener {
 
 		String hoverText;
 		boolean undo;
 
-		public UndoRedoButton(String textArg, boolean undo) {
+		public HistoryButton(String textArg, boolean undo) {
 			super(textArg);
 			this.undo = undo;
 			setNormalBackground(FontsAndColors.MENU_NORMAL_BG);
@@ -119,6 +119,9 @@ public class AppView extends ConstraintContainer {
 			setPressedForeground(FontsAndColors.MENU_PRESSED_FG);
 		}
 
+		/**
+		 * Gets the font type
+		 */
 		@Override
 		public Font getFont() {
 			return FontsAndColors.headerFont;
@@ -195,6 +198,9 @@ public class AppView extends ConstraintContainer {
 			hoverMessage.setVisible(true);
 		}
 
+		/**
+		 * The mouse exited event listener.
+		 */
 		@Override
 		public void mouseExited(MouseEvent e) {
 			super.mouseExited(e);
@@ -202,8 +208,15 @@ public class AppView extends ConstraintContainer {
 		}
 	}
 
-	public static XButton createMenuButton(String text) {
-		XButton button = new XButton(text) {
+	/**
+	 * Creates the menu buttons
+	 * 
+	 * @param label
+	 *            The menu button label.
+	 * @return The button object with the specified label.
+	 */
+	public static XButton createMenuButton(String label) {
+		XButton button = new XButton(label) {
 			@Override
 			public Font getFont() {
 				return FontsAndColors.headerFont;
@@ -318,7 +331,7 @@ public class AppView extends ConstraintContainer {
 
 	private Notification notification = new Notification();
 	private XButton proceed = createMenuButton("proceed");
-	private XButton redo = new UndoRedoButton("redo", false);
+	private XButton redo = new HistoryButton("redo", false);
 	private XButton save = createMenuButton("save");
 	private JPanel searchResults = new JPanel() {
 		@Override
@@ -356,7 +369,7 @@ public class AppView extends ConstraintContainer {
 			return FontsAndColors.headerFont;
 		}
 	};
-	private XButton undo = new UndoRedoButton("undo", true);
+	private XButton undo = new HistoryButton("undo", true);
 	private XButton zoomIn = createMenuButton("+");
 
 	private XButton zoomOut = createMenuButton("-");
@@ -408,14 +421,12 @@ public class AppView extends ConstraintContainer {
 		cancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (tagger.hedEdited()) {
-					ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.HED_XML_SAVE_Q);
-					int option = dialog.showDialog();
-					if (option == 0)
-						saveHEDXMLDialog(option);
+				ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.CANCEL_Q);
+				int option = dialog.showDialog();
+				if (option == 0) {
+					AppView.this.loader.setSubmitted(false);
+					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				}
-				AppView.this.loader.setSubmitted(false);
-				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 
 			}
 		});
@@ -601,8 +612,10 @@ public class AppView extends ConstraintContainer {
 	 * Adds a specified extension to a file.
 	 * 
 	 * @param file
+	 *            A File object.
 	 * @param extension
-	 * @return
+	 *            The extension that is appended to the file.
+	 * @return A new File object that has the appended extension.
 	 */
 	private File addExtensionToFile(File file, String extension) {
 		File fileWithExtension = new File(file.getAbsolutePath() + "." + extension);
@@ -828,8 +841,12 @@ public class AppView extends ConstraintContainer {
 		frame = new JFrame() {
 			@Override
 			public void dispose() {
-				loader.setNotified(true);
-				super.dispose();
+				ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.CANCEL_Q);
+				int option = dialog.showDialog();
+				if (option == 0) {
+					loader.setNotified(true);
+					super.dispose();
+				}
 			}
 		};
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -994,7 +1011,7 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
-	 * Refreshes the event and tag panels.
+	 * Repaints the tags and events panel.
 	 */
 	private void refreshPanels() {
 		selectedGroups.clear();
@@ -1003,15 +1020,24 @@ public class AppView extends ConstraintContainer {
 		updateTags();
 	}
 
+	/**
+	 * Repaints the events panel.
+	 */
 	public void repaintEventsPanel() {
 		eventsPanel.validate();
 		eventsPanel.repaint();
 	}
 
+	/**
+	 * Repaints the events scroll pane.
+	 */
 	public void repaintEventsScrollPane() {
 		eventsScrollPane.repaint();
 	}
 
+	/**
+	 * Repaints the tags scroll pane.
+	 */
 	public void repaintTagsScrollPane() {
 		tagsScrollPane.repaint();
 	}
@@ -1053,7 +1079,7 @@ public class AppView extends ConstraintContainer {
 	}
 
 	/**
-	 * Shows a file chooser to select a Tagger Data XML file.
+	 * Shows a file chooser to select a TaggerData XML file.
 	 * 
 	 * @param option
 	 *            The dialog option.
@@ -1088,6 +1114,12 @@ public class AppView extends ConstraintContainer {
 		return checkSaveSuccess(option, saveFile, saveSuccess);
 	}
 
+	/**
+	 * Scrolls to a particular event.
+	 * 
+	 * @param event
+	 *            The event that is scrolled to.
+	 */
 	public void scrollToEvent(TaggedEvent event) {
 		int offset = 100;
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
@@ -1098,6 +1130,12 @@ public class AppView extends ConstraintContainer {
 		eventView.highlight();
 	}
 
+	/**
+	 * Scrolls to an event group.
+	 * 
+	 * @param event
+	 *            The event that the group belongs to.
+	 */
 	public void scrollToEventGroup(TaggedEvent event) {
 		int offset = event.getEventView().getHeight() + event.findNumberOfTagsInEvents() * 27;
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
@@ -1106,6 +1144,12 @@ public class AppView extends ConstraintContainer {
 		layout.scrollTo(y);
 	}
 
+	/**
+	 * Scrolls to a particular tag in a event.
+	 * 
+	 * @param tag
+	 *            The tag that is scrolled to in the event.
+	 */
 	public void scrollToEventTag(GuiTagModel tag) {
 		if (selectedGroups.size() > 0) {
 			int offset = 100;
@@ -1143,6 +1187,9 @@ public class AppView extends ConstraintContainer {
 		}
 	}
 
+	/**
+	 * Scrolls to the last selected group when a new tag is added.
+	 */
 	public void scrollToLastSelectedGroup() {
 		int offset = 100;
 		Iterator<Integer> selectedGroupsIterator = selectedGroups.iterator();
@@ -1167,6 +1214,14 @@ public class AppView extends ConstraintContainer {
 
 	}
 
+	/**
+	 * Scrolls to a newly created group.
+	 * 
+	 * @param event
+	 *            The event that contains the new group.
+	 * @param groupId
+	 *            The id of the new group.
+	 */
 	public void scrollToNewGroup(TaggedEvent event, int groupId) {
 		int offset = event.getEventView().getHeight() + event.findNumberOfTagsInEvents() * 27;
 		ScrollLayout layout = (ScrollLayout) eventsScrollPane.getLayout();
@@ -1183,6 +1238,7 @@ public class AppView extends ConstraintContainer {
 	 * hierarchy.
 	 * 
 	 * @param tag
+	 *            The tag that is scrolled to.
 	 */
 	public void scrollToTag(AbstractTagModel tag) {
 		int offset = 100;
@@ -1293,6 +1349,7 @@ public class AppView extends ConstraintContainer {
 	 * identifies which event and group they are in.
 	 * 
 	 * @param message
+	 *            The message shown in the descendant dialog.
 	 */
 	public void showDescendantDialog(ToggleTagMessage message) {
 		TagDisplayDialog dialog = new TagDisplayDialog(frame, message.descendants, MessageConstants.DESCENDANT, null,
@@ -1304,6 +1361,7 @@ public class AppView extends ConstraintContainer {
 	 * Shows a file chooser dialog with the given message.
 	 * 
 	 * @param message
+	 *            The message shown in the file chooser dialog.
 	 * @return The File chosen, or null if no file was chosen.
 	 */
 	public File showFileChooserDialog(String dialogTitle, String approveButton, String approveButtonToolTip,
@@ -1326,12 +1384,13 @@ public class AppView extends ConstraintContainer {
 	 * Shows a dialog with a message containing required tags that are missing
 	 * from events.
 	 * 
-	 * @param missingReqTags
+	 * @param missingTags
+	 *            The missing required tags.
 	 * @return True if the user chooses to exit anyway, and false if the user
 	 *         chooses cancel.
 	 */
-	public boolean showRequiredMissingDialog(List<EventModel> missingReqTags) {
-		TagDisplayDialog dialog = new TagDisplayDialog(frame, missingReqTags, MessageConstants.MISSING_REQUIRED,
+	public boolean showRequiredMissingDialog(List<EventModel> missingTags) {
+		TagDisplayDialog dialog = new TagDisplayDialog(frame, missingTags, MessageConstants.MISSING_REQUIRED,
 				MessageConstants.EXIT_Q, true, "Okay", "Warning");
 		return dialog.showDialog();
 	}
@@ -1340,7 +1399,7 @@ public class AppView extends ConstraintContainer {
 	 * Shows a tab separated option dialog
 	 * 
 	 * @return A string array containing the header lines, event code column,
-	 *         and the tag column
+	 *         and the tag column.
 	 */
 	public String[] showTabSeparatedOptions() {
 		JTextField field1 = new JTextField("1");
@@ -1422,6 +1481,7 @@ public class AppView extends ConstraintContainer {
 	 * groups and identifies which event and group they are in.
 	 * 
 	 * @param message
+	 *            The message that shows up in the dialog.
 	 */
 	public void showUniqueDialog(ToggleTagMessage message) {
 		String text = MessageConstants.UNIQUE + message.uniqueKey.getPath() + ":";
