@@ -5,7 +5,7 @@
 %   >>  [response, primary] = tagdlg(fieldname, fieldValues)
 %
 % Description:
-% [response, primary] = tagdlg(fieldname, fieldValues) brings up a GUI 
+% [response, primary] = tagdlg(fieldname, fieldValues) brings up a GUI
 % that is a helper for selectmaps
 %
 % Function documentation:
@@ -63,6 +63,7 @@ elseif iscellstr(fieldValues)
 end
 inputFig = figure( ...
     'MenuBar', 'none', ...
+    'Color',[.94 .94 .94],...
     'Name', theTitle, ...
     'NextPlot', 'add', ...
     'NumberTitle','off', ...
@@ -127,9 +128,10 @@ uiwait(inputFig);
             'Units','normalized', ...
             'Position', [0.01 0.5 0.9 0.3]);
         set(primaryCtrl, 'Value', get(primaryCtrl, 'Max'));
-    end
+    end % createPrimaryFieldPanel
 
     function createValuePanel(fieldname)
+        % Create panel that displays field values
         valuePanel = uipanel('Title', ...
             ['The ' fieldname ' field has values:'], ...
             'BackgroundColor',[.94 .94 .94],...
@@ -143,10 +145,6 @@ uiwait(inputFig);
             'Callback', @primaryCallback, ...
             'Position', [0.05 0.1 0.1 0.8]);
     end
-
-    function saveAllCallback(src, eventdata) %#ok<INUSD>
-        primary = get(src, 'Max') == get(src, 'Value');
-    end % saveAllCallback
 
     function buttonCallback(src, eventdata, responseValue) %#ok<INUSL>
         % Callback for browse button sets a directory for control
