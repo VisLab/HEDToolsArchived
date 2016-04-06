@@ -309,7 +309,7 @@ public class AppView extends ConstraintContainer {
 		}
 	};
 
-	private XButton exit = createMenuButton("exit");
+	private XButton close = createMenuButton("close");
 	/**
 	 * Creates a expand button.
 	 */
@@ -323,7 +323,6 @@ public class AppView extends ConstraintContainer {
 	private JFrame frame;
 	private JLabel hoverMessage = new JLabel();
 
-	// private JFileChooser fileChooser = new JFileChooser();
 	private XButton load = createMenuButton("load");
 
 	private Loader loader;
@@ -394,7 +393,7 @@ public class AppView extends ConstraintContainer {
 		this.isStandAloneVersion = isStandAloneVersion;
 
 		autoCollapseDepth = loader.getInitialDepth();
-		createGui(isStandAloneVersion);
+		createGui();
 
 		frame.setTitle(frameTitle);
 
@@ -408,41 +407,22 @@ public class AppView extends ConstraintContainer {
 				}
 				if (exit) {
 					AppView.this.loader.setSubmitted(true);
-					if (tagger.hedEdited()) {
-						ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.HED_XML_SAVE_Q);
-						int option = dialog.showDialog();
-						if (option == 0)
-							saveHEDXMLDialog(option);
-					}
-					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+					System.exit(0);
 				}
 			}
 		});
+
 		cancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.CANCEL_Q);
-				int option = dialog.showDialog();
-				if (option == 0) {
-					AppView.this.loader.setSubmitted(false);
-					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-				}
-
+				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			}
 		});
 
-		exit.addMouseListener(new MouseAdapter() {
+		close.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (tagger.hedEdited()) {
-					ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.HED_XML_SAVE_Q);
-					int option = dialog.showDialog();
-					if (option == 0)
-						saveHEDXMLDialog(option);
-				}
-				AppView.this.loader.setSubmitted(false);
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-
 			}
 		});
 		load.addMouseListener(new LoadMouseListener());
@@ -679,7 +659,7 @@ public class AppView extends ConstraintContainer {
 	 * Creates the GUI for the application and makes it visible. Updates the tag
 	 * and event panels with information from the Tagger.
 	 */
-	public void createGui(boolean isStandAloneVersion) {
+	public void createGui() {
 
 		setLayout(new ConstraintLayout());
 		setOpaque(true);
@@ -796,8 +776,8 @@ public class AppView extends ConstraintContainer {
 			add(save, new Constraint("top:0 height:50 left:350 width:80"));
 			save.setHoverForeground(Color.BLACK);
 		} else {
-			add(exit, new Constraint("top:0 height:50 left:0 width:55"));
-			exit.setHoverForeground(Color.BLACK);
+			add(close, new Constraint("top:0 height:50 left:0 width:55"));
+			close.setHoverForeground(Color.BLACK);
 			add(load, new Constraint("top:0 height:50 left:290 width:55"));
 			load.setHoverForeground(Color.BLACK);
 			add(save, new Constraint("top:0 height:50 left:350 width:80"));
@@ -841,11 +821,14 @@ public class AppView extends ConstraintContainer {
 		frame = new JFrame() {
 			@Override
 			public void dispose() {
-				ExitSaveDialog dialog = new ExitSaveDialog(frame, MessageConstants.CANCEL_Q);
+				String message = MessageConstants.CANCEL_Q;
+				if (isStandAloneVersion)
+					message = MessageConstants.CLOSE_Q;
+				ExitSaveDialog dialog = new ExitSaveDialog(frame, message);
 				int option = dialog.showDialog();
 				if (option == 0) {
 					loader.setNotified(true);
-					super.dispose();
+					System.exit(0);
 				}
 			}
 		};
