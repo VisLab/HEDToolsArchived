@@ -13,8 +13,7 @@ warning off all;
 try
     javaaddpath([jarPath 'ctagger.jar']);
     javaaddpath([jarPath 'jackson.jar']);
-    javaaddpath([jarPath 'postgresql-9.2-1002.jdbc4.jar']);
-catch mex 
+catch mex
 end
 warning on all;
 
@@ -27,7 +26,7 @@ if ~isempty(wPath)
     return;
 end
 
-% See if ctagger has been installed as an EEGLAB plugin  
+% See if ctagger has been installed as an EEGLAB plugin
 p = strfind(configPath, 'plugins');
 if isempty(p)
     PLUG_PATH = '';
@@ -35,19 +34,19 @@ else
     PLUG_PATH = configPath(1:p-2);
 end
 if ~isempty(PLUG_PATH)
-    fprintf('Adding default EEGLAB path %s\n', PLUG_PATH);   
+    fprintf('Adding default EEGLAB path %s\n', PLUG_PATH);
     addpath(genpath(PLUG_PATH));
     return;
 end
 
 % See if user has hardcoded in a path
-EEGLAB_PATH = '';  % Give full path of eeglab installation if not using as plugin 
+EEGLAB_PATH = '';  % Give full path of eeglab installation if not using as plugin
 if isdir(EEGLAB_PATH)
-    fprintf('Adding default EEGLAB path %s\n', EEGLAB_PATH);   
+    fprintf('Adding default EEGLAB path %s\n', EEGLAB_PATH);
     addpath(genpath(EEGLAB_PATH));
     return;
 end
 
 warning('setup:NoEEGLAB', ...
-        ['Edit setup.m so that EEGLABPath is the full pathname ' ...
-         'of directory containing EEGLAB if you want to use EEGLAB']);
+    ['Edit setup.m so that EEGLABPath is the full pathname ' ...
+    'of directory containing EEGLAB if you want to use EEGLAB']);
