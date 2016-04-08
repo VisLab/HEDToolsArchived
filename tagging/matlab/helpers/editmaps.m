@@ -93,10 +93,11 @@ end
                 k = 1;
             end
         elseif ~loader.isSubmitted()
-            cancel = true;
-        else
-            updateFieldMap(field, xml, taggedList);
+                        updateFieldMap(field, xml, taggedList);
             k = k + 1;
+        else
+
+            cancel = true;
         end
     end % editmap
 
