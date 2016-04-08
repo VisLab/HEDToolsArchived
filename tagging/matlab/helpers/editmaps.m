@@ -92,11 +92,10 @@ end
             if loader.isStartOver()
                 k = 1;
             end
-        elseif ~loader.isSubmitted()
-                        updateFieldMap(field, xml, taggedList);
+        elseif loader.isSubmitted()
+            updateFieldMap(field, xml, taggedList);
             k = k + 1;
         else
-
             cancel = true;
         end
     end % editmap

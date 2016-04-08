@@ -154,7 +154,7 @@ function [fMap, fPaths, excluded] = tagdir(inDir, varargin)
     if ~isempty(baseTags) && ~isempty(p.Fields)
         excluded = setdiff(baseTags.getFields(), p.Fields);
     end;
-    fMap.merge(baseTags, 'Merge', excluded);
+    fMap.merge(baseTags, 'Merge', excluded, p.Fields);
 
     if p.SelectOption
         fprintf('\n---Now select the fields you want to tag---\n');
