@@ -56,7 +56,7 @@
 % $Initial version $
 %
 
-function fMap = editmaps(fMap, varargin)
+function [fMap, canceled] = editmaps(fMap, varargin)
 % Check the input arguments for validity and initialize
 parser = inputParser;
 parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
@@ -72,9 +72,9 @@ permissions = 0;
 initialDepth = 3;
 isStandAloneVersion = false;
 fields = fMap.getFields();
-cancel = false;
+canceled = false;
 k = 1;
-while (~cancel && k <= length(fields))
+while (~canceled && k <= length(fields))
     fprintf('Tagging %s\n', fields{k});
     editmap(fields{k});
 end
@@ -96,7 +96,7 @@ end
             updateFieldMap(field, xml, taggedList);
             k = k + 1;
         else
-            cancel = true;
+            canceled = true;
         end
     end % editmap
 

@@ -96,60 +96,62 @@
 
 function [EEG, fMap, excluded] = tageeg(EEG, varargin)
 % Parse the input arguments
-    parser = inputParser;
-    parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
-    parser.addParamValue('BaseMap', '', ...
-        @(x)(isempty(x) || ischar(x) || isa(x, 'fieldMap')));
-    parser.addParamValue('EditXml', false, @islogical);
-    parser.addParamValue('ExcludeFields', ...
-        {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
-        @(x) (iscellstr(x)));
-    parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-    parser.addParamValue('PreservePrefix', false, @islogical);
-    parser.addParamValue('RewriteOption', 'both', ...
-        @(x) any(validatestring(lower(x), ...
-        {'Both', 'Individual', 'None', 'Summary'})));
-    parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || (ischar(x))));
-    parser.addParamValue('SelectOption', true, @islogical);
-    parser.addParamValue('Synchronize', false, @islogical);
-    parser.addParamValue('UseGui', true, @islogical);
-    parser.parse(EEG, varargin{:});
-    p = parser.Results;
+parser = inputParser;
+parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
+parser.addParamValue('BaseMap', '', ...
+    @(x)(isempty(x) || ischar(x) || isa(x, 'fieldMap')));
+parser.addParamValue('EditXml', false, @islogical);
+parser.addParamValue('ExcludeFields', ...
+    {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
+    @(x) (iscellstr(x)));
+parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+parser.addParamValue('PreservePrefix', false, @islogical);
+parser.addParamValue('RewriteOption', 'both', ...
+    @(x) any(validatestring(lower(x), ...
+    {'Both', 'Individual', 'None', 'Summary'})));
+parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || (ischar(x))));
+parser.addParamValue('SelectOption', true, @islogical);
+parser.addParamValue('Synchronize', false, @islogical);
+parser.addParamValue('UseGui', true, @islogical);
+parser.parse(EEG, varargin{:});
+p = parser.Results;
 
-    % Get the existing tags for the EEG
-    fMap = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
-        'ExcludeFields', p.ExcludeFields, 'Fields', p.Fields);
+% Get the existing tags for the EEG
+fMap = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
+    'ExcludeFields', p.ExcludeFields, 'Fields', p.Fields);
 
-    % Exclude the appropriate tags from baseTags
-    excluded = p.ExcludeFields;
-    if isa(p.BaseMap, 'fieldMap')
-        baseTags = p.BaseMap;
-    else
-        baseTags = fieldMap.loadFieldMap(p.BaseMap);
-    end
-    if ~isempty(baseTags) && ~isempty(p.Fields)
-        excluded = setdiff(baseTags.getFields(), p.Fields);
-    end;
-    fMap.merge(baseTags, 'Merge', excluded, p.Fields);
-    if p.SelectOption
-        fprintf('\n---Now select the fields you want to tag---\n');
-        [fMap, exc] = selectmaps(fMap, 'Fields', p.Fields);
-        excluded = union(excluded, exc);
-    end
+% Exclude the appropriate tags from baseTags
+excluded = p.ExcludeFields;
+if isa(p.BaseMap, 'fieldMap')
+    baseTags = p.BaseMap;
+else
+    baseTags = fieldMap.loadFieldMap(p.BaseMap);
+end
+if ~isempty(baseTags) && ~isempty(p.Fields)
+    excluded = setdiff(baseTags.getFields(), p.Fields);
+end;
+fMap.merge(baseTags, 'Merge', excluded, p.Fields);
+if p.SelectOption
+    fprintf('\n---Now select the fields you want to tag---\n');
+    [fMap, exc] = selectmaps(fMap, 'Fields', p.Fields);
+    excluded = union(excluded, exc);
+end
 
-    if p.UseGui
-    fMap = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
+if p.UseGui
+    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
         p.PreservePrefix, 'Synchronize', p.Synchronize);
-    end
+end
 
+if ~canceled
     % Save the fieldmap
     if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
         warning('tageeg:invalidFile', ...
             ['Couldn''t save fieldMap to ' p.SaveMapFile]);
     end
-
+    
     % Now finish writing the tags to the EEG structure
     EEG = writetags(EEG, fMap, 'ExcludeFields', excluded, ...
         'PreservePrefix', p.PreservePrefix, ...
         'RewriteOption', p.RewriteOption);
+end
 end % tageeg

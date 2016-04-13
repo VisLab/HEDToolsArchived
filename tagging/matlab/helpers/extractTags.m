@@ -6,7 +6,6 @@ usertags = {EEG.event.('usertags')};
 uniqueValues = unique(cellfun(@num2str, values, 'UniformOutput', false));  % sample data 'rt' and 'square' for 'type'
 uniqueValues = uniqueValues(~cellfun(@isempty, uniqueValues));
 values = cellfun(@num2str, values, 'UniformOutput', false);
-% leftoverTags = TagList();
 for k = 1:length(uniqueValues)
     theseValues = strcmpi(uniqueValues{k}, values); % events with this type
     theseTags = usertags(theseValues);
@@ -17,10 +16,7 @@ for k = 1:length(uniqueValues)
             newList = tagList(uniqueValues{k});
             newList.addString(theseTags{j});
             myTagList.intersect(newList);
-            %         leftoverTags.union(newList);
         end
     end
     tMap.addValue(myTagList);
 end
-%leftoverTags that didn't appear in the tMap
-
