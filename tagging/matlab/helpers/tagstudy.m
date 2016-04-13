@@ -22,7 +22,7 @@
 % .set files that were affected.
 %
 %
-% [fMap, fPaths, excluded] = tagstudy(studyFile, 'key1', 'value1', ...) 
+% [fMap, fPaths, excluded] = tagstudy(studyFile, 'key1', 'value1', ...)
 % specifies optional name/value parameter pairs:
 %   'BaseMap'        A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used for initial tag
@@ -142,36 +142,38 @@ if p.SelectOption
 end
 
 if p.UseGui
-    fMap = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
+    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
         p.PreservePrefix, 'Synchronize', p.Synchronize);
 end
 
-% Save the tags file for next step
-if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
-    warning('tagstudy:invalidFile', ...
-        ['Couldn''t save fieldMap to ' p.SaveMapFile]);
-end
-
-if isempty(fPaths) || strcmpi(p.RewriteOption, 'none')
-    return;
-end
-
-% Rewrite all of the EEG files with updated tag information
-fprintf('\n---Now rewriting the tags to the individual data files---\n');
-for k = 1:length(fPaths) % Assemble the list
-    teeg = pop_loadset(fPaths{k});
-    teeg = writetags(teeg, fMap, 'ExcludeFields', excluded, ...
-        'PreservePrefix', p.PreservePrefix, ...
-        'RewriteOption', p.RewriteOption);
-    pop_saveset(teeg, 'filename', fPaths{k});
-end
-
-% Rewrite to the study file
-if strcmpi(p.RewriteOption, 'Both') || strcmpi(p.RewriteOption, 'Summary')
-    s = writetags(s, fMap, 'ExcludeFields', excluded, ...
-        'PreservePrefix', p.PreservePrefix, ...
-        'RewriteOption', p.RewriteOption);  %#ok<NASGU>
-    save(p.StudyFile, 's', '-mat');
+if ~canceled
+    % Save the tags file for next step
+    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
+        warning('tagstudy:invalidFile', ...
+            ['Couldn''t save fieldMap to ' p.SaveMapFile]);
+    end
+    
+    if isempty(fPaths) || strcmpi(p.RewriteOption, 'none')
+        return;
+    end
+    
+    % Rewrite all of the EEG files with updated tag information
+    fprintf('\n---Now rewriting the tags to the individual data files---\n');
+    for k = 1:length(fPaths) % Assemble the list
+        teeg = pop_loadset(fPaths{k});
+        teeg = writetags(teeg, fMap, 'ExcludeFields', excluded, ...
+            'PreservePrefix', p.PreservePrefix, ...
+            'RewriteOption', p.RewriteOption);
+        pop_saveset(teeg, 'filename', fPaths{k});
+    end
+    
+    % Rewrite to the study file
+    if strcmpi(p.RewriteOption, 'Both') || strcmpi(p.RewriteOption, 'Summary')
+        s = writetags(s, fMap, 'ExcludeFields', excluded, ...
+            'PreservePrefix', p.PreservePrefix, ...
+            'RewriteOption', p.RewriteOption);  %#ok<NASGU>
+        save(p.StudyFile, 's', '-mat');
+    end
 end
 
     function [s, fNames] = loadstudy(studyFile)
