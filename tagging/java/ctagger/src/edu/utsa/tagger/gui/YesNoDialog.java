@@ -21,7 +21,7 @@ import edu.utsa.tagger.guisupport.XButton;
  *         Robbins
  */
 @SuppressWarnings("serial")
-public class ExitSaveDialog extends JDialog {
+public class YesNoDialog extends JDialog {
 
 	/**
 	 * Closes the dialog and returns the option.
@@ -56,7 +56,7 @@ public class ExitSaveDialog extends JDialog {
 	 * @param frame
 	 * @param message
 	 */
-	public ExitSaveDialog(JFrame frame, String message) {
+	public YesNoDialog(JFrame frame, String message) {
 		super(frame, true);
 		bgPanel.setLayout(new ConstraintLayout());
 		bgPanel.setBackground(Color.white);

@@ -2,6 +2,8 @@ package edu.utsa.tagger.app;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import edu.utsa.tagger.Loader;
@@ -10,7 +12,7 @@ import edu.utsa.tagger.gui.GuiModelFactory;
 public class TestGui {
 
 	@Test
-	public void testShowDialogJSONInput() {
+	public void testShowDialogJSONInput() throws IOException {
 		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 

@@ -1,5 +1,7 @@
 package edu.utsa.tagger;
 
+import java.io.IOException;
+
 import edu.utsa.tagger.gui.GuiModelFactory;
 
 /**
@@ -30,11 +32,9 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public static void load(int flags, int permissions, String frameTitle,
-			int initialDepth, IFactory factory, boolean isPrimary,
-			boolean isStandAloneVersion) {
-		new Loader(flags, permissions, frameTitle, initialDepth, factory,
-				isPrimary, isStandAloneVersion);
+	public static void load(int flags, int permissions, String frameTitle, int initialDepth, IFactory factory,
+			boolean isPrimary, boolean isStandAloneVersion) {
+		new Loader(flags, permissions, frameTitle, initialDepth, factory, isPrimary, isStandAloneVersion);
 	}
 
 	/**
@@ -56,11 +56,10 @@ public class Loader {
 	 *         presses "Cancel," this is equal to the String passed in as a
 	 *         parameter (with no changes included).
 	 */
-	public static String load(String xmlData, int flags, int permissions,
-			String frameTitle, int initialDepth, boolean isPrimary,
-			boolean isStandAloneVersion) {
-		return load(xmlData, flags, permissions, frameTitle, initialDepth,
-				new GuiModelFactory(), isPrimary, isStandAloneVersion);
+	public static String load(String xmlData, int flags, int permissions, String frameTitle, int initialDepth,
+			boolean isPrimary, boolean isStandAloneVersion) {
+		return load(xmlData, flags, permissions, frameTitle, initialDepth, new GuiModelFactory(), isPrimary,
+				isStandAloneVersion);
 
 	}
 
@@ -84,11 +83,10 @@ public class Loader {
 	 *         presses "Cancel," this is equal to the String passed in as a
 	 *         parameter (with no changes included).
 	 */
-	public static String load(String xmlData, int flags, int permissions,
-			String frameTitle, int initialDepth, IFactory factory,
-			boolean isPrimary, boolean isStandAloneVersion) {
-		Loader loader = new Loader(xmlData, flags, permissions, frameTitle,
-				initialDepth, factory, isPrimary, isStandAloneVersion);
+	public static String load(String xmlData, int flags, int permissions, String frameTitle, int initialDepth,
+			IFactory factory, boolean isPrimary, boolean isStandAloneVersion) {
+		Loader loader = new Loader(xmlData, flags, permissions, frameTitle, initialDepth, factory, isPrimary,
+				isStandAloneVersion);
 
 		loader.waitForSubmitted();
 
@@ -121,12 +119,12 @@ public class Loader {
 	 *         the user made in the GUI. If the user presses "Cancel," these are
 	 *         equal to the Strings passed in as parameters (with no changes
 	 *         included).
+	 * @throws IOException
 	 */
-	public static String[] load(String tags, String events, int flags,
-			int permissions, String frameTitle, int initialDepth,
-			boolean isPrimary, boolean isStandAloneVersion) {
-		return load(tags, events, flags, permissions, frameTitle, initialDepth,
-				new GuiModelFactory(), isPrimary, isStandAloneVersion);
+	public static String[] load(String tags, String events, int flags, int permissions, String frameTitle,
+			int initialDepth, boolean isPrimary, boolean isStandAloneVersion) throws IOException {
+		return load(tags, events, flags, permissions, frameTitle, initialDepth, new GuiModelFactory(), isPrimary,
+				isStandAloneVersion);
 	}
 
 	/**
@@ -150,12 +148,11 @@ public class Loader {
 	 *         the user made in the GUI. If the user presses "Cancel," these are
 	 *         equal to the Strings passed in as parameters (with no changes
 	 *         included).
+	 * @throws IOException
 	 */
-	public static String[] load(String tags, String events, int flags,
-			int permissions, String frameTitle, int initialDepth,
-			IFactory factory, boolean isPrimary, boolean isStandAloneVersion) {
-		Loader loader = new Loader(tags, events, flags, permissions,
-				frameTitle, initialDepth, factory, isPrimary,
+	public static String[] load(String tags, String events, int flags, int permissions, String frameTitle,
+			int initialDepth, IFactory factory, boolean isPrimary, boolean isStandAloneVersion) throws IOException {
+		Loader loader = new Loader(tags, events, flags, permissions, frameTitle, initialDepth, factory, isPrimary,
 				isStandAloneVersion);
 
 		loader.waitForSubmitted();
@@ -167,7 +164,7 @@ public class Loader {
 				returnString[1] = loader.tagger.getJsonEventsString();
 			} else {
 				// Tab-delimited text format
-				returnString[1] = loader.tagger.getTdtEventsString();
+				returnString[1] = loader.tagger.createTSVString();
 			}
 		} else {
 			returnString[0] = tags;
@@ -176,21 +173,21 @@ public class Loader {
 		return returnString;
 	}
 
-	public static String[] load(Loader loader, String tags, String events) {
-		loader.waitForSubmitted();
+	public static String[] load(Loader loader, String tags, String events) throws IOException {
+		// loader.waitForSubmitted();
 		String[] returnString = new String[2];
-		if (loader.isSubmitted()) {
-			returnString[0] = loader.tagger.getHedXmlString();
-			if (loader.testFlag(Loader.USE_JSON)) {
-				returnString[1] = loader.tagger.getJsonEventsString();
-			} else {
-				// Tab-delimited text format
-				returnString[1] = loader.tagger.getTdtEventsString();
-			}
+		// if (loader.isSubmitted()) {
+		returnString[0] = loader.tagger.getHedXmlString();
+		if (loader.testFlag(Loader.USE_JSON)) {
+			returnString[1] = loader.tagger.getJsonEventsString();
 		} else {
-			returnString[0] = tags;
-			returnString[1] = events;
+			// Tab-delimited text format
+			returnString[1] = loader.tagger.createTSVString();
 		}
+		// } else {
+		// returnString[0] = tags;
+		// returnString[1] = events;
+		// }
 		return returnString;
 	}
 
@@ -204,6 +201,10 @@ public class Loader {
 	private boolean submitted = false;
 	private boolean notified = false;
 	private Tagger tagger;
+	private boolean fMapLoaded = false;
+	private boolean fMapSaved = false;
+	private String fMapPath = new String();
+	private boolean startOver = false;
 
 	/**
 	 * Constructor launches the Tagger GUI with no events or tag hierarchy using
@@ -219,8 +220,7 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public Loader(int flags, int permissions, String frameTitle,
-			int initialDepth, IFactory factory, boolean isPrimary,
+	public Loader(int flags, int permissions, String frameTitle, int initialDepth, IFactory factory, boolean isPrimary,
 			boolean isStandAloneVersion) {
 		this.initialDepth = initialDepth;
 		this.title = frameTitle;
@@ -247,8 +247,7 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public Loader(String xmlData, int flags, int permissions,
-			String frameTitle, int initialDepth, IFactory factory,
+	public Loader(String xmlData, int flags, int permissions, String frameTitle, int initialDepth, IFactory factory,
 			boolean isPrimary, boolean isStandAloneVersion) {
 		this.initialDepth = initialDepth;
 		this.title = frameTitle;
@@ -274,11 +273,10 @@ public class Loader {
 	 * @param initialDepth
 	 *            Initial depth to display tags
 	 */
-	public Loader(String tags, String events, int flags, int permissions,
-			String frameTitle, int initialDepth, boolean isPrimary,
-			boolean isStandAloneVersion) {
-		this(tags, events, flags, permissions, frameTitle, initialDepth,
-				new GuiModelFactory(), isPrimary, isStandAloneVersion);
+	public Loader(String tags, String events, int flags, int permissions, String frameTitle, int initialDepth,
+			boolean isPrimary, boolean isStandAloneVersion) {
+		this(tags, events, flags, permissions, frameTitle, initialDepth, new GuiModelFactory(), isPrimary,
+				isStandAloneVersion);
 	}
 
 	/**
@@ -299,9 +297,8 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public Loader(String tags, String events, int flags, int permissions,
-			String frameTitle, int initialDepth, IFactory factory,
-			boolean isPrimary, boolean isStandAloneVersion) {
+	public Loader(String tags, String events, int flags, int permissions, String frameTitle, int initialDepth,
+			IFactory factory, boolean isPrimary, boolean isStandAloneVersion) {
 		this.tags = tags;
 		this.events = events;
 		this.initialDepth = initialDepth;
@@ -312,7 +309,7 @@ public class Loader {
 		factory.createApp(this, tagger, frameTitle, isStandAloneVersion);
 	}
 
-	public synchronized String[] getXMLAndEvents() {
+	public synchronized String[] getXMLAndEvents() throws IOException {
 		return Loader.load(this, tags, events);
 	}
 
@@ -341,12 +338,44 @@ public class Loader {
 		notify();
 	}
 
+	public synchronized void setFMapLoaded(boolean fMapLoaded) {
+		this.fMapLoaded = fMapLoaded;
+	}
+
+	public synchronized void setFMapSaved(boolean fMapSaved) {
+		this.fMapSaved = fMapSaved;
+	}
+
+	public synchronized void setFMapPath(String fMapPath) {
+		this.fMapPath = fMapPath;
+	}
+
+	public synchronized void setStartOver(boolean startOver) {
+		this.startOver = startOver;
+	}
+
 	public synchronized void setSubmitted(boolean submittedArg) {
 		submitted = submittedArg;
 	}
 
 	public synchronized boolean testFlag(int flag) {
 		return ((flags & flag) == flag);
+	}
+
+	public synchronized boolean isStartOver() {
+		return startOver;
+	}
+
+	public synchronized boolean fMapLoaded() {
+		return fMapLoaded;
+	}
+
+	public synchronized boolean fMapSaved() {
+		return fMapSaved;
+	}
+
+	public synchronized String getFMapPath() {
+		return fMapPath;
 	}
 
 	public synchronized void waitForSubmitted() {

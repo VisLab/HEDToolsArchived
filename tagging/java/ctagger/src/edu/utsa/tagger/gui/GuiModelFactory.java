@@ -26,9 +26,8 @@ public class GuiModelFactory implements IFactory {
 	}
 
 	@Override
-	public void createApp(Loader loader, Tagger tagger, String frameTitle,
-			boolean isStandAloneVersion) {
-		new AppView(loader, tagger, frameTitle, isStandAloneVersion);
+	public AppView createApp(Loader loader, Tagger tagger, String frameTitle, boolean isStandAloneVersion) {
+		return new AppView(loader, tagger, frameTitle, isStandAloneVersion);
 	}
 
 }

@@ -12,6 +12,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -34,7 +35,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
@@ -358,6 +358,8 @@ public class AppView extends ConstraintContainer {
 	private Tagger tagger;
 
 	private JPanel tagsPanel = new JPanel();
+	private boolean startOver;
+	private boolean fMapLoaded;
 	private String fMapPath;
 	private ScrollLayout tagsScrollLayout;
 
@@ -387,7 +389,7 @@ public class AppView extends ConstraintContainer {
 	 * @param tagger
 	 * @param frameTitle
 	 */
-	public AppView(Loader loader, final Tagger tagger, String frameTitle, boolean isStandAloneVersion) {
+	public AppView(final Loader loader, final Tagger tagger, String frameTitle, final boolean isStandAloneVersion) {
 		this.loader = loader;
 		this.tagger = tagger;
 		this.isStandAloneVersion = isStandAloneVersion;
@@ -406,8 +408,9 @@ public class AppView extends ConstraintContainer {
 					exit = AppView.this.showRequiredMissingDialog(missingReqTags);
 				}
 				if (exit) {
-					AppView.this.loader.setSubmitted(true);
-					System.exit(0);
+					loader.setSubmitted(true);
+					loader.setNotified(true);
+					frame.dispose();
 				}
 			}
 		});
@@ -415,19 +418,26 @@ public class AppView extends ConstraintContainer {
 		cancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+				String message = MessageConstants.CANCEL_Q;
+				if (isStandAloneVersion)
+					message = MessageConstants.CLOSE_Q;
+				createYesNoDialog(message);
 			}
 		});
 
 		close.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+				String message = MessageConstants.CANCEL_Q;
+				if (isStandAloneVersion)
+					message = MessageConstants.CLOSE_Q;
+				createYesNoDialog(message);
 			}
 		});
 		load.addMouseListener(new LoadMouseListener());
 		save.addMouseListener(new SaveMouseListener());
 		zoomOut.addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				ConstraintLayout.scale -= 0.1;
@@ -818,24 +828,21 @@ public class AppView extends ConstraintContainer {
 			}
 		});
 
-		frame = new JFrame() {
-			@Override
-			public void dispose() {
-				String message = MessageConstants.CANCEL_Q;
-				if (isStandAloneVersion)
-					message = MessageConstants.CLOSE_Q;
-				ExitSaveDialog dialog = new ExitSaveDialog(frame, message);
-				int option = dialog.showDialog();
-				if (option == 0) {
-					loader.setNotified(true);
-					System.exit(0);
-				}
-			}
-		};
-		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		frame = new JFrame();
 		frame.setSize(1024, 768);
 		frame.getContentPane().add(this);
 		frame.setVisible(true);
+
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) {
+				String message = MessageConstants.CANCEL_Q;
+				if (isStandAloneVersion)
+					message = MessageConstants.CLOSE_Q;
+				createYesNoDialog(message);
+			}
+		});
+
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		updateTags();
 		updateEventsPanel();
@@ -942,12 +949,18 @@ public class AppView extends ConstraintContainer {
 	 */
 	public int loadFieldMapDialog(int option) {
 		fMapPath = null;
-		File fMapFile = showFileChooserDialog("Load field map", "Load", "Load .mat file", ".m files",
-				new String[] { "m" });
+		File fMapFile = showFileChooserDialog("Load field map", "Load", "Load .mat file", ".mat files",
+				new String[] { "mat" });
 		if (fMapFile != null) {
-			fMapFile = addExtensionToFile(fMapFile, "mat");
-			fMapPath = fMapFile.getAbsolutePath();
+			loader.setFMapPath(fMapFile.getAbsolutePath());
+			YesNoDialog dialog = new YesNoDialog(frame, MessageConstants.FMAP_START_OVER_Q);
+			int startOverOption = dialog.showDialog();
+			if (startOverOption == 0) {
+				startOver = true;
+			}
+			loader.setFMapLoaded(true);
 			loader.setNotified(true);
+			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 		}
 		return option;
 	}
@@ -1055,8 +1068,8 @@ public class AppView extends ConstraintContainer {
 		File fMapFile = showFileChooserDialog("Save field map", "Save", "Save .mat file", ".mat files",
 				new String[] { "xml" });
 		if (fMapFile != null) {
-			fMapFile = addExtensionToFile(fMapFile, "mat");
-			fMapPath = fMapFile.getAbsolutePath();
+			loader.setFMapSaved(true);
+			loader.setFMapPath(fMapFile.getAbsolutePath());
 		}
 		return option;
 	}
@@ -1077,6 +1090,30 @@ public class AppView extends ConstraintContainer {
 			saveSuccess = tagger.saveEventsAndHED(saveFile);
 		}
 		return checkSaveSuccess(option, saveFile, saveSuccess);
+	}
+
+	/**
+	 * 
+	 * @return True if CTagger needs to be started over.
+	 */
+	public boolean isStartOver() {
+		return startOver;
+	}
+
+	/**
+	 * 
+	 * @return True if a field map is loaded
+	 */
+	public boolean fMapLoaded() {
+		return fMapLoaded;
+	}
+
+	/**
+	 * 
+	 * @return The field map path.
+	 */
+	public String getFMapPath() {
+		return fMapPath;
 	}
 
 	/**
@@ -1295,6 +1332,16 @@ public class AppView extends ConstraintContainer {
 	 */
 	public void showContextMenu(Map<String, ContextMenuAction> map) {
 		showContextMenu(map, 100);
+	}
+
+	private int createYesNoDialog(String message) {
+		YesNoDialog dialog = new YesNoDialog(frame, message);
+		int option = dialog.showDialog();
+		if (option == 0) {
+			loader.setNotified(true);
+			frame.dispose();
+		}
+		return option;
 	}
 
 	/**

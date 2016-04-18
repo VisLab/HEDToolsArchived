@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import edu.utsa.tagger.Loader;
@@ -12,7 +14,7 @@ import edu.utsa.tagger.gui.GuiModelFactory;
 public class TestLoader {
 
 	@Test
-	public void testLoadDelimitedString() {
+	public void testLoadDelimitedString() throws IOException {
 		System.out.println("It should load the data from a delimited string " + "and HED XML");
 		String hedXml = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.DelimitedString);
@@ -23,7 +25,7 @@ public class TestLoader {
 	}
 
 	@Test
-	public void testLoaderJsonTagArrays() {
+	public void testLoaderJsonTagArrays() throws IOException {
 		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		System.out.println("It should work with a JSON event String and " + "HED XML String");
@@ -46,7 +48,7 @@ public class TestLoader {
 	}
 
 	@Test
-	public void testTagEditAll() {
+	public void testTagEditAll() throws IOException {
 		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		System.out.println("It should work allowing all tags to be edited.");
@@ -57,7 +59,7 @@ public class TestLoader {
 	}
 
 	@Test
-	public void testTagEditNone() {
+	public void testTagEditNone() throws IOException {
 		String hedXML = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		String events = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		System.out.println("It should work allowing no tag " + "editing by default.");

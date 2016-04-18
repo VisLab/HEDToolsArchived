@@ -155,14 +155,14 @@ if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
 fMap.merge(baseTags, 'Merge', excluded, p.Fields);
-
+canceled = false;
 if p.SelectOption
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMap, exc] = selectmaps(fMap, 'Fields', p.Fields);
+    [fMap, exc, canceled] = selectmaps(fMap, 'Fields', p.Fields);
     excluded = union(excluded, exc);
 end
 
-if p.UseGui
+if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
         p.PreservePrefix, 'Synchronize', p.Synchronize);
 end

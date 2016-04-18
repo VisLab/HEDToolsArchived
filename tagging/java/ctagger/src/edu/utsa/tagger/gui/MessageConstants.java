@@ -26,6 +26,7 @@ public final class MessageConstants {
 	public static final String EXIT_SAVE_Q = "Would you like to save before exiting?";
 	public static final String HED_XML_SAVE_Q = "The HED XML has been modified, would you like to save?";
 	public static final String CANCEL_Q = "Are you sure you want to cancel?";
+	public static final String FMAP_START_OVER_Q = "A field map has been loaded. Would you like to start over?";
 	public static final String CLOSE_Q = "Are you sure you want to close?";
 	public static final String SAVE_DATA_TYPE_Q = "In which format would you like to save the data?";
 	public static final String TAKES_VALUE = "Click to enter a value. The value will replace the '#' character.";

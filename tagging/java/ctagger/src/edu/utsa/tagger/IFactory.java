@@ -1,5 +1,7 @@
 package edu.utsa.tagger;
 
+import edu.utsa.tagger.gui.AppView;
+
 /**
  * Interface for a factory to be used with the Tagger.
  * 
@@ -12,7 +14,6 @@ public interface IFactory {
 
 	AbstractTagModel createAbstractTagModel(Tagger tagger);
 
-	void createApp(Loader loader, Tagger tagger, String frameTitle,
-			boolean isStandAloneVersion);
+	AppView createApp(Loader loader, Tagger tagger, String frameTitle, boolean isStandAloneVersion);
 
 }
