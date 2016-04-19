@@ -14,7 +14,7 @@
 %                   The name or the path of the remap file containing
 %                   the mappings of old HED tags to new HED tags. This
 %                   file is a two column tab-delimited file with the old
-%                   HED tags in the first column and the new HED tags are 
+%                   HED tags in the first column and the new HED tags are
 %                   in the second column.
 %
 %       tsvFile
@@ -64,6 +64,7 @@ function remapTSVTags(remapFile, tsvFile, tsvTagColumns, varargin)
 p = parseArguments();
 output = '';
 remapMap = remap2Map(p.remapFile);
+wildCardTags = getWildCardTags();
 try
     fileId = fopen(p.tsvFile);
     tLine = fgetl(fileId);
@@ -78,62 +79,6 @@ catch me
     rethrow(me);
 end
 
-    function p = parseArguments()
-        % Parses the arguements passed in and returns the results
-        p = inputParser();
-        p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
-        p.addRequired('tsvFile', @(x) ~isempty(x) && ischar(x));
-        p.addRequired('tsvTagColumns', @(x) (~isempty(x) && ...
-            isa(x,'double') && length(x) >= 1));
-        [path, file] = fileparts(tsvFile);
-        p.addParamValue('OutputFile', ...
-            fullfile(path, [file '_update.tsv']), ...
-            @(x) ~isempty(x) && ischar(x));  %#ok<NVREPL>
-        p.parse(remapFile, tsvFile, tsvTagColumns, varargin{:});
-        p = p.Results;
-    end % parseArguments
-
-    function readTags(tLine, tagColumns)
-        % Reads the tag columns from a tab-delimited row
-        splitLine = textscan(tLine, '%s', 'delimiter', '\t', ...
-            'multipleDelimsAsOne', 1)';
-        numCols = size(splitLine{1}, 1);
-        for a = 1:numCols
-            if ismember(a, tagColumns)
-                splitTags = splitLine{1}{a};
-                splitCellTags = str2cell(splitTags);
-                replacedTags = remapTags(splitCellTags);
-                replacedTags = cell2str(replacedTags);
-                output = sprintf('%s%s\t', output, replacedTags);
-            else
-                output = sprintf('%s%s\t', output, splitLine{1}{a});
-            end
-        end
-        output = sprintf('%s\n', output); 
-    end % readTags
-
-    function remappedTags = remapTags(tags)
-        % Remaps the old tags with the new tags
-        remappedTags = {};
-        for a = 1:length(tags)
-            if iscellstr(tags{a})
-                remappedTags{end+1} = remapTags(tags{a}); %#ok<AGROW>
-            else
-                if remapMap.isKey(lower(tags{a}))
-                    remappedTags{end+1} = ...
-                        remapMap(lower(tags{a}));   %#ok<AGROW>
-                else
-                    remappedTags{end+1} = tags{a}; %#ok<AGROW>
-                end
-            end
-        end
-    end % remapTags
-
-    function tags = str2cell(tags)
-        % Converts the tags from a string to a cell array
-        tags = formatTags(tags, true);
-    end % str2cell
-
     function tagStr = cell2str(tags)
         % Converts the tags from a cell array to a string
         numTags = size(tags, 2);
@@ -144,13 +89,28 @@ end
     end % cell2str
 
     function tagStr = convertTag(tag)
-        % Converts a cell array containing a tag or a tag group into a string
+        % Converts a cell array containing a tag or a tag group into a
+        % string
         if iscellstr(tag)
             tagStr = joinTagGroup(tag);
         else
             tagStr = tag;
         end
     end % convertTag
+
+    function wildCardTags = getWildCardTags()
+        keys = remapMap.keys();
+        wildCardTags = keys(cellfun(@(x) ~isempty(strfind(x, '*')), keys));
+        wildCardTags = cellfun(@(x) x(1:end-1), ...
+            wildCardTags, 'UniformOutput', false);
+    end % getWildCardTags
+
+    function found = isWildCardTag(tag)
+        % Checks to see if tag is a wildcard tag
+        matches = cellfun(@(x) strncmp(x, tag, length(x)), ...
+            wildCardTags);
+        found = any(matches);
+    end % isWildCardTag
 
     function groupStr = joinTagGroup(group)
         % Joins a cell array containing a tag group into a comma delimited
@@ -171,6 +131,76 @@ end
         end
         groupStr = [groupStr ')'];
     end % joinTagGroup
+
+    function p = parseArguments()
+        % Parses the arguements passed in and returns the results
+        p = inputParser();
+        p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
+        p.addRequired('tsvFile', @(x) ~isempty(x) && ischar(x));
+        p.addRequired('tsvTagColumns', @(x) (~isempty(x) && ...
+            isa(x,'double') && length(x) >= 1));
+        [path, file] = fileparts(tsvFile);
+        p.addParamValue('OutputFile', ...
+            fullfile(path, [file '_update.tsv']), ...
+            @(x) ~isempty(x) && ischar(x));
+        p.parse(remapFile, tsvFile, tsvTagColumns, varargin{:});
+        p = p.Results;
+    end % parseArguments
+
+    function readTags(tLine, tagColumns)
+        % Reads the tag columns from a tab-delimited row
+        splitLine = textscan(tLine, '%s', 'delimiter', '\t', ...
+            'multipleDelimsAsOne', 1)';
+        numCols = size(splitLine{1}, 1);
+        for a = 1:numCols
+            if ismember(a, tagColumns)
+                splitTags = splitLine{1}{a};
+                splitCellTags = str2cell(splitTags);
+                replacedTags = remapTags(splitCellTags);
+                replacedTags = cell2str(replacedTags);
+                output = sprintf('%s%s\t', output, replacedTags);
+            else
+                output = sprintf('%s%s\t', output, splitLine{1}{a});
+            end
+        end
+        output = sprintf('%s\n', output);
+    end % readTags
+
+    function remappedTags = remapTags(tags)
+        % Remaps the old tags with the new tags
+        remappedTags = {};
+        for a = 1:length(tags)
+            if iscellstr(tags{a})
+                remappedTags{end+1} = remapTags(tags{a}); %#ok<AGROW>
+            else
+                if remapMap.isKey(lower(tags{a}))
+                    remappedTags{end+1} = ...
+                        remapMap(lower(tags{a}));   %#ok<AGROW>
+                elseif isWildCardTag(lower(tags{a}))
+                    remappedTags{end+1} = ...
+                        replaceWildCardTag(lower(tags{a})); %#ok<AGROW>
+                else
+                    remappedTags{end+1} = tags{a}; %#ok<AGROW>
+                end
+            end
+        end
+    end % remapTags
+
+    function replacementTag = replaceWildCardTag(tag)
+        % Replaces the wildcard tag with new remap tag
+        matchedTag = wildCardTags(cellfun(@(x) strncmp(x, tag, ...
+            length(x)), wildCardTags));
+        matchedTag = matchedTag{1};
+        numCharacters = length(matchedTag);
+        restOfTag = tag(numCharacters+1:end);
+        valueTag = remapMap([matchedTag '*']);
+        replacementTag = strrep(valueTag, '*', restOfTag);
+    end % replaceWildCardTag
+
+    function tags = str2cell(tags)
+        % Converts the tags from a string to a cell array
+        tags = formatTags(tags, true);
+    end % str2cell
 
     function writeOutput(output)
         % Writes the output to the file
