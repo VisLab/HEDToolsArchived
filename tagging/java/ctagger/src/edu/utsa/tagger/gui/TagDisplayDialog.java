@@ -144,7 +144,7 @@ public class TagDisplayDialog extends JDialog {
 		bgPanel.setPreferredSize(new Dimension(700, 300));
 
 		topMessageLabel.setText(topMessage);
-		okButton = AppView.createMenuButton(buttonText);
+		okButton = TaggerView.createMenuButton(buttonText);
 		okButton.addMouseListener(new OkButtonListener());
 		fileScrollLayout = new ScrollLayout(fileScrollPane, tagsPanel);
 		fileScrollPane.setLayout(fileScrollLayout);
@@ -166,7 +166,7 @@ public class TagDisplayDialog extends JDialog {
 		bgPanel.add(okButton, new Constraint(
 				"bottom:10 height:30 right:10 width:120"));
 		if (options) {
-			cancelButton = AppView.createMenuButton("Cancel");
+			cancelButton = TaggerView.createMenuButton("Cancel");
 			cancelButton.addMouseListener(new CancelButtonListener());
 			bgPanel.add(cancelButton, new Constraint(
 					"bottom:10 height:30 left:10 width:80"));

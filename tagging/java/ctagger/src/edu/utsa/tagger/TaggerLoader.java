@@ -5,56 +5,56 @@ import java.io.IOException;
 import edu.utsa.tagger.gui.GuiModelFactory;
 
 /**
- * This class is used to load the Tagger GUI with the desired parameters.
+ * This class is used to load the TaggerView with the desired parameters.
  * 
  * @author Lauren Jett, Rebecca Strautman, Thomas Rognon, Jeremy Cockfield, Kay
  *         Robbins
  */
-public class Loader {
-	// Tagger flags
-	// place bin
+public class TaggerLoader {
 	public static final int USE_JSON = (1 << 0); // 1 0001
 	public static final int PRESERVE_PREFIX = (1 << 1); // 2 0010
 	public static final int IGNORE_EXTENSION_RULES = (1 << 2); // 3 0100
 	public static final int TAG_EDIT_ALL = (1 << 3); // 4 1000
 
 	/**
-	 * Creates a Loader that launches the Tagger GUI with the given parameters.
+	 * Creates a Loader that launches the TaggerViewwith the given parameters.
 	 * No events or tag hierarchy is included.
 	 * 
 	 * @param flags
-	 *            Options for running Tagger
+	 *            Options for running TaggerView.
 	 * @param permissions
+	 *            Permissions of the TaggerView.
 	 * @param frameTitle
-	 *            Title of Tagger GUI window
+	 *            Title of TaggerView.
 	 * @param initialDepth
-	 *            Initial depth to display tags
+	 *            Initial depth to display tags.
 	 * @param factory
-	 *            Factory used to create the GUI
+	 *            Factory used to create the TaggerView.
 	 */
 	public static void load(int flags, int permissions, String frameTitle, int initialDepth, IFactory factory,
 			boolean isPrimary, boolean isStandAloneVersion) {
-		new Loader(flags, permissions, frameTitle, initialDepth, factory, isPrimary, isStandAloneVersion);
+		new TaggerLoader(flags, permissions, frameTitle, initialDepth, factory, isPrimary, isStandAloneVersion);
 	}
 
 	/**
-	 * Creates a Loader that launches the Tagger GUI with the given parameters.
-	 * The default factory is used to create the GUI.
+	 * Creates a Loader that launches the TaggerView with the given parameters.
 	 * 
 	 * @param xmlData
 	 *            An XML string in the TaggerData format containing the events
-	 *            and the HED hierarchy
+	 *            and the HED hierarchy.
 	 * @param flags
-	 *            Options for running Tagger
+	 *            Options for running the TaggerView.
 	 * @param permissions
+	 *            The permissions of the TaggerView.
+	 * 
 	 * @param frameTitle
-	 *            Title of Tagger GUI window
+	 *            Title of TaggerView.
 	 * @param initialDepth
-	 *            Initial depth to display tags
-	 * @return String containing the TaggerData XML. If the user presses "Done,"
-	 *         this includes the changes the user made in the GUI. If the user
-	 *         presses "Cancel," this is equal to the String passed in as a
-	 *         parameter (with no changes included).
+	 *            Initial depth to display tags.
+	 * @return String containing the TaggerData XML. If the user presses
+	 *         "Proceed," this includes the changes the user made in the GUI. If
+	 *         the user presses "Cancel," this is equal to the String passed in
+	 *         as a parameter (with no changes included).
 	 */
 	public static String load(String xmlData, int flags, int permissions, String frameTitle, int initialDepth,
 			boolean isPrimary, boolean isStandAloneVersion) {
@@ -85,12 +85,10 @@ public class Loader {
 	 */
 	public static String load(String xmlData, int flags, int permissions, String frameTitle, int initialDepth,
 			IFactory factory, boolean isPrimary, boolean isStandAloneVersion) {
-		Loader loader = new Loader(xmlData, flags, permissions, frameTitle, initialDepth, factory, isPrimary,
-				isStandAloneVersion);
-
+		TaggerLoader loader = new TaggerLoader(xmlData, flags, permissions, frameTitle, initialDepth, factory,
+				isPrimary, isStandAloneVersion);
 		loader.waitForSubmitted();
-
-		String returnString = "";
+		String returnString = new String();
 		if (loader.isSubmitted()) {
 			returnString = loader.tagger.getXmlDataString();
 		} else {
@@ -152,18 +150,15 @@ public class Loader {
 	 */
 	public static String[] load(String tags, String events, int flags, int permissions, String frameTitle,
 			int initialDepth, IFactory factory, boolean isPrimary, boolean isStandAloneVersion) throws IOException {
-		Loader loader = new Loader(tags, events, flags, permissions, frameTitle, initialDepth, factory, isPrimary,
-				isStandAloneVersion);
-
+		TaggerLoader loader = new TaggerLoader(tags, events, flags, permissions, frameTitle, initialDepth, factory,
+				isPrimary, isStandAloneVersion);
 		loader.waitForSubmitted();
-
 		String[] returnString = new String[2];
 		if (loader.isSubmitted()) {
 			returnString[0] = loader.tagger.getHedXmlString();
-			if (loader.testFlag(Loader.USE_JSON)) {
+			if (loader.checkFlags(TaggerLoader.USE_JSON)) {
 				returnString[1] = loader.tagger.getJsonEventsString();
 			} else {
-				// Tab-delimited text format
 				returnString[1] = loader.tagger.createTSVString();
 			}
 		} else {
@@ -173,21 +168,14 @@ public class Loader {
 		return returnString;
 	}
 
-	public static String[] load(Loader loader, String tags, String events) throws IOException {
-		// loader.waitForSubmitted();
+	public static String[] load(TaggerLoader loader, String tags, String events) throws IOException {
 		String[] returnString = new String[2];
-		// if (loader.isSubmitted()) {
 		returnString[0] = loader.tagger.getHedXmlString();
-		if (loader.testFlag(Loader.USE_JSON)) {
+		if (loader.checkFlags(TaggerLoader.USE_JSON)) {
 			returnString[1] = loader.tagger.getJsonEventsString();
 		} else {
-			// Tab-delimited text format
 			returnString[1] = loader.tagger.createTSVString();
 		}
-		// } else {
-		// returnString[0] = tags;
-		// returnString[1] = events;
-		// }
 		return returnString;
 	}
 
@@ -220,14 +208,14 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public Loader(int flags, int permissions, String frameTitle, int initialDepth, IFactory factory, boolean isPrimary,
-			boolean isStandAloneVersion) {
+	public TaggerLoader(int flags, int permissions, String frameTitle, int initialDepth, IFactory factory,
+			boolean isPrimary, boolean isStandAloneVersion) {
 		this.initialDepth = initialDepth;
 		this.title = frameTitle;
 		this.permissions = permissions;
 		this.flags = flags;
 		tagger = new Tagger(isPrimary, factory, this);
-		factory.createApp(this, tagger, frameTitle, isStandAloneVersion);
+		factory.createTaggerView(this, tagger, frameTitle, isStandAloneVersion);
 	}
 
 	/**
@@ -247,14 +235,14 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public Loader(String xmlData, int flags, int permissions, String frameTitle, int initialDepth, IFactory factory,
-			boolean isPrimary, boolean isStandAloneVersion) {
+	public TaggerLoader(String xmlData, int flags, int permissions, String frameTitle, int initialDepth,
+			IFactory factory, boolean isPrimary, boolean isStandAloneVersion) {
 		this.initialDepth = initialDepth;
 		this.title = frameTitle;
 		this.permissions = permissions;
 		this.flags = flags;
 		tagger = new Tagger(xmlData, isPrimary, factory, this);
-		factory.createApp(this, tagger, frameTitle, isStandAloneVersion);
+		factory.createTaggerView(this, tagger, frameTitle, isStandAloneVersion);
 	}
 
 	/**
@@ -273,7 +261,7 @@ public class Loader {
 	 * @param initialDepth
 	 *            Initial depth to display tags
 	 */
-	public Loader(String tags, String events, int flags, int permissions, String frameTitle, int initialDepth,
+	public TaggerLoader(String tags, String events, int flags, int permissions, String frameTitle, int initialDepth,
 			boolean isPrimary, boolean isStandAloneVersion) {
 		this(tags, events, flags, permissions, frameTitle, initialDepth, new GuiModelFactory(), isPrimary,
 				isStandAloneVersion);
@@ -297,7 +285,7 @@ public class Loader {
 	 * @param factory
 	 *            Factory used to create the GUI
 	 */
-	public Loader(String tags, String events, int flags, int permissions, String frameTitle, int initialDepth,
+	public TaggerLoader(String tags, String events, int flags, int permissions, String frameTitle, int initialDepth,
 			IFactory factory, boolean isPrimary, boolean isStandAloneVersion) {
 		this.tags = tags;
 		this.events = events;
@@ -306,78 +294,176 @@ public class Loader {
 		this.permissions = permissions;
 		this.flags = flags;
 		tagger = new Tagger(tags, events, isPrimary, factory, this);
-		factory.createApp(this, tagger, frameTitle, isStandAloneVersion);
+		factory.createTaggerView(this, tagger, frameTitle, isStandAloneVersion);
 	}
 
 	public synchronized String[] getXMLAndEvents() throws IOException {
-		return Loader.load(this, tags, events);
+		return TaggerLoader.load(this, tags, events);
 	}
 
+	/**
+	 * Gets the initial depth of the TaggerView.
+	 * 
+	 * @return The initial depth of the TaggerView.
+	 */
 	public synchronized int getInitialDepth() {
 		return initialDepth;
 	}
 
+	/**
+	 * Gets the permissions of the TaggerView.
+	 * 
+	 * @return The permissions of the TaggerView.
+	 */
 	public synchronized int getPermissions() {
 		return permissions;
 	}
 
+	/**
+	 * Gets the title of the TaggerView.
+	 * 
+	 * @return The title of the TaggerView.
+	 */
 	public synchronized String getTitle() {
 		return title;
 	}
 
+	/**
+	 * Checks if the TaggerView flags are equal to the flags passed in.
+	 * 
+	 * @param flags
+	 *            The flags for the TaggerView.
+	 * @return True if the flags are equal to the flags passed in, false if
+	 *         otherwise.
+	 */
+	public synchronized boolean checkFlags(int flags) {
+		return ((this.flags & flags) == flags);
+	}
+
+	/**
+	 * Checks if the TaggerView is notified.
+	 * 
+	 * @param notified
+	 *            True if the TaggerView is notified, false if otherwise.
+	 */
 	public synchronized boolean isNotified() {
 		return notified;
 	}
 
+	/**
+	 * Checks if the TaggerView is submitted.
+	 * 
+	 * @param notified
+	 *            True if the TaggerView is submitted, false if otherwise.
+	 */
 	public synchronized boolean isSubmitted() {
 		return submitted;
 	}
 
-	public synchronized void setNotified(boolean notifiedArg) {
-		notified = notifiedArg;
+	/**
+	 * Sets if the TaggerView is notified.
+	 * 
+	 * @param notified
+	 *            True if the TaggerView is notified, false if otherwise.
+	 */
+	public synchronized void setNotified(boolean notified) {
+		this.notified = notified;
 		notify();
 	}
 
+	/**
+	 * Sets if the field map has been loaded in the TaggerView.
+	 * 
+	 * @param fMapLoaded
+	 *            True if the TaggerView has loaded a field map, false if
+	 *            otherwise.
+	 */
 	public synchronized void setFMapLoaded(boolean fMapLoaded) {
 		this.fMapLoaded = fMapLoaded;
 	}
 
+	/**
+	 * Sets if the field map has been saved in the TaggerView.
+	 * 
+	 * @param fMapSaved
+	 *            True if the TaggerView has saved a field map, false if
+	 *            otherwise.
+	 */
 	public synchronized void setFMapSaved(boolean fMapSaved) {
 		this.fMapSaved = fMapSaved;
 	}
 
+	/**
+	 * Sets the TaggerView field map path.
+	 * 
+	 * @param fMapPath
+	 *            The TaggerView field map path.
+	 */
 	public synchronized void setFMapPath(String fMapPath) {
 		this.fMapPath = fMapPath;
 	}
 
+	/**
+	 * Sets if the TaggerView should start over.
+	 * 
+	 * @param startOver
+	 *            True if the TaggerView should start over, false if otherwise.
+	 */
 	public synchronized void setStartOver(boolean startOver) {
 		this.startOver = startOver;
 	}
 
-	public synchronized void setSubmitted(boolean submittedArg) {
-		submitted = submittedArg;
+	/**
+	 * Sets if the TaggerView is submitted.
+	 * 
+	 * @param submitted
+	 *            True if the TaggerView is submitted, false if otherwise.
+	 */
+	public synchronized void setSubmitted(boolean submitted) {
+		this.submitted = submitted;
 	}
 
-	public synchronized boolean testFlag(int flag) {
-		return ((flags & flag) == flag);
-	}
-
+	/**
+	 * Checks if TaggerView should be started over.
+	 * 
+	 * @return True if the TaggerView should be started over, false if
+	 *         otherwise.
+	 */
 	public synchronized boolean isStartOver() {
 		return startOver;
 	}
 
+	/**
+	 * Checks to see if a field map has been loaded in the TaggerView.
+	 * 
+	 * @return True if a field map has been loaded in the TaggerView, false if
+	 *         otherwise.
+	 */
 	public synchronized boolean fMapLoaded() {
 		return fMapLoaded;
 	}
 
+	/**
+	 * Checks to see if a field map has been saved in the TaggerView.
+	 * 
+	 * @return True if a field map has been saved, false if otherwise.
+	 */
 	public synchronized boolean fMapSaved() {
 		return fMapSaved;
 	}
 
+	/**
+	 * Gets the field map path in the TaggerView if there is one.
+	 * 
+	 * @return The field map path if there is one available in the TaggerView.
+	 */
 	public synchronized String getFMapPath() {
 		return fMapPath;
 	}
 
+	/**
+	 * Waits for the TaggerView to send a notification.
+	 */
 	public synchronized void waitForSubmitted() {
 		try {
 			while (!notified)

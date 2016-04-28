@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 
 import org.junit.Test;
 
-import edu.utsa.tagger.Loader;
+import edu.utsa.tagger.TaggerLoader;
 import edu.utsa.tagger.gui.GuiModelFactory;
 
 public class TestGuiXml {
@@ -15,7 +15,7 @@ public class TestGuiXml {
 	@Test
 	public void testGuiXml() throws FileNotFoundException, URISyntaxException {
 		String xmlData = TestUtilities.getResourceAsString(TestUtilities.XmlDataFile);
-		String result = Loader.load(xmlData, 0, 0, "Tagger Test - XML data", 2, new GuiModelFactory(), true, true);
+		String result = TaggerLoader.load(xmlData, 0, 0, "Tagger Test - XML data", 2, new GuiModelFactory(), true, true);
 		System.out.println(result);
 		assertTrue(result != null);
 	}

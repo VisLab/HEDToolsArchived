@@ -45,10 +45,10 @@ public class EventEditView extends ConstraintContainer {
 	public static final int HEIGHT = 135;
 	private static final String LabelTag = "Event/Label/";
 	private final TaggedEvent taggedEvent;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final Tagger tagger;
 
-	public EventEditView(Tagger tagger, AppView appView, TaggedEvent taggedEvent) {
+	public EventEditView(Tagger tagger, TaggerView appView, TaggedEvent taggedEvent) {
 		this.tagger = tagger;
 		this.appView = appView;
 		this.taggedEvent = taggedEvent;

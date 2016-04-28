@@ -38,7 +38,7 @@ import edu.utsa.tagger.guisupport.XCheckBox.StateListener;
 public class EventView extends JComponent implements MouseListener {
 
 	private final Tagger tagger;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final TaggedEvent taggedEvent;
 	private int groupId;
 	private int currentPosition;
@@ -48,7 +48,7 @@ public class EventView extends JComponent implements MouseListener {
 	private boolean selected = false;
 	private XCheckBox checkbox;
 
-	public EventView(Tagger tagger, AppView appView, TaggedEvent taggedEvent) {
+	public EventView(Tagger tagger, TaggerView appView, TaggedEvent taggedEvent) {
 		this.tagger = tagger;
 		this.appView = appView;
 		this.taggedEvent = taggedEvent;

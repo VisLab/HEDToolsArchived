@@ -43,7 +43,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import edu.utsa.tagger.AbstractTagModel;
 import edu.utsa.tagger.EventModel;
 import edu.utsa.tagger.HistoryItem;
-import edu.utsa.tagger.Loader;
+import edu.utsa.tagger.TaggerLoader;
 import edu.utsa.tagger.TaggedEvent;
 import edu.utsa.tagger.Tagger;
 import edu.utsa.tagger.TaggerSet;
@@ -67,7 +67,7 @@ import edu.utsa.tagger.guisupport.XTextBox;
  *         Robbins
  */
 @SuppressWarnings("serial")
-public class AppView extends ConstraintContainer {
+public class TaggerView extends ConstraintContainer {
 
 	/**
 	 * When the load button is clicked, it shows a dialog for the user to choose
@@ -192,7 +192,7 @@ public class AppView extends ConstraintContainer {
 			hoverMessage.setText(hoverText);
 			Point point = this.getLocation();
 			int top = point.y + 50;
-			int right = AppView.this.getWidth() - point.x - 120;
+			int right = TaggerView.this.getWidth() - point.x - 120;
 			setTopHeight(hoverMessage, top, Unit.PX, 25.0, Unit.PX);
 			setRightWidth(hoverMessage, right, Unit.PX, 120.0, Unit.PX);
 			hoverMessage.setVisible(true);
@@ -325,7 +325,7 @@ public class AppView extends ConstraintContainer {
 
 	private XButton load = createMenuButton("load");
 
-	private Loader loader;
+	private TaggerLoader loader;
 	private boolean isStandAloneVersion;
 
 	private Notification notification = new Notification();
@@ -389,7 +389,7 @@ public class AppView extends ConstraintContainer {
 	 * @param tagger
 	 * @param frameTitle
 	 */
-	public AppView(final Loader loader, final Tagger tagger, String frameTitle, final boolean isStandAloneVersion) {
+	public TaggerView(final TaggerLoader loader, final Tagger tagger, String frameTitle, final boolean isStandAloneVersion) {
 		this.loader = loader;
 		this.tagger = tagger;
 		this.isStandAloneVersion = isStandAloneVersion;
@@ -405,7 +405,7 @@ public class AppView extends ConstraintContainer {
 				List<EventModel> missingReqTags = tagger.findMissingRequiredTags();
 				boolean exit = true;
 				if (missingReqTags != null && !missingReqTags.isEmpty()) {
-					exit = AppView.this.showRequiredMissingDialog(missingReqTags);
+					exit = TaggerView.this.showRequiredMissingDialog(missingReqTags);
 				}
 				if (exit) {
 					loader.setSubmitted(true);
@@ -565,7 +565,7 @@ public class AppView extends ConstraintContainer {
 				updateEventsPanel();
 				selectedGroups.clear();
 				selectedGroups.add(event.getEventGroupId());
-				AppView.this.scrollToEvent(event);
+				TaggerView.this.scrollToEvent(event);
 			}
 		});
 		addTag.addMouseListener(new MouseAdapter() {
@@ -576,7 +576,7 @@ public class AppView extends ConstraintContainer {
 				if (newGuiTag != null) {
 					newGuiTag.setFirstEdit(true);
 					updateTags();
-					AppView.this.scrollToTag(newTag);
+					TaggerView.this.scrollToTag(newTag);
 				}
 			}
 		});
@@ -635,7 +635,7 @@ public class AppView extends ConstraintContainer {
 		if (loadFile == null)
 			return -1;
 		if (!loadSuccess) {
-			AppView.this.showTaggerMessageDialog(MessageConstants.LOAD_ERROR, "Okay", null, null);
+			TaggerView.this.showTaggerMessageDialog(MessageConstants.LOAD_ERROR, "Okay", null, null);
 			return -1;
 		}
 		refreshPanels();
@@ -659,7 +659,7 @@ public class AppView extends ConstraintContainer {
 			return -1;
 		}
 		if (!saveSuccess) {
-			AppView.this.showTaggerMessageDialog(MessageConstants.SAVE_ERROR, "Okay", null, null);
+			TaggerView.this.showTaggerMessageDialog(MessageConstants.SAVE_ERROR, "Okay", null, null);
 			return -1;
 		}
 		return option;

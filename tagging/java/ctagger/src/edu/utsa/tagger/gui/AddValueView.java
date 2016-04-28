@@ -50,12 +50,12 @@ public class AddValueView extends ConstraintContainer {
 	public final static int HEIGHT = 80;
 	private int top = 15;
 	private final Tagger tagger;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final GuiTagModel tagModel;
 	private boolean highlight = false;
 	private final ITagDisplay alternateView;
 
-	public AddValueView(Tagger tagger, AppView appView,
+	public AddValueView(Tagger tagger, TaggerView appView,
 			ITagDisplay alternateView, GuiTagModel guiTagModel) {
 		this.tagger = tagger;
 		this.appView = appView;
@@ -122,7 +122,7 @@ public class AddValueView extends ConstraintContainer {
 		}
 	};
 
-	public AddValueView(final Tagger tagger, final AppView appView,
+	public AddValueView(final Tagger tagger, final TaggerView appView,
 			final GuiTagModel guiTagModel) {
 		this.tagger = tagger;
 		this.appView = appView;

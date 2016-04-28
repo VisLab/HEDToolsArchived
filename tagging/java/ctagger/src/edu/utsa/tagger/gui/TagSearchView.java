@@ -31,7 +31,7 @@ public class TagSearchView extends JComponent implements MouseListener {
 
 	private final GuiTagModel model;
 
-	public TagSearchView(final Tagger tagger, final AppView appView, final GuiTagModel model) {
+	public TagSearchView(final Tagger tagger, final TaggerView appView, final GuiTagModel model) {
 
 		this.model = model;
 

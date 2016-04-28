@@ -41,7 +41,7 @@ import edu.utsa.tagger.guisupport.XTextBox;
 public class TagEventEditView extends ConstraintContainer {
 
 	public static final int HEIGHT = 85;
-	private AppView appView;
+	private TaggerView appView;
 	private final GuiTagModel tagModel;
 	private final Tagger tagger;
 	private final TaggedEvent taggedEvent;
@@ -248,7 +248,7 @@ public class TagEventEditView extends ConstraintContainer {
 
 	}
 
-	public void setAppView(AppView appView) {
+	public void setAppView(TaggerView appView) {
 		this.appView = appView;
 	}
 

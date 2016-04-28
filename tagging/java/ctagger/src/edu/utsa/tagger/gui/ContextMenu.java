@@ -33,13 +33,13 @@ public class ContextMenu extends JPanel {
 	private static class ContextMenuItem extends JComponent implements
 			MouseListener {
 
-		private final AppView appView;
+		private final TaggerView appView;
 		private final String text;
 		private final ContextMenuAction action;
 		private boolean hover;
 		private boolean pressed;
 
-		private ContextMenuItem(AppView appView, String text,
+		private ContextMenuItem(TaggerView appView, String text,
 				ContextMenuAction action) {
 			if (appView == null || text == null || action == null) {
 				throw new NullPointerException();
@@ -116,7 +116,7 @@ public class ContextMenu extends JPanel {
 
 	}
 
-	public ContextMenu(AppView appView, Map<String, ContextMenuAction> map) {
+	public ContextMenu(TaggerView appView, Map<String, ContextMenuAction> map) {
 		setBackground(FontsAndColors.CONTEXTMENU_BG);
 		setLayout(new ConstraintLayout());
 		int top = 0;

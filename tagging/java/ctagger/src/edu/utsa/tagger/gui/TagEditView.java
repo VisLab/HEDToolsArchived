@@ -56,10 +56,10 @@ public class TagEditView extends ConstraintContainer {
 	public final static int HEIGHT = 225;
 	private final Tagger tagger;
 	private int top = 15;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final GuiTagModel tagModel;
 
-	public TagEditView(Tagger tagger, AppView appView, GuiTagModel model) {
+	public TagEditView(Tagger tagger, TaggerView appView, GuiTagModel model) {
 		this.tagger = tagger;
 		this.appView = appView;
 		this.tagModel = model;

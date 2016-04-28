@@ -64,11 +64,11 @@ public class YesNoDialog extends JDialog {
 		label = new JLabel(message, JLabel.CENTER);
 		label.setFont(FontsAndColors.contentFont);
 		bgPanel.add(label, new Constraint("top:0 height:30 left:0 width:400"));
-		yesButton = AppView.createMenuButton("Yes");
+		yesButton = TaggerView.createMenuButton("Yes");
 		bgPanel.add(yesButton, new Constraint(
 				"bottom:10 height:30 left:5 width:80"));
 		yesButton.addMouseListener(new OptionButtonListener(0));
-		noButton = AppView.createMenuButton("No");
+		noButton = TaggerView.createMenuButton("No");
 		bgPanel.add(noButton, new Constraint(
 				"bottom:10 height:30 right:5 width:80"));
 		noButton.addMouseListener(new OptionButtonListener(1));

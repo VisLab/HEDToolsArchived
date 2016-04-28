@@ -39,7 +39,7 @@ public class TagView extends JComponent implements MouseListener {
 	private static final String COLLAPSED = "\ue00f";
 
 	private final Tagger tagger;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final GuiTagModel model;
 	private boolean highlight = false;
 
@@ -53,7 +53,7 @@ public class TagView extends JComponent implements MouseListener {
 
 	private Rectangle collapserBounds = new Rectangle(0, 0, 0, 0);
 
-	public TagView(Tagger tagger, AppView appview, GuiTagModel model) {
+	public TagView(Tagger tagger, TaggerView appview, GuiTagModel model) {
 		this.tagger = tagger;
 		this.appView = appview;
 		this.model = model;

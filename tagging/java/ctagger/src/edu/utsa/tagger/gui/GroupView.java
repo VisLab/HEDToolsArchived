@@ -45,14 +45,14 @@ public class GroupView extends JComponent implements MouseListener,
 
 	private final int MAX_GROUP_TILDES = 2;
 	private final Tagger tagger;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final Integer groupId;
 	private HashMap<AbstractTagModel, TagEventView> tagEgtViews;
 	private boolean highlight = false;
 	private boolean selected = false;
 	XCheckBox checkbox;
 
-	public GroupView(Tagger tagger, AppView appView, Integer groupId) {
+	public GroupView(Tagger tagger, TaggerView appView, Integer groupId) {
 		this.tagger = tagger;
 		this.appView = appView;
 		this.groupId = groupId;

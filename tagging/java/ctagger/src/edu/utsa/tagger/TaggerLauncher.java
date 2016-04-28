@@ -9,10 +9,10 @@ import edu.utsa.tagger.gui.GuiModelFactory;
  * @author Lauren Jett, Rebecca Strautman, Thomas Rognon, Jeremy Cockfield, Kay
  *         Robbins
  */
-public class Launcher {
+public class TaggerLauncher {
 	public static void main(String[] args) {
 
-		Loader.load(Loader.TAG_EDIT_ALL, 0, "CTAGGER", 3,
+		TaggerLoader.load(TaggerLoader.TAG_EDIT_ALL, 0, "CTAGGER", 3,
 				new GuiModelFactory(), true, false);
 
 	}

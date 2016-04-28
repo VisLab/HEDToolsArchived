@@ -100,7 +100,7 @@ public class Tagger {
 	}
 
 	private IFactory factory;
-	private Loader loader;
+	private TaggerLoader loader;
 	// Set of tags in the HED hierarchy
 	private TaggerSet<AbstractTagModel> tagList = new TaggerSet<AbstractTagModel>();
 	// Set of events and their associated tags
@@ -139,12 +139,12 @@ public class Tagger {
 	 * @param loader
 	 *            loads the tagger GUI
 	 */
-	public Tagger(boolean isPrimary, IFactory factory, Loader loader) {
+	public Tagger(boolean isPrimary, IFactory factory, TaggerLoader loader) {
 		this.isPrimary = isPrimary;
 		this.factory = factory;
 		this.loader = loader;
 		history = new TaggerHistory(this);
-		editTags = loader.testFlag(Loader.TAG_EDIT_ALL);
+		editTags = loader.checkFlags(TaggerLoader.TAG_EDIT_ALL);
 	}
 
 	/**
@@ -158,12 +158,12 @@ public class Tagger {
 	 * @param loader
 	 *            loads the tagger GUI
 	 */
-	public Tagger(String xmlData, boolean isPrimary, IFactory factory, Loader loader) {
+	public Tagger(String xmlData, boolean isPrimary, IFactory factory, TaggerLoader loader) {
 		this.isPrimary = isPrimary;
 		this.factory = factory;
 		this.loader = loader;
 		history = new TaggerHistory(this);
-		editTags = loader.testFlag(Loader.TAG_EDIT_ALL);
+		editTags = loader.checkFlags(TaggerLoader.TAG_EDIT_ALL);
 
 		if (xmlData.isEmpty()) {
 			throw new RuntimeException("XML data is empty.");
@@ -196,18 +196,18 @@ public class Tagger {
 	 * @param loader
 	 *            loads the tagger GUI
 	 */
-	public Tagger(String hedXmlString, String egtString, boolean isPrimary, IFactory factory, Loader loader) {
+	public Tagger(String hedXmlString, String egtString, boolean isPrimary, IFactory factory, TaggerLoader loader) {
 		this.factory = factory;
 		this.loader = loader;
 		this.isPrimary = isPrimary;
 		history = new TaggerHistory(this);
-		editTags = loader.testFlag(Loader.TAG_EDIT_ALL);
+		editTags = loader.checkFlags(TaggerLoader.TAG_EDIT_ALL);
 		tagList = new TaggerSet<AbstractTagModel>();
 		taggedEventSet = new TaggerSet<TaggedEvent>();
 		try {
 			HedXmlModel hedXmlModel = readHedXmlString(hedXmlString);
 			populateTagList(hedXmlModel);
-			if (loader.testFlag(Loader.USE_JSON)) {
+			if (loader.checkFlags(TaggerLoader.USE_JSON)) {
 				Set<EventJsonModel> eventJsonModels = readEventJsonString(egtString);
 				populateEventsFromJson(eventJsonModels);
 			} else {
@@ -2490,7 +2490,7 @@ public class Tagger {
 	 */
 	public ToggleTagMessage toggleTag(AbstractTagModel tagModel, Set<Integer> groupIds) {
 		AbstractTagModel uniqueKey = getUniqueKey(tagModel);
-		if (!loader.testFlag(Loader.PRESERVE_PREFIX) || uniqueKey != null || tagModel.isRecommended()
+		if (!loader.checkFlags(TaggerLoader.PRESERVE_PREFIX) || uniqueKey != null || tagModel.isRecommended()
 				|| tagModel.isRequired()) {
 			return toggleTagReplacePrefix(tagModel, groupIds, uniqueKey);
 		}
