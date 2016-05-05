@@ -17,25 +17,6 @@
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%   'RewriteOption'  String indicating how tag information should be
-%                    written to the datasets. The options are 'Both',
-%                    'Individual', 'None', 'Summary'. See the notes for
-%                    additional information.
-%
-% Notes:
-%   The tags are written to the data files in two ways. In both cases
-%   the dataset x is assumed to be a MATLAB structure:
-%   1) If the 'RewriteOption' is either 'Both' or 'Summary', the tags
-%      are written to the dataset in the x.etc.tags field:
-%            x.etc.tags.xml
-%            x.etc.tags.map(1).field
-%            x.etc.tags.map(1).values ...
-%                   ...
-%
-%   2) If the 'RewriteOption' is either 'Both' or 'Individual', the tags
-%      are also written to x.event.usertags based on the individual
-%      values of their events.
-%
 % Function documentation:
 % Execute the following in the MATLAB command window to view the function
 % documentation for writetags:
@@ -66,22 +47,7 @@
 %
 
 function eData = writetags(eData, fMap, varargin)
-% Parse the input arguments
-parser = inputParser;
-parser.addRequired('eData', @(x) (isempty(x) || isstruct(x)));
-parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
-parser.addParamValue('ExcludeFields', {}, @(x) (iscellstr(x)));
-parser.addParamValue('PreservePrefix', false, @islogical);
-parser.addParamValue('RewriteOption', 'Both', ...
-    @(x) any(validatestring(lower(x), ...
-    {'Both', 'Individual', 'None', 'Summary'})));
-parser.parse(eData, fMap, varargin{:});
-p = parser.Results;
-
-% Do nothing if option is 'none'
-if strcmpi(p.RewriteOption, 'None')
-    return;
-end
+p = parseArguments();
 
 % Prepare the values to be written
 tFields = setdiff(fMap.getFields(), p.ExcludeFields);
@@ -97,8 +63,7 @@ end
 % Write the etc.tags.map fields
 eFields = intersect(union(eFields, urFields), tFields);
 
-% Write summary if needed (write all Fmap non-excluded fields
-if strcmpi(p.RewriteOption, 'Summary') || strcmpi(p.RewriteOption, 'Both')
+% Write summary tags in etc fields
     
     % Prepare the structure
     if isfield(eData, 'etc') && ~isstruct(eData.etc)
@@ -114,11 +79,9 @@ if strcmpi(p.RewriteOption, 'Summary') || strcmpi(p.RewriteOption, 'Both')
         end
     end
     eData.etc.tags = struct('xml', fMap.getXml(), 'map', map);
-end
 
-% Write tags to individual events in usertags field if needed
-if isfield(eData, 'event') && (strcmpi(p.RewriteOption, 'Both') ...
-        || strcmpi(p.RewriteOption, 'Individual'))
+% Write tags to individual events in usertags field
+if isfield(eData, 'event') 
     for k = 1:length(eData.event)
         uTags = {};
         for l = 1:length(eFields)
@@ -160,5 +123,16 @@ if isfield(eData, 'event') && (strcmpi(p.RewriteOption, 'Both') ...
         end
     end
 end
+
+    function p = parseArguments()
+        % Parses the input arguments and returns the results
+        parser = inputParser;
+        parser.addRequired('eData', @(x) (isempty(x) || isstruct(x)));
+        parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
+        parser.addParamValue('ExcludeFields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('PreservePrefix', false, @islogical);
+        parser.parse(eData, fMap, varargin{:});
+        p = parser.Results;
+    end % parseArguments
 
 end %writetags
