@@ -37,9 +37,9 @@
 % $Initial version $
 %
 
-function [inDir, baseMap, doSubDirs, editXml, preservePrefix, ...
-    rewriteOption, saveMapFile, selectOption, useGUI, writeTags, ...
-    cancelled] = tagdir_input()
+function [cancelled, inDir, baseMap, doSubDirs, editXml, ...
+    preservePrefix, rewriteOption, saveDatasets, saveMapFile, ...
+    selectOption, useGUI, writeTags] = tagdir_input()
 
 % Setup the variables used by the GUI
 baseMap = '';
@@ -48,7 +48,8 @@ doSubDirs = true;
 inDir = '';
 preservePrefix = false;
 editXml = false;
-rewriteOption = 'Preserve';
+rewriteOption = 'preserve';
+saveDatasets = true;
 saveMapFile = '';
 selectOption = true;
 useGUI = true;
@@ -80,7 +81,7 @@ uiwait(inputFig);
         % Callback for browse button sets a directory for control
         [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Save field map', 'fMap.mat');
-        if file ~= 0
+        if ischar(file) && ~isempty(file)
             saveMapFile = fullfile(path, file);
             set(findobj('Tag', 'SaveTags'), 'String', saveMapFile);
         end
@@ -90,8 +91,11 @@ uiwait(inputFig);
         % Callback for browse button sets a directory for control
         [file, path] = uigetfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Browse for base tags');
-        baseMap = fullfile(path, file);
-        set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        tagsFile = fullfile(path, file);
+        if ischar(file) && ~isempty(file) && validateBaseTags(tagsFile)
+            baseMap = fullfile(path, file);
+            set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        end
     end % browseTagsCallback
 
 
@@ -304,7 +308,7 @@ uiwait(inputFig);
 
     function rewriteCallback(src, ~)
         % Callback for the radio button group
-        rewriteOption = lower(get(src, 'Tag'));
+        rewriteOption = lower(get(get(src, 'SelectedObject'), 'Tag'));
     end % rewriteCallback
 
     function selectCallback(src, eventdata) %#ok<INUSD>
@@ -313,14 +317,21 @@ uiwait(inputFig);
 
     function tagsCtrlCallback(hObject, eventdata, tagsCtrl) %#ok<INUSD>
         % Callback for user directly editing directory control textbox
-        tagsFile = get(hObject, 'String');
-        if isempty(typeMap.loadTagFile(tagsFile))
-            warndlg([ tagsFile ' does not contain an typeMap object'], 'modal');
-            set(hObject, 'String', baseMap);
-        else
+        tagsFile = get(src, 'String');
+        if ~isempty(strtrim(tagsFile)) && validateBaseTags(tagsFile)
             baseMap = tagsFile;
         end
     end % tagsCtrlCallback
+
+    function valid = validateBaseTags(tagsFile)
+        valid = true;
+        if isempty(fieldMap.loadFieldMap(tagsFile))
+            valid = false;
+            warndlg([ tagsFile ...
+                ' is a invalid base tag file'], 'Invalid file');
+            set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        end
+    end % validateBaseTags
 
     function useGUICallback(src, eventdata) %#ok<INUSD>
         useGUI = get(src, 'Max') == get(src, 'Value');

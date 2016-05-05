@@ -37,17 +37,18 @@
 % $Initial version $
 %
 
-function [baseMap,  editXml, preservePrefix, rewriteOption, ...
-    saveMapFile, selectOption, useGUI, cancelled] = tageeg_input()
+function [baseMap, cancelled, editXml, preservePrefix, rewriteOption, ...
+    saveDataset, selectFields, saveMapFile, useGUI] = tageeg_input()
 
 % Setup the variables used by the GUI
 baseMap = '';
 cancelled = true;
 editXml = false;
 preservePrefix = false;
-rewriteOption = 'Preserve';
+rewriteOption = 'preserve';
+saveDataset = false;
 saveMapFile = '';
-selectOption = true;
+selectFields = true;
 useGUI = true;
 title = 'Inputs for tagging an EEG structure';
 inputFig = figure( ...
@@ -73,7 +74,7 @@ end
         % Callback for browse button sets a directory for control
         [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Save field map', 'fMap.mat');
-        if file ~= 0
+        if ischar(file) && ~isempty(file)
             saveMapFile = fullfile(path, file);
             set(findobj('Tag', 'SaveTags'), 'String', saveMapFile);
         end
@@ -83,8 +84,11 @@ end
         % Callback for browse button sets a directory for control
         [file, path] = uigetfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Browse for base tags');
-        baseMap = fullfile(path, file);
-        set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        tagsFile = fullfile(path, file);
+        if ischar(file) && ~isempty(file) && validateBaseTags(tagsFile)
+            baseMap = tagsFile;
+            set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        end
     end % browseTagsCallback
 
     function cancelCallback(src, eventdata)  %#ok<INUSD>
@@ -94,7 +98,7 @@ end
         preservePrefix = false;
         rewriteOption = 'Preserve';
         saveMapFile = '';
-        selectOption = true;
+        selectFields = true;
         useGUI = true;
         close(inputFig);
     end % browseTagsCallback
@@ -266,9 +270,9 @@ end
         preservePrefix = get(src, 'Max') == get(src, 'Value');
     end % useGUICallback
 
-    function rewriteCallback(src, ~)  
+    function rewriteCallback(src, ~)
         % Callback for the radio button group
-        rewriteOption = lower(get(src, 'Tag'));
+        rewriteOption = lower(get(get(src, 'SelectedObject'), 'Tag'));
     end % rewriteCallback
 
     function saveTagsCtrlCallback(src, ~)
@@ -277,20 +281,26 @@ end
     end % saveTagsCtrlCallback
 
     function selectCallback(src, ~)
-        selectOption = get(src, 'Max') == get(src, 'Value');
+        selectFields = get(src, 'Max') == get(src, 'Value');
     end % selectCallback
 
-    function tagsCtrlCallback(src, ~) 
+    function tagsCtrlCallback(src, ~)
         % Callback for user directly editing directory control textbox
         tagsFile = get(src, 'String');
-        if isempty(typeMap.loadTagFile(tagsFile))
-            warndlg([ tagsFile ...
-                ' does not contain an typeMap object'], 'modal');
-            set(src, 'String', baseMap);
-        else
+        if ~isempty(strtrim(tagsFile)) && validateBaseTags(tagsFile)
             baseMap = tagsFile;
         end
     end % tagsCtrlCallback
+
+    function valid = validateBaseTags(tagsFile)
+        valid = true;
+        if isempty(fieldMap.loadFieldMap(tagsFile))
+            valid = false;
+            warndlg([ tagsFile ...
+                ' is a invalid base tag file'], 'Invalid file');
+            set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        end
+    end % validateBaseTags
 
     function saveCallback(src, ~)
         saveDataset = get(src, 'Max') == get(src, 'Value');
@@ -303,7 +313,7 @@ end
         end
     end % saveAllCallback
 
-    function useGUICallback(src, ~) 
+    function useGUICallback(src, ~)
         useGUI = get(src, 'Max') == get(src, 'Value');
         if ~useGUI
             set(findobj('Tag', 'SelectFieldsCB'), 'Enable', 'off');

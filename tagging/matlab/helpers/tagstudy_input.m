@@ -37,25 +37,23 @@
 % $Initial version $
 %
 
-function [studyFile, baseMap, editXml, preservePrefix, ...
-    rewriteOption, saveDatasets, saveMapFile,  selectOption, useGUI, ...
-    writeTags, cancelled] =  tagstudy_input()
+function [cancelled, baseMap, editXml, preservePrefix, rewriteOption, ...
+    saveDatasets, saveMapFile,  selectOption, studyFile, useGUI] ...
+    = tagstudy_input()
 
 % Setup the variables used by the GUI
 baseMap = '';
 cancelled = true;
 preservePrefix = false;
 editXml = false;
-rewriteOption = 'Both';
+rewriteOption = 'preserve';
 writeButtonGroup = '';
-editXmlCtrl = '';
 saveDatasets = true;
 saveMapFile = '';
 selectOption = true;
 studyFile = '';
 useGUI = true;
 title = 'Inputs for tagging EEG study';
-writeTags = true;
 inputFig = figure( ...
     'Color', [.94 .94 .94], ...
     'MenuBar', 'none', ...
@@ -75,7 +73,7 @@ uiwait(inputFig);
         % Callback for browse button sets a directory for control
         [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Save field map', 'fMap.mat');
-        if file ~= 0
+        if ischar(file) && ~isempty(file)
             saveMapFile = fullfile(path, file);
             set(findobj('Tag', 'SaveTags'), 'String', saveMapFile);
         end
@@ -85,8 +83,11 @@ uiwait(inputFig);
         % Callback for browse button sets a directory for control
         [file, path] = uigetfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Browse for base tags');
-        baseMap = fullfile(path, file);
-        set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        tagsFile = fullfile(path, file);
+        if ischar(file) && ~isempty(file) && validateBaseTags(tagsFile)
+            baseMap = fullfile(path, file);
+            set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        end
     end % browseTagsCallback
 
     function createLayout()
@@ -118,7 +119,7 @@ uiwait(inputFig);
             'Position', [0.015 .2 0.12 0.13]);
         uicontrol('Parent', browsePanel, 'Style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
-            'Tag', 'StudyEdit', 'String', '', ...
+            'Tag', 'Study', 'String', '', ...
             'TooltipString', ...
             'EEG study file name', ...
             'Units','normalized',...
@@ -126,7 +127,7 @@ uiwait(inputFig);
             'Position', [0.15 0.7 0.6 0.25]);
         uicontrol('Parent', browsePanel, 'style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
-            'Tag', 'BaseTagsEdit', 'String', '', ...
+            'Tag', 'BaseTags', 'String', '', ...
             'TooltipString', ...
             'Complete path for loading the consolidated event tags', ...
             'Units','normalized',...
@@ -271,10 +272,10 @@ uiwait(inputFig);
         % Callback for browse button sets a directory for control
         [file, filePath] = uigetfile({'*.study', 'Study files(*.study)'}, ...
             'Browse for study file');
-        file = fullfile(filePath, file);
-        if file ~= 0
-            set(findobj('Tag', 'StudyEdit'), 'String', file);
-            studyFile = file;
+        study = fullfile(filePath, file);
+        if ischar(study) && ~isempty(study)
+            set(findobj('Tag', 'Study'), 'String', study);
+            studyFile = study;
         end
     end % browseStudyCallback
 
@@ -302,11 +303,11 @@ uiwait(inputFig);
         preservePrefix = get(src, 'Max') == get(src, 'Value');
     end % preservePrefixCallback
 
-    function rewriteCallback(src, ~) 
+    function rewriteCallback(src, ~)
         rewriteOption = get(get(src, 'SelectedObject'), 'Tag');
     end % rewriteCallback
 
-    function saveCallback(src, ~) 
+    function saveCallback(src, ~)
         saveDatasets = get(src, 'Max') == get(src, 'Value');
         if ~saveDatasets
             set(findall(writeButtonGroup, '-property', 'Enable'), ...
@@ -322,11 +323,11 @@ uiwait(inputFig);
         saveMapFile = get(src, 'String');
     end % tagsCtrlCallback
 
-    function selectCallback(src, ~) 
+    function selectCallback(src, ~)
         selectOption = get(src, 'Max') == get(src, 'Value');
     end % selectCallback
 
-    function studyCtrlCallback(src, ~) 
+    function studyCtrlCallback(src, ~)
         % Callback for user directly editing directory control textbox
         study = get(src, 'String');
         if exist(study, 'file')
@@ -338,7 +339,10 @@ uiwait(inputFig);
 
     function tagsCtrlCallback(src, ~)
         % Callback for user directly editing directory control textbox
-        baseMap = get(src, 'String');
+        tagsFile = get(src, 'String');
+        if ~isempty(strtrim(tagsFile)) && validateBaseTags(tagsFile)
+            baseMap = tagsFile;
+        end
     end % tagsCtrlCallback
 
     function useGUICallback(src, ~)
@@ -353,6 +357,16 @@ uiwait(inputFig);
             set(findobj('Tag', 'PreservePrefixCB'), 'Enable', 'on');
         end
     end % useGUICallback
+
+    function valid = validateBaseTags(tagsFile)
+        valid = true;
+        if isempty(fieldMap.loadFieldMap(tagsFile))
+            valid = false;
+            warndlg([ tagsFile ...
+                ' is a invalid base tag file'], 'Invalid file');
+            set(findobj('Tag', 'BaseTags'), 'String', baseMap);
+        end
+    end % validateBaseTags
 
     function editXmlCallback(src, eventdata) %#ok<INUSD>
         editXml = get(src, 'Max') == get(src, 'Value');
