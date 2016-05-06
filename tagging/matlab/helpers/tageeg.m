@@ -132,18 +132,21 @@ if ~canceled
     % Now finish writing the tags to the EEG structure
     EEG = writetags(EEG, fMap, 'ExcludeFields', excluded, ...
         'PreservePrefix', p.PreservePrefix);
-    if isequal(p.Precision, 'double') && issingle(EEG.data)
+    if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
         EEG.data = double(EEG.data);
-    elseif isequal(p.Precision, 'single') && isdouble(EEG.data)
+    elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
         EEG.data = single(EEG.data);
     end
     if p.SaveDataset
        if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
-         EEG = pop_saveset(EEG, 'savemode', 'onefile');
+         EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
+             EEG.filepath, 'savemode', 'onefile');
        elseif isequal(p.SaveMode, 'twofiles')
-         EEG = pop_saveset(EEG, 'savemode', 'twoFiles'); 
+         EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
+             EEG.filepath, 'savemode', 'twoFiles'); 
        else
-         EEG = pop_saveset(EEG, 'savemode', 'resave');  
+         EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
+             EEG.filepath,'savemode', 'resave');  
        end
     end
 end
