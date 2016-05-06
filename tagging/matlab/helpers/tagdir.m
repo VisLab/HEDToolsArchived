@@ -177,7 +177,6 @@ if ~canceled
                     EEG.filepath,'savemode', 'resave');
             end
         end
-        %         pop_saveset(teeg, 'filename', fPaths{k});
     end
 end
 
@@ -193,10 +192,10 @@ end
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('Precision', 'Preserve', ...
             @(x) any(validatestring(lower(x), ...
             {'Double', 'Preserve', 'Single'})));
+        parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('SaveDatasets', false, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
         parser.addParamValue('SaveMode', 'TwoFiles', ...
