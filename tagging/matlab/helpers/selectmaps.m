@@ -48,6 +48,7 @@
 %
 
 function [fMap, excluded, canceled] = selectmaps(fMap, varargin)
+title = 'Please select the fields that you would like to tag';
 canceled = false;
 % Check the input arguments for validity and initialize
 parser = inputParser;
@@ -73,26 +74,36 @@ if isempty(fields) || ~parser.Results.SelectOption
     return;
 end
 
-excludeUser = {};
 % Tag the values associated with field
-for k = 1:length(fields)
-    tMap = fMap.getMap(fields{k});
-    if isempty(tMap)
-        labels = {' '};
-    else
-        labels = tMap.getCodes();
-    end
-    [retValue, primary] = tagdlg(fields{k}, labels);
-    tValues = tMap.getValueStruct();
-    fMap.removeMap(fields{k});
-    fMap.addValues(fields{k}, tValues, 'Primary', primary);
-    if strcmpi(retValue, 'Exclude')
-        excludeUser = [excludeUser fields{k}]; %#ok<AGROW>
-    elseif strcmpi(retValue, 'Cancel')
-        canceled = true;
-        excludeUser = {};
-        break;
-    end
+% for k = 1:length(fields)
+%     tMap = fMap.getMap(fields{k});
+%     if isempty(tMap)
+%         labels = {' '};
+%     else
+%         labels = tMap.getCodes();
+%     end
+%     [retValue, primary] = tagdlg(fields{k}, labels);
+%     tValues = tMap.getValueStruct();
+%     fMap.removeMap(fields{k});
+%     fMap.addValues(fields{k}, tValues, 'Primary', primary);
+%     if strcmpi(retValue, 'Exclude')
+%         excludeUser = [excludeUser fields{k}]; %#ok<AGROW>
+%     elseif strcmpi(retValue, 'Cancel')
+%         canceled = true;
+%         excludeUser = {};
+%         break;
+%     end
+% end
+loader = javaObjectEDT('edu.utsa.tagger.FieldSelectLoader', title, ...
+    {}, fields);
+[notified, submitted] = checkStatus(loader);
+while (~notified)
+    pause(0.5);
+    [notified, submitted] = checkStatus(loader);
+end
+excludeUser = cell(loader.getExcludeFields());
+if ~submitted
+    canceled = true;
 end
 
 if isempty(excludeUser)
@@ -104,4 +115,9 @@ for k = 1:length(excludeUser)
     fMap.removeMap(excludeUser{k});
 end
 excluded = union(excluded, excludeUser);
+
+    function [notified, submitted] = checkStatus(loader)
+        notified = loader.isNotified();
+        submitted = loader.isSubmitted();
+    end
 end % selectmaps
