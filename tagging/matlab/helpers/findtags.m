@@ -75,63 +75,80 @@ p = parser.Results;
 edata = p.edata;
 
 % If edata.etc.tags exists, then extract tag information
-xml = '';
-tFields = {};
+
 if isfield(edata, 'etc') && isstruct(edata.etc) && ...
         isfield(edata.etc, 'tags') && isstruct(edata.etc.tags)
+    xml = '';
     if isfield(edata.etc.tags, 'xml')
         xml = edata.etc.tags.xml;
     end
+    fMap = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
     if isfield(edata.etc.tags, 'map') && isstruct(edata.etc.tags.map) ...
             && isfield(edata.etc.tags.map, 'field')
         tFields = {edata.etc.tags.map.field};
-    end
-end
-fMap = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
-if ~isempty(p.Fields)
-    tFields = intersect(p.Fields, tFields);
-end
-
-
-for k = 1:length(tFields)
-    thisField = edata.etc.tags.map(k).field;
-    if sum(strcmpi(thisField, tFields) == 1)
-        fMap.addValues(thisField, edata.etc.tags.map(k).values);
-    end
-end
-
-efields = {};
-if isfield(edata, 'event') && isstruct(edata.event)
-    efields = fieldnames(edata.event);
-end
-if isfield(edata, 'urevent') && isstruct(edata.urevent)
-    efields = union(efields, fieldnames(edata.urevent));
-end
-
-efields = setdiff(efields, p.ExcludeFields);
-if ~isempty(p.Fields)
-    efields = intersect(p.Fields, efields);
-end
-
-for k = 1:length(efields)
-    if isfield(edata.event, 'usertags')
-        tMap = extractTags(edata, efields{k});
-        tMapValues = getValues(tMap);
-        for j = 1:length(tMapValues)
-            fMap.addValues(efields{k}, tMapValues{j});
+        allFields = {edata.etc.tags.map.field};
+        if ~isempty(p.Fields)
+            tFields = intersect(p.Fields, tFields);
+        end
+        for k = 1:length(allFields)
+            thisField = edata.etc.tags.map(k).field;
+            if sum(strcmpi(thisField, tFields) == 1)
+                fMap.addValues(thisField, edata.etc.tags.map(k).values);
+            end
         end
     end
-    tValues = getutypes(edata.event, efields{k});
-    if isfield(edata, 'urevent')
-        tValues = union(tValues, getutypes(edata.urevent, efields{k}));
+else
+    % If edata.etc.tags don't exists
+    efields = {};
+    if isfield(edata, 'event') && isstruct(edata.event)
+        efields = fieldnames(edata.event);
     end
-    if isempty(tValues)
-        continue
+    if isfield(edata, 'urevent') && isstruct(edata.urevent)
+        efields = union(efields, fieldnames(edata.urevent));
     end
-    valueForm = tagList.empty(0,length(tValues));
-    for j = 1:length(tValues)
-        valueForm(j) = tagList(num2str(tValues{j})); 
+    
+    efields = setdiff(efields, p.ExcludeFields);
+    if ~isempty(p.Fields)
+        efields = intersect(p.Fields, efields);
     end
-    fMap.addValues(efields{k}, valueForm);
+    
+    fMap = fieldMap('PreservePrefix', p.PreservePrefix);
+    
+    for k = 1:length(efields)
+        tValues = getutypes(edata.event, efields{k});
+        if isfield(edata, 'urevent')
+            tValues = union(tValues, getutypes(edata.urevent, efields{k}));
+        end
+        if isempty(tValues)
+            continue;
+        end
+        valueForm = tagList.empty(0,length(tValues));
+        for j = 1:length(tValues)
+            valueForm(j) = tagList(num2str(tValues{j}));
+        end
+        fMap.addValues(efields{k}, valueForm);
+    end
 end
+
+% for k = 1:length(efields)
+%     if isfield(edata.event, 'usertags')
+%         tMap = extractTags(edata, efields{k});
+%         tMapValues = getValues(tMap);
+%         for j = 1:length(tMapValues)
+%             fMap.addValues(efields{k}, tMapValues{j});
+%         end
+%     end
+%     tValues = getutypes(edata.event, efields{k});
+%     if isfield(edata, 'urevent')
+%         tValues = union(tValues, getutypes(edata.urevent, efields{k}));
+%     end
+%     if isempty(tValues)
+%         continue
+%     end
+%     valueForm = tagList.empty(0,length(tValues));
+%     for j = 1:length(tValues)
+%         valueForm(j) = tagList(num2str(tValues{j}));
+%     end
+%     fMap.addValues(efields{k}, valueForm);
+% end
 end %findtags
