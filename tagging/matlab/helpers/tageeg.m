@@ -96,7 +96,7 @@ function [EEG, fMap, excluded] = tageeg(EEG, varargin)
 p = parseArguments();
 
 % Get the existing tags for the EEG
-fMap = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
+[fMap, fMapTag] = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
     'ExcludeFields', p.ExcludeFields, 'Fields', p.Fields);
 
 % Exclude the appropriate tags from baseTags
@@ -109,30 +109,32 @@ end
 if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
-fMap.merge(baseTags, 'Merge', excluded, p.Fields);
+fMapTag.merge(baseTags, 'Merge', excluded, p.Fields);
 canceled = false;
 
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMap, exc, canceled] = selectmaps(fMap);
+    [fMapTag, exc, canceled] = selectmaps(fMapTag);
     excluded = union(excluded, exc);
 end
 
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
-        p.PreservePrefix, 'Synchronize', p.Synchronize);
+    [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
+        'PreservePrefix', p.PreservePrefix);
 end
+
+fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
 
 if ~canceled
     % Save the fieldmap
-    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
+    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, ...
+            fMap)
         warning('tageeg:invalidFile', ...
             ['Couldn''t save fieldMap to ' p.SaveMapFile]);
     end
     
     % Now finish writing the tags to the EEG structure
-    EEG = writetags(EEG, fMap, 'ExcludeFields', excluded, ...
-        'PreservePrefix', p.PreservePrefix);
+    EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
     if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
         EEG.data = double(EEG.data);
     elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')

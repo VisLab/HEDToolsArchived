@@ -60,7 +60,7 @@
 % $Initial version $
 %
 
-function fMap = findtags(edata, varargin)
+function [fMapAll, fMapTagged] = findtags(edata, varargin)
 % Parse the input arguments
 parser = inputParser;
 parser.addRequired('edata', @(x) (isempty(x) || isstruct(x)));
@@ -82,7 +82,8 @@ if isfield(edata, 'etc') && isstruct(edata.etc) && ...
     if isfield(edata.etc.tags, 'xml')
         xml = edata.etc.tags.xml;
     end
-    fMap = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
+    fMapAll = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
+    fMapTagged = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
     if isfield(edata.etc.tags, 'map') && isstruct(edata.etc.tags.map) ...
             && isfield(edata.etc.tags.map, 'field')
         tFields = {edata.etc.tags.map.field};
@@ -93,8 +94,9 @@ if isfield(edata, 'etc') && isstruct(edata.etc) && ...
         for k = 1:length(allFields)
             thisField = edata.etc.tags.map(k).field;
             if sum(strcmpi(thisField, tFields) == 1)
-                fMap.addValues(thisField, edata.etc.tags.map(k).values);
+                fMapTagged.addValues(thisField, edata.etc.tags.map(k).values);
             end
+            fMapAll.addValues(thisField, edata.etc.tags.map(k).values);
         end
     end
 else
@@ -112,8 +114,8 @@ else
         efields = intersect(p.Fields, efields);
     end
     
-    fMap = fieldMap('PreservePrefix', p.PreservePrefix);
-    
+    fMapAll = fieldMap('PreservePrefix', p.PreservePrefix);
+    fMapTagged = fieldMap('PreservePrefix', p.PreservePrefix);
     for k = 1:length(efields)
         tValues = getutypes(edata.event, efields{k});
         if isfield(edata, 'urevent')
@@ -126,7 +128,8 @@ else
         for j = 1:length(tValues)
             valueForm(j) = tagList(num2str(tValues{j}));
         end
-        fMap.addValues(efields{k}, valueForm);
+        fMapAll.addValues(efields{k}, valueForm);
+        fMapTagged.addValues(efields{k}, valueForm);
     end
 end
 
