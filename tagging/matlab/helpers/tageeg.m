@@ -111,9 +111,10 @@ if ~isempty(baseTags) && ~isempty(p.Fields)
 end;
 fMap.merge(baseTags, 'Merge', excluded, p.Fields);
 canceled = false;
-if p.UseGui && p.SelectFields
+
+if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMap, exc, canceled] = selectmaps(fMap, 'Fields', p.Fields);
+    [fMap, exc, canceled] = selectmaps(fMap);
     excluded = union(excluded, exc);
 end
 

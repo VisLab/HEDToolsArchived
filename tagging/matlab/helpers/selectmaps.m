@@ -11,9 +11,6 @@
 %
 % [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...) specifies
 % optional name/value parameter pairs:
-%   'Fields'         Cell array of field names of the fields to include
-%                    in the tagging. If this parameter is non-empty,
-%                    only these fields are tagged.
 %   'SelectOption'   If true (default), the user is presented with a GUI
 %                    that allows users to select which fields to tag.
 %
@@ -53,47 +50,17 @@ canceled = false;
 % Check the input arguments for validity and initialize
 parser = inputParser;
 parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
-parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
 parser.addParamValue('SelectOption', true, @islogical);
 parser.parse(fMap, varargin{:});
 
 % Figure out the fields to be used
 fields = fMap.getFields();
-sfields = parser.Results.Fields;
-if ~isempty(sfields)
-    excluded = setdiff(fields, sfields);
-    fields = intersect(fields, sfields);
-    for k = 1:length(excluded)
-        fMap.removeMap(excluded{k});
-    end
-else
-    excluded = {};
-end
+excluded = {};
 
 if isempty(fields) || ~parser.Results.SelectOption
     return;
 end
 
-% Tag the values associated with field
-% for k = 1:length(fields)
-%     tMap = fMap.getMap(fields{k});
-%     if isempty(tMap)
-%         labels = {' '};
-%     else
-%         labels = tMap.getCodes();
-%     end
-%     [retValue, primary] = tagdlg(fields{k}, labels);
-%     tValues = tMap.getValueStruct();
-%     fMap.removeMap(fields{k});
-%     fMap.addValues(fields{k}, tValues, 'Primary', primary);
-%     if strcmpi(retValue, 'Exclude')
-%         excludeUser = [excludeUser fields{k}]; %#ok<AGROW>
-%     elseif strcmpi(retValue, 'Cancel')
-%         canceled = true;
-%         excludeUser = {};
-%         break;
-%     end
-% end
 loader = javaObjectEDT('edu.utsa.tagger.FieldSelectLoader', title, ...
     {}, fields);
 [notified, submitted] = checkStatus(loader);
@@ -102,8 +69,13 @@ while (~notified)
     [notified, submitted] = checkStatus(loader);
 end
 excludeUser = cell(loader.getExcludeFields());
+primaryField = char(loader.getPrimaryField());
 if ~submitted
     canceled = true;
+end
+
+if ~isempty(primaryField)
+    fMap.setPrimaryMap(primaryField);
 end
 
 if isempty(excludeUser)
@@ -114,6 +86,7 @@ end
 for k = 1:length(excludeUser)
     fMap.removeMap(excludeUser{k});
 end
+
 excluded = union(excluded, excludeUser);
 
     function [notified, submitted] = checkStatus(loader)

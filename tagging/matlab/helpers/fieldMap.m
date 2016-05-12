@@ -127,7 +127,7 @@ classdef fieldMap < hgsetget
             p.addRequired('Type', @(x) (~isempty(x) && ischar(x)));
             p.addRequired('Values', ...
                 @(x) (isempty(x) || isstruct(x) || isa(x, 'tagList')));
-            p.addParamValue('Primary', true, ...
+            p.addParamValue('Primary', false, ...
                 @(x) validateattributes(x, {'logical'}, {}));
             p.addParamValue('UpdateType', 'merge', ...
                 @(x) any(validatestring(lower(x), ...
@@ -311,6 +311,17 @@ classdef fieldMap < hgsetget
                 obj.GroupMap.remove(field);
             end
         end % removeMap
+        
+        function setPrimaryMap(obj, field)
+            % Sets the tag map associated with specified field name as a
+            % primary field
+            if ~isempty(field)
+                tMap = getMap(obj, field);
+                setPrimary(tMap, true);
+                obj.GroupMap.remove(field);
+                obj.GroupMap(field) = tMap;
+            end
+        end % setPrimaryMap
         
         function setDescription(obj, description)
             % Set the description of the fieldMap
