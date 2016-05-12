@@ -99,7 +99,7 @@ excluded = '';
 
 % Consolidate all of the tags from the study
 [s, fPaths] = loadstudy(p.StudyFile);
-fMap = findtags(s, 'ExcludeFields', p.ExcludeFields, ...
+[fMap, fMapTag] = findtags(s, 'ExcludeFields', p.ExcludeFields, ...
     'Fields', p.Fields, 'PreservePrefix', p.PreservePrefix);
 
 % Merge the tags for the study from individual files
@@ -112,7 +112,7 @@ for k = 1:length(fPaths) % Assemble the list
     eegTemp = pop_loadset(fPaths{k});
     tMapNew = findtags(eegTemp, 'PreservePrefix', p.PreservePrefix, ...
         'ExcludeFields', p.ExcludeFields, 'Fields', p.Fields);
-    fMap.merge(tMapNew, 'Merge', p.ExcludeFields, p.Fields);
+    fMapTag.merge(tMapNew, 'Merge', p.ExcludeFields, p.Fields);
 end
 
 % Exclude the appropriate tags from baseTags
@@ -125,22 +125,25 @@ end
 if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
-fMap.merge(baseTags, 'Merge', excluded);
+fMapTag.merge(baseTags, 'Merge', excluded);
 canceled = false;
-if p.UseGui && p.SelectFields
+if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMap, exc, canceled] = selectmaps(fMap, 'Fields', p.Fields);
+    [fMapTag, exc, canceled] = selectmaps(fMapTag);
     excluded = union(excluded, exc);
 end
 
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
-        p.PreservePrefix, 'Synchronize', p.Synchronize);
+    [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
+        'PreservePrefix', p.PreservePrefix);
 end
+
+fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
 
 if ~canceled
     % Save the tags file for next step
-    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
+    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, ...
+            fMap)
         warning('tagstudy:invalidFile', ...
             ['Couldn''t save fieldMap to ' p.SaveMapFile]);
     end
@@ -171,8 +174,8 @@ if ~canceled
     end
     
     % Rewrite to the study file
-    s = writetags(s, fMap, 'ExcludeFields', excluded, ...
-        'PreservePrefix', p.PreservePrefix);  %#ok<NASGU>
+    s = writetags(s, fMap, 'PreservePrefix', ...
+        p.PreservePrefix);  %#ok<NASGU>
     save(p.StudyFile, 's', '-mat');
 end
 
