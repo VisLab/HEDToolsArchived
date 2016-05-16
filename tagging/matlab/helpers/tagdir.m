@@ -116,11 +116,15 @@ if isempty(fPaths)
     return;
 end
 fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
+fMapTag = fieldMap('PreservePrefix',  p.PreservePrefix);
 for k = 1:length(fPaths) % Assemble the list
     eegTemp = pop_loadset(fPaths{k});
-    tMapNew = findtags(eegTemp, 'PreservePrefix', p.PreservePrefix, ...
-        'ExcludeFields', p.ExcludeFields, 'Fields', p.Fields);
-    fMap.merge(tMapNew, 'Merge', p.ExcludeFields, p.Fields);
+    [tMapNew, tMapTagNew] = findtags(eegTemp, 'PreservePrefix', ...
+        p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, 'Fields', ...
+        p.Fields);
+    fMap.merge(tMapNew, 'Merge', p.ExcludeFields, tMapNew.getFields());
+    fMapTag.merge(tMapTagNew, 'Merge', p.ExcludeFields, ...
+        tMapTagNew.getFields());
 end
 % Exclude the appropriate tags from baseTags
 excluded = p.ExcludeFields;
@@ -132,18 +136,23 @@ end
 if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
-fMap.merge(baseTags, 'Merge', excluded, p.Fields);
+fMap.merge(baseTags, 'Update', excluded, p.Fields);
+fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
-if p.UseGui && p.SelectFields
+
+if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMap, exc, canceled] = selectmaps(fMap, 'Fields', p.Fields);
+    [fMapTag, exc, canceled] = selectmaps(fMapTag);
     excluded = union(excluded, exc);
 end
 
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, 'PreservePrefix', ...
-        p.PreservePrefix, 'Synchronize', p.Synchronize);
+    [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
+        'PreservePrefix', p.PreservePrefix);
 end
+
+% Replace the existing tags, and then add any new codes found
+fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
 
 if ~canceled
     % Save the tags file for next step
@@ -158,15 +167,15 @@ if ~canceled
         ' files---\n']);
     for k = 1:length(fPaths) % Assemble the list
         EEG = pop_loadset(fPaths{k});
-        EEG = writetags(EEG, fMap, 'ExcludeFields', excluded, ...
-            'PreservePrefix', p.PreservePrefix);
+        EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
         if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
             EEG.data = double(EEG.data);
         elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
             EEG.data = single(EEG.data);
         end
         if p.SaveDatasets
-            if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
+            if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, ...
+                    'double')
                 pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
                     EEG.filepath, 'savemode', 'onefile');
             elseif isequal(p.SaveMode, 'twofiles')
@@ -196,7 +205,7 @@ end
             @(x) any(validatestring(lower(x), ...
             {'Double', 'Preserve', 'Single'})));
         parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('SaveDatasets', false, @islogical);
+        parser.addParamValue('SaveDatasets', true, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
         parser.addParamValue('SaveMode', 'TwoFiles', ...
             @(x) any(validatestring(lower(x), {'OneFile', 'TwoFiles'})));
