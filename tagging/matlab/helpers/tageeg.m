@@ -38,8 +38,11 @@
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
+%   'PrimaryField'   The name of the primary field. Only one field can be
+%                    the primary field. A primary field requires a label,
+%                    category, and a description.
 %   'SaveDataset'    If false (default), only save the tags to the EEG
-%                    structure and not to the underlying dataset file. 
+%                    structure and not to the underlying dataset file.
 %   'SaveMapFile'    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
@@ -109,13 +112,16 @@ end
 if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
-fMapTag.merge(baseTags, 'Merge', excluded, p.Fields);
+fMap.merge(baseTags, 'Update', excluded, p.Fields);
+fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
 
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
     [fMapTag, exc, canceled] = selectmaps(fMapTag);
     excluded = union(excluded, exc);
+elseif ~isempty(p.PrimaryField)
+    fMapTag.setPrimaryMap(p.PrimaryField);
 end
 
 if p.UseGui && ~canceled
@@ -123,7 +129,7 @@ if p.UseGui && ~canceled
         'PreservePrefix', p.PreservePrefix);
 end
 
-fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
+fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
 
 if ~canceled
     % Save the fieldmap
@@ -141,16 +147,16 @@ if ~canceled
         EEG.data = single(EEG.data);
     end
     if p.SaveDataset
-       if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
-         EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-             EEG.filepath, 'savemode', 'onefile');
-       elseif isequal(p.SaveMode, 'twofiles')
-         EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-             EEG.filepath, 'savemode', 'twoFiles'); 
-       else
-         EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-             EEG.filepath,'savemode', 'resave');  
-       end
+        if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
+            EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
+                EEG.filepath, 'savemode', 'onefile');
+        elseif isequal(p.SaveMode, 'twofiles')
+            EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
+                EEG.filepath, 'savemode', 'twoFiles');
+        else
+            EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
+                EEG.filepath,'savemode', 'resave');
+        end
     end
 end
 
@@ -169,8 +175,11 @@ end
         parser.addParamValue('Precision', 'Preserve', ...
             @(x) any(validatestring(lower(x), ...
             {'Double', 'Preserve', 'Single'})));
+        parser.addParamValue('PrimaryField', '', @(x) ...
+            (isempty(x) || ischar(x)))
         parser.addParamValue('SaveDataset', false, @islogical);
-        parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || (ischar(x))));
+        parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || ...
+            (ischar(x))));
         parser.addParamValue('SaveMode', 'TwoFiles', ...
             @(x) any(validatestring(lower(x), {'OneFile', 'TwoFiles'})));
         parser.addParamValue('SelectFields', true, @islogical);
