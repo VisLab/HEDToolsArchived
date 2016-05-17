@@ -118,7 +118,8 @@ canceled = false;
 
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, exc, canceled] = selectmaps(fMapTag);
+    [fMapTag, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
+        p.PrimaryField);
     excluded = union(excluded, exc);
 elseif ~isempty(p.PrimaryField)
     fMapTag.setPrimaryMap(p.PrimaryField);
