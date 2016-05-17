@@ -113,9 +113,11 @@ end
 
 for k = 1:length(fPaths) % Assemble the list
     eegTemp = pop_loadset(fPaths{k});
-    tMapNew = findtags(eegTemp, 'PreservePrefix', p.PreservePrefix, ...
-        'ExcludeFields', p.ExcludeFields, 'Fields', p.Fields);
-    fMapTag.merge(tMapNew, 'Merge', p.ExcludeFields, p.Fields);
+    [tMapNew, tMapTagNew] = findtags(eegTemp, 'PreservePrefix', ...
+        p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, 'Fields', ...
+        p.Fields);
+    fMap.merge(tMapNew, 'Merge', p.ExcludeFields, tMapNew.getFields());
+    fMapTag.merge(tMapTagNew, 'Merge', p.ExcludeFields, p.Fields);
 end
 
 % Exclude the appropriate tags from baseTags
@@ -128,7 +130,8 @@ end
 if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
-fMapTag.merge(baseTags, 'Merge', excluded);
+fMap.merge(baseTags, 'Merge', excluded, p.Fields);
+fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
@@ -144,6 +147,7 @@ if p.UseGui && ~canceled
         'PreservePrefix', p.PreservePrefix);
 end
 
+fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
 fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
 
 if ~canceled
