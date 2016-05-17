@@ -113,7 +113,7 @@ if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
 fMap.merge(baseTags, 'Merge', excluded, p.Fields);
-fMapTag.merge(baseTags, 'Merge', excluded, p.Fields);
+fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
 
 if p.UseGui && p.SelectFields && isempty(p.Fields)
