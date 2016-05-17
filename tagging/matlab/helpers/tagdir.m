@@ -51,6 +51,9 @@
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
+%   'PrimaryField'   The name of the primary field. Only one field can be
+%                    the primary field. A primary field requires a label,
+%                    category, and a description.
 %   'SaveDatasets'   If true (default), save the tags to the underlying
 %                    dataset files in the directory.
 %   'SaveMapFile'    A string representing the file name for saving the
@@ -142,8 +145,11 @@ canceled = false;
 
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, exc, canceled] = selectmaps(fMapTag);
+    [fMapTag, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
+        p.PrimaryField);
     excluded = union(excluded, exc);
+elseif ~isempty(p.PrimaryField)
+    fMapTag.setPrimaryMap(p.PrimaryField);
 end
 
 if p.UseGui && ~canceled
@@ -205,6 +211,8 @@ end
             @(x) any(validatestring(lower(x), ...
             {'Double', 'Preserve', 'Single'})));
         parser.addParamValue('PreservePrefix', false, @islogical);
+        parser.addParamValue('PrimaryField', '', @(x) ...
+            (isempty(x) || ischar(x)))
         parser.addParamValue('SaveDatasets', true, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
         parser.addParamValue('SaveMode', 'TwoFiles', ...
