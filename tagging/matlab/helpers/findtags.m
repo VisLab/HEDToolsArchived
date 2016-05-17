@@ -61,77 +61,128 @@
 %
 
 function [fMapAll, fMapTagged] = findtags(edata, varargin)
-% Parse the input arguments
-parser = inputParser;
-parser.addRequired('edata', @(x) (isempty(x) || isstruct(x)));
-parser.addParamValue('ExcludeFields', ...
-    {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
-    @(x) (iscellstr(x)));
-parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-parser.addParamValue('PreservePrefix', false, ...
-    @(x) validateattributes(x, {'logical'}, {}));
-parser.parse(edata, varargin{:});
-p = parser.Results;
-edata = p.edata;
+p = parseArguments();
 
-% If edata.etc.tags exists, then extract tag information
-
-if isfield(edata, 'etc') && isstruct(edata.etc) && ...
-        isfield(edata.etc, 'tags') && isstruct(edata.etc.tags)
-    xml = '';
-    if isfield(edata.etc.tags, 'xml')
-        xml = edata.etc.tags.xml;
-    end
-    fMapAll = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
-    fMapTagged = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
-    if isfield(edata.etc.tags, 'map') && isstruct(edata.etc.tags.map) ...
-            && isfield(edata.etc.tags.map, 'field')
-        tFields = {edata.etc.tags.map.field};
-        allFields = {edata.etc.tags.map.field};
-        if ~isempty(p.Fields)
-            tFields = intersect(p.Fields, tFields);
-        end
-        for k = 1:length(allFields)
-            thisField = edata.etc.tags.map(k).field;
-            if sum(strcmpi(thisField, tFields) == 1)
-                fMapTagged.addValues(thisField, edata.etc.tags.map(k).values);
-            end
-            fMapAll.addValues(thisField, edata.etc.tags.map(k).values);
-        end
-    end
+if isfield(p.edata, 'etc') && isstruct(p.edata.etc) && ...
+        isfield(p.edata.etc, 'tags') && isstruct(p.edata.etc.tags)
+    [fMapAll, fMapTagged] = createFMapsFromEtc(p);
 else
-    % If edata.etc.tags don't exists
-    efields = {};
-    if isfield(edata, 'event') && isstruct(edata.event)
-        efields = fieldnames(edata.event);
-    end
-    if isfield(edata, 'urevent') && isstruct(edata.urevent)
-        efields = union(efields, fieldnames(edata.urevent));
-    end
-    
-    efields = setdiff(efields, p.ExcludeFields);
-    if ~isempty(p.Fields)
-        efields = intersect(p.Fields, efields);
-    end
-    
-    fMapAll = fieldMap('PreservePrefix', p.PreservePrefix);
-    fMapTagged = fieldMap('PreservePrefix', p.PreservePrefix);
-    for k = 1:length(efields)
-        tValues = getutypes(edata.event, efields{k});
-        if isfield(edata, 'urevent')
-            tValues = union(tValues, getutypes(edata.urevent, efields{k}));
+    [fMapAll, fMapTagged] = createFMapsFromEvents(p);
+end
+
+    function [fMapAll, fMapTagged] = createFMapsFromEtc(p)
+        % Creates and populates the field maps from the .etc field
+        xml = '';
+        if isfield(p.edata.etc.tags, 'xml')
+            xml = p.edata.etc.tags.xml;
+        end
+        fMapAll = fieldMap('XML', xml, 'PreservePrefix', ...
+            p.PreservePrefix);
+        fMapTagged = fieldMap('XML', xml, 'PreservePrefix', ...
+            p.PreservePrefix);
+        if isfield(p.edata.etc.tags, 'map') && ...
+                isstruct(p.edata.etc.tags.map) ...
+                && isfield(p.edata.etc.tags.map, 'field')
+            [allFields, taggedFields] = getFieldsFromEtc(p);
+            for k = 1:length(allFields)
+                addFieldValuesFromEtc(p, fMapAll, fMapTagged, ...
+                    allFields, taggedFields, k);
+            end
+        end
+    end % createFMapsFromEtc
+
+    function [fMapAll, fMapTagged] = createFMapsFromEvents(p)
+        % Creates and populates the field maps from the .event and
+        % .urevent fields
+        [allFields, taggedFields] = getFieldsFromEvents(p);
+        fMapAll = fieldMap('PreservePrefix', p.PreservePrefix);
+        fMapTagged = fieldMap('PreservePrefix', p.PreservePrefix);
+        for k = 1:length(allFields)
+            [fMapAll, fMapTagged] = addFieldValuesFromEvents(p, ...
+                fMapAll, fMapTagged, allFields, taggedFields, k);
+        end
+    end % createFMapsFromEvents
+
+    function [fMapAll, fMapTagged] = addFieldValuesFromEtc(p, fMapAll, ...
+            fMapTagged, allFields, taggedFields, index)
+        % Adds the field values to the field maps from the .etc field
+        if isempty(p.edata.etc.tags.map(index).values)
+            addFieldValuesFromEvents(p, fMapAll, fMapTagged, ...
+                allFields, taggedFields, index);
+        else
+            thisField = p.edata.etc.tags.map(index).field;
+            if sum(strcmpi(thisField, taggedFields) == 1)
+                fMapTagged.addValues(thisField, ...
+                    p.edata.etc.tags.map(index).values);
+            end
+            fMapAll.addValues(thisField, ...
+                p.edata.etc.tags.map(index).values);
+        end
+    end % addFieldValuesFromEtc
+
+    function [fMapAll, fMapTagged] = addFieldValuesFromEvents(p, ...
+            fMapAll, fMapTagged, allFields, taggedFields, index)
+        % Adds the field values to the field maps from the .event and
+        % .urevent fields
+        tValues = getutypes(p.edata.event, allFields{index});
+        if isfield(p.edata, 'urevent')
+            tValues = union(tValues, getutypes(p.edata.urevent, ...
+                allFields{index}));
         end
         if isempty(tValues)
-            continue;
+            return;
         end
         valueForm = tagList.empty(0,length(tValues));
         for j = 1:length(tValues)
             valueForm(j) = tagList(num2str(tValues{j}));
         end
-        fMapAll.addValues(efields{k}, valueForm);
-        fMapTagged.addValues(efields{k}, valueForm);
-    end
-end
+        if sum(strcmpi(allFields{index}, taggedFields) == 1)
+            fMapTagged.addValues(allFields{index}, valueForm);
+        end
+        fMapAll.addValues(allFields{index}, valueForm);
+    end % addFieldValuesFromEvents
+
+    function [allFields, taggedFields] = getFieldsFromEvents(p)
+        % Gets all of the event fields from the .event and .urevent fields
+        allFields = {};
+        taggedFields = {};
+        if isfield(p.edata, 'event') && isstruct(p.edata.event)
+            allFields = fieldnames(p.edata.event);
+            taggedFields = fieldnames(p.edata.event);
+        end
+        if isfield(p.edata, 'urevent') && isstruct(p.edata.urevent)
+            allFields = union(allFields, fieldnames(p.edata.urevent));
+            taggedFields = union(allFields, fieldnames(p.edata.urevent));
+        end
+        allFields = setdiff(allFields, p.ExcludeFields);
+        taggedFields = setdiff(taggedFields, p.ExcludeFields);
+        if ~isempty(p.Fields)
+            taggedFields = intersect(p.Fields, allFields);
+        end
+    end % getFieldsFromEvents
+
+    function [allFields, taggedFields] = getFieldsFromEtc(p)
+        % Gets all of the event fields from the .etc field
+        taggedFields = {p.edata.etc.tags.map.field};
+        allFields = {p.edata.etc.tags.map.field};
+        if ~isempty(p.Fields)
+            taggedFields = intersect(p.Fields, taggedFields);
+        end
+    end % getFieldsFromEtc
+
+    function p = parseArguments()
+        % Parses the input arguments and returns the results
+        parser = inputParser;
+        parser.addRequired('edata', @(x) (isempty(x) || isstruct(x)));
+        parser.addParamValue('ExcludeFields', ...
+            {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
+            @(x) (iscellstr(x)));
+        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('PreservePrefix', false, ...
+            @(x) validateattributes(x, {'logical'}, {}));
+        parser.parse(edata, varargin{:});
+        p = parser.Results;
+    end % parseArguments
 
 % for k = 1:length(efields)
 %     if isfield(edata.event, 'usertags')
