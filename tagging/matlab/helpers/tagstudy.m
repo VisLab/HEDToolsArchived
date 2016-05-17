@@ -45,6 +45,9 @@
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
+%   'PrimaryField'   The name of the primary field. Only one field can be
+%                    the primary field. A primary field requires a label,
+%                    category, and a description.
 %   'SaveDatasets'   If true (default), save the tags to the underlying
 %                    dataset files in the directory.
 %   'SaveMapFile'    The full path name of the file for saving the final,
@@ -129,8 +132,11 @@ fMapTag.merge(baseTags, 'Merge', excluded);
 canceled = false;
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, exc, canceled] = selectmaps(fMapTag);
+    [fMapTag, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
+        p.PrimaryField);
     excluded = union(excluded, exc);
+elseif ~isempty(p.PrimaryField)
+    fMapTag.setPrimaryMap(p.PrimaryField);
 end
 
 if p.UseGui && ~canceled
@@ -152,8 +158,7 @@ if ~canceled
     fprintf('\n---Now rewriting the tags to the individual data files---\n');
     for k = 1:length(fPaths) % Assemble the list
         EEG = pop_loadset(fPaths{k});
-        EEG = writetags(EEG, fMap, 'ExcludeFields', excluded, ...
-            'PreservePrefix', p.PreservePrefix);
+        EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
         if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
             EEG.data = double(EEG.data);
         elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
@@ -234,7 +239,9 @@ end
             @(x) any(validatestring(lower(x), ...
             {'Double', 'Preserve', 'Single'})));
         parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('SaveDatasets', false, @islogical);
+        parser.addParamValue('PrimaryField', '', @(x) ...
+            (isempty(x) || ischar(x)))
+        parser.addParamValue('SaveDatasets', true, @islogical);
         parser.addParamValue('SaveMapFile', '', ...
             @(x)(isempty(x) || (ischar(x))));
         parser.addParamValue('SaveMode', 'TwoFiles', ...
