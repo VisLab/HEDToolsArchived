@@ -139,7 +139,7 @@ end
 if ~isempty(baseTags) && ~isempty(p.Fields)
     excluded = setdiff(baseTags.getFields(), p.Fields);
 end;
-fMap.merge(baseTags, 'Update', excluded, p.Fields);
+fMap.merge(baseTags, 'Merge', excluded, p.Fields);
 fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
 
@@ -159,6 +159,7 @@ end
 
 % Replace the existing tags, and then add any new codes found
 fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
+fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
 
 if ~canceled
     % Save the tags file for next step
