@@ -309,7 +309,7 @@ classdef fieldMap < hgsetget
         function setPrimaryMap(obj, field)
             % Sets the tag map associated with specified field name as a
             % primary field
-            if ~isempty(field)
+            if ~isempty(field) && obj.GroupMap.isKey(field)
                 tMap = getMap(obj, field);
                 setPrimary(tMap, true);
                 obj.GroupMap.remove(field);
