@@ -111,11 +111,13 @@ parseTSVLines();
         [lineErrors, lineErrorTags] = ...
             checkForValidationErrors(p.hedMaps, originalTags, ...
             formattedTags, p.extensionAllowed);
-        if ~isempty(lineErrorTags)
+        if ~isempty(lineErrors)
             lineErrors = [generateErrorMessage('line', lineNumber, ...
                 '', '', ''), lineErrors];
             errors{errorCount} = lineErrors;
-            uniqueErrorTags = union(uniqueErrorTags, lineErrorTags);
+            if ~isempty(lineErrorTags)
+                uniqueErrorTags = union(uniqueErrorTags, lineErrorTags);
+            end
             errorCount = errorCount + 1;
         end
     end % checkForTSVLineErrors
