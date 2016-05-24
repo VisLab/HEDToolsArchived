@@ -78,7 +78,7 @@ classdef tagMap < hgsetget
             parser = inputParser;
             parser.addParamValue('Field', 'type', ...
                 @(x) (~isempty(x) && ischar(x)));
-            parser.addParamValue('Primary', true, ...
+            parser.addParamValue('Primary', false, ...
                 @(x) validateattributes(x, {'logical'}, {}));
             parser.parse(varargin{:})
             obj.Field = parser.Results.Field;
@@ -222,6 +222,11 @@ classdef tagMap < hgsetget
                     'PreservePrefix', preservePrefix);
             end
         end % merge
+        
+        function setPrimary(obj, primary)
+            % Sets the primary field
+            obj.Primary = primary;
+        end % setPrimary
         
     end % public methods
     

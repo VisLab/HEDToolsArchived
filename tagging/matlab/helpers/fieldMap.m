@@ -26,12 +26,6 @@
 %                     object, do nothing. Otherwise, if an event with that
 %                     key is part of this object then completely replace
 %                     that event with the new one.
-%   'OnlyTags'        If an event with that key is not part of this
-%                     object, do nothing. Otherwise, if an event with that
-%                     key is part of this object, then update the tags of
-%                     the matching event with the new ones from this event,
-%                     using the PreservePrefix value to determine how to
-%                     combine the tags.
 %   'Update'          If an event with that key is not part of this
 %                     object, do nothing. Otherwise, if an event with that
 %                     key is part of this object, then update the tags of
@@ -127,7 +121,7 @@ classdef fieldMap < hgsetget
             p.addRequired('Type', @(x) (~isempty(x) && ischar(x)));
             p.addRequired('Values', ...
                 @(x) (isempty(x) || isstruct(x) || isa(x, 'tagList')));
-            p.addParamValue('Primary', true, ...
+            p.addParamValue('Primary', false, ...
                 @(x) validateattributes(x, {'logical'}, {}));
             p.addParamValue('UpdateType', 'merge', ...
                 @(x) any(validatestring(lower(x), ...
@@ -311,6 +305,17 @@ classdef fieldMap < hgsetget
                 obj.GroupMap.remove(field);
             end
         end % removeMap
+        
+        function setPrimaryMap(obj, field)
+            % Sets the tag map associated with specified field name as a
+            % primary field
+            if ~isempty(field) && obj.GroupMap.isKey(field)
+                tMap = getMap(obj, field);
+                setPrimary(tMap, true);
+                obj.GroupMap.remove(field);
+                obj.GroupMap(field) = tMap;
+            end
+        end % setPrimaryMap
         
         function setDescription(obj, description)
             % Set the description of the fieldMap

@@ -2,8 +2,9 @@ package edu.utsa.tagger.gui;
 
 import edu.utsa.tagger.AbstractEventModel;
 import edu.utsa.tagger.AbstractTagModel;
+import edu.utsa.tagger.FieldSelectLoader;
 import edu.utsa.tagger.IFactory;
-import edu.utsa.tagger.Loader;
+import edu.utsa.tagger.TaggerLoader;
 import edu.utsa.tagger.Tagger;
 
 /**
@@ -26,9 +27,15 @@ public class GuiModelFactory implements IFactory {
 	}
 
 	@Override
-	public void createApp(Loader loader, Tagger tagger, String frameTitle,
+	public TaggerView createTaggerView(TaggerLoader loader, Tagger tagger, String frameTitle,
 			boolean isStandAloneVersion) {
-		new AppView(loader, tagger, frameTitle, isStandAloneVersion);
+		return new TaggerView(loader, tagger, frameTitle, isStandAloneVersion);
+	}
+
+	@Override
+	public FieldSelectView createFieldSelectView(FieldSelectLoader loader, String frameTitle, String[] excluded,
+			String[] tagged) {
+		return new FieldSelectView(loader, frameTitle, excluded, tagged);
 	}
 
 }

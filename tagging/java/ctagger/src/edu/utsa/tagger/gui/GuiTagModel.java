@@ -22,7 +22,7 @@ public class GuiTagModel extends AbstractTagModel {
 	};
 
 	private final Tagger tagger;
-	private AppView appView;
+	private TaggerView appView;
 	private TagView tagView;
 	private TagEditView tagEditView;
 	private TagChooserView tagChooserView;
@@ -195,7 +195,7 @@ public class GuiTagModel extends AbstractTagModel {
 		appView.updateEventsPanel();
 	}
 
-	public void setAppView(AppView appView) {
+	public void setAppView(TaggerView appView) {
 		this.appView = appView;
 	}
 

@@ -25,6 +25,9 @@ public final class MessageConstants {
 	public static final String OPEN_DATA_TYPE_Q = "What kind of data would you like to load?";
 	public static final String EXIT_SAVE_Q = "Would you like to save before exiting?";
 	public static final String HED_XML_SAVE_Q = "The HED XML has been modified, would you like to save?";
+	public static final String CANCEL_Q = "Are you sure you want to cancel?";
+	public static final String FMAP_START_OVER_Q = "A field map has been loaded. Would you like to start over?";
+	public static final String CLOSE_Q = "Are you sure you want to close?";
 	public static final String SAVE_DATA_TYPE_Q = "In which format would you like to save the data?";
 	public static final String TAKES_VALUE = "Click to enter a value. The value will replace the '#' character.";
 	public static final String TAKES_VALUE_ERROR = "Please specify # for a tag that takes a value.";
@@ -34,8 +37,7 @@ public final class MessageConstants {
 	public static final String TAG_RR_ERROR = "Tag cannot be both required and recommended.";
 	public static final String TAG_POSITION_ERROR = "Tag position must be an integer.";
 	public static final String TAG_UNIT_ERROR = "Tag value must be numerical.";
-	public static final String TILDE_ERROR = "There can be at most "
-			+ MAX_GROUP_TILDES + " tildes in a group.";
+	public static final String TILDE_ERROR = "There can be at most " + MAX_GROUP_TILDES + " tildes in a group.";
 	public static final String ADD_EVENT_ERROR = "Duplicate event - unable to add";
 	public static final String ASSOCIATE_RR_ERROR = "Unable to add tag: Required and recommended tags can only be added at the event level.";
 	public static final String NO_EVENT_SELECTED = "Please select a event or tag group before tagging";

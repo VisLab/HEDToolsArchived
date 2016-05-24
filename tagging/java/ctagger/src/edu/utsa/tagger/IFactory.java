@@ -1,5 +1,8 @@
 package edu.utsa.tagger;
 
+import edu.utsa.tagger.gui.FieldSelectView;
+import edu.utsa.tagger.gui.TaggerView;
+
 /**
  * Interface for a factory to be used with the Tagger.
  * 
@@ -12,7 +15,9 @@ public interface IFactory {
 
 	AbstractTagModel createAbstractTagModel(Tagger tagger);
 
-	void createApp(Loader loader, Tagger tagger, String frameTitle,
-			boolean isStandAloneVersion);
+	TaggerView createTaggerView(TaggerLoader loader, Tagger tagger, String frameTitle, boolean isStandAloneVersion);
+
+	FieldSelectView createFieldSelectView(FieldSelectLoader loader, String frameTitle, String[] excluded,
+			String[] tagged);
 
 }

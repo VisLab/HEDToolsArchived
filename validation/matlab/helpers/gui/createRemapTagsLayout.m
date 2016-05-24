@@ -26,7 +26,7 @@ createPanel(tab);
             myTitle) %#ok<INUSL>
         % Callback for 'Browse' button that sets the 'Remap' editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-delimited files'; ...
-            '*.txt', 'Text files'}, myTitle);
+            '*.txt', 'Text files'; '*.*', 'All files'}, myTitle);
         if tFile ~= 0
             mapFile = fullfile(tPath, tFile);
             set(replaceTxtCtrl, 'String', mapFile);
@@ -37,7 +37,7 @@ createPanel(tab);
             myTitle) %#ok<INUSL>
         % Callback for 'Browse' button that sets the 'Tags' editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-delimited files'; ...
-            '*.txt', 'Text files'}, myTitle);
+            '*.txt', 'Text files'; '*.*', 'All files'}, myTitle);
         if tFile ~= 0
             tsvFile = fullfile(tPath, tFile);
             set(replaceTagCtrl, 'String', tsvFile);

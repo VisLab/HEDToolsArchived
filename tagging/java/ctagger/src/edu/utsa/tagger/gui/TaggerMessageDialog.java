@@ -88,17 +88,17 @@ public class TaggerMessageDialog extends JDialog {
 		int margin = 30;
 		if (opt2 != null) {
 			margin = 15;
-			opt2Button = AppView.createMenuButton(opt2);
+			opt2Button = TaggerView.createMenuButton(opt2);
 			bgPanel.add(opt2Button, new Constraint("bottom:10 height:30 "
 					+ "left:100 right:100"));
 			opt2Button.addMouseListener(new OptionButtonListener(2));
 		}
-		opt0Button = AppView.createMenuButton(opt0);
+		opt0Button = TaggerView.createMenuButton(opt0);
 		bgPanel.add(opt0Button, new Constraint("bottom:10 height:30 right:"
 				+ margin + " width:80"));
 		opt0Button.addMouseListener(new OptionButtonListener(0));
 		if (opt1 != null) {
-			opt1Button = AppView.createMenuButton(opt1);
+			opt1Button = TaggerView.createMenuButton(opt1);
 			bgPanel.add(opt1Button, new Constraint("bottom:10 height:30 left:"
 					+ margin + " width:80"));
 			opt1Button.addMouseListener(new OptionButtonListener(1));

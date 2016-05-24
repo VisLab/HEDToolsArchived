@@ -37,7 +37,7 @@ public class TagEventView extends JComponent implements MouseListener {
 
 	private final int MAX_GROUP_TILDES = 2;
 	private final Tagger tagger;
-	private final AppView appView;
+	private final TaggerView appView;
 	private final Integer groupId;
 	private final GuiTagModel model;
 	private String text;
@@ -45,7 +45,7 @@ public class TagEventView extends JComponent implements MouseListener {
 	private boolean pressed = false;
 	private boolean highlight = false;
 
-	public TagEventView(Tagger tagger, AppView appView, Integer groupId, GuiTagModel model, boolean nameOnly) {
+	public TagEventView(Tagger tagger, TaggerView appView, Integer groupId, GuiTagModel model, boolean nameOnly) {
 		this.tagger = tagger;
 		this.appView = appView;
 		this.groupId = groupId;

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
-import edu.utsa.tagger.gui.AppView;
+import edu.utsa.tagger.gui.TaggerView;
 import edu.utsa.tagger.gui.EventEditView;
 import edu.utsa.tagger.gui.EventView;
 import edu.utsa.tagger.gui.GroupView;
@@ -23,7 +23,7 @@ import edu.utsa.tagger.gui.TagEventView;
  */
 public class TaggedEvent implements Comparable<TaggedEvent> {
 	private Tagger tagger;
-	private AppView appView;
+	private TaggerView appView;
 	private GuiEventModel guiEventModel;
 	private TreeMap<Integer, TaggerSet<AbstractTagModel>> tagGroups;
 	// Tag group used to represent tags at the event level
@@ -542,7 +542,7 @@ public class TaggedEvent implements Comparable<TaggedEvent> {
 		return guiEventModel.showInfo();
 	}
 
-	public void setAppView(AppView appView) {
+	public void setAppView(TaggerView appView) {
 		this.appView = appView;
 	}
 }

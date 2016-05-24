@@ -43,7 +43,7 @@ public class TagChooserDialog extends JDialog implements ITagDisplay {
 	}
 
 	private JFrame frame;
-	private AppView appView;
+	private TaggerView appView;
 	private Tagger tagger;
 	private TaggerSet<AbstractTagModel> tags;
 	private AbstractTagModel tagChosen;
@@ -81,7 +81,7 @@ public class TagChooserDialog extends JDialog implements ITagDisplay {
 		tagScrollPane.repaint();
 	}
 
-	public TagChooserDialog(JFrame frame, AppView appView, Tagger tagger,
+	public TagChooserDialog(JFrame frame, TaggerView appView, Tagger tagger,
 			TaggerSet<AbstractTagModel> tags) {
 		super(frame, true);
 		this.frame = frame;
@@ -93,7 +93,7 @@ public class TagChooserDialog extends JDialog implements ITagDisplay {
 			baseDepth = tags.get(0).getDepth();
 		}
 
-		cancel = AppView.createMenuButton("Cancel");
+		cancel = TaggerView.createMenuButton("Cancel");
 		cancel.addMouseListener(new CancelButtonListener());
 		bgPanel.setLayout(new ConstraintLayout());
 		bgPanel.setBackground(Color.white);

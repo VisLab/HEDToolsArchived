@@ -60,7 +60,7 @@ public class TestTagger {
 		hedRR = TestUtilities.getResourceAsString(TestUtilities.HedFileName);
 		eventsOld = TestUtilities.getResourceAsString(TestUtilities.JsonEventsArrays);
 		factory = new GuiModelFactory();
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON, 0, "Tagger Test - JSON Events", 2, factory, true,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test - JSON Events", 2, factory, true,
 				true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		TaggerSet<TaggedEvent> egtSet = testTagger.getEgtSet();
@@ -144,7 +144,7 @@ public class TestTagger {
 	@Test
 	public void testLoad() throws URISyntaxException {
 		System.out.println("It should load the correct number of tags and " + "EGT data into the Tagger using XML.");
-		Loader loader = new Loader(hedRR, eventsOld, Loader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
+		TaggerLoader loader = new TaggerLoader(hedRR, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
 		testTagger = new Tagger(hedRR, eventsOld, true, factory, loader);
 		testTagger.loadEventsAndHED(testLoadXml);
 		// Verify EGT set loaded correctly
@@ -168,7 +168,7 @@ public class TestTagger {
 	public void testLoadJSON() throws URISyntaxException {
 		System.out.println(
 				"It should load the correct number of tags and " + "EGT data into the Tagger using JSON + XML.");
-		Loader loader = new Loader(hedRR, eventsOld, Loader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
+		TaggerLoader loader = new TaggerLoader(hedRR, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		testTagger.loadJSON(TestUtilities.getResourceAsFile(TestUtilities.JsonEventsArrays),
 				TestUtilities.getResourceAsFile(TestUtilities.HedFileName));
@@ -185,7 +185,7 @@ public class TestTagger {
 	public void testLoadTdt() throws URISyntaxException {
 		System.out.println("It should load the events and tag hierarchy from "
 				+ "saved files when the events are in tab-delimited text format");
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
 				true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		int headerLines = 0;
@@ -220,7 +220,7 @@ public class TestTagger {
 		int headerLines = 0;
 		int[] eventCodeColumn = { 1 };
 		int[] tagColumns = { 2, 3, 4 };
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
 				true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		assertTrue("Tagger load success - tag-delimited text",
@@ -252,7 +252,7 @@ public class TestTagger {
 		int headerLines = 0;
 		int[] eventCodeColumn = { 1 };
 		int[] tagColumns = { 3 };
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
 				true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		assertTrue("Tagger load success - tag-delimited text",
@@ -286,7 +286,7 @@ public class TestTagger {
 		int headerLines = 0;
 		int[] eventCodeColumn = { 1 };
 		int[] tagColumns = { 0 };
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test - delimited string", 2, factory,
 				true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		assertTrue("Tagger load success - tag-delimited text",
@@ -317,7 +317,7 @@ public class TestTagger {
 	public void testPreservePrefixTrue1() {
 		System.out.println("It should return null even though ancestors " + "exist.");
 		// Set up for preserve prefix
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON | Loader.PRESERVE_PREFIX, 0,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON | TaggerLoader.PRESERVE_PREFIX, 0,
 				"Tagger Test - JSON Events", 2, factory, true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		TaggerSet<TaggedEvent> egtSet = testTagger.getEgtSet();
@@ -349,7 +349,7 @@ public class TestTagger {
 	public void testPreservePrefixTrue2() {
 		System.out.println("It should return null even though descendants " + "exist.");
 		// Set up for preserve prefix
-		Loader loader = new Loader(hedOld, eventsOld, Loader.USE_JSON | Loader.PRESERVE_PREFIX, 0,
+		TaggerLoader loader = new TaggerLoader(hedOld, eventsOld, TaggerLoader.USE_JSON | TaggerLoader.PRESERVE_PREFIX, 0,
 				"Tagger Test - JSON Events", 2, factory, true, true);
 		testTagger = new Tagger(hedOld, eventsOld, true, factory, loader);
 		TaggerSet<TaggedEvent> egtSet = testTagger.getEgtSet();
@@ -384,7 +384,7 @@ public class TestTagger {
 		String required2 = "Event/Description";
 		System.out.println("It should find the required and recommended tags "
 				+ "in the hierarchy and add them to the correct lists, sorted" + " by their position attributes.");
-		Loader loader = new Loader(hedRR, eventsOld, Loader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
+		TaggerLoader loader = new TaggerLoader(hedRR, eventsOld, TaggerLoader.USE_JSON, 0, "Tagger Test", 2, factory, true, true);
 		testTagger = new Tagger(hedRR, eventsOld, true, factory, loader);
 		TaggerSet<AbstractTagModel> requiredTags = testTagger.getRequiredTags();
 		assertEquals("First required tag (Label)", requiredTags.get(0).getPath(), required0);

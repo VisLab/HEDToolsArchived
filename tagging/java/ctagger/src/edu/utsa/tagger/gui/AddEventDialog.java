@@ -123,10 +123,10 @@ public class AddEventDialog extends JDialog {
 		code = new JTextField();
 		label = new JTextField();
 
-		saveButton = AppView.createMenuButton("Save");
+		saveButton = TaggerView.createMenuButton("Save");
 		saveButton.setEnabled(false);
 		saveButton.setVisible(false);
-		cancelButton = AppView.createMenuButton("Cancel");
+		cancelButton = TaggerView.createMenuButton("Cancel");
 
 		bgPanel.add(codeLabel, new Constraint(
 				"top:15 height:30 left:5 width:130"));

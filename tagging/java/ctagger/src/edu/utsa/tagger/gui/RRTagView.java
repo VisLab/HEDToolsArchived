@@ -56,7 +56,7 @@ public class RRTagView extends JComponent {
 	private static final int TAG_SIZE = 27;
 	private final TaggedEvent taggedEvent;
 	private final Tagger tagger;
-	private final AppView appView;
+	private final TaggerView appView;
 	private JLabel label;
 	private XScrollTextBox valueField;
 	private RREditView editView;
@@ -77,7 +77,7 @@ public class RRTagView extends JComponent {
 	 * @param key
 	 *            The required/recommended tag
 	 */
-	public RRTagView(Tagger tagger, AppView appView, TaggedEvent taggedEvent, AbstractTagModel key) {
+	public RRTagView(Tagger tagger, TaggerView appView, TaggedEvent taggedEvent, AbstractTagModel key) {
 		label = new JLabel(key.getPath()) {
 			@Override
 			public Font getFont() {

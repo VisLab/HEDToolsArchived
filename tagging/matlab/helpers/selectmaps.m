@@ -11,10 +11,7 @@
 %
 % [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...) specifies
 % optional name/value parameter pairs:
-%   'Fields'         Cell array of field names of the fields to include
-%                    in the tagging. If this parameter is non-empty,
-%                    only these fields are tagged.
-%   'SelectOption'   If true (default), the user is presented with a GUI 
+%   'SelectOption'   If true (default), the user is presented with a GUI
 %                    that allows users to select which fields to tag.
 %
 % Function documentation:
@@ -47,60 +44,66 @@
 % $Initial version $
 %
 
-function [fMap, excluded, primary] = selectmaps(fMap, varargin)
+function [fMap, excluded, canceled] = selectmaps(fMap, varargin)
+p = parseArguments();
 
-    % Check the input arguments for validity and initialize
-    parser = inputParser;
-    parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
-    parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-    parser.addParamValue('SelectOption', true, @islogical);
-    parser.parse(fMap, varargin{:});
+title = 'Please select the fields that you would like to tag';
+canceled = false;
 
-    % Figure out the fields to be used
-    fields = fMap.getFields();
-    sfields = parser.Results.Fields;
-    if ~isempty(sfields)
-       excluded = setdiff(fields, sfields);
-       fields = intersect(fields, sfields);
-       for k = 1:length(excluded)
-           fMap.removeMap(excluded{k});
-       end
-    else
-        excluded = {};
+% Figure out the fields to be used
+fields = fMap.getFields();
+excluded = {};
+
+if isempty(fields) || ~p.SelectOption
+    return;
+end
+
+primaryField = p.PrimaryField;
+if sum(strcmp(fields, p.PrimaryField)) == 0
+    primaryField = '';
+end
+
+loader = javaObjectEDT('edu.utsa.tagger.FieldSelectLoader', title, ...
+    {}, fields, primaryField);
+[notified, submitted] = checkStatus(loader);
+while (~notified)
+    pause(0.5);
+    [notified, submitted] = checkStatus(loader);
+end
+excludeUser = cell(loader.getExcludeFields());
+primaryField = char(loader.getPrimaryField());
+if ~submitted
+    canceled = true;
+end
+
+if ~isempty(primaryField)
+    fMap.setPrimaryMap(primaryField);
+end
+
+if isempty(excludeUser)
+    return;
+end
+
+% Remove the excluded fields
+for k = 1:length(excludeUser)
+    fMap.removeMap(excludeUser{k});
+end
+
+excluded = union(excluded, excludeUser);
+
+    function [notified, submitted] = checkStatus(loader)
+        notified = loader.isNotified();
+        submitted = loader.isSubmitted();
     end
- 
-    if isempty(fields) || ~parser.Results.SelectOption
-        return;
+
+    function p = parseArguments()
+        % Parses the input arguments and returns the results
+        parser = inputParser;
+        parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
+        parser.addParamValue('PrimaryField', '', @(x) ...
+            (isempty(x) || ischar(x)))
+        parser.addParamValue('SelectOption', true, @islogical);
+        parser.parse(fMap, varargin{:});
+        p = parser.Results;
     end
-    
-    excludeUser = {};
-    % Tag the values associated with field
-    for k = 1:length(fields)
-        tMap = fMap.getMap(fields{k});
-        if isempty(tMap)
-            labels = {' '};
-        else
-            labels = tMap.getCodes();
-        end
-        [retValue, primary] = tagdlg(fields{k}, labels); 
-        tValues = tMap.getValueStruct();
-        fMap.removeMap(fields{k});
-        fMap.addValues(fields{k}, tValues, 'Primary', primary);
-        if strcmpi(retValue, 'Exclude')
-            excludeUser = [excludeUser fields{k}]; %#ok<AGROW>
-        elseif strcmpi(retValue, 'Cancel')
-            excludeUser = {};
-            break;
-        end
-    end
-    
-    if isempty(excludeUser)
-        return;
-    end
-    
-    % Remove the excluded fields
-    for k = 1:length(excludeUser)
-        fMap.removeMap(excludeUser{k});
-    end
-    excluded = union(excluded, excludeUser);
 end % selectmaps
