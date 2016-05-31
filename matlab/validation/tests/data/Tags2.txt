@@ -1,2 +1,0 @@
-Events	Tags
-1	/This/Is/Not/A/Tag,/This/Is/Also/Not/A/Tag
