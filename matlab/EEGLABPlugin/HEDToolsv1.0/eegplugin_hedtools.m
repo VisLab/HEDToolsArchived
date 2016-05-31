@@ -1,12 +1,11 @@
-% eegplugin_ctagger makes a ctagger plugin for EEGLAB 
+% eegplugin_hedtools makes a HEDTools plugin for EEGLAB 
 %     
 % Usage:
-%   >> eegplugin_ctagger(fig, trystrs, catchstrs)
+%   >> eegplugin_hedtools(fig, trystrs, catchstrs)
 %
 %% Description
-% eegplugin_ctagger(fig, trystrs, catchstrs) makes a ctagger 
-%    plugin for EEGLAB. The ctagger function displays a GUI for
-%    performing hierarchical tagging of items. The plugin automatically
+% eegplugin_hedtools(fig, trystrs, catchstrs) makes a HEDTools 
+%    plugin for EEGLAB. The plugin automatically
 %    extracts the items and the current tagging structure from the
 %    current EEG structure in EEGLAB.
 % 
@@ -47,19 +46,19 @@
 % Initial revision
 %
 
-function vers = eegplugin_ctagger(fig, trystrs, catchstrs)
+function vers = eegplugin_hedtools(fig, trystrs, catchstrs)
 % 
-    vers = 'ctagger1.0';
+    vers = 'hedtools1.0';
     if nargin < 3
-        error('eegplugin_ctagger requires 3 arguments');
+        error('eegplugin_hedtools requires 3 arguments');
     end;
 
     % Find the path of the current directory
-    tPath = which('eegplugin_ctagger.m');
-    tPath = strrep(tPath, [filesep 'eegplugin_ctagger.m'], '');
+    tPath = which('eegplugin_hedtools.m');
+    tPath = strrep(tPath, [filesep 'eegplugin_hedtools.m'], '');
 
-    % Add ctagger folders to path if they aren't already there
-    if ~exist('eegplugin_ctagger-subfoldertest.m', 'file')  % Dummy file to make sure not added
+    % Add hedtools folders to path if they aren't already there
+    if ~exist('eegplugin_hedtools-subfoldertest.m', 'file')  % Dummy file to make sure not added
         addpath(genpath(tPath));  % Add all subfolders to path too
     end;
 
@@ -69,6 +68,7 @@ function vers = eegplugin_ctagger(fig, trystrs, catchstrs)
     try
         javaaddpath([jarPath 'ctagger.jar']);
         javaaddpath([jarPath 'jackson.jar']);
+        javaaddpath([jarPath 'hedconversion.jar']);
     catch mex  %#ok<NASGU>
     end
     warning on all;
