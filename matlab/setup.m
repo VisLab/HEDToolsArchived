@@ -1,10 +1,10 @@
 %% Set up the paths
-% Run from ctagger directory or have ctagger directory in your path
-configPath = which('eegplugin_ctagger.m');
+% Run from HEDTools directory or have HEDTools directory in your path
+configPath = which('eegplugin_hedtools.m');
 if isempty(configPath)
     error('Cannot configure: change to ctagger directory');
 end
-dirPath = strrep(configPath, [filesep 'eegplugin_ctagger.m'],'');
+dirPath = strrep(configPath, [filesep 'eegplugin_hedtools.m'],'');
 addpath(genpath(dirPath));
 
 %% Now add java jar paths
@@ -13,6 +13,7 @@ warning off all;
 try
     javaaddpath([jarPath 'ctagger.jar']);
     javaaddpath([jarPath 'jackson.jar']);
+    javaaddpath([jarPath 'hedconversion.jar']);
 catch mex
 end
 warning on all;
