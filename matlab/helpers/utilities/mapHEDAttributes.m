@@ -2,7 +2,7 @@
 % unit classes in a structure of Map objects.
 %
 % Usage:
-%   >>  Maps = parsehed(xml)
+%   >>  Maps = mapHEDAttributes(xml)
 %
 % Input:
 %       hedXML

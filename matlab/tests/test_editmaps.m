@@ -3,7 +3,7 @@ initTestSuite;
 
 function values = setup %#ok<DEFNU>
 % Read in the HED schema
-latestHed = 'HED 2.026.xml';
+latestHed = 'HED.xml';
 values.xml = fileread(latestHed);
 s1(1) = tagList('square');
 s1(1).add({'/Attribute/Visual/Color/Green', ...
@@ -26,16 +26,17 @@ function teardown(values) %#ok<INUSD,DEFNU>
 function testSubmit(values)  %#ok<DEFNU>
 % Unit test for editmaps
 fprintf('\nUnit tests for editmaps normal execution\n');
-fprintf('\nIt should work when there is a single field\n');
+fprintf('\nIt should not modify the number of tags\n')
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS OKAY AFTER NO CHANGES\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS PROCEED BUTTON\n');
 fMap = values.map1;
-fMap1 = editmaps(fMap.clone());
-assertFalse(isequal(fMap1, values.map1));
+editmaps(fMap.clone());
 
 fprintf('\nIt should modify the number of tags\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS OKAY AFTER ADDING 2 TAGS TO A EVENT\n');
+fprintf('ADD 2 NEW TAGS TO THE FIRST EVENT\n');
+fprintf('PRESS PROCEED BUTTON\n');
 fMap2 = editmaps(fMap.clone());
 events1 = fMap.getValues('type');
 count1 = 0;
@@ -47,7 +48,6 @@ for k = 1:length(events1)
         count1 = count1 + length(etags);
     end
 end
-fprintf('\nIt should not modify the number of type values\n');
 events2 = fMap2.getValues('type');
 assertEqual(length(events2), 2);
 
@@ -62,12 +62,13 @@ for k = 1:length(events2)
     end
 end
 assertEqual(count2, count1 + 2);
-fprintf(['\nIt should not increase the number of type values when' ...
-    ' edited again\n']);
+fprintf('\nIt should modify the number of tags\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS OKAY AFTER ADDING 3 TAGS TO A EVENT\n');
+fprintf('ADD 3 NEW TAGS TO THE SECOND EVENT\n');
+fprintf('PRESS PROCEED BUTTON\n');
 fMap3 = editmaps(fMap2);
 events3 = fMap3.getValues('type');
+fprintf('\nIt should increase the number of tags by 3\n');
 count3 = 0;
 for k = 1:length(events3)
     etags = events3{k}.getTags();
@@ -82,17 +83,19 @@ assertEqual(count3, count2 + 3);
 function testMultipleFields(values)  %#ok<DEFNU>
 % Unit test for editmaps
 fprintf('\nUnit tests for editmaps multiple fields\n');
-fprintf('\nIt should work when the okay button is pressed\n');
+fprintf('\nIt should work when the proceed button is pressed\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS OKAY BUTTON WITH NO CHANGES\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS PROCEED BUTTON\n');
 fMap1 = editmaps(values.map2);
 assertEqual(fMap1, values.map2);
 
 function testCancel(values)  %#ok<DEFNU>
 % Unit test for editmaps
 fprintf('\nUnit tests for editmaps cancel\n');
-fprintf('\nIt should work when the exit button is pressed\n');
+fprintf('\nIt should work when the cancel button is pressed\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS EXIT BUTTON\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS CANCEL BUTTON\n');
 fMap1 = editmaps(values.map2);
 assertEqual(fMap1, values.map2);

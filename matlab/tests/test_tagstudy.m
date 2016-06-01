@@ -34,9 +34,9 @@ fprintf(['It should work for the EEGLAB study with both options and' ...
 thisStudy = [values.testroot filesep values.studydir filesep ...
     values.studyname];
 [fMap1, fPaths1, excluded1] = tagstudy(thisStudy, 'UseGui', false, ...
-    'SelectOption', false);
+    'SelectFields', false, 'SaveDatasets', false);
 fields1 = fMap1.getFields();
-assertEqual(length(fields1), 5);
+assertEqual(length(fields1), 4);
 type1 = fMap1.getValues('type');
 assertEqual(length(type1), 247);
 assertEqual(length(fPaths1), 10);

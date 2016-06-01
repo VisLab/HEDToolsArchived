@@ -27,67 +27,36 @@ function test_valid(values)  %#ok<DEFNU>
 fprintf(['\nUnit tests for selectmaps when no user interaction is' ...
     ' required\n']);
 fprintf('It should return an empty map when input map is empty\n');
-[fMap1, excluded1] = selectmaps(values.map1);
+[fMap4, excluded1] = selectmaps(values.map1);
 assertTrue(isempty(excluded1));
-assertTrue(isempty(fMap1.getFields()));
+assertTrue(isempty(fMap4.getFields()));
 
 fprintf('It should return all fields when no Fields or selection\n');
-[fMap2, excluded2] = selectmaps(values.map2, 'SelectOption', false);
+[fMap2, excluded2] = selectmaps(values.map2, 'SelectFields', false);
 assertEqual(length(values.map2.getFields()), length(fMap2.getFields()));
 assertTrue(isempty(excluded2));
 
-fprintf('It should correctly exclude fields when Fields are specified\n');
-[fMap3, excluded3] = selectmaps(values.map2.clone(), ...
-       'Fields', {'position'}, 'SelectOption', false);
-fprintf('It should work when there are multiple fields\n');
-assertEqual(length(fMap3.getFields()), 1);
-assertEqual(length(excluded3), 1);
-
 fprintf('It should correctly exclude fields when not all Fields exist\n');
-[fMap4, excluded4] = selectmaps(values.map3, ...
-       'Fields', {'type', 'position', 'cat'}, 'SelectOption', false);
-assertEqual(length(fMap4.getFields()), 2);
+[fMap3, excluded4] = selectmaps(values.map3, 'SelectFields', false);
+assertEqual(length(fMap3.getFields()), 2);
 assertEqual(length(excluded4), 0);
 
 fprintf('It should return an empty map when input map is empty\n');
-[fMap1, excluded1] = selectmaps(values.map1.clone(), 'SelectOption', true);
+[fMap4, excluded1] = selectmaps(values.map1.clone(), 'SelectFields', true);
 assertTrue(isempty(excluded1));
-assertTrue(isempty(fMap1.getFields()));
+assertTrue(isempty(fMap4.getFields()));
 
 
 function test_tag_button(values)  %#ok<DEFNU>
 % Unit test for selectmaps interactive use with Tag button
 fprintf('\n\nUnit tests for selectmaps interactive use with Tag button\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf(['PRESS the TAG BUTTON TWO TIMES (should show position and '...
-    ' type)\n']);
+fprintf('TAG ALL FIELDS (should show position and type)\n');
+fprintf('PRESS OKAY BUTTON\n');
 fprintf('It should return all fields when no fields or selection\n');
-[fMap2, excluded2] = selectmaps(values.map2, 'SelectOption', true);
+[fMap2, excluded2] = selectmaps(values.map2, 'SelectFields', true);
 assertEqual(length(values.map2.getFields()), length(fMap2.getFields()));
 assertTrue(isempty(excluded2));
-
-function test_field_argument(values)  %#ok<DEFNU>
-% Unit test for selectmaps with Tag button and Field argument
-fprintf('\n\nUnit tests for selectmaps interactive use with Tag button\n');
-fprintf('....REQUIRES USER INPUT\n');
-fprintf(['\nIt should correctly exclude fields when Fields are' ...
-    ' specified\n']);
-fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS the TAG BUTTON ONCE (should show type)\n');
-[fMap3, excluded3] = selectmaps(values.map2.clone(), ...
-       'Fields', {'type'}, 'SelectOption', true); 
-assertTrue(sum(strcmpi(excluded3{1}, 'position')) == 1);
-assertEqual(length(fMap3.getFields()), 1);
-
-function test_field_argument_no_exist(values)  %#ok<DEFNU>
-fprintf(['\n\nIt should correctly exclude fields when not all' ...
-    ' Fields exist\n']);
-fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS the TAG BUTTON ONCE (should show position)\n');
-[fMap4, excluded4] = selectmaps(values.map2.clone(), ...
-       'Fields', {'position', 'cat'}, 'SelectOption', true); 
-assertTrue(sum(strcmpi(excluded4(:), 'type')) == 1);
-assertEqual(length(fMap4.getFields()), 1);
 
 function test_exclude_button(values)  %#ok<DEFNU>
 % Unit test for selectmaps interactive usage with Exclude button
@@ -95,8 +64,10 @@ fprintf(['\n\nUnit tests for selectmaps interactive use with' ...
     ' Exclude button\n']);
 fprintf('It should exclude the type field from the map\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS TAG BUTTON FOR POSITION AND EXCLUDE BUTTON FOR TYPE\n');
-[fMap2, excluded2] = selectmaps(values.map2, 'SelectOption', true);
+fprintf('TAG POSITION FIELD\n');
+fprintf('EXCLUDE TYPE FIELD\n');
+fprintf('PRESS OKAY BUTTON\n');
+[fMap2, excluded2] = selectmaps(values.map2, 'SelectFields', true);
 fields2 = fMap2.getFields();
 assertEqual(length(fields2), 1);
 assertTrue(sum(strcmpi(fields2, 'type'))==0);
@@ -108,9 +79,9 @@ function test_exclude_all(values)  %#ok<DEFNU>
 fprintf('\n\nUnit tests for selectmaps interactive excluding all\n');
 fprintf('\nIt should work when all fields are excluded\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf(['PRESS EXCLUDE BUTTON TWO TIMES (should show position and' ...
-    ' type)\n']);
-[fMap3, excluded3] = selectmaps(values.map2, 'SelectOption', true);
+fprintf('EXCLUDE ALL FIELDS (should show position and type)\n');
+fprintf('PRESS OKAY BUTTON\n');
+[fMap3, excluded3] = selectmaps(values.map2, 'SelectFields', true);
 fields3 = fMap3.getFields();
 assertTrue(isempty(fields3));
 assertEqual(length(excluded3), 2);
@@ -120,8 +91,10 @@ function test_successive_use(values)  %#ok<DEFNU>
 fprintf('\n\nUnit tests for selectmaps when map is reused\n');
 fprintf('It should exclude the type field from the map\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS TAG BUTTON FOR POSITION AND EXCLUDE BUTTON FOR TYPE\n');
-[fMap2, excluded2] = selectmaps(values.map2, 'SelectOption', true);
+fprintf('TAG POSITION FIELD\n');
+fprintf('EXCLUDE TYPE FIELD\n');
+fprintf('PRESS OKAY BUTTON\n');
+[fMap2, excluded2] = selectmaps(values.map2, 'SelectFields', true);
 fields2 = fMap2.getFields();
 assertEqual(length(fields2), 1);
 assertTrue(sum(strcmpi(fields2, 'type'))==0);
@@ -130,8 +103,9 @@ assertEqual(length(excluded2), 1);
 
 fprintf('\n\nIt should only have group and type fields when reselected\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS TAG BUTTON ONCE (should show position)\n');
-[fMap3, excluded3] = selectmaps(fMap2, 'SelectOption', true);
+fprintf('TAG ALL FIELDS (should show position)\n');
+fprintf('PRESS OKAY BUTTON\n');
+[fMap3, excluded3] = selectmaps(fMap2, 'SelectFields', true);
 fields3 = fMap3.getFields();
 assertEqual(length(fields3), 1);
 assertTrue(sum(strcmpi(fields3, 'type'))==0);

@@ -14,11 +14,11 @@ fprintf('\nUnit tests for getfilelist\n');
 fprintf('It should get all the files when no extension is given\n');
 bciDir = [values.testroot filesep values.BCI2000dir];
 fList1 = getfilelist(bciDir);
-assertEqual(length(fList1), 84);
+assertEqual(length(fList1), 42);
 
 fprintf('It should get all the files when an empty extension is given\n');
 fList2 = getfilelist(bciDir);
-assertEqual(length(fList2), 84);
+assertEqual(length(fList2), 42);
 
 fprintf('It should get all the files when a .set extension is given\n');
 fList3 = getfilelist(bciDir, '.set');

@@ -25,7 +25,8 @@ fprintf('\nUnit tests for tagdir with EEGLAB data\n');
 
 fprintf('It should work for the EEGLAB data without any GUIs\n');
 thisDir = [values.testroot filesep values.EEGLAB];
-[fMap1, fPaths1] = tagdir(thisDir, 'UseGui', false, 'SelectOption', false);
+[fMap1, fPaths1] = tagdir(thisDir, 'UseGui', false, 'SelectFields', ...
+    false, 'SaveDatasets', false);
 fields1 = fMap1.getFields();
 assertEqual(length(fields1), 2);
 types1 = fMap1.getValues('type');
@@ -38,11 +39,15 @@ assertEqual(length(fPaths1), 3);
 fprintf(['\n\nIt should work for the EEGLAB data with the only the' ...
     ' options\n']);
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS THE TAG BUTTON FOR POSITION AND EXCLUDE BUTTON FOR TYPE\n');
-[fMap2, fPaths2] = tagdir(thisDir, 'UseGui', false, ...
-    'Synchronize', false, 'SelectOption', true);
+fprintf('TAG POSITION FIELD\n');
+fprintf('EXCLUDE TYPE FIELD\n');
+fprintf('PRESS the OKAY BUTTON\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS the PROCEED BUTTON\n');
+[fMap2, fPaths2] = tagdir(thisDir, 'UseGui', false, 'SelectFields', ...
+    true, 'SaveDatasets', false);
 fields2 = fMap2.getFields();
-assertEqual(length(fields2), 1);
+assertEqual(length(fields2), 2);
 assertTrue(strcmpi('position', fields2{1}));
 types2 = fMap2.getValues('type');
 assertTrue(isempty(types2));
@@ -52,9 +57,12 @@ assertEqual(length(fPaths2), 3);
 
 fprintf('\n\nIt should work for the EEGLAB data with just the GUI\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS the OKAY BUTTON BOTH TIMES\n');
-[fMap3, fPaths3] = tagdir(thisDir, 'UseGui', true, ...
-    'SelectOption', false, 'Synchronize', true);
+fprintf('TAG ALL FIELDS\n');
+fprintf('PRESS the OKAY BUTTON\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS the PROCEED BUTTON\n');
+[fMap3, fPaths3] = tagdir(thisDir, 'UseGui', true, 'SelectFields', ...
+    false, 'SaveDatasets', false);
 fields3 = fMap3.getFields();
 assertEqual(length(fields3), 2);
 types3 = fMap3.getValues('type');
@@ -66,9 +74,12 @@ assertEqual(length(fPaths3), 3);
 fprintf(['\n\nIt should work for the EEGLAB data with both options' ...
     ' and GUI\n']);
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS THE TAG BUTTON BOTH TIMES\n');
-[fMap4, fPaths4] = tagdir(thisDir, 'UseGui', true, ...
-    'SelectOption', true, 'Synchronize', false);
+fprintf('TAG ALL FIELDS\n');
+fprintf('PRESS the OKAY BUTTON\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS the PROCEED BUTTON\n');
+[fMap4, fPaths4] = tagdir(thisDir, 'UseGui', true, 'SelectFields', ...
+    true, 'SaveDatasets', false);
 fields4 = fMap4.getFields();
 assertEqual(length(fields4), 2);
 types4 = fMap4.getValues('type');
@@ -77,23 +88,24 @@ position4 = fMap4.getValues('position');
 assertEqual(length(position4), 2)
 assertEqual(length(fPaths4), 3);
 
-
 function test_tagdirBCI2000(values)  %#ok<DEFNU>
 % Unit test for tagdir for BCI2000 data
 fprintf('\n\nUnit tests for tagdir for BCI2000\n');
 
 fprintf('It should work for the BCI2000 data with both options and GUI\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS THE TAG BUTTON TWICE\n');
+fprintf('TAG ALL FIELDS\n');
+fprintf('PRESS the OKAY BUTTON\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS the PROCEED BUTTON\n');
 thisDir = [values.testroot filesep values.BCI2000dir];
-[fMap1, fPaths1] = tagdir(thisDir, 'UseGui', true, ...
-    'SelectOption', true, 'Synchronize', false);
+[fMap1, fPaths1] = tagdir(thisDir, 'UseGui', true, 'SelectFields', ...
+    true, 'SaveDatasets', false);
 fields1 = fMap1.getFields();
 assertEqual(length(fields1), 1);
 type1 = fMap1.getValues('type');
 assertEqual(length(type1), 17);
 assertEqual(length(fPaths1), 42);
-
 
 function test_tagdirShooter(values)  %#ok<DEFNU>
 % Unit test for tagdir with shooter data 
@@ -101,12 +113,15 @@ fprintf('\n\nUnit tests for tagdir with shooter data\n');
 
 fprintf('It should work for the shooter data with both options and GUI\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS THE TAG BUTTON FOR ALL FIELDS EXCEPT EXCLUDE TRIAL\n');
+fprintf('EXCLUDE TRIAL FIELD\n');
+fprintf('TAG ALL OTHER FIELDS\n');
+fprintf('PRESS the OKAY BUTTON\n');
+fprintf('DO NOT ADD ANY NEW TAGS\n');
+fprintf('PRESS the PROCEED BUTTON\n');
 [fMap1, fPaths1] = tagdir([values.testroot filesep values.shooterdir], ...
-    'UseGui', true, ...
-    'SelectOption', true, 'Synchronize', false);
+    'UseGui', true, 'SelectFields', true, 'SaveDatasets', false);
 fields1 = fMap1.getFields();
-assertEqual(length(fields1), 15);
+assertEqual(length(fields1), 10);
 type1 = fMap1.getValues('type');
-assertEqual(length(type1), 46);
+assertEqual(length(type1), 23);
 assertEqual(length(fPaths1), 16);

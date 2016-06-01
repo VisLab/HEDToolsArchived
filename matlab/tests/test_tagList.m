@@ -269,13 +269,13 @@ function testAdd(values)  %#ok<DEFNU>
 
     fprintf('It should separate duplicates when prefix is false\n');
     [keep3, duplicates3] = tagList.separateDuplicates(values.dups, false);
-    assertEqual(length(keep3), 4);
-    assertEqual(length(duplicates3), 1);
+    assertEqual(length(keep3), 5);
+    assertEqual(length(duplicates3), 0);
 
     fprintf('It should remove duplicates when prefix is true\n');
     [keep4, duplicates4] = tagList.separateDuplicates(values.dups, true);
-    assertEqual(length(keep4), 2);
-    assertEqual(length(duplicates4), 3);
+    assertEqual(length(keep4), 3);
+    assertEqual(length(duplicates4), 2);
 
 function testRemoveGroupDuplicates(values)  %#ok<DEFNU>
     % Unit test for tagList removeGroupDuplicates static method
@@ -289,15 +289,15 @@ function testRemoveGroupDuplicates(values)  %#ok<DEFNU>
 
     fprintf('It should remove duplicates when prefix is false\n');
     removed2 = tagList.removeGroupDuplicates(values.dups, false);
-    assertEqual(length(removed2), 4);
+    assertEqual(length(removed2), 5);
     removed3 = tagList.removeGroupDuplicates(values.dupGroups, false);
-    assertEqual(length(removed3), 9);
+    assertEqual(length(removed3), 11);
 
     fprintf('It should remove duplicates when prefix is true\n');
     removed4 = tagList.removeGroupDuplicates(values.dups, true);
-    assertEqual(length(removed4), 2);
+    assertEqual(length(removed4), 3);
     removed5 = tagList.removeGroupDuplicates(values.dupGroups, true);
-    assertEqual(length(removed5), 5);
+    assertEqual(length(removed5), 7);
 
 function testValid(values) %#ok<INUSD,DEFNU>
     % Unit test for tagList constructor valid

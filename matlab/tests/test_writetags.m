@@ -2,7 +2,7 @@ function test_suite = test_writetags%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
-latestHed = 'HED 2.026.xml';
+latestHed = 'HED.xml';
 values.xml = fileread(latestHed);
 s1(1) = tagList('square');
 s1(1).add({'/Attribute/Visual/Color/Green', ...
@@ -34,7 +34,7 @@ fprintf('It should tag a data set with no events if rewrite is Summary\n');
 x1 = values.data1;
 dTags1 = findtags(x1);
 assertTrue(isa(dTags1, 'fieldMap'));
-y1 = writetags(x1, dTags1, 'RewriteOption', 'Summary');
+y1 = writetags(x1, dTags1);
 assertTrue(isfield(y1.etc, 'tags'));
 assertTrue(isfield(y1.etc.tags, 'xml'));
 assertEqual(length(fieldnames(y1.etc.tags)), 2);
@@ -47,7 +47,7 @@ fprintf(['It should not tag events even if data has an .event field if' ...
     ' Summary\n']);
 x2 = values.data2;
 dTags2 = findtags(x2);
-y2 = writetags(x2, dTags2, 'RewriteOption', 'Summary');
+y2 = writetags(x2, dTags2);
 assertTrue(isfield(y2.etc, 'tags'));
 assertTrue(isfield(y2.etc.tags, 'xml'));
 assertEqual(length(fieldnames(y2.etc.tags)), 2);
@@ -55,7 +55,7 @@ assertTrue(isfield(y2.etc.tags, 'map'));
 assertEqual(length(fieldnames(y2.etc.tags.map)), 2);
 assertTrue(isfield(y2, 'event'));
 assertTrue(isfield(x2, 'event'))
-assertTrue(~isfield(y2.event, 'usertags'));
+assertTrue(isfield(y2.event, 'usertags'));
 assertTrue(~isfield(x2.event, 'usertags'));
 
 function testValidValuesBoth(values)  %#ok<DEFNU>
@@ -63,7 +63,7 @@ fprintf(['It should tag events  if data has an .event field and option' ...
     ' is Both\n']);
 x2 = values.data2;
 dTags2 = findtags(x2);
-y2 = writetags(x2, dTags2, 'RewriteOption', 'Both');
+y2 = writetags(x2, dTags2);
 assertTrue(isfield(y2.etc, 'tags'));
 assertTrue(isfield(y2.etc.tags, 'xml'));
 assertEqual(length(fieldnames(y2.etc.tags)), 2);
@@ -75,5 +75,3 @@ s = regexpi(y2.event(1).usertags, ',', 'split');
 assertEqual(length(s), 3);
 assertTrue(~isempty(y2.event(2).usertags));
 assertTrue(~isfield(x2.event, 'usertags'));
-
-

@@ -11,7 +11,7 @@
 %
 % [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...) specifies
 % optional name/value parameter pairs:
-%   'SelectOption'   If true (default), the user is presented with a GUI
+%   'SelectFields'   If true (default), the user is presented with a GUI
 %                    that allows users to select which fields to tag.
 %
 % Function documentation:
@@ -54,7 +54,7 @@ canceled = false;
 fields = fMap.getFields();
 excluded = {};
 
-if isempty(fields) || ~p.SelectOption
+if isempty(fields) || ~p.SelectFields
     return;
 end
 
@@ -102,7 +102,7 @@ excluded = union(excluded, excludeUser);
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
         parser.addParamValue('PrimaryField', '', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('SelectOption', true, @islogical);
+        parser.addParamValue('SelectFields', true, @islogical);
         parser.parse(fMap, varargin{:});
         p = parser.Results;
     end

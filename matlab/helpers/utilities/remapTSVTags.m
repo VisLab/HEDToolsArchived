@@ -29,6 +29,12 @@
 %
 %       Optional:
 %
+%       'hasHeader'
+%                   True(default)if the tab-delimited file containing
+%                   the HED study tags has a header. The header will be
+%                   skipped and not validated. False if the file doesn't
+%                   have a header.
+%
 %       'outputFile'
 %                   The name or the path to the file that the output is
 %                   written to. The output file will be a tab-delimited
@@ -67,7 +73,7 @@ remapMap = remap2Map(p.remapFile);
 wildCardTags = getWildCardTags();
 try
     fileId = fopen(p.tsvFile);
-    tLine = fgetl(fileId);
+    tLine = checkForHeader(fileId);
     while ischar(tLine)
         readTags(tLine, tsvTagColumns);
         tLine = fgetl(fileId);
@@ -87,6 +93,14 @@ end
             tagStr = [tagStr ', ' convertTag(tags{a})]; %#ok<AGROW>
         end
     end % cell2str
+
+    function tLine = checkForHeader(fileId)
+        % Checks to see if the file has a header line
+        tLine = fgetl(fileId);
+        if p.hasHeader
+            tLine = fgetl(fileId);
+        end
+    end % checkForHeader
 
     function tagStr = convertTag(tag)
         % Converts a cell array containing a tag or a tag group into a
@@ -140,6 +154,7 @@ end
         p.addRequired('tsvTagColumns', @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
         [path, file] = fileparts(tsvFile);
+        p.addParamValue('hasHeader', true, @islogical); 
         p.addParamValue('OutputFile', ...
             fullfile(path, [file '_update.tsv']), ...
             @(x) ~isempty(x) && ischar(x));

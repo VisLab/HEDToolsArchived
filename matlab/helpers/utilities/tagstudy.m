@@ -158,17 +158,18 @@ if ~canceled
             ['Couldn''t save fieldMap to ' p.SaveMapFile]);
     end
     
-    % Rewrite all of the EEG files with updated tag information
-    fprintf('\n---Now rewriting the tags to the individual data files---\n');
-    for k = 1:length(fPaths) % Assemble the list
-        EEG = pop_loadset(fPaths{k});
-        EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
-        if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
-            EEG.data = double(EEG.data);
-        elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
-            EEG.data = single(EEG.data);
-        end
-        if p.SaveDatasets
+    if p.SaveDatasets
+        % Rewrite all of the EEG files with updated tag information
+        fprintf('\n---Now rewriting the tags to the individual data files---\n');
+        for k = 1:length(fPaths) % Assemble the list
+            EEG = pop_loadset(fPaths{k});
+            EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
+            if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
+                EEG.data = double(EEG.data);
+            elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
+                EEG.data = single(EEG.data);
+            end
+            
             if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
                 pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
                     EEG.filepath, 'savemode', 'onefile');

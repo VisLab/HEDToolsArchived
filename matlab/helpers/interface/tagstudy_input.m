@@ -284,7 +284,7 @@ uiwait(inputFig);
         baseMap = '';
         cancelled = true;
         preservePrefix = false;
-        precision = 'Both';
+        precision = 'preserve';
         saveDatasets = true;
         saveMapFile = '';
         selectOption = true;

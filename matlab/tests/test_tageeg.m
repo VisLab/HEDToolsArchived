@@ -31,8 +31,8 @@ fprintf('\nUnit tests for tageeg\n');
 fprintf('It should tag a data set that has a map but no events\n');
 fName = 'temp1.mat';
 x = values.data;
-[y, fMap, excluded] = tageeg(x, 'RewriteOption', 'both', ...
-        'UseGui', false, 'SaveMapFile', fName, 'SelectOption', false);
+[y, fMap, excluded] = tageeg(x, 'UseGui', false, 'SaveMapFile', fName, ...
+    'SelectFields', false);
 assertEqual(length(excluded), 5);
 assertTrue(isa(fMap, 'fieldMap'));
 assertTrue(isfield(y.etc, 'tags'));
@@ -48,13 +48,13 @@ function testSelectTags(values)  %#ok<DEFNU>
 % Unit tests for tag_eeg selecting which fields
 fprintf('\n\nIt should allow user to select the types to tag\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS EXCLUDE BUTTON FOR POSITION\n');
-fprintf('PRESS TAG BUTTON FOR TYPE\n');
-fprintf('PRESS OKAY WITHOUT TAGGING TYPE\n');
+fprintf('EXCLUDE POSITION\n');
+fprintf('TAG TYPE\n');
+fprintf('PRESS PROCEED WITHOUT ADDING ANY TAGS TO TYPE\n');
 fName = 'temp2.mat';
 x = values.data;
-[y, fMap, excluded] = tageeg(x, 'RewriteOption', 'both', ...
-        'UseGui', true, 'SaveMapFile', fName, 'SelectOption', true);
+[y, fMap, excluded] = tageeg(x, 'UseGui', true, 'SaveMapFile', fName, ...
+    'SelectFields', true);
 assertTrue(isa(fMap, 'fieldMap'));
 assertTrue(isfield(y.etc, 'tags'));
 assertTrue(isfield(y.etc.tags, 'xml'));
@@ -69,12 +69,12 @@ delete(fName);
 function testUseGUI(values)  %#ok<DEFNU>
 fprintf('\n\nIt should allow user to use the GUI to tag\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS OKAY BUTTON FOR POSITON\n');
-fprintf('PRESS OKAY BUTTON FOR TYPE\n');
+fprintf('PRESS PROCEED BUTTON FOR POSITON\n');
+fprintf('PRESS PROCEED BUTTON FOR TYPE\n');
 fName = 'temp2.mat';
 x = values.data;
-[y, fMap, excluded] = tageeg(x, 'RewriteOption', 'both', ...
-        'UseGui', true, 'SaveMapFile', fName, 'SelectOption', false);
+[y, fMap, excluded] = tageeg(x, 'UseGui', true, 'SaveMapFile', fName, ...
+    'SelectFields', false);
 assertTrue(isa(fMap, 'fieldMap'));
 fields = fMap.getFields();
 assertEqual(sum(strcmpi(fields, 'type')), 1);
@@ -88,12 +88,12 @@ delete(fName);
 function testReuse(values)  %#ok<DEFNU>
 fprintf('\n\nIt should correctly tag a dataset multiple times\n');
 fprintf('....REQUIRES USER INPUT\n');
-fprintf('PRESS OKAY BUTTON FOR POSITON\n');
-fprintf('PRESS OKAY BUTTON FOR TYPE\n');
+fprintf('PRESS PROCEED BUTTON FOR POSITON\n');
+fprintf('PRESS PROCEED BUTTON FOR TYPE\n');
 fName = 'temp3.mat';
 x = values.data;
-[y1, fMap, excluded] = tageeg(x, 'RewriteOption', 'both', ...
-        'UseGui', true, 'SaveMapFile', fName, 'SelectOption', false);
+[y1, fMap, excluded] = tageeg(x, 'UseGui', true, 'SaveMapFile', fName, ...
+    'SelectFields', false);
 assertTrue(isa(fMap, 'fieldMap'));
 fields = fMap.getFields();
 assertEqual(sum(strcmpi(fields, 'type')), 1);
@@ -103,12 +103,11 @@ assertTrue(isfield(y1.etc.tags, 'xml'));
 assertEqual(length(fieldnames(y1.etc.tags)), 2);
 assertEqual(length(excluded), 5);
 fprintf('Now retagging... there should be 2 values for position\n');
-fprintf('PRESS OKAY BUTTON FOR POSITON\n');
-fprintf('PRESS OKAY BUTTON FOR TYPE\n');
+fprintf('PRESS PROCEED BUTTON FOR POSITON\n');
+fprintf('PRESS PROCEED BUTTON FOR TYPE\n');
 fName = 'temp3.mat';
-[y2, fMap, excluded] = tageeg(y1, 'RewriteOption', 'both', ...
-        'UseGui', true, 'SaveMapFile', fName, 'SelectOption', ...
-        false); %#ok<ASGLU>
+[y2, fMap, excluded] = tageeg(y1, 'UseGui', true, 'SaveMapFile', ...
+    fName, 'SelectFields', false); %#ok<ASGLU>
 assertEqual(sum(strcmpi(fields, 'type')), 1);
 assertEqual(sum(strcmpi(fields, 'position')), 1);
 assertTrue(isfield(y2.etc, 'tags'));

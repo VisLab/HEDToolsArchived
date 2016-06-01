@@ -96,10 +96,10 @@ assertTrue(strcmpi(e1.field, 'epoch'));
 assertEqual(length(e1.values), 80);
 e2 = values1{2}.getStruct();
 assertTrue(strcmpi(e2.field, 'position'));
-assertEqual(length(e2.values), 79);
+assertEqual(length(e2.values), 2);
 e3 = values1{3}.getStruct();
 assertTrue(strcmpi(e3.field, 'type'));
-assertEqual(length(e3.values), 80);
+assertEqual(length(e3.values), 2);
 
 function testEmpty(values)  %#ok<INUSD,DEFNU>
 % Unit test for findtags
