@@ -2,13 +2,21 @@ function test_suite = test_tagtsv %#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
-values.tsvFile1 = 'sample_tsv1.txt';
-values.tsvFile2 = 'sample_tsv2.txt';
-values.tsvFile3 = 'sample_tsv3.txt';
-values.tsvFile4 = 'sample_tsv4.txt';
-values.tsvFile5 = 'sample_tsv5.txt';
-values.tsvFile6 = 'sample_tsv6.txt';
-values.tsvFile7 = 'sample_tsv7.txt';
+setup_tests;
+values.tsvFile1 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv1.txt']; %#ok<NODEF>
+values.tsvFile2 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv2.txt'];
+values.tsvFile3 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv3.txt'];
+values.tsvFile4 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv4.txt'];
+values.tsvFile5 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv5.txt'];
+values.tsvFile6 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv6.txt'];
+values.tsvFile7 = [values.testroot filesep values.Otherdir filesep ...
+    'sample_tsv7.txt'];
 
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test

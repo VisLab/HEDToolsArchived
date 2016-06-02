@@ -3,9 +3,10 @@ initTestSuite;
 
 function values = setup %#ok<DEFNU>
 % Read in the HED schema
+setup_tests;
 latestHed = 'HED.xml';
 values.data.etc.tags.xml = fileread(latestHed);
-load EEGEpoch.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGEpoch.mat']);
 values.EEGEpoch = EEGEpoch;
 
 function test_valid(values)  %#ok<DEFNU>

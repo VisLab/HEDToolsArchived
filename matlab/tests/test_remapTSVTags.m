@@ -3,15 +3,19 @@ initTestSuite;
 
 function values = setup %#ok<DEFNU>
 % Read in the HED schema
-dirPath = which('fMap.mat');
-dataPath = strrep(dirPath, 'fMap.mat', '');
-values.remapFile = [dataPath filesep 'Remap1.txt'];
-values.tagFile1 = [dataPath filesep 'Tags1.txt'];
+setup_tests;
+values.remapFile = [values.testroot filesep values.Otherdir filesep ...
+    'Remap1.txt']; %#ok<NODEF>
+values.tagFile1 = [values.testroot filesep values.Otherdir filesep ...
+    'Tags1.txt'];
 values.tagColumns1 = 2;
-values.outputFile1 = [dataPath filesep 'Tags1_output.txt'];
-values.tagFile2 = [dataPath filesep 'Tags2.txt'];
+values.outputFile1 = [values.testroot filesep values.Otherdir filesep ...
+    'Tags1_output.txt'];
+values.tagFile2 = [values.testroot filesep values.Otherdir filesep ...
+    'Tags2.txt'];
 values.tagColumns2 = 2;
-values.outputFile2 = [dataPath filesep 'Tags2_output.txt'];
+values.outputFile2 = [values.testroot filesep values.Otherdir filesep ...
+    'Tags2_output.txt'];
 
 function teardown(values) %#ok<DEFNU>
 % Function executed after each test

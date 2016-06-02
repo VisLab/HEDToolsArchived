@@ -2,7 +2,7 @@ function test_suite = test_selectmaps%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
-latestHed = 'HED 2.026.xml';
+latestHed = 'HED.xml';
 values.xml = fileread(latestHed);
 s1(1) = tagList('square');
 s1(1).add({'/Attribute/Visual/Color/Green', ...

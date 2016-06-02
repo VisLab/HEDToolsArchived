@@ -2,10 +2,10 @@ function test_suite = test_xml %#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
-latestHed = 'HED 2.026.xml';
+latestHed = 'HED.xml';
 values.HedXml = fileread(latestHed);
 hPath = fileparts(which(latestHed));
-values.SchemaFile = [hPath filesep 'HED Schema 2.026.xsd'];
+values.SchemaFile = [hPath filesep 'HED.xsd'];
 values.Schema = fileread(values.SchemaFile);
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test

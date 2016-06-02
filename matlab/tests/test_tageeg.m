@@ -2,6 +2,7 @@ function test_suite = test_tageeg%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
+setup_tests;
 a(1) = tagList('square');
 a(1).add({'/Attribute/Visual/Color/Green', ...
     '/Item/2D shape/Rectangle/Square'});
@@ -12,14 +13,14 @@ b(1).add('/Attribute/Object orientation/Rotated/Degrees/3 degrees');
 b(2) = tagList('2');
 b(2).add('/Attribute/Object orientation/Rotated/Degrees/1.5 degrees');
 % Read in the HED schema
-latestHed = 'HED 2.026.xml';
+latestHed = 'HED.xml';
 values.data.etc.tags.xml = fileread(latestHed);
 values.xml = fileread(latestHed);
 values.map1 = fieldMap('XML', values.xml);
 values.map1.addValues('type', a);
 values.map1.addValues('position', b);
 values.data.etc.tags = values.map1.getStruct();
-load EEGEpoch.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGEpoch.mat']);
 values.EEGEpoch = EEGEpoch;
 
 function teardown(values) %#ok<INUSD,DEFNU>

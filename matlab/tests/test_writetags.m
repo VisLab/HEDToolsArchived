@@ -2,6 +2,7 @@ function test_suite = test_writetags%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
+setup_tests;
 latestHed = 'HED.xml';
 values.xml = fileread(latestHed);
 s1(1) = tagList('square');
@@ -21,7 +22,7 @@ values.data.event = struct('type', {'square', 'rt'}, ...
     'position', {'1', '2'});
 values.data1.etc.tags = values.map1.getStruct();
 values.data2 = values.data;
-load EEGEpoch.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGEpoch.mat']);
 values.EEGEpoch = EEGEpoch;
 
 function teardown(values) %#ok<INUSD,DEFNU>

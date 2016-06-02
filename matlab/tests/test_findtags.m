@@ -2,7 +2,8 @@ function test_suite = test_findtags%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
-latestHed = 'HED 2.026.xml';
+setup_tests;
+latestHed = 'HED.xml';
 values.xml = fileread(latestHed);
 s1(1) = tagList('square');
 s1(1).add({'/Attribute/Visual/Color/Green', ...
@@ -17,7 +18,7 @@ values.map1 = fieldMap('XML', values.xml);
 values.map1.addValues('type', s1);
 values.map2 = fieldMap('XML', values.xml);
 values.map2.addValues('position', s2);
-load EEGEpoch.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGEpoch.mat']);
 values.EEGEpoch = EEGEpoch;
 values.noTagsFile = 'EEGEpoch.mat';
 values.oneTagsFile = 'fMapOne.mat';

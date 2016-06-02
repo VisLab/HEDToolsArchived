@@ -1,2 +1,0 @@
-Events	Tags
-1	/Action/Type/Button press

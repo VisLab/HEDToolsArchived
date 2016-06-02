@@ -2,7 +2,7 @@ function test_suite = test_getutypes%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
-  values = '';
+setup_tests;
 types = {'RT', 'Trigger', 'Missed'};
 eStruct = struct('hedXML', '', 'events', 'def');
 tags = {'/Sensory presentation/Taste', ...
@@ -14,9 +14,9 @@ eStruct.events = sE;
 eJSON1 = savejson('', eStruct);
 values.eStruct1 = eStruct;
 values.eJSON1 = eJSON1;
-load EEGEpoch.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGEpoch.mat']);
 values.EEGEpoch = EEGEpoch;
-load EEGShoot.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGShoot.mat']);
 values.EEGShoot = EEGShoot;
 
 function teardown(values) %#ok<INUSD,DEFNU>

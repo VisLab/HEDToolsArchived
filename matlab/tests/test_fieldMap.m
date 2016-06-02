@@ -3,7 +3,8 @@ initTestSuite;
 
 function values = setup %#ok<DEFNU>
 % Read in the HED schema
-latestHed = 'HED 2.026.xml';
+setup_tests;
+latestHed = 'HED.xml';
 values.xml = fileread(latestHed);
 s1(1) = tagList('square');
 s1(1).add({'/Attribute/Visual/Color/Green', ...
@@ -18,19 +19,22 @@ values.map1 = fieldMap('XML', values.xml);
 values.map1.addValues('type', s1);
 values.map2 = fieldMap('XML', values.xml);
 values.map2.addValues('position', s2);
-load EEGEpoch.mat;
+load([values.testroot filesep values.Otherdir filesep 'EEGEpoch.mat']);
 values.EEGEpoch = EEGEpoch;
-values.noTagsFile = 'EEGEpoch.mat';
-values.oneTagsFile = 'fMapOne.mat';
-values.otherTagsFile = 'fMapTwo.mat';
-values.xmlSchema = fileread('HED Schema 2.026.xsd');
+values.noTagsFile = [values.testroot filesep values.Otherdir filesep ...
+    'EEGEpoch.mat'];
+values.oneTagsFile = [values.testroot filesep values.Otherdir filesep ...
+    'fMapOne.mat'];
+values.otherTagsFile = [values.testroot filesep values.Otherdir filesep ...
+    'fMapTwo.mat'];
+values.xmlSchema = fileread('HED.xsd');
 values.data.etc.tags.xml = fileread(latestHed);
 values.data.etc.tags = values.map1.getStruct();
 
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test
 
-function testAddValue(values) %#ok<DEFNU>
+function testAddValue(values) %#ok<INUSD,DEFNU>
 % Unit test for fieldMap adding structure events
 fprintf('\nUnit tests for fieldMap adding structure events\n');
 fprintf('It should allow adding of a single type\n');
@@ -73,7 +77,7 @@ fprintf(['It should return an fieldMap object when it is not first' ...
 bT3 = fieldMap.loadFieldMap(values.otherTagsFile);
 assertTrue(isa(bT3, 'fieldMap'));
 
-function testClone(values) %#ok<DEFNU>
+function testClone(values) %#ok<INUSD,DEFNU>
 %____________TODO
 fprintf('\nUnit tests for clone method of fieldMap\n');
 fprintf('It should correctly clone a fieldMap object\n');

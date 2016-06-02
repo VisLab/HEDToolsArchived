@@ -147,6 +147,7 @@ processNodeElements(rootElement, '');
             end
         end
         if ~nodesFound
+            parentPath = parentPath(1:end-1);
             hedMaps.extensionAllowed(lower(parentPath)) = parentPath;
         end
     end % processNodeElements
