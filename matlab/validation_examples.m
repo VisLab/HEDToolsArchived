@@ -1,0 +1,16 @@
+% The following sections contain code examples for validating and remapping
+% HED tags in tab-delimited files. 
+
+%% Set the example directory (PLEASE SET THIS)
+exampleDir = 'Path\To\HEDToolsTestArchive';
+
+%% Validate the HED tags in a tab-delimited file
+[errors, warnings, extensions] = ...
+    validateTSVTags([exampleDir filesep ... 
+    'Other' filesep BCIT_GuardDuty_HED_tag_spec_v25.tsv'], ...
+    [2,3,4,5,6]);
+
+%% Remap (replace) the HED tags in a tab-delimited file
+remapTSVTags([exampleDir filesep ... 
+    'Other' filesep BCIT_Driving_HED_tag_spec_v25_remap.tsv'], ...
+    [exampleDir 'BCIT_Driving_HED_tag_spec_v25.tsv'], [2,3,4,5,6]);
