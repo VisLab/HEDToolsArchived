@@ -27,12 +27,12 @@
 %   'BaseMap'        A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used to initialize tag
 %                    information.
-%   'DbCreds'        Name of a property file containing the database
-%                    credentials. If this argument is not provided, a
-%                    database is not used. (See notes.)
 %   'DoSubDirs'      If true (default), the entire inDir directory tree is
 %                    searched. If false, only the inDir directory is
 %                    searched.
+%   'EditXml'        If false (default), the HED XML cannot be modified
+%                    using the tagger GUI. If true, then the HED XML can be
+%                    modified using the tagger GUI.  
 %   'ExcludeFields'  A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process. By
 %                    default the following subfields of the event structure
@@ -66,13 +66,8 @@
 %                    file. If the 'Precision' input argument is 'Preserve'
 %                    then the 'SaveMode' is ignored and the way that the
 %                    file is already saved will be retained.
-%   'SelectFields'   If true (default), the user is presented with dialog
-%                    GUIs that allow users to select which fields to tag.
-%   'Synchronize'    If false (default), the CTAGGER GUI is run with
-%                    synchronization done using the MATLAB pause. If true,
-%                    synchronization is done within Java. This latter
-%                    option is usually reserved when not calling the GUI
-%                    from MATLAB.
+%   'SelectFields'   If true (default), the user is presented with a 
+%                    GUI that allow users to select which fields to tag.
 %   'UseGui'         If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
 %
@@ -219,7 +214,6 @@ end
         parser.addParamValue('SaveMode', 'TwoFiles', ...
             @(x) any(validatestring(lower(x), {'OneFile', 'TwoFiles'})));
         parser.addParamValue('SelectFields', true, @islogical);
-        parser.addParamValue('Synchronize', false, @islogical);
         parser.addParamValue('UseGui', true, @islogical);
         parser.parse(inDir, varargin{:});
         p = parser.Results;
