@@ -72,17 +72,28 @@
 
 function [errors, warnings, extensions] = validateStructTags(eeg, varargin)
 p = parseArguments();
+errors = '';
+warnings = ''; 
+extensions = '';
 hedMaps = loadHEDMap();
 mapVersion = hedMaps.version;
 xmlVersion = getXMLHEDVersion(p.hedXML);
 if ~strcmp(mapVersion, xmlVersion);
     hedMaps = mapHEDAttributes(p.hedXML);
 end
+if isfield(eeg.event, p.tagField)
 [errors, warnings, extensions] = ...
     parseStructTags(hedMaps, p.eeg.event, p.tagField, p.extensionAllowed);
 if p.writeOutput
     writeOutputFiles();
 end
+else
+   fprintf(['The ''.%s'' field does not exist in the EEG events.' ...
+       ' Please tag the dataseet before running the validation.\n'], ...
+       p.tagField); 
+end
+ 
+
 
     function hedMaps = loadHEDMap()
         % Loads a structure that contains Maps associated with the HED XML
