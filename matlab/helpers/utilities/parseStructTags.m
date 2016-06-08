@@ -66,31 +66,36 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions] = parseStructTags(hedMaps, ...
-    events, tagField, extensionAllowed)
+function [errors, warnings, extensions, uniqueErrorTags] = ...
+    parseStructTags(hedMaps, events, tagField, extensionAllowed)
 p = parseArguments();
 errors = {};
 warnings = {};
 extensions = {};
+uniqueErrorTags = {};
 errorCount = 1;
 warningCount = 1;
 extensionCount = 1;
 validateStructureTags();
 
-    function checkForTSVLineErrors(originalTags, formattedTags, ...
+    function checkForEventErrors(originalTags, formattedTags, ...
             eventNumber)
         % Errors will be generated for the line if found
-        eventErrors = checkForValidationErrors(p.hedMaps, originalTags, ...
+        [eventErrors, eventErrorTags] = ...
+            checkForValidationErrors(p.hedMaps, originalTags, ...
             formattedTags, p.extensionAllowed);
         if ~isempty(eventErrors)
             eventErrors = [generateErrorMessage('event', eventNumber, ...
                 '', '', ''), eventErrors];
             errors{errorCount} = eventErrors;
+            if ~isempty(eventErrorTags)
+                uniqueErrorTags = union(uniqueErrorTags, lineErrorTags);
+            end
             errorCount = errorCount + 1;
         end
-    end % checkForTSVLineErrors
+    end % checkForEventErrors
 
-    function checkForTSVLineExtensions(originalTags, formattedTags, ...
+    function checkForEventExtensions(originalTags, formattedTags, ...
             eventNumber)
         % Errors will be generated for the line if found
         eventExtensions = checkForValidationExtensions(p.hedMaps, ...
@@ -101,9 +106,9 @@ validateStructureTags();
             extensions{extensionCount} = eventExtensions;
             extensionCount = extensionCount + 1;
         end
-    end % checkForTSVLineExtensions
+    end % checkForEventExtensions
 
-    function checkForTSVLineWarnings(originalTags, formattedTags, ...
+    function checkForEventWarnings(originalTags, formattedTags, ...
             eventNumber)
         % Warnings will be generated for the line if found
         eventWarnings = checkForValidationWarnings(p.hedMaps, ...
@@ -114,7 +119,7 @@ validateStructureTags();
             warnings{warningCount} = eventWarnings;
             warningCount = warningCount + 1;
         end
-    end % checkForTSVLineWarnings
+    end % checkForEventWarnings
 
     function [originalTags, formattedTags] = formatStructureTags(tags)
         % Converts the tags from a str to a cellstr
@@ -136,13 +141,13 @@ validateStructureTags();
     function validateStructureTags()
         % This function validates the tags in a EEG structure
         numberEvents = length(p.events);
-        for a = 1:length(numberEvents)
+        for a = 1:numberEvents
             [originalTags, formattedTags] = ...
                 formatStructureTags(p.events(a).(p.tagField));
             if ~isempty(originalTags)
-                checkForTSVLineErrors(originalTags, formattedTags, a);
-                checkForTSVLineWarnings(originalTags, formattedTags, a);
-                checkForTSVLineExtensions(originalTags, formattedTags, a);
+                checkForEventErrors(originalTags, formattedTags, a);
+                checkForEventWarnings(originalTags, formattedTags, a);
+                checkForEventExtensions(originalTags, formattedTags, a);
             end
         end
     end % validateStructureTags
