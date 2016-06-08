@@ -171,7 +171,7 @@ parseTSVLines();
     function parseTSVLines()
         % Parses the tags in a tab-delimited file line by line and
         % validates them
-%         try
+        try
             fileId = fopen(p.tsvFile);
             [tsvLine, lineNumber] = checkForHeader(fileId);
             while ischar(tsvLine)
@@ -183,11 +183,11 @@ parseTSVLines();
                 lineNumber = lineNumber + 1;
             end
             fclose(fileId);
-%         catch ME
-%             fclose(fileId);
-%             throw(MException('ParseTags:cannotParse', ...
-%                 'Unable to parse TSV file on line %d', lineNumber));
-%         end
+        catch ME
+            fclose(fileId);
+            throw(MException('ParseTags:cannotParse', ...
+                'Unable to parse TSV file on line %d', lineNumber));
+        end
     end % parseTSVLines
 
     function [originalTags, formattedTags] = readTSVLineTags(tLine, ...
