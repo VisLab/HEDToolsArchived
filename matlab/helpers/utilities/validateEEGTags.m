@@ -3,8 +3,8 @@
 % tags and attributes in the HED XML file.
 %
 % Usage:
-%   >>  [errors, warnings, extensions] = validateStructTags(eeg);
-%   >>  [errors, warnings, extensions] = validateStructTags(eeg, varargin);
+%   >>  [errors, warnings, extensions] = validateEEGTags(eeg);
+%   >>  [errors, warnings, extensions] = validateEEGTags(eeg, varargin);
 %
 % Input:
 %       eeg         The EEG dataset structure containing HED tags in the
@@ -70,7 +70,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions] = validateStructTags(eeg, varargin)
+function [errors, warnings, extensions] = validateEEGTags(eeg, varargin)
 p = parseArguments();
 errors = '';
 warnings = ''; 
