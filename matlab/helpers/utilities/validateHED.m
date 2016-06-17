@@ -94,7 +94,7 @@ end
         dir = fileparts(hedXML);
         p.addOptional('outputDirectory', dir, ...
             @(x) ~isempty(x) && ischar(x));
-        p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>
+        p.addParamValue('writeOutput', false, @islogical);
         p.parse(hedSchema, hedXML, varargin{:});
         p = p.Results;
     end % parseArguments

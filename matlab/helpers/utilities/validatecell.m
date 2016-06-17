@@ -25,7 +25,7 @@
 %                   The name or the path of the XML file containing
 %                   all of the HED tags and their attributes.
 %
-%       'outputDirectory'
+%       'outDir'
 %                   A directory where the validation output is written to
 %                   if the 'writeOuput' argument is true.
 %                   There will be four separate files generated, one
@@ -43,26 +43,20 @@
 %
 % Output:
 %
-%       errors
-%                   A cell array containing all of the validation errors.
-%                   Each cell is associated with the validation errors on a
-%                   particular line.
-%
-%       warnings
-%                   A cell array containing all of the validation warnings.
-%                   Each cell is associated with the validation warnings on
-%                   a particular line.
-%
-%       extensions
-%                   A cell array containing all of the extension allowed
-%                   validation warnings. Each cell is associated with the
-%                   extension allowed validation warnings on a particular
+%       errorLog
+%                   A cell array containing the error log. Each cell is
+%                   associated with the validation errors on a particular
 %                   line.
 %
-% Examples:
-%                   To validate the HED study tags in cellstr 'hedTags'.
+%       warningLog
+%                   A cell array containing the warning log. Each cell is
+%                   associated with the validation warnings on a particular
+%                   line.
 %
-%                   validateCellTags(hedTags);
+%       extensionLog
+%                   A cell array containing the extension log. Each cell is
+%                   associated with the extension allowed validation
+%                   warnings on a particular line.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -81,24 +75,45 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions] = validateCellTags(cells, varargin)
-p = parseArguments();
-errors = '';
-warnings = '';
-extensions = '';
-hedMaps = loadHEDMap();
-mapVersion = hedMaps.version;
-xmlVersion = getXMLHEDVersion(p.hedXML);
-if ~strcmp(mapVersion, xmlVersion);
-    hedMaps = mapHEDAttributes(p.hedXML);
+function [errorLog, warningLog, extensionLog] = validatecell(cells, ...
+    varargin)
+p = parseArguments(cells, varargin{:});
+[success, p] = validate(p);
+if ~success
+    errorLog = '';
+    warningLog = '';
+    extensionLog = '';
+    return;
 end
-if ~all(cellfun(@isempty, strtrim(cells)))
-    [errors, warnings, extensions] = parseCellTags(hedMaps, p.cells, ...
-        p.extensionAllowed);
-    if p.writeOutput
-        writeOutputFiles();
-    end
-end
+errorLog = p.errorLog;
+warningLog = p.warningLog;
+extensionLog = p.extensionLog;
+
+
+    function [success, p] = validate(p)
+        % Validates a cellstr
+        success = false;
+        p.hedMaps = getHEDMaps(p);
+        if ~all(cellfun(@isempty, strtrim(p.cells)))
+            [p.errorLog, p.warningLog, p.extensionLog] = ...
+                parseCellTags(p.hedMaps, p.cells, p.extensionAllowed);
+            if p.writeOutput
+                createLogs();
+            end
+            success = true;
+        end
+    end % validate
+
+    function hedMaps = getHEDMaps(p)
+        % Gets a structure that contains Maps associated with the HED XML
+        % tags
+        hedMaps = loadHEDMap();
+        mapVersion = hedMaps.version;
+        xmlVersion = getXMLHEDVersion(p.hedXML);
+        if ~strcmp(mapVersion, xmlVersion);
+            hedMaps = mapHEDAttributes(p.hedXML);
+        end
+    end % getHEDMaps
 
     function hedMaps = loadHEDMap()
         % Loads a structure that contains Maps associated with the HED XML
@@ -107,63 +122,64 @@ end
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
-    function p = parseArguments()
+    function p = parseArguments(cells, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('cells', @iscell);
         p.addParamValue('extensionAllowed', true, ...
-            @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
+            @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('hedXML', 'HED.xml', ...
-            @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
+            @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('outputDirectory', pwd, ...
-            @(x) ischar(x) && 7 == exist(x, 'dir')); %#ok<NVREPL>
-        p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>
+            @(x) ischar(x) && 7 == exist(x, 'dir'));
+        p.addParamValue('writeOutput', false, @islogical);
         p.parse(cells, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function writeErrorFile(dir, file, ext)
-        % Writes the errors to a file
-        numErrors = length(errors);
-        errorFile = fullfile(dir, [file '_err' ext]);
+    function createErrorLog(p)
+        % Creates a error log
+        numErrors = length(p.errorLog);
+        errorFile = fullfile(p.dir, [p.file '_error_log' p.ext]);
         fileId = fopen(errorFile,'w');
         for a = 1:numErrors
-            fprintf(fileId, '%s\n', errors{a});
+            fprintf(fileId, '%s\n', p.errorLog{a});
         end
         fclose(fileId);
-    end % writeErrorFile
+    end % createErrorLog
 
-    function writeExtensionFile(dir, file, ext)
-        % Writes the extensions to a file
-        numExtensions = length(extensions);
-        extensionFile = fullfile(dir, [file '_ext' ext]);
+    function createExtensionLog(p)
+        % Creates a extension log
+        numExtensions = length(p.extensionLog);
+        extensionFile = fullfile(p.dir, [p.file '_extension_log' p.ext]);
         fileId = fopen(extensionFile,'w');
         for a = 1:numExtensions
-            fprintf(fileId, '%s\n', extensions{a});
+            fprintf(fileId, '%s\n', p.extensionLog{a});
         end
         fclose(fileId);
-    end % writeExtensionFile
+    end % createExtensionLog
 
-    function writeOutputFiles()
-        % Writes the errors, warnings, extension allowed warnings to
-        % the output files
-        dir = p.outputDirectory;
+    function createLogs(p)
+        % Creates the log files
+        p.dir = p.outDir;
         [~, file] = fileparts(p.tsvFile);
-        ext = '.txt';
-        writeErrorFile(dir, file, ext);
-        writeWarningFile(dir, file, ext);
-        writeExtensionFile(dir, file, ext);
-    end % writeOutputFiles
+        p.ext = '.txt';
+        createErrorLog(p);
+        if ~p.errorLogOnly
+            createWarningLog(p);
+            createExtensionLog(p);
+        end
+    end % createLogs
 
-    function writeWarningFile(dir, file, ext)
-        % Writes the warnings to a file
-        numWarnings = length(warnings);
-        warningFile = fullfile(dir, [file '_wrn' ext]);
+    function createWarningLog(p)
+        % Creates a warning log
+        numWarnings = length(p.warningLog);
+        warningFile = fullfile(p.dir, [p.file '_warning_log' p.ext]);
         fileId = fopen(warningFile,'w');
         for a = 1:numWarnings
-            fprintf(fileId, '%s\n', warnings{a});
+            fprintf(fileId, '%s\n', p.warningLog{a});
         end
         fclose(fileId);
-    end % writeWarningFile
+    end % createWarningLog
 
-end % validateCellTags
+end % validatecell

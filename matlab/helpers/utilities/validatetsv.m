@@ -16,7 +16,7 @@
 %                   The name or the path of a tab-delimited text file
 %                   containing HED tags associated with a particular study.
 %
-%       tsvTagColumns
+%       columns
 %                   The columns that contain the study or experiment HED
 %                   tags. The columns can be a scalar value or a vector
 %                   (e.g. 2 or [2,3,4]).
@@ -25,7 +25,7 @@
 %
 %       'extensionAllowed'
 %                   True(default) if descendants of extension allowed tags
-%                   are accepted which will generate warnings, False if 
+%                   are accepted which will generate warnings, False if
 %                   they are not accepted which will generate errors.
 %
 %       'hasHeader'
@@ -72,9 +72,9 @@
 %                   extension allowed validation warnings on a particular
 %                   line.
 %
-%       uniqueErrorTags 
-%                   A cell array containing all of the unique validation 
-%                   error tags. 
+%       uniqueErrorTags
+%                   A cell array containing all of the unique validation
+%                   error tags.
 %
 % Examples:
 %                   To validate the HED study tags in file
@@ -102,21 +102,42 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings, extensions, uniqueErrorTags] = ...
-    validateTSVTags(tsvFile, tsvTagColumns, varargin)
-p = parseArguments();
-hedMaps = loadHEDMap();
-mapVersion = hedMaps.version;
-xmlVersion = getXMLHEDVersion(p.hedXML);
-if ~strcmp(mapVersion, xmlVersion);
-    hedMaps = mapHEDAttributes(p.hedXML);
+function [errorLog, warningLog, extensionLog] = validatetsv(tsvFile, ...
+    columns, varargin)
+p = parseArguments(tsvFile, columns, varargin{:});
+[success, p] = validate(p);
+if ~success
+    errorLog = '';
+    warningLog = '';
+    extensionLog = '';
+    return;
 end
-[errors, warnings, extensions, uniqueErrorTags] = ...
-    parseTSVTags(hedMaps, p.tsvFile, p.tsvTagColumns, p.hasHeader, ...
-    p.extensionAllowed);
-if p.writeOutput
-    writeOutputFiles();
-end
+errorLog = p.errorLog;
+warningLog = p.warningLog;
+extensionLog = p.extensionLog;
+
+    function [success, p] = validate(p)
+        % Validates a tsv file
+        p.hedMaps = getHEDMaps(p);
+        [p.errorLog, p.warningLog, p.extensionLog, p.uniqueErrorTags] = ...
+            parseTSVTags(p.hedMaps, p.tsvFile, p.columns, ...
+            p.hasHeader, p.extensionAllowed);
+        if p.writeOutput
+            writeOutputFiles();
+        end
+        success = true;
+    end % validate
+
+    function hedMaps = getHEDMaps(p)
+        % Gets a structure that contains Maps associated with the HED XML
+        % tags
+        hedMaps = loadHEDMap();
+        mapVersion = hedMaps.version;
+        xmlVersion = getXMLHEDVersion(p.hedXML);
+        if ~strcmp(mapVersion, xmlVersion);
+            hedMaps = mapHEDAttributes(p.hedXML);
+        end
+    end % getHEDMaps
 
     function hedMaps = loadHEDMap()
         % Loads a structure that contains Maps associated with the HED XML
@@ -125,81 +146,83 @@ end
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
-    function p = parseArguments()
+    function p = parseArguments(tsvFile, columns, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('tsvFile', @(x) (~isempty(x) && ischar(x)));
-        p.addRequired('tsvTagColumns', @(x) (~isempty(x) && ...
+        p.addRequired('columns', @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
+        p.addParamValue('errorLogOnly', true, ...
+            @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('hedXML', 'HED.xml', ...
-            @(x) (~isempty(x) && ischar(x))); %#ok<NVREPL>
+            @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('extensionAllowed', true, ...
-            @(x) validateattributes(x, {'logical'}, {})); %#ok<NVREPL>
-        p.addParamValue('hasHeader', true, @islogical); %#ok<NVREPL>
+            @(x) validateattributes(x, {'logical'}, {}));
+        p.addParamValue('hasHeader', true, @islogical);
         p.addParamValue('remapFile', '', @(x) (~isempty(x) && ...
-            ischar(x))); %#ok<NVREPL>
-        p.addParamValue('outputDirectory', fileparts(tsvFile), ...
-            @(x) ischar(x) && 7 == exist(x, 'dir')); %#ok<NVREPL>
-        p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>
-        p.parse(tsvFile, tsvTagColumns, varargin{:});
+            ischar(x)));
+        p.addParamValue('outDir', fileparts(tsvFile), ...
+            @(x) ischar(x) && 7 == exist(x, 'dir'));
+        p.addParamValue('writeOutput', false, @islogical);
+        p.parse(tsvFile, columns, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function writeErrorFile(dir, file, ext)
-        % Writes the errors to a file
-        numErrors = length(errors);
-        errorFile = fullfile(dir, [file '_err' ext]);
+    function createErrorLog(p)
+        % Creates a error log
+        numErrors = length(p.errorLog);
+        errorFile = fullfile(p.dir, [p.file '_error_log' p.ext]);
         fileId = fopen(errorFile,'w');
         for a = 1:numErrors
-            fprintf(fileId, '%s\n', errors{a});
+            fprintf(fileId, '%s\n', p.errorLog{a});
         end
         fclose(fileId);
-    end % writeErrorFile
+    end % createErrorLog
 
-    function writeExtensionFile(dir, file, ext)
-        % Writes the extensions to a file
-        numExtensions = length(extensions);
-        extensionFile = fullfile(dir, [file '_ext' ext]);
+    function createExtensionLog(p)
+        % Creates a extension log
+        numExtensions = length(p.extensionLog);
+        extensionFile = fullfile(p.dir, [p.file '_extension_log' p.ext]);
         fileId = fopen(extensionFile,'w');
         for a = 1:numExtensions
-            fprintf(fileId, '%s\n', extensions{a});
+            fprintf(fileId, '%s\n', p.extensionLog{a});
         end
         fclose(fileId);
-    end % writeExtensionFile
+    end % createExtensionLog
 
-    function writeMapFile(dir, file, ext)
+    function writeMapFile(p)
         % Writes the extensions to a file
         if isempty(p.remapFile)
-            fileId = writeToNewMapFile(dir, file, ext);
+            fileId = writeToNewMapFile(p);
         else
-            fileId = writeToExistingMapFile(dir, ext);
+            fileId = writeToExistingMapFile(p);
         end
         fclose(fileId);
     end % writeMapFile
 
-    function fileId = writeToNewMapFile(dir, file, ext)
+    function fileId = writeToNewMapFile(p)
         % Writes to a new map file
-        numMapTags = length(uniqueErrorTags);
-        remapFile = fullfile(dir, [file '_remap' ext]);
+        numMapTags = length(p.uniqueErrorTags);
+        remapFile = fullfile(p.dir, [p.file '_remap' p.ext]);
         fileId = fopen(remapFile,'w');
         for a = 1:numMapTags
-            fprintf(fileId, '%s\n', uniqueErrorTags{a});
+            fprintf(fileId, '%s\n', p.uniqueErrorTags{a});
         end
     end % writeToNewMapFile
 
-    function fileId = writeToExistingMapFile(dir, ext)
+    function fileId = writeToExistingMapFile(p)
         % Writes to an existing map file
-        numMapTags = size(uniqueErrorTags, 1);
+        numMapTags = size(p.uniqueErrorTags, 1);
         [mapFileDir, file]  = fileparts(p.remapFile);
-        remapFile = fullfile(dir, [file ext]);
+        remapFile = fullfile(p.dir, [p.file p.ext]);
         mapTagMap = putMapFileInHash(remapFile);
         if ~strcmp(dir, mapFileDir)
             copyfile(p.remapFile, remapFile);
         end
         fileId = fopen(remapFile,'a');
         for a = 1:numMapTags
-            if ~mapTagMap.isKey(lower(uniqueErrorTags{a}))
-                fprintf(fileId, '\n%s', uniqueErrorTags{a});
+            if ~mapTagMap.isKey(lower(p.uniqueErrorTags{a}))
+                fprintf(fileId, '\n%s', p.uniqueErrorTags{a});
             end
         end
     end % writeToExistingMapFile
@@ -225,28 +248,30 @@ end
         end
     end % putMapTagsInHash
 
-    function writeOutputFiles()
+    function writeOutputFiles(p)
         % Writes the errors, warnings, extension allowed warnings to
         % the output files
-        dir = p.outputDirectory;
-        [~, file] = fileparts(p.tsvFile);
-        ext = '.txt';
-        mapExt = '.tsv';
-        writeErrorFile(dir, file, ext);
-        writeWarningFile(dir, file, ext);
-        writeExtensionFile(dir, file, ext);
-        writeMapFile(dir, file, mapExt);
+        p.dir = p.outputDirectory;
+        [~, p.file] = fileparts(p.tsvFile);
+        p.ext = '.txt';
+        p.mapExt = '.tsv';
+        createErrorLog(p);
+        if ~errorLogOnly
+            createWarningLog(p);
+            createExtensionLog(p);
+            writeMapFile(p);
+        end
     end % writeOutputFiles
 
-    function writeWarningFile(dir, file, ext)
-        % Writes the warnings to a file
-        numWarnings = length(warnings);
-        warningFile = fullfile(dir, [file '_wrn' ext]);
+    function createWarningLog(p)
+        % Creates a warning log
+        numWarnings = length(p.warningLog);
+        warningFile = fullfile(p.dir, [p.file '_warning_log' p.ext]);
         fileId = fopen(warningFile,'w');
         for a = 1:numWarnings
-            fprintf(fileId, '%s\n', warnings{a});
+            fprintf(fileId, '%s\n', p.warningLog{a});
         end
         fclose(fileId);
-    end % writeWarningFile
+    end % createWarningLog
 
-end % validateTSVTags
+end % validatetsv
