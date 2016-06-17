@@ -79,11 +79,37 @@ finalcmd =  [trystrs.no_check finalcmd ifeegcmd savecmd ...
 uimenu(parentMenu, 'Label', 'Tag current EEG', 'Callback', finalcmd, ...
     'Separator', 'on');
 
+% Processing for 'Validate current EEG'
+finalcmd = '[~, ~, ~, LASTCOM] = pop_validateeeg(EEG);';
+
+% Add 'Validate current EEG' to 'Edit'
+uimenu(parentMenu, 'Label', 'Validate current EEG', 'Callback', finalcmd);
+
 % Find 'Memory and other options' in the figure 
 parentMenu = findobj(fig, 'Label', 'File', 'Type', 'uimenu');
 positionMenu = findobj(fig, 'Label', 'Memory and other options', ...
     'Type', 'uimenu');
 position = get(positionMenu, 'Position');
+
+% Add 'Validate files' to 'File'
+dirMenu = uimenu(parentMenu, 'Label', 'Validate files', ...
+    'Position', position, 'userdata', 'startup:on;study:on');
+
+% Processing for 'Tag directory'
+finalcmd = '[~, LASTCOM] = pop_validatedir();';
+finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
+
+% Add 'Validate directory' to 'Tag files' 
+uimenu(dirMenu, 'Label', 'Validate directory', 'Callback', finalcmd, ...
+    'Separator', 'on', 'userdata', 'startup:on;study:on');
+
+% Processing for 'Tag EEG study'
+finalcmd = 'LASTCOM = pop_validatestudy();';
+finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
+
+% Add 'Validate EEG study' to 'Tag files'  
+uimenu(dirMenu, 'Label', 'Validate EEG study', 'Callback', finalcmd, ...
+    'Separator', 'on', 'userdata', 'startup:on;study:on');
 
 % Add 'Tag files' to 'File'
 dirMenu = uimenu(parentMenu, 'Label', 'Tag files', ...
@@ -104,6 +130,7 @@ finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
 % Add 'Tag EEG study' to 'Tag files'  
 uimenu(dirMenu, 'Label', 'Tag EEG study', 'Callback', finalcmd, ...
     'Separator', 'on', 'userdata', 'startup:on;study:on');
+
 
 % Find 'Remove baseline' in the figure 
 parentMenu = findobj(fig, 'Label', 'Tools');
