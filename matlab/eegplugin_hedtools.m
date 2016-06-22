@@ -56,12 +56,15 @@ end;
 % Add the jar files needed to run this
 jarPath = [tPath filesep 'jars' filesep];  % With jar
 warning off all;
+evalin('base', 'save([tempdir ''tmp.mat''], ''-mat'');');
 try
     javaaddpath([jarPath 'ctagger.jar']);
     javaaddpath([jarPath 'jackson.jar']);
     javaaddpath([jarPath 'hedconversion.jar']);
 catch mex  %#ok<NASGU>
 end
+evalin('base', 'load([tempdir ''tmp.mat''], ''-mat'');');
+delete([tempdir 'tmp.mat']);
 warning on all;
 
 % Find 'Edit' in the figure 

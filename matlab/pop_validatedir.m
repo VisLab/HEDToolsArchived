@@ -6,7 +6,7 @@
 % See also:
 %   eeglab, tageeg, tagdir, tagstudy, and eegplugin_ctagger
 %
-% Copyright (C) 2012-2013 Thomas Rognon tcrognon@gmail.com and
+% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify

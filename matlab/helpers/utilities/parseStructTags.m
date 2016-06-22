@@ -127,13 +127,24 @@ validateStructureTags();
         formattedTags = formatTags(tags, true);
     end % formatStructureTags
 
+    function generateEmptyError(eventNumber)
+        % Generates a error message when there are no tags present
+        generalError = generateErrorMessage('event', eventNumber, ...
+            '', '', '');
+        specificError = generateErrorMessage('empty', '', '', ...
+            '', '');
+        eventErrors = [generalError specificError];
+        errors{errorCount} = eventErrors;
+        errorCount = errorCount + 1;
+    end % createEmptyError
+
     function p = parseArguments()
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
         parser.addRequired('events', @(x) (~isempty(x) && isstruct(x)));
         parser.addRequired('tagField', @(x) (~isempty(x) && ischar(x)));
-         parser.addRequired('extensionAllowed', @islogical);
+        parser.addRequired('extensionAllowed', @islogical);
         parser.parse(hedMaps, events, tagField, extensionAllowed);
         p = parser.Results;
     end % parseArguments
@@ -148,6 +159,8 @@ validateStructureTags();
                 checkForEventErrors(originalTags, formattedTags, a);
                 checkForEventWarnings(originalTags, formattedTags, a);
                 checkForEventExtensions(originalTags, formattedTags, a);
+            else
+                generateEmptyError(a);
             end
         end
     end % validateStructureTags

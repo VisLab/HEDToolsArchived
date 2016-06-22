@@ -1,4 +1,3 @@
-% pop_tageeg
 % Allows a user to validate a EEG structure using a GUI
 %
 % Usage:
@@ -11,7 +10,7 @@
 % See also:
 %   eeglab, tageeg, tagdir, tagstudy, and eegplugin_ctagger
 %
-% Copyright (C) 2012-2013 Thomas Rognon tcrognon@gmail.com and
+% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -29,8 +28,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 
-function [errorLog, warningLog, extensionLog, com] = ...
-    pop_validateeeg(EEG)
+function [errorLog, warningLog, extensionLog, com] = pop_validateeeg(EEG)
 errorLog = '';
 warningLog = '';
 extensionLog = '';
@@ -57,7 +55,7 @@ com = char(['validateeeg(EEG, ' ...
     '''errorLogOnly'', ' logical2str(errorLogOnly) ', ' ...
     '''extensionAllowed'', ' logical2str(extensionsAllowed) ', ' ...
     '''hedXML'', ''' hedXML ''', ' ...
-    '''outDir'', ''' outDir ''', ' ... 
+    '''outDir'', ''' outDir ''', ' ...
     '''writeOutput'', ' 'true)']);
 end % pop_validateeeg
 
@@ -67,5 +65,5 @@ if b
     s = 'true';
 else
     s = 'false';
-end % logical2str
+end
 end % logical2str

@@ -2,10 +2,12 @@
 % lastest HED schema. 
 %
 % Usage:
+%
 %   >>  [errors, warnings, extensions] = validateeeg(eeg);
 %   >>  [errors, warnings, extensions] = validateeeg(eeg, varargin);
 %
 % Input:
+%
 %       eeg         The EEG dataset structure containing HED tags in the
 %                   .event field.
 %
@@ -77,7 +79,7 @@ validate(p);
         p.hedMaps = getHEDMaps(p);
         if isfield(p.eeg.event, p.tagField)
             [p.errorLog, p.warningLog, p.extensionLog] = ...
-                parseStructTags(hedMaps, p.eeg.event, p.tagField, ...
+                parseStructTags(p.hedMaps, p.eeg.event, p.tagField, ...
                 p.extensionAllowed);
             errorLog = p.errorLog;
             warningLog = p.warningLog;

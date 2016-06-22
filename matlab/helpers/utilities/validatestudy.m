@@ -2,20 +2,17 @@
 % the tags the against the latest HED schema.
 %
 % Usage:
+%
 %   >>  validateDir(study);
 %   >>  validateDir(study, varargin);
 %
 % Input:
-%       inDir
-%                   A directory containing EEG datasets that will be
+%
+%       studyFile
+%                   A study file and the associated datasets that will be
 %                   validated.
 %
 %       Optional:
-%
-%       'DoSubDirs'
-%                   If true (default), the entire inDir directory tree is
-%                   searched. If false, only the inDir directory is
-%                   searched.
 %
 %       'tagField'
 %                   The field in .event that contains the HED tags.
@@ -34,11 +31,6 @@
 %                   allowed validation warnings. The default directory will
 %                   be the directory that contains the tab-delimited text
 %                  file.
-%
-%       'writeOutput'
-%                   If false(default) the validation output is not written
-%                   to separate files. If true the validation output is
-%                   written to separate files.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -87,7 +79,7 @@ validate(p);
                 createLogs(p);
             else
                 fprintf(['The ''.%s'' field does not exist in the' ...
-                    ' EEG events. Please tag the dataseet before' ...
+                    ' EEG events. Please tag the dataset before' ...
                     ' running the validation.\n'], p.tagField);
             end
         end
@@ -206,4 +198,4 @@ validate(p);
         fclose(fileId);
     end % createWarningLog
 
-end % validateDir
+end % validatestudy

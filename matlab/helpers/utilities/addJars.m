@@ -24,13 +24,25 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function addJars()
-dirPath = which('pop_validate.m');
-dirPath = strrep(dirPath, 'pop_validate.m', '');
-jarPath = [dirPath 'jars' filesep];  % With jar
+% Find the path of the current directory
+save('workspace.mat');
+tPath = which('eegplugin_hedtools.m');
+tPath = strrep(tPath, [filesep 'eegplugin_hedtools.m'], '');
+
+% Add hedtools folders to path if they aren't already there
+if ~exist('eegplugin_hedtools-subfoldertest.m', 'file')  % Dummy file to make sure not added
+    addpath(genpath(tPath));  % Add all subfolders to path too
+end;
+
+% Add the jar files needed to run this
+jarPath = [tPath filesep 'jars' filesep];  % With jar
 warning off all;
 try
+    javaaddpath([jarPath 'ctagger.jar']);
+    javaaddpath([jarPath 'jackson.jar']);
     javaaddpath([jarPath 'hedconversion.jar']);
 catch mex  %#ok<NASGU>
 end
 warning on all;
+delete('workspace.mat');
 end % addJars

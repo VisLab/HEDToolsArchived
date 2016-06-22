@@ -2,10 +2,12 @@
 % the tags the against the latest HED schema. 
 %
 % Usage:
+%
 %   >>  validateDir(inDir);
 %   >>  validateDir(inDir, varargin);
 %
 % Input:
+%
 %       inDir       
 %                   A directory containing EEG datasets that will be
 %                   validated.
@@ -162,4 +164,4 @@ fPaths = validate(p);
         fclose(fileId);
     end % createWarningLog
 
-end % validateDir
+end % validatedir
