@@ -32,7 +32,7 @@
 %                    searched.
 %   'EditXml'        If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can be
-%                    modified using the tagger GUI.  
+%                    modified using the tagger GUI.
 %   'ExcludeFields'  A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process. By
 %                    default the following subfields of the event structure
@@ -66,7 +66,7 @@
 %                    file. If the 'Precision' input argument is 'Preserve'
 %                    then the 'SaveMode' is ignored and the way that the
 %                    file is already saved will be retained.
-%   'SelectFields'   If true (default), the user is presented with a 
+%   'SelectFields'   If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %   'UseGui'         If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
@@ -175,12 +175,12 @@ if ~canceled
                 EEG.data = double(EEG.data);
             elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
                 EEG.data = single(EEG.data);
-            end        
+            end
             if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, ...
                     'double')
                 pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
                     EEG.filepath, 'savemode', 'onefile');
-            elseif isequal(p.SaveMode, 'twofiles')
+            elseif isequal(p.SaveMode, 'twofiles') || findDatFile()
                 pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
                     EEG.filepath, 'savemode', 'twoFiles');
             else
@@ -190,6 +190,12 @@ if ~canceled
         end
     end
 end
+
+    function found = findDatFile()
+        % Looks for a .dat file
+        [~, fName] = fileparts(EEG.filename);
+        found = 2 == exist([EEG.filepath filesep fName '.dat'], 'file');
+    end % findDatFile
 
     function p = parseArguments()
         % Parses the input arguments and returns the results

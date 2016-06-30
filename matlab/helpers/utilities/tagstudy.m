@@ -171,7 +171,7 @@ if ~canceled
             if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
                 pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
                     EEG.filepath, 'savemode', 'onefile');
-            elseif isequal(p.SaveMode, 'twofiles')
+            elseif isequal(p.SaveMode, 'twofiles') || findDatFile()
                 pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
                     EEG.filepath, 'savemode', 'twoFiles');
             else
@@ -186,6 +186,12 @@ if ~canceled
         p.PreservePrefix);  %#ok<NASGU>
     save(p.StudyFile, 's', '-mat');
 end
+
+    function found = findDatFile()
+        % Looks for a .dat file
+        [~, fName] = fileparts(EEG.filename);
+        found = 2 == exist([EEG.filepath filesep fName '.dat'], 'file');
+    end % findDatFile
 
     function [s, fNames] = loadstudy(studyFile)
         % Set baseTags if tagsFile contains an tagMap object
