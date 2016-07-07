@@ -79,14 +79,16 @@ finalcmd =  [trystrs.no_check finalcmd ifeegcmd savecmd ...
     redrawcmd 'end;' catchstrs.add_to_hist];
 
 % Add 'Tag current EEG' to 'Edit'
-uimenu(parentMenu, 'Label', 'Tag current EEG', 'Callback', finalcmd, ...
+uimenu(parentMenu, 'Label', 'Tag current dataset', 'Callback', ...
+    finalcmd, ...
     'Separator', 'on');
 
 % Processing for 'Validate current EEG'
 finalcmd = '[~, ~, ~, LASTCOM] = pop_validateeeg(EEG);';
 
 % Add 'Validate current EEG' to 'Edit'
-uimenu(parentMenu, 'Label', 'Validate current EEG', 'Callback', finalcmd);
+uimenu(parentMenu, 'Label', 'Validate current dataset', 'Callback', ...
+    finalcmd);
 
 % Find 'Memory and other options' in the figure 
 parentMenu = findobj(fig, 'Label', 'File', 'Type', 'uimenu');
@@ -111,7 +113,7 @@ finalcmd = 'LASTCOM = pop_validatestudy();';
 finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
 
 % Add 'Validate EEG study' to 'Tag files'  
-uimenu(dirMenu, 'Label', 'Validate EEG study', 'Callback', finalcmd, ...
+uimenu(dirMenu, 'Label', 'Validate study', 'Callback', finalcmd, ...
     'Separator', 'on', 'userdata', 'startup:on;study:on');
 
 % Add 'Tag files' to 'File'
@@ -131,7 +133,7 @@ finalcmd = '[~, LASTCOM] = pop_tagstudy();';
 finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
 
 % Add 'Tag EEG study' to 'Tag files'  
-uimenu(dirMenu, 'Label', 'Tag EEG study', 'Callback', finalcmd, ...
+uimenu(dirMenu, 'Label', 'Tag study', 'Callback', finalcmd, ...
     'Separator', 'on', 'userdata', 'startup:on;study:on');
 
 

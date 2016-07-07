@@ -49,9 +49,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function validatestudy(studyFile, varargin)
+function fPaths = validatestudy(studyFile, varargin)
 p = parseArguments(studyFile, varargin{:});
-validate(p);
+fPaths = validate(p);
 
     function hedMaps = getHEDMaps(p)
         % Gets a structure that contains Maps associated with the HED XML
@@ -64,7 +64,7 @@ validate(p);
         end
     end % getHEDMaps
 
-    function validate(p)
+    function fPaths = validate(p)
         % Validates all .set files in the input directory
         p.hedMaps = getHEDMaps(p);
         [~, fPaths] = loadstudy(p.studyFile);
