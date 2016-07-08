@@ -32,11 +32,6 @@
 %   'Fields'         A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty, only
 %                    these fields are tagged.
-%   'Precision'      The precision that the .data field should be converted
-%                    to. The options are 'Preserve', 'Double' and 'Single'.
-%                    'Preserve' retains the .data field precision, 'Double'
-%                    converts the .data field to double precision, and
-%                    'Single' converts the .data field to single precision.
 %   'PreservePrefix' If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
@@ -44,8 +39,6 @@
 %   'PrimaryField'   The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description.
-%   'SaveDataset'    If false (default), only save the tags to the EEG
-%                    structure and not to the underlying dataset file.
 %   'SaveMapFile'    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
@@ -55,7 +48,7 @@
 %                    file and the transposed data in a binary float .fdt
 %                    file. If the 'Precision' input argument is 'Preserve'
 %                    then the 'SaveMode' is ignored and the way that the
-%                    file is already saved will be retained.
+%                    file is already saved will be retained.zzz
 %   'SelectFields'   If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %   'UseGui'         If true (default), the CTAGGER GUI is displayed after
@@ -141,30 +134,7 @@ if ~canceled
     
     % Now finish writing the tags to the EEG structure
     EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
-    if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
-        EEG.data = double(EEG.data);
-    elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
-        EEG.data = single(EEG.data);
-    end
-    if p.SaveDataset
-        if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, 'double')
-            EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-                EEG.filepath, 'savemode', 'onefile');
-        elseif isequal(p.SaveMode, 'twofiles') || findDatFile()
-            EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-                EEG.filepath, 'savemode', 'twoFiles');
-        else
-            EEG = pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-                EEG.filepath,'savemode', 'resave');
-        end
-    end
 end
-
-    function found = findDatFile()
-        % Looks for a .dat file
-        [~, fName] = fileparts(EEG.filename);
-        found = 2 == exist([EEG.filepath filesep fName '.dat'], 'file');
-    end % findDatFile
 
     function p = parseArguments()
         % Parses the input arguments and returns the results
@@ -178,16 +148,10 @@ end
             @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('Precision', 'Preserve', ...
-            @(x) any(validatestring(lower(x), ...
-            {'Double', 'Preserve', 'Single'})));
         parser.addParamValue('PrimaryField', '', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('SaveDataset', false, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || ...
             (ischar(x))));
-        parser.addParamValue('SaveMode', 'TwoFiles', ...
-            @(x) any(validatestring(lower(x), {'OneFile', 'TwoFiles'})));
         parser.addParamValue('SelectFields', true, @islogical);
         parser.addParamValue('UseGui', true, @islogical);
         parser.parse(EEG, varargin{:});
