@@ -85,7 +85,7 @@
 % $Initial version $
 %
 
-function [EEG, fMap, excluded] = tageeg(EEG, varargin)
+function [EEG, fMap, excluded, canceled] = tageeg(EEG, varargin)
 % Parse the input arguments
 p = parseArguments();
 
@@ -119,6 +119,8 @@ end
 if p.UseGui && ~canceled
     [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
         'PreservePrefix', p.PreservePrefix);
+else
+    return;
 end
 
 fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
@@ -130,8 +132,7 @@ if ~canceled
             fMap)
         warning('tageeg:invalidFile', ...
             ['Couldn''t save fieldMap to ' p.SaveMapFile]);
-    end
-    
+    end    
     % Now finish writing the tags to the EEG structure
     EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
 end

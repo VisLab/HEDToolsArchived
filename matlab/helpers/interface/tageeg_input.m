@@ -37,12 +37,12 @@
 % $Initial version $
 %
 
-function [baseMap, cancelled, editXml, preservePrefix, saveMapFile, ...
+function [baseMap, canceled, editXml, preservePrefix, saveMapFile, ...
     selectFields, useGUI] = tageeg_input()
 
 % Setup the variables used by the GUI
 baseMap = '';
-cancelled = true;
+canceled = true;
 editXml = false;
 preservePrefix = false;
 saveMapFile = '';
@@ -92,7 +92,7 @@ end
     function cancelCallback(src, eventdata)  %#ok<INUSD>
         % Callback for browse button sets a directory for control
         baseMap = '';
-        cancelled = true;
+        canceled = true;
         preservePrefix = false;
         saveMapFile = '';
         selectFields = true;
@@ -215,7 +215,7 @@ end
 
     function okayCallback(~, ~)
         % Callback for closing GUI window
-        cancelled = false;
+        canceled = false;
         close(inputFig);
     end % okayCallback
 
