@@ -48,6 +48,8 @@ switch(type)
         warning = sprintf(['\tEach slash-separated string in "%s"' ...
             ' should only have the first letter captilized or be camel' ...
             ' case\n'], tag);
+    case 'correct'
+        warning = sprintf('No warnings were found.');
     case 'event'
         warning = sprintf('Warnings in event %s:\n', num2str(line));
     case 'line'

@@ -123,7 +123,7 @@ extensionLog = p.extensionLog;
             parseTSVTags(p.hedMaps, p.tsvFile, p.columns, ...
             p.hasHeader, p.extensionAllowed);
         if p.writeOutput
-            writeOutputFiles();
+            writeOutputFiles(p);
         end
         success = true;
     end % validate
@@ -190,20 +190,20 @@ extensionLog = p.extensionLog;
         fclose(fileId);
     end % createExtensionLog
 
-    function writeMapFile(p)
-        % Writes the extensions to a file
+    function writeRemapFile(p)
+        % Writes a remap file
         if isempty(p.remapFile)
             fileId = writeToNewMapFile(p);
         else
             fileId = writeToExistingMapFile(p);
         end
         fclose(fileId);
-    end % writeMapFile
+    end % writeRemapFile
 
     function fileId = writeToNewMapFile(p)
         % Writes to a new map file
         numMapTags = length(p.uniqueErrorTags);
-        remapFile = fullfile(p.dir, [p.file '_remap' p.ext]);
+        remapFile = fullfile(p.dir, [p.file '_remap' p.mapExt]);
         fileId = fopen(remapFile,'w');
         for a = 1:numMapTags
             fprintf(fileId, '%s\n', p.uniqueErrorTags{a});
@@ -251,15 +251,15 @@ extensionLog = p.extensionLog;
     function writeOutputFiles(p)
         % Writes the errors, warnings, extension allowed warnings to
         % the output files
-        p.dir = p.outputDirectory;
+        p.dir = p.outDir;
         [~, p.file] = fileparts(p.tsvFile);
         p.ext = '.txt';
         p.mapExt = '.tsv';
         createErrorLog(p);
-        if ~errorLogOnly
+        writeRemapFile(p);
+        if ~p.errorLogOnly
             createWarningLog(p);
             createExtensionLog(p);
-            writeMapFile(p);
         end
     end % writeOutputFiles
 

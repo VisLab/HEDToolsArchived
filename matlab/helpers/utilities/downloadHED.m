@@ -30,6 +30,6 @@
 function wikiVersion = downloadHED()
 wikiURL = 'https://raw.githubusercontent.com/wiki/BigEEGConsortium/HED/HED-Schema.mediawiki';
 wikiPath = [tempdir 'temp.mediawiki'];
-websave(wikiPath, wikiURL);
+urlwrite(wikiURL, wikiPath);
 wikiVersion = getWikiHEDVersion(wikiPath);
 end % downloadHED

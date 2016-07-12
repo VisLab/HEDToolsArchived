@@ -47,6 +47,8 @@
 
 function extension = generateExtensionMessage(type, line, tag, prefix)
 switch(type)
+    case 'correct'
+        extension = sprintf('No extensions allowed warnings were found.');
     case 'event'
         extension = sprintf('Warnings in event %s:\n', num2str(line));
     case 'extensionAllowed'
@@ -54,5 +56,5 @@ switch(type)
             ' descendant of "%s" which has the extensionAllowed' ...
             ' attribute\n'], tag, prefix);
     case 'line'
-        extension = sprintf('Warnings on line %s:\n', num2str(line));       
+        extension = sprintf('Warnings on line %s:\n', num2str(line));
 end % generateExtensionMessage

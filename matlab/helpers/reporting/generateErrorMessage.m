@@ -51,6 +51,8 @@ switch(type)
     case 'comma'
         error = sprintf(['\t"%s" may contain a comma when no commas' ...
             ' are allowed in tags'], tag);
+    case 'correct'
+        error = sprintf('No errors were found.');
     case 'empty'
         error = sprintf('There are no tags present. Please add tags.\n');
     case 'event'

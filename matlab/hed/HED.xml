@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="2.3.1">
+<HED version="2.3.3">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1601,9 +1601,23 @@
       </node>
       <node>
          <name>Probability</name>
-         <description>Use to specify the level of certainty</description>
+         <description>Use to specify the level of certainty about the occurrence of the event. Use either numerical values as the child node or low, high, etc.</description>
       </node>
-      <node>
+      <node requireChild="true">
+         <name>Temporal uncertainty</name>
+         <description>Use to specify the amount of uncertainty in the timing of the event. Please notice that this is different from Attribute/Probability tag which relates to the occurrence of event and can be interpretative as the integral of probability density across a distribution whose shape (temporal extent) is specified by Attribute/Temporal uncertainty</description>
+         <node isNumeric="true" takesValue="true" unitClass="time">
+            <name>#</name>
+         </node>
+         <node requireChild="true">
+            <name>Standard deviation</name>
+            <description>implies that the distribution of temporal uncertainty is Gaussian with the provided standard deviation (in seconds).</description>
+            <node isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+            </node>
+         </node>
+      </node>
+      <node requireChild="true">
          <name>Presentation fraction</name>
          <description>the fraction of presentation of an Oddball or Expected stimuli to the total number of same-class presentations, e.g. 10% of images in an RSVP being targets</description>
          <node isNumeric="true" takesValue="true">
@@ -2454,6 +2468,13 @@
             </node>
             <node>
                <name>Sleep</name>
+               <node requireChild="true">
+                  <name>Stage</name>
+                  <node takesValue="true">
+                     <name>#</name>
+                     <description>a number between 1 to 4, or REM</description>
+                  </node>
+               </node>
             </node>
             <node>
                <name>Drunk</name>
@@ -2675,10 +2696,6 @@
          </node>
       </node>
    </node>
-   <node requireChild="true">
-      <name>Custom</name>
-      <description>This node can be used to organize events in an alternative (parallel) hierarchy. Uou can define your custom tags and hierarchies without any restriction under this node. These tags will still be matched to each other as for example  /Custom/Dance/Waltz is considered a subtype of /Custom/DanceExample.</description>
-   </node>
    <node extensionAllowed="true" requireChild="true">
       <name>Experiment context</name>
       <description>Describes the context of the whole experiment or large portions of it and also includes tags that are common across all events</description>
@@ -2810,6 +2827,10 @@
       <node>
          <name>Virtual world</name>
       </node>
+   </node>
+   <node requireChild="true">
+      <name>Custom</name>
+      <description>This node can be used to organize events in an alternative (parallel) hierarchy. Uou can define your custom tags and hierarchies without any restriction under this node. These tags will still be matched to each other as for example  /Custom/Dance/Waltz is considered a subtype of /Custom/DanceExample.</description>
    </node>
    <node requireChild="true">
       <name>HED</name>

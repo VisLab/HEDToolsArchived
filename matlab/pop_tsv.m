@@ -6,7 +6,7 @@
 % 'updateHED' function.
 %
 % Usage:
-%   >>  pop_hedtagvalidate();
+%   >>  pop_tsv();
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -26,11 +26,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function pop_hedtagvalidate()
+function pop_tsv()
+% Prevent an annoying warning msg
 addJars();
-title = 'HED Validation Utilities';
+title = 'HEDTools Validation';
 fig = createFigure(title);
-tabGroup = uitabgroup(fig);
+tabGroup = uitabgroup('Parent', fig);
 tabs = createTabs(tabGroup);
 createTabLayouts(tabs);
 
@@ -57,11 +58,14 @@ createTabLayouts(tabs);
 
     function tabs = createTabs(tabGroup)
         % Creates the tab panels in the figure
-        tabs.tab1 = uitab(tabGroup, 'title', ...
-            'Validate Tab-Delimited HED Tags');
-        tabs.tab2 = uitab(tabGroup, 'title', ...
-            'Remap Tab-Delimited HED Tags');
-        tabs.tab3 = uitab(tabGroup, 'title', 'Check for Updates');
+        warning off all;
+        tabs.tab1 = uitab('Parent', tabGroup, 'title', ...
+            'Validate Tab-Delimited File Tags');
+        tabs.tab2 = uitab('Parent', tabGroup, 'title', ...
+            'Update Tab-Delimited File Tags');
+        tabs.tab3 = uitab('Parent', tabGroup, 'title', ...
+            'Check for Latest HED');
+        warning on all;
     end % createTabs
 
 end % pop_hedtagvalidate

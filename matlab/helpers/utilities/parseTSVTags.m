@@ -182,6 +182,7 @@ parseTSVLines();
                 tsvLine = fgetl(fileId);
                 lineNumber = lineNumber + 1;
             end
+            handleEmptyOutput();
             fclose(fileId);
         catch ME
             fclose(fileId);
@@ -224,5 +225,19 @@ parseTSVLines();
                 lineNumber);
         end
     end % validateTSVLineTags
+
+    function handleEmptyOutput()
+        % Handles empty output
+        if isempty(errors)
+            errors{1} = generateErrorMessage('correct', '', '', '', '');
+        end
+        if isempty(warnings)
+            warnings{1} = generateWarningMessage('correct', '', '', '');
+        end
+        if isempty(extensions)
+            extensions{1} = generateExtensionMessage('correct', '', '', ...
+                '');
+        end
+    end % handleEmptyOutput
 
 end % parsetags
