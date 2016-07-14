@@ -1,5 +1,6 @@
 package edu.utsa.tagger;
 
+import edu.utsa.tagger.gui.FieldSelectView;
 import edu.utsa.tagger.gui.GuiModelFactory;
 
 /**
@@ -12,6 +13,10 @@ public class FieldSelectLoader {
 
 	private boolean submitted = false;
 	private boolean notified = false;
+	private String primaryField = new String();
+	private String[] taggedFields = null;
+	private String[] excludedFields = null;
+	FieldSelectView fieldSelectView;
 
 	/**
 	 * The constructor for the FieldSelectLoader.
@@ -23,8 +28,8 @@ public class FieldSelectLoader {
 	 * @param tagged
 	 *            The tagged fields for the FieldSelectView list box.
 	 */
-	public FieldSelectLoader(String frameTitle, String[] excluded, String[] tagged) {
-		this(new GuiModelFactory(), frameTitle, excluded, tagged);
+	public FieldSelectLoader(String frameTitle, String[] excluded, String[] tagged, String primaryField) {
+		this(new GuiModelFactory(), frameTitle, excluded, tagged, primaryField);
 	}
 
 	/**
@@ -38,8 +43,36 @@ public class FieldSelectLoader {
 	 * @param tagged
 	 *            The tagged fields for the FieldSelectView list box.
 	 */
-	public FieldSelectLoader(IFactory factory, String frameTitle, String[] excluded, String[] tagged) {
-		factory.createFieldSelectView(this, frameTitle, excluded, tagged);
+	public FieldSelectLoader(IFactory factory, String frameTitle, String[] excluded, String[] tagged,
+			String primaryField) {
+		fieldSelectView = factory.createFieldSelectView(this, frameTitle, excluded, tagged, primaryField);
+	}
+
+	/**
+	 * Gets the primary field.
+	 * 
+	 * @return A String containing the primary field.
+	 */
+	public synchronized String getPrimaryField() {
+		return primaryField;
+	}
+
+	/**
+	 * Gets the tagged fields.
+	 * 
+	 * @return A String array containing the tagged fields.
+	 */
+	public synchronized String[] getTagFields() {
+		return taggedFields;
+	}
+
+	/**
+	 * Gets the excluded fields.
+	 * 
+	 * @return A String array containing the excluded fields.
+	 */
+	public synchronized String[] getExcludeFields() {
+		return excludedFields;
 	}
 
 	/**
@@ -72,6 +105,16 @@ public class FieldSelectLoader {
 	}
 
 	/**
+	 * Sets the primary field.
+	 * 
+	 * @param primaryField
+	 *            Sets the primary field from the FieldSelectView.
+	 */
+	public synchronized void setPrimaryField(String primaryField) {
+		this.primaryField = primaryField;
+	}
+
+	/**
 	 * Sets if the FieldSelectView is submitted.
 	 * 
 	 * @param submitted
@@ -79,6 +122,26 @@ public class FieldSelectLoader {
 	 */
 	public synchronized void setSubmitted(boolean submitted) {
 		this.submitted = submitted;
+	}
+
+	/**
+	 * Sets the tagged fields.
+	 * 
+	 * @param taggedFields
+	 *            A String array containing the tagged fields.
+	 */
+	public synchronized void setTaggedFields(String[] taggedFields) {
+		this.taggedFields = taggedFields;
+	}
+
+	/**
+	 * Sets the excluded fields.
+	 * 
+	 * @param excludedFields
+	 *            A String array containing the excluded fields.
+	 */
+	public synchronized void setExcludedFields(String[] excludedFields) {
+		this.excludedFields = excludedFields;
 	}
 
 	/**

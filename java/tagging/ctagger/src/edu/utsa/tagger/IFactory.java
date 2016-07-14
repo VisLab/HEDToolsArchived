@@ -1,5 +1,6 @@
 package edu.utsa.tagger;
 
+import edu.utsa.tagger.gui.FieldOrderView;
 import edu.utsa.tagger.gui.FieldSelectView;
 import edu.utsa.tagger.gui.TaggerView;
 
@@ -18,6 +19,8 @@ public interface IFactory {
 	TaggerView createTaggerView(TaggerLoader loader, Tagger tagger, String frameTitle, boolean isStandAloneVersion);
 
 	FieldSelectView createFieldSelectView(FieldSelectLoader loader, String frameTitle, String[] excluded,
-			String[] tagged);
+			String[] tagged, String primaryField);
+
+	FieldOrderView createFieldOrderView(FieldOrderLoader loader, String frameTitle, String[] fields);
 
 }

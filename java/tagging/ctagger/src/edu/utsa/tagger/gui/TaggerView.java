@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -43,9 +44,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import edu.utsa.tagger.AbstractTagModel;
 import edu.utsa.tagger.EventModel;
 import edu.utsa.tagger.HistoryItem;
-import edu.utsa.tagger.TaggerLoader;
 import edu.utsa.tagger.TaggedEvent;
 import edu.utsa.tagger.Tagger;
+import edu.utsa.tagger.TaggerLoader;
 import edu.utsa.tagger.TaggerSet;
 import edu.utsa.tagger.ToggleTagMessage;
 import edu.utsa.tagger.gui.ContextMenu.ContextMenuAction;
@@ -298,9 +299,6 @@ public class TaggerView extends ConstraintContainer {
 		}
 	};
 
-	private JComponent eventsPanel = new JComponent() {
-	};
-
 	private JLayeredPane eventsScrollPane = new JLayeredPane();
 	private JLabel eventsTitle = new JLabel("Events") {
 		@Override
@@ -358,6 +356,7 @@ public class TaggerView extends ConstraintContainer {
 	private Tagger tagger;
 
 	private JPanel tagsPanel = new JPanel();
+	private JPanel eventsPanel = new JPanel();
 	private boolean startOver;
 	private boolean fMapLoaded;
 	private String fMapPath;
@@ -389,7 +388,8 @@ public class TaggerView extends ConstraintContainer {
 	 * @param tagger
 	 * @param frameTitle
 	 */
-	public TaggerView(final TaggerLoader loader, final Tagger tagger, String frameTitle, final boolean isStandAloneVersion) {
+	public TaggerView(final TaggerLoader loader, final Tagger tagger, String frameTitle,
+			final boolean isStandAloneVersion) {
 		this.loader = loader;
 		this.tagger = tagger;
 		this.isStandAloneVersion = isStandAloneVersion;
@@ -679,6 +679,7 @@ public class TaggerView extends ConstraintContainer {
 		zoomPercent.setForeground(FontsAndColors.GREY_DARK);
 
 		eventsScrollPane.setLayout(new ScrollLayout(eventsScrollPane, eventsPanel));
+		eventsPanel.setBackground(Color.WHITE);
 		tagsPanel.setBackground(Color.WHITE);
 		tagsScrollLayout = new ScrollLayout(tagsScrollPane, tagsPanel);
 		tagsScrollPane.setLayout(tagsScrollLayout);
@@ -832,6 +833,8 @@ public class TaggerView extends ConstraintContainer {
 		frame.setSize(1024, 768);
 		frame.getContentPane().add(this);
 		frame.setVisible(true);
+		ImageIcon img = new ImageIcon("src\\vml_logo.png");
+		frame.setIconImage(img.getImage());
 
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {

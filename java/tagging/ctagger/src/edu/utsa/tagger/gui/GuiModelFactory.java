@@ -2,6 +2,7 @@ package edu.utsa.tagger.gui;
 
 import edu.utsa.tagger.AbstractEventModel;
 import edu.utsa.tagger.AbstractTagModel;
+import edu.utsa.tagger.FieldOrderLoader;
 import edu.utsa.tagger.FieldSelectLoader;
 import edu.utsa.tagger.IFactory;
 import edu.utsa.tagger.TaggerLoader;
@@ -34,8 +35,13 @@ public class GuiModelFactory implements IFactory {
 
 	@Override
 	public FieldSelectView createFieldSelectView(FieldSelectLoader loader, String frameTitle, String[] excluded,
-			String[] tagged) {
-		return new FieldSelectView(loader, frameTitle, excluded, tagged);
+			String[] tagged, String primaryField) {
+		return new FieldSelectView(loader, frameTitle, excluded, tagged, primaryField);
+	}
+
+	@Override
+	public FieldOrderView createFieldOrderView(FieldOrderLoader loader, String frameTitle, String[] fields) {
+		return new FieldOrderView(loader, frameTitle, fields);
 	}
 
 }
