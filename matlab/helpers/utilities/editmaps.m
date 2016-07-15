@@ -60,16 +60,22 @@ function [fMap, canceled] = editmaps(fMap, varargin)
 % Check the input arguments for validity and initialize
 parser = inputParser;
 parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
+parser.addParamValue('Fields', {}, @iscellstr);
 parser.addParamValue('EditXml', false, @islogical);
 parser.addParamValue('PreservePrefix', false, @islogical);
 parser.parse(fMap, varargin{:});
+p = parser.Results;
 excluded = {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'};
-EditXml = parser.Results.EditXml;
-preservePrefix = parser.Results.PreservePrefix;
+EditXml = p.EditXml;
+preservePrefix = p.PreservePrefix;
 permissions = 0;
 initialDepth = 3;
 isStandAloneVersion = false;
-fields = fMap.getFields();
+if ~isempty(p.Fields)
+    fields = p.Fields;
+else
+    fields = fMap.getFields();
+end
 canceled = false;
 k = 1;
 while (~canceled && k <= length(fields))

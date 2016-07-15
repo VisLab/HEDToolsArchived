@@ -11,7 +11,7 @@
 %
 % [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...) specifies
 % optional name/value parameter pairs:
-%   'SelectFields'   If true (default), the user is presented with a GUI
+%   'selectFields'   If true (default), the user is presented with a GUI
 %                    that allows users to select which fields to tag.
 %
 % Function documentation:
@@ -44,49 +44,48 @@
 % $Initial version $
 %
 
-function [fMap, excluded, canceled] = selectmaps(fMap, varargin)
-p = parseArguments();
-
+function [fMap, fields, excluded, canceled] = selectmaps(fMap, varargin)
+p = parseArguments(fMap, varargin{:});
+fields = {};
 title = 'Please select the fields that you would like to tag';
 canceled = false;
 
 % Figure out the fields to be used
-fields = fMap.getFields();
+p.fields = p.fMap.getFields();
 excluded = {};
 
-if isempty(fields) || ~p.SelectFields
+if isempty(p.fields) || ~p.selectFields
     return;
 end
 
-primaryField = p.PrimaryField;
-if sum(strcmp(fields, p.PrimaryField)) == 0
-    primaryField = '';
-end
+p = movePrimaryField(p);
 
 loader = javaObjectEDT('edu.utsa.tagger.FieldSelectLoader', title, ...
-    {}, fields, primaryField);
+    {}, p.fields, p.primaryField);
 [notified, submitted] = checkStatus(loader);
 while (~notified)
     pause(0.5);
     [notified, submitted] = checkStatus(loader);
 end
 excludeUser = cell(loader.getExcludeFields());
-primaryField = char(loader.getPrimaryField());
+p.primaryField = char(loader.getPrimaryField());
 if ~submitted
     canceled = true;
 end
 
-if ~isempty(primaryField)
-    fMap.setPrimaryMap(primaryField);
+if ~isempty(p.primaryField)
+    p.fMap.setPrimaryMap(p.primaryField);
 end
 
+% p = movePrimaryField(p);
+fields = cell(loader.getTagFields());
 if isempty(excludeUser)
     return;
 end
 
 % Remove the excluded fields
 for k = 1:length(excludeUser)
-    fMap.removeMap(excludeUser{k});
+    p.fMap.removeMap(excludeUser{k});
 end
 
 excluded = union(excluded, excludeUser);
@@ -96,13 +95,25 @@ excluded = union(excluded, excludeUser);
         submitted = loader.isSubmitted();
     end
 
-    function p = parseArguments()
+    function p = movePrimaryField(p)
+        % Moves the primary field to the beginning of the list of fields
+        if sum(strcmp(p.fields, p.primaryField)) == 0
+            p.primaryField = '';
+        else
+            pos = find(strcmp(p.fields, p.primaryField));
+            temp = p.fields{pos};
+            p.fields{pos} = p.fields{1};
+            p.fields{1} = temp;
+        end
+    end % movePrimaryField
+
+    function p = parseArguments(fMap, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
-        parser.addParamValue('PrimaryField', '', @(x) ...
+        parser.addParamValue('primaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('SelectFields', true, @islogical);
+        parser.addParamValue('selectFields', true, @islogical);
         parser.parse(fMap, varargin{:});
         p = parser.Results;
     end

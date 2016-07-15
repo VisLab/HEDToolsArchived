@@ -38,7 +38,8 @@
 %                    /a/b/c). If true, then all unique tags are retained.
 %   'PrimaryField'   The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
-%                    category, and a description.
+%                    category, and a description. The default is the type
+%                    field.
 %   'SaveMapFile'    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
@@ -107,9 +108,10 @@ fMap.merge(baseTags, 'Merge', excluded, p.Fields);
 fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
 
+fields = {};
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
+    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
         p.PrimaryField);
     excluded = union(excluded, exc);
 elseif ~isempty(p.PrimaryField)
@@ -118,15 +120,13 @@ end
 
 if p.UseGui && ~canceled
     [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix);
-else
-    return;
+        'PreservePrefix', p.PreservePrefix, 'Fields', fields);
 end
 
-fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
-fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
-
 if ~canceled
+    % Replace the existing tags, and then add any new codes found
+    fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
+    fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
     % Save the fieldmap
     if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, ...
             fMap)
@@ -135,7 +135,9 @@ if ~canceled
     end    
     % Now finish writing the tags to the EEG structure
     EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
+    return;
 end
+fprintf('Tagging was canceled\n');
 
     function p = parseArguments()
         % Parses the input arguments and returns the results
@@ -149,7 +151,7 @@ end
             @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('PrimaryField', '', @(x) ...
+        parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
         parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || ...
             (ischar(x))));

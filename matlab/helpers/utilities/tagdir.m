@@ -53,7 +53,8 @@
 %                    /a/b/c). If true, then all unique tags are retained.
 %   'PrimaryField'   The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
-%                    category, and a description.
+%                    category, and a description. The default is the type
+%                    field.
 %   'SaveDatasets'   If true (default), save the tags to the underlying
 %                    dataset files in the directory.
 %   'SaveMapFile'    A string representing the file name for saving the
@@ -137,10 +138,10 @@ end;
 fMap.merge(baseTags, 'Merge', excluded, p.Fields);
 fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
 canceled = false;
-
+fields = {};
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
+    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
         p.PrimaryField);
     excluded = union(excluded, exc);
 elseif ~isempty(p.PrimaryField)
@@ -149,14 +150,13 @@ end
 
 if p.UseGui && ~canceled
     [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix);
+        'PreservePrefix', p.PreservePrefix, 'Fields', fields);
 end
 
-% Replace the existing tags, and then add any new codes found
-fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
-fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
-
 if ~canceled
+    % Replace the existing tags, and then add any new codes found
+    fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
+    fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
     % Save the tags file for next step
     if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, ...
             fMap)
@@ -189,7 +189,9 @@ if ~canceled
             end
         end
     end
+    return;
 end
+fprintf('Tagging was canceled\n');
 
     function found = findDatFile()
         % Looks for a .dat file
@@ -213,7 +215,7 @@ end
             @(x) any(validatestring(lower(x), ...
             {'Double', 'Preserve', 'Single'})));
         parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('PrimaryField', '', @(x) ...
+        parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
         parser.addParamValue('SaveDatasets', true, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
