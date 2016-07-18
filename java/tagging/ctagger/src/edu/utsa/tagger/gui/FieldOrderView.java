@@ -1,6 +1,7 @@
 package edu.utsa.tagger.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -135,11 +136,11 @@ public class FieldOrderView extends JPanel {
 	 */
 	private JPanel createSouthPanelButtons() {
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(cancelButton);
-		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		Dimension d = cancelButton.getMaximumSize();
-		okayButton.setMaximumSize(new Dimension(d));
 		buttonPanel.add(okayButton);
+		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+		Dimension d = okayButton.getMaximumSize();
+		cancelButton.setMaximumSize(new Dimension(d));
+		buttonPanel.add(cancelButton);
 		return buttonPanel;
 	}
 
@@ -220,8 +221,10 @@ public class FieldOrderView extends JPanel {
 	 * Sets the colors for all of the components.
 	 */
 	private void setColors() {
-		cancelButton.setContentAreaFilled(false);
-		okayButton.setContentAreaFilled(false);
+		cancelButton.setBackground(Color.gray);
+		cancelButton.setOpaque(false);
+		okayButton.setBackground(Color.gray);
+		okayButton.setOpaque(false);
 	}
 
 	/**

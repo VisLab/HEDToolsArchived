@@ -1,5 +1,6 @@
 package edu.utsa.tagger.guisupport;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -27,6 +28,8 @@ public class ScrollLayout implements LayoutManager {
 		scrollContainer.add(scrollbar);
 		scrollbar.setBorder(null);
 		scrollbar.getVerticalScrollBar().setUnitIncrement(20);
+		scrollbar.setBackground(Color.gray);
+		scrollbar.setOpaque(false);
 	}
 
 	@Override

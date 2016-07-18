@@ -1,6 +1,7 @@
 package edu.utsa.tagger.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -64,8 +65,6 @@ public class FieldSelectView extends JPanel {
 	private JFrame jFrame = new JFrame();
 	private FieldSelectLoader loader;
 	private String frameTitle;
-	private BasicArrowButton leftUpButton = new BasicArrowButton(BasicArrowButton.NORTH);
-	private BasicArrowButton leftDownButton = new BasicArrowButton(BasicArrowButton.SOUTH);
 	private BasicArrowButton rightUpButton = new BasicArrowButton(BasicArrowButton.NORTH);
 	private BasicArrowButton rightDownButton = new BasicArrowButton(BasicArrowButton.SOUTH);
 
@@ -88,7 +87,7 @@ public class FieldSelectView extends JPanel {
 		excludedListBox = intializeJList(excluded);
 		taggedListBox = intializeJList(tagged);
 		layoutComponents(excluded, tagged);
-		updatePrimaryField();
+		primaryFieldLabel.setText("Primary field: " + primaryField);
 	}
 
 	/**
@@ -115,8 +114,8 @@ public class FieldSelectView extends JPanel {
 		setListeners();
 		setColors();
 		northPanel.add(descriptionLabel);
-		centerPanel.add(createPanelForListBoxWithLabel(excludedListBox, excludeBoxLabel, addAllButton, leftUpButton,
-				leftDownButton), BorderLayout.WEST);
+		centerPanel.add(createPanelForListBoxWithLabel(excludedListBox, excludeBoxLabel, addAllButton),
+				BorderLayout.WEST);
 		centerPanel.add(createCenterPanelButtons(), BorderLayout.CENTER);
 		centerPanel.add(createPanelForListBoxWithLabel(taggedListBox, tagBoxLabel, removeAllButton, rightUpButton,
 				rightDownButton), BorderLayout.EAST);
@@ -165,11 +164,11 @@ public class FieldSelectView extends JPanel {
 	 */
 	private JPanel createSouthPanelButtons() {
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(cancelButton);
-		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		Dimension d = cancelButton.getMaximumSize();
-		okayButton.setMaximumSize(new Dimension(d));
 		buttonPanel.add(okayButton);
+		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+		Dimension d = okayButton.getMaximumSize();
+		cancelButton.setMaximumSize(new Dimension(d));
+		buttonPanel.add(cancelButton);
 		return buttonPanel;
 	}
 
@@ -181,7 +180,6 @@ public class FieldSelectView extends JPanel {
 	 */
 	private JPanel createCenterPanelButtons() {
 		JPanel buttonPanel = new JPanel();
-		System.out.println(getHeight());
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		buttonPanel.add(Box.createRigidArea(new Dimension(0, 50)));
 		transferButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -197,8 +195,6 @@ public class FieldSelectView extends JPanel {
 		transferButton.addActionListener(new addRemoveListener());
 		removeAllButton.addActionListener(new removeAddAllListener());
 		addAllButton.addActionListener(new removeAddAllListener());
-		leftUpButton.addActionListener(new moveUpDownListener());
-		leftDownButton.addActionListener(new moveUpDownListener());
 		rightUpButton.addActionListener(new moveUpDownListener());
 		rightDownButton.addActionListener(new moveUpDownListener());
 		taggedListBox.addListSelectionListener(new SharedListSelectionHandler());
@@ -251,20 +247,46 @@ public class FieldSelectView extends JPanel {
 	 */
 	private void checkPrimary() {
 		List<String> selectedValues = taggedListBox.getSelectedValuesList();
-		if (!selectedValues.contains(primaryField)) {
+		if (!containsElement(taggedListBox, primaryField) && !selectedValues.contains(primaryField)) {
 			primaryField = new String();
 		}
+	}
+
+	/**
+	 * Checks to see if a element is in a JList.
+	 * 
+	 * @param jList
+	 *            The JList searched through.
+	 * @param element
+	 *            The element that is searched for.
+	 * 
+	 * @return true if found in the JList, false if otherwise.
+	 */
+	private boolean containsElement(JList<String> jList, String element) {
+		ListModel<String> jModel = jList.getModel();
+		int numElements = jModel.getSize();
+		for (int i = 0; i < numElements; i++) {
+			if (jModel.getElementAt(i).equals(element)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
 	 * Sets the colors for all of the components.
 	 */
 	private void setColors() {
-		removeAllButton.setContentAreaFilled(false);
-		addAllButton.setContentAreaFilled(false);
-		transferButton.setContentAreaFilled(false);
-		cancelButton.setContentAreaFilled(false);
-		okayButton.setContentAreaFilled(false);
+		removeAllButton.setBackground(Color.gray);
+		removeAllButton.setOpaque(false);
+		addAllButton.setBackground(Color.gray);
+		addAllButton.setOpaque(false);
+		transferButton.setBackground(Color.gray);
+		transferButton.setOpaque(false);
+		cancelButton.setBackground(Color.gray);
+		cancelButton.setOpaque(false);
+		okayButton.setBackground(Color.gray);
+		okayButton.setOpaque(false);
 	}
 
 	/**
@@ -293,6 +315,33 @@ public class FieldSelectView extends JPanel {
 		arrowPanel.setLayout(new BoxLayout(arrowPanel, BoxLayout.Y_AXIS));
 		arrowPanel.add(upButton);
 		arrowPanel.add(downButton);
+		panel.add(arrowPanel, BorderLayout.EAST);
+		return panel;
+	}
+
+	/**
+	 * Creates a JPanel that holds a list box.
+	 * 
+	 * @param listBox
+	 *            The list box that is added to the panel.
+	 * @param listBoxLabel
+	 *            The label of the list box.
+	 * @param transferButton
+	 *            The button to transfer all of the elements in the list box to
+	 *            the other list box.
+	 * @return
+	 */
+	private JPanel createPanelForListBoxWithLabel(JList<String> listBox, JLabel listBoxLabel, JButton transferButton) {
+		JPanel panel = new JPanel(new BorderLayout(0, 3));
+		listBox.setVisibleRowCount(20);
+		panel.add(listBoxLabel, BorderLayout.NORTH);
+		JScrollPane scrollPaneForListBox = new JScrollPane(listBox);
+		scrollPaneForListBox.setPreferredSize(new Dimension(200, 400));
+		panel.setBorder(new EmptyBorder(new Insets(10, 40, 30, 40)));
+		panel.add(scrollPaneForListBox, BorderLayout.CENTER);
+		panel.add(transferButton, BorderLayout.SOUTH);
+		JPanel arrowPanel = new JPanel(new BorderLayout(0, 2));
+		arrowPanel.setLayout(new BoxLayout(arrowPanel, BoxLayout.Y_AXIS));
 		panel.add(arrowPanel, BorderLayout.EAST);
 		return panel;
 	}
@@ -758,16 +807,8 @@ public class FieldSelectView extends JPanel {
 			JButton sourceButton = (JButton) e.getSource();
 			if (sourceButton == rightUpButton && isTagBox) {
 				moveUpElements(taggedListBox);
-				updatePrimaryField();
-			} else if (sourceButton == leftUpButton && !isTagBox) {
-				moveUpElements(excludedListBox);
-				updatePrimaryField();
 			} else if (sourceButton == rightDownButton && isTagBox) {
 				moveDownElements(taggedListBox);
-				updatePrimaryField();
-			} else if (sourceButton == leftDownButton && !isTagBox) {
-				moveDownElements(excludedListBox);
-				updatePrimaryField();
 			}
 		}
 	}
