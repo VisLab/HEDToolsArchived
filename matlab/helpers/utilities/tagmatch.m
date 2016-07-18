@@ -31,6 +31,8 @@
 
 function found = tagmatch(tags, search)
 parseArguments();
+defaultTag = 'Attribute/Onset';
+tags{end+1} = defaultTag;
 found = any(strncmpi(tags, search, length(search)));
 
     function p = parseArguments()

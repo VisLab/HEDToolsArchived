@@ -121,7 +121,8 @@ checkBoundaryEvents();
             epochData()
         % Epoch the data based on the event latencies
         if isempty(matchedLatencies)
-            error('pop_epoch(): empty epoch range (no epochs were found).');
+%             error('pop_epoch(): empty epoch range (no epochs were found).');
+            fprintf('pop_epoch(): empty epoch range (no epochs were found).\n');
         end;
         fprintf('hed_epoch():%d epochs selected\n', ...
             length(matchedLatencies));
