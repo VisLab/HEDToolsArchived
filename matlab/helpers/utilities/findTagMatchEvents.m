@@ -53,41 +53,55 @@
 
 function positions = findTagMatchEvents(events, tags)
 p = parseArguments();
-positions = false(1,length(events));
-readEEGEvents();
+positions = processEvents();
 
-    function [queryMap, matchedIndecies] = createQueryMap(matchedIndecies)
-        % This function creates a search query based on the number of
-        % event groups in the first event and stores it in a Map which is
-        % used to compute following event tag searches
-        [eventTags, eventNonGroupTags, eventGroupTags] = ...
-            formatTags(events(1).usertags);
-        str = createlogexp(length(eventGroupTags), p.tags);
-        queryMap = containers.Map('KeyType','double','ValueType','char');
-        queryMap(length(eventGroupTags)) = str;
-        matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
-            eventGroupTags);
-        if matchFound
-            matchedIndecies(1) = true;
-        end
-    end % createQueryMap
-
-    function [queryMap, matchedIndecies] = ...
-            findTagMatch(queryMap, matchedIndecies, index)
-        % This function searches for tags in the current event and returns
-        % true if any matches are found
-        [eventTags, ~, eventGroupTags] = ...
-            formatTags(events(index).usertags);
-        try
-            str = queryMap(length(eventGroupTags));
-        catch
+    function positions = processEvents()
+        % Process the events and look for matches
+        [uniqueHedStrings, ~, ids]= unique({events.usertags});
+        positions = false(1,length(events));
+        for a=1:length(uniqueHedStrings)
+            [eventTags, eventNonGroupTags, eventGroupTags] = ...
+                formatTags(uniqueHedStrings{a});
             str = createlogexp(length(eventGroupTags), p.tags);
-            queryMap(length(eventGroupTags)) = str;
+            matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
+                eventGroupTags);
+            positions(ids == a) = matchFound;
         end
-        matchedIndecies(index) = evallogexp(str, eventTags, ...
-            eventGroupTags);
-    end % findTagMatch
+    end % processEvents
+% readEEGEvents();
 
+%     function [queryMap, matchedIndecies] = createQueryMap(matchedIndecies)
+%         % This function creates a search query based on the number of
+%         % event groups in the first event and stores it in a Map which is
+%         % used to compute following event tag searches
+%         [eventTags, eventNonGroupTags, eventGroupTags] = ...
+%             formatTags(events(1).usertags);
+%         str = createlogexp(length(eventGroupTags), p.tags);
+%         queryMap = containers.Map('KeyType','double','ValueType','char');
+%         queryMap(length(eventGroupTags)) = str;
+%         matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
+%             eventGroupTags);
+%         if matchFound
+%             matchedIndecies(1) = true;
+%         end
+%     end % createQueryMap
+%
+%     function [queryMap, matchedIndecies] = ...
+%             findTagMatch(queryMap, matchedIndecies, index)
+%         % This function searches for tags in the current event and returns
+%         % true if any matches are found
+%         [eventTags, ~, eventGroupTags] = ...
+%             formatTags(events(index).usertags);
+%         if queryMap.isKey(length(eventGroupTags))
+%             str = queryMap(length(eventGroupTags));
+%         else
+%             str = createlogexp(length(eventGroupTags), p.tags);
+%             queryMap(length(eventGroupTags)) = str;
+%         end
+%         matchedIndecies(index) = evallogexp(str, eventTags, ...
+%             eventGroupTags);
+%     end % findTagMatch
+%
     function [tags, eventLevelTags, groupTags] = formatTags(tags)
         % Format the tags and puts them in a cellstr if they are in a
         % string
@@ -113,12 +127,12 @@ readEEGEvents();
         p = p.Results;
     end % parseArguments
 
-    function readEEGEvents()
-        % This function reads EEG events in from a EEG structure
-        [queryMap, positions] = createQueryMap(positions);
-        for a = 2:length(events)
-            [queryMap, positions] = findTagMatch(queryMap, positions, a);
-        end
-    end % readEEGEvents
+%     function readEEGEvents()
+%         % This function reads EEG events in from a EEG structure
+%         [queryMap, positions] = createQueryMap(positions);
+%         for a = 2:length(events)
+%             [queryMap, positions] = findTagMatch(queryMap, positions, a);
+%         end
+%     end % readEEGEvents
 
 end % findevents
