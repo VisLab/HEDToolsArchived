@@ -192,7 +192,7 @@ end
     end % createLabels
 
     function downCall(src, evnt) %#ok<INUSD>
-        disp('yes');
+%         disp('yes');
     end
 
     function createButtons(panel)

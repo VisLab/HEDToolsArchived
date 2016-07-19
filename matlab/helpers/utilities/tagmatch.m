@@ -4,12 +4,12 @@
 %   >>  found = tagmatch(tags, search)
 %
 % Inputs:
-%   tags         A cell array containing the event tags. 
-% 
+%   tags         A cell array containing the event tags.
+%
 %   search       A search tag that is looked for amongst the event tags.
 %
 % Outputs:
-%   found        True if a match was found. 
+%   found        True if a match was found.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -31,12 +31,15 @@
 
 function found = tagmatch(tags, search)
 parseArguments();
-defaultTag = 'Attribute/Onset';
-tags{end+1} = defaultTag;
+offsetTag = 'Attribute/Offset';
+if any(strncmpi(tags, offsetTag, length(offsetTag)))
+    onsetTag = 'Attribute/Onset';
+    tags{end+1} = onsetTag;
+end
 found = any(strncmpi(tags, search, length(search)));
 
     function p = parseArguments()
-        % Parses the input arguments and returns the results 
+        % Parses the input arguments and returns the results
         p = inputParser();
         p.addRequired('Tags', @(x) iscell(x));
         p.addRequired('Search', @(x) ischar(x));
