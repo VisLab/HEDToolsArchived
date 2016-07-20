@@ -1,12 +1,11 @@
-function uniquetags = finduniquetags(events)
-% tagMap = containers.Map('KeyType','char','ValueType','char');
-uniquetags = {};
-getUniqueTags();
+function uniquetags = finduniquetags(tags)
+uniquetags = getUniqueTags(tags);
 
-    function getUniqueTags()
-        numEvents = length(events);
+    function uniquetags = getUniqueTags(tags)
+        uniquetags = {};
+        numEvents = length(tags);
         for a = 1:numEvents
-            uniquetags = union(uniquetags, formatTags(events(a).usertags));
+            uniquetags = union(uniquetags, formatTags(tags{a}));
         end
     end
 

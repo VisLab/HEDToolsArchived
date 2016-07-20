@@ -30,7 +30,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function found = tagmatch(tags, search)
-parseArguments();
+parseArguments(tags, search);
 offsetTag = 'Attribute/Offset';
 if any(strncmpi(tags, offsetTag, length(offsetTag)))
     onsetTag = 'Attribute/Onset';
@@ -38,7 +38,7 @@ if any(strncmpi(tags, offsetTag, length(offsetTag)))
 end
 found = any(strncmpi(tags, search, length(search)));
 
-    function p = parseArguments()
+    function p = parseArguments(tags, search)
         % Parses the input arguments and returns the results
         p = inputParser();
         p.addRequired('Tags', @(x) iscell(x));

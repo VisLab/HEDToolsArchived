@@ -3,12 +3,12 @@
 %
 % Usage:
 %
-%   >> positions = findTagMatchEvents(events, tags);
+%   >> positions = findTagMatchEvents(EEG, tags);
 %
 % Inputs:
 %
-%   events       The dataset .event structure. The .event structure
-%                is assumed to be tagged and has a .usertags field
+%   EEG          A EEG dataset structure. The dataset needs to have an .event
+%                fieldThe .event structure is assumed to be tagged and has a .usertags field
 %                containing the tags.
 %
 %   tags         A comma separated list of tags or a tag search string
@@ -51,14 +51,28 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function positions = findTagMatchEvents(events, tags)
-p = parseArguments();
-positions = processEvents();
+function positions = findTagMatchEvents(EEG, varargin)
+p = parseArguments(EEG, varargin{:});
+positions = [];
+if ischar(p.data)
+    p.userTags = readTSVLines(p);
+else
+    p.userTags = {p.data.event.usertags};
+end
+if isempty(p.tags)
+    % Find all the unique tags in the events
+    uniqueTags = finduniquetags(p.userTags);
+    [canceled, p.tags] = hedsearch_input(uniqueTags);
+    if canceled
+        return;
+    end
+end
+positions = processEvents(p);
 
-    function positions = processEvents()
+    function positions = processEvents(p)
         % Process the events and look for matches
-        [uniqueHedStrings, ~, ids]= unique({events.usertags});
-        positions = false(1,length(events));
+        positions = false(1,length(p.userTags));
+        [uniqueHedStrings, ~, ids]= unique(p.userTags);
         for a = 1:length(uniqueHedStrings)
             [eventTags, eventNonGroupTags, eventGroupTags] = ...
                 formatTags(uniqueHedStrings{a});
@@ -67,6 +81,7 @@ positions = processEvents();
                 eventGroupTags);
             positions(ids == a) = matchFound;
         end
+        positions = find(positions);
     end % processEvents
 
     function [tags, eventLevelTags, groupTags] = formatTags(tags)
@@ -85,12 +100,68 @@ positions = processEvents();
         end
     end % formatTags
 
-    function p = parseArguments()
+    function [tLine, currentRow, userTags] = checkForHeader(p)
+        % Checks to see if the file has a header line
+        userTags = {};
+        currentRow = 1;
+        tLine = fgetl(p.fileId);
+        if p.header
+            userTags{1} = '';
+            tLine = fgetl(p.fileId);
+            currentRow = 2;
+        end
+    end % checkForHeader
+
+    function userTags = readTSVLines(p)
+        % Parses the tags in a tab-delimited file line by line and
+        % validates them
+        try
+            p.fileId = fopen(p.data);
+            [tsvLine, lineNumber, userTags] = checkForHeader(p);
+            while ischar(tsvLine)
+                userTags{lineNumber} = parseTSVLineTags(tsvLine, ...
+                    p.columns);
+                tsvLine = fgetl(p.fileId);
+                lineNumber = lineNumber + 1;
+            end
+            fclose(p.fileId);
+        catch ME
+            fclose(p.fileId);
+            throw(MException('findTagMatchEvents:cannotParse', ...
+                'Unable to parse TSV file on line %d', lineNumber));
+        end
+    end % parseTSVLines
+
+    function lineTags = parseTSVLineTags(tLine, columns)
+        % Reads the tag columns in a tab-delimited file and formats them
+        lineTags = '';
+        splitLine = textscan(tLine, '%s', 'delimiter', '\t', ...
+            'multipleDelimsAsOne', 1)';
+        numLineCols = size(splitLine{1},1);
+        numCols = size(columns, 2);
+        % clean this up later
+        if ~all(cellfun(@isempty, strtrim(splitLine))) && ...
+                columns(1) <= numLineCols
+            lineTags = splitLine{1}{columns(1)};
+            for a = 2:numCols
+                if columns(a) <= numLineCols
+                    lineTags  = [lineTags, ',', ...
+                        splitLine{1}{columns(a)}]; %#ok<AGROW>
+                end
+            end
+        end
+    end % readTSVLineTags
+
+    function p = parseArguments(EEG, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
-        p.addRequired('events', @(x) ~isempty(x) && isstruct(x));
-        p.addRequired('tags', @(x) ischar(x));
-        p.parse(events, tags);
+        p.addRequired('data', @(x) ~isempty(x) && ...
+            (ischar(x) ||isstruct(x)));
+        p.addParamValue('columns', 2, @(x) (~isempty(x) && ...
+            isa(x,'double') && length(x) >= 1));
+        p.addParamValue('tags', '', @ischar);
+        p.addParamValue('header', true, @islogical);
+        p.parse(EEG, varargin{:});
         p = p.Results;
     end % parseArguments
 

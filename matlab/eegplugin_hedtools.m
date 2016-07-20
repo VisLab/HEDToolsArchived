@@ -129,7 +129,7 @@ uimenu(dirMenu, 'Label', 'Tag directory', 'Callback', finalcmd, ...
     'Separator', 'on', 'userdata', 'startup:on;study:on');
 
 % Processing for 'Tag EEG study'
-finalcmd = '[~, LASTCOM] = pop_tagstudy();';
+finalcmd = '[~, ~, LASTCOM] = pop_tagstudy();';
 finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
 
 % Add 'Tag EEG study' to 'Tag files'  

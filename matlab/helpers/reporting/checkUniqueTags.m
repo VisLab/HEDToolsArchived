@@ -28,7 +28,7 @@ end
                     originalTags, isGroup);
             end
         end
-    end % findUniqueTags
+    end % checkUniqueTags
 
     function generateErrorMessages(uniqueTagsIndex, foundIndexes, ...
             originalTags, isGroup)

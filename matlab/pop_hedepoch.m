@@ -42,7 +42,7 @@ if nargin < 1
 end;
 
 % Find all the unique tags in the events
-uniquetags = finduniquetags(EEG.event);
+uniquetags = finduniquetags({EEG.event.usertags});
 
 % Get input arguments from GUI
 [canceled, tags, newName, timeLim, valueLim] = ...

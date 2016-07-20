@@ -236,7 +236,7 @@ sequence = strtrim(text(start:finish));
     function isOp = isOperator(string)
         % Returns true if the string is a operator
         isOp = false;
-        operators = {'AND', 'OR', 'NOT'};
+        operators = {'AND', 'OR', 'NOT', '~'};
         if any(strcmp(operators, string))
             isOp = true;
         end
