@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="2.3.3">
+<HED version="2.3.4">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1623,6 +1623,9 @@
          <node isNumeric="true" takesValue="true">
             <name>#</name>
          </node>
+      </node>
+      <node>
+         <name>Intended effect</name>
       </node>
       <node requireChild="true">
          <name>Path</name>
