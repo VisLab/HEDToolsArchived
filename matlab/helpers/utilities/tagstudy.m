@@ -184,9 +184,9 @@ if ~canceled
     end
     
     % Rewrite to the study file
-    s = writetags(s, fMap, 'PreservePrefix', ...
+    s.STUDY = writetags(s.STUDY, fMap, 'PreservePrefix', ...
         p.PreservePrefix);  %#ok<NASGU>
-    save(p.StudyFile, 's', '-mat');
+    save(p.StudyFile, '-struct', 's');
     return;
 end
 fprintf('Tagging was canceled\n');
@@ -200,11 +200,9 @@ fprintf('Tagging was canceled\n');
     function [s, fNames] = loadstudy(studyFile)
         % Set baseTags if tagsFile contains an tagMap object
         try
-            t = load('-mat', studyFile);
-            tFields = fieldnames(t);
-            s = t.(tFields{1});
+            s = load('-mat', studyFile);
             sPath = fileparts(studyFile);
-            fNames = getstudyfiles(s, sPath);
+            fNames = getstudyfiles(s.STUDY, sPath);
         catch ME %#ok<NASGU>
             warning('tagstudy:loadStudyFile', 'Invalid study file');
             s = '';

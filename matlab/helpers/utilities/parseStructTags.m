@@ -89,7 +89,7 @@ validateStructureTags();
                 '', '', ''), eventErrors];
             errors{errorCount} = eventErrors;
             if ~isempty(eventErrorTags)
-                uniqueErrorTags = union(uniqueErrorTags, lineErrorTags);
+                uniqueErrorTags = union(uniqueErrorTags, eventErrorTags);
             end
             errorCount = errorCount + 1;
         end
