@@ -119,9 +119,9 @@ fPaths = validate(p);
     function createErrorLog(p)
         % Creates a error log
         numErrors = length(p.errorLog);
-        errorFile = fullfile(p.dir, [p.file '_error_log' p.ext]);
-        if ~exist(p.dir, 'dir')
-            mkdir(p.dir);
+        errorFile = fullfile(p.outDir, [p.file '_error_log' p.ext]);
+        if ~exist(p.outDir, 'dir')
+            mkdir(p.outDir);
         end
         fileId = fopen(errorFile,'w');
         for a = 1:numErrors
@@ -133,7 +133,7 @@ fPaths = validate(p);
     function createExtensionLog(p)
         % Creates a extension log
         numExtensions = length(p.extensionLog);
-        extensionFile = fullfile(p.dir, [p.file '_extension_log' p.ext]);
+        extensionFile = fullfile(p.outDir, [p.file '_extension_log' p.ext]);
         fileId = fopen(extensionFile,'w');
         for a = 1:numExtensions
             fprintf(fileId, '%s\n', p.extensionLog{a});
@@ -143,7 +143,6 @@ fPaths = validate(p);
 
     function createLogs(p)
         % Creates the log files 
-        p.dir = fileparts(strrep(p.fPath, p.inDir, p.outDir));
         [~, p.file] = fileparts(p.eeg.filename);
         p.ext = '.txt';
         createErrorLog(p);
@@ -156,7 +155,7 @@ fPaths = validate(p);
     function createWarningLog(p)
         % Creates a warning log 
         numWarnings = length(p.warningLog);
-        warningFile = fullfile(p.dir, [p.file '_warning_log' p.ext]);
+        warningFile = fullfile(p.outDir, [p.file '_warning_log' p.ext]);
         fileId = fopen(warningFile,'w');
         for a = 1:numWarnings
             fprintf(fileId, '%s\n', p.warningLog{a});

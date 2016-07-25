@@ -163,6 +163,21 @@ validateStructureTags();
                 generateEmptyError(a);
             end
         end
+        handleEmptyOutput();
     end % validateStructureTags
+
+    function handleEmptyOutput()
+        % Handles empty output
+        if isempty(errors)
+            errors{1} = generateErrorMessage('correct', '', '', '', '');
+        end
+        if isempty(warnings)
+            warnings{1} = generateWarningMessage('correct', '', '', '');
+        end
+        if isempty(extensions)
+            extensions{1} = generateExtensionMessage('correct', '', '', ...
+                '');
+        end
+    end % handleEmptyOutput
 
 end % parseStructTags
