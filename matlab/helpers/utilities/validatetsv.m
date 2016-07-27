@@ -161,8 +161,7 @@ extensionLog = p.extensionLog;
         p.addParamValue('hasHeader', true, @islogical);
         p.addParamValue('remapFile', '', @(x) (~isempty(x) && ...
             ischar(x)));
-        p.addParamValue('outDir', fileparts(tsvFile), ...
-            @(x) ischar(x) && 7 == exist(x, 'dir'));
+        p.addParamValue('outDir', pwd);
         p.addParamValue('writeOutput', false, @islogical);
         p.parse(tsvFile, columns, varargin{:});
         p = p.Results;
