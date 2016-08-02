@@ -7,30 +7,40 @@
 %
 % Inputs:
 %
-%   EEG          A EEG dataset structure. The dataset needs to have an .event
-%                fieldThe .event structure is assumed to be tagged and has a .usertags field
-%                containing the tags.
-%
+%   data         A EEG dataset structure or a tab-delimited file containing
+%                event HED tags. If a EEG dataset is passed in then it
+%                needs to have an .event field. The .event structure is
+%                assumed to be present and has a .usertags field containing
+%                HED tags. If a tab-delimited file is passed in then it
+%                needs to have at least one column that contains HED tags. 
+%                The default tag column will be the second column. 
+% Optional:
 %   tags         A comma separated list of tags or a tag search string
-%                consisting of tags to extract data epochs.
-%                The tag search uses boolean operators (AND, OR, NOT) to
-%                widen or narrow the search. Two tags separated by a comma
-%                use the AND operator by default which will only return
-%                events that contain both of the tags. The OR operator
-%                looks for events that include either one or both tags
-%                being specified. The NOT operator looks for events that
-%                contain the first tag but not the second tag. To nest or
-%                organize the search statements use square brackets.
-%                Nesting will change the order in which the search
-%                statements are evaluated. For example,
+%                used to extract event positions that found a match. If no
+%                tags are passed in then a pop-up menu will appear allowing
+%                you to specify the tags. The tag search uses boolean
+%                operators (AND, OR, NOT) to widen or narrow the search.
+%                Two tags separated by a comma use the AND operator by
+%                default which will only return events that contain both of
+%                the tags. The OR operator looks for events that include
+%                either one or both tags being specified. The NOT operator
+%                looks for events that contain the first tag but not the
+%                second tag. To nest or organize the search statements use
+%                square brackets. Nesting will change the order in which
+%                the search statements are evaluated. For example,
 %                "/attribute/visual/color/green AND
 %                [/item/2d shape/rectangle/square OR
-%                /item/2d shape/ellipse/circle]"
+%                /item/2d shape/ellipse/circle]".
+%
+%  header        
+%                True (the default), if the tab-delimited file has a
+%                header. False, if the tab-delimited file doesn't have a
+%                header.
 %
 % Outputs:
 %
 %   positions
-%                A logical array containing the positions of the events
+%                An array containing the positions of the events
 %                that found tag matches.
 %
 %
@@ -51,8 +61,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function positions = findTagMatchEvents(EEG, varargin)
-p = parseArguments(EEG, varargin{:});
+function positions = findTagMatchEvents(data, varargin)
+p = parseArguments(data, varargin{:});
 positions = [];
 if ischar(p.data)
     p.userTags = readTSVLines(p);
@@ -152,7 +162,7 @@ positions = processEvents(p);
         end
     end % readTSVLineTags
 
-    function p = parseArguments(EEG, varargin)
+    function p = parseArguments(data, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
         p.addRequired('data', @(x) ~isempty(x) && ...
@@ -161,7 +171,7 @@ positions = processEvents(p);
             isa(x,'double') && length(x) >= 1));
         p.addParamValue('tags', '', @ischar);
         p.addParamValue('header', true, @islogical);
-        p.parse(EEG, varargin{:});
+        p.parse(data, varargin{:});
         p = p.Results;
     end % parseArguments
 

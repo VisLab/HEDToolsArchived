@@ -65,110 +65,117 @@ parser.addParamValue('EditXml', false, @islogical);
 parser.addParamValue('PreservePrefix', false, @islogical);
 parser.parse(fMap, varargin{:});
 p = parser.Results;
-excluded = {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'};
-EditXml = p.EditXml;
-preservePrefix = p.PreservePrefix;
-permissions = 0;
-initialDepth = 3;
-isStandAloneVersion = false;
+p.excluded = {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'};
+p.EditXml = p.EditXml;
+p.preservePrefix = p.PreservePrefix;
+p.permissions = 0;
+p.initialDepth = 3;
+p.isStandAloneVersion = false;
 if ~isempty(p.Fields)
-    fields = p.Fields;
+    p.fields = p.Fields;
 else
-    fields = fMap.getFields();
+    p.fields = p.fMap.getFields();
 end
-canceled = false;
-k = 1;
-while (~canceled && k <= length(fields))
-    fprintf('Tagging %s\n', fields{k});
-    editmap(fields{k});
+p.canceled = false;
+p.k = 1;
+p.firstField = true;
+while (~p.canceled && p.k <= length(p.fields))
+    fprintf('Tagging %s\n', p.fields{p.k});
+    p.field = p.fields{p.k};
+    p = editmap(p);
 end
+canceled = p.canceled;
 
-    function editmap(field)
+    function p = editmap(p)
         % Proceed with tagging for field values and adjust fMap accordingly
-        tMap = fMap.getMap(field);
-        if isempty(tMap)
+        p.tMap = p.fMap.getMap(p.field);
+        if isempty(p.tMap)
             return;
         end
-        [loader, xml, taggedList, loaded] = executeTagger(tMap, field);
-        if loaded
-            baseTags = fieldMap.loadFieldMap(char(loader.getFMapPath));
-            fMap.merge(baseTags, 'Merge', excluded, fields);
-            if loader.isStartOver()
-                k = 1;
+        p = executeTagger(p);
+        if p.loaded
+            baseTags = fieldMap.loadFieldMap(char(p.loader.getFMapPath));
+            p.fMap.merge(baseTags, 'Merge', p.excluded, p.fields);
+            if p.loader.isStartOver()
+                p.k = 1;
+                p.firstField = true;
             end
-        elseif loader.isSubmitted()
-            updateFieldMap(field, xml, taggedList);
-            k = k + 1;
+        elseif p.loader.isSubmitted()
+            updateFieldMap(p);
+            if p.loader.isBack()
+                p.k = p.k - 1;
+            else
+                p.k = p.k + 1;
+            end
+            p.firstField = p.k == 1;
         else
-            canceled = true;
+            p.canceled = true;
         end
     end % editmap
 
-    function [loader, xml, taggedList, loaded] = ...
-            executeTagger(tMap, field)
+    function p = executeTagger(p)
         % Executes the CTagger gui
-        [primary, tValues, xml, flags, eTitle] = ...
-            getTaggerParameters(tMap, field);
-        loader = javaObjectEDT('edu.utsa.tagger.TaggerLoader', ...
-            xml, tValues, flags, permissions, eTitle, initialDepth, ...
-            primary, isStandAloneVersion);
-        [loaded, saved, notified] = checkStatus(loader);
-        while (~notified)
+        p = getTaggerParameters(p);
+        p.loader = javaObject('edu.utsa.tagger.TaggerLoader', ...
+            p.xml, p.tValues, p.flags, p.permissions, p.eTitle, ...
+            p.initialDepth,  p.primary, p.isStandAloneVersion, ...
+            p.firstField);
+        p = checkStatus(p);
+        while (~p.notified)
             pause(0.5);
-            checkFMapSave(field, loader, xml, saved);
-            [loaded, saved, notified] = checkStatus(loader);
+            checkFMapSave(p);
+            p = checkStatus(p);
         end
-        taggedList = loader.getXMLAndEvents();
+        p.taggedList = p.loader.getXMLAndEvents();
     end % executeTagger
 
-    function [loaded, saved, notified] = checkStatus(loader)
+    function p = checkStatus(p)
         % Checks the status of the CTagger
-        loaded = loader.fMapLoaded();
-        saved = loader.fMapSaved();
-        notified = loader.isNotified();
+        p.loaded = p.loader.fMapLoaded();
+        p.saved = p.loader.fMapSaved();
+        p.notified = p.loader.isNotified();
     end % checkStatus
 
-    function checkFMapSave(field, loader, xml, saved)
+    function checkFMapSave(p)
         % Checks if an fieldMap has been saved
-        if saved
-            taggedList = loader.getXMLAndEvents();
-            updateFieldMap(field, xml, taggedList);
-            fMap.saveFieldMap(char(loader.getFMapPath), fMap);
-            loader.setFMapSaved(false);
+        if p.saved
+            p.taggedList = p.loader.getXMLAndEvents();
+            updateFieldMap(p);
+            p.fMap.saveFieldMap(char(p.loader.getFMapPath), p.fMap);
+            p.loader.setFMapSaved(false);
         end
     end % checkFMapSave
 
-    function [primary, tValues, xml, flags, eTitle] = ...
-            getTaggerParameters(tMap, field)
+    function p = getTaggerParameters(p)
         % Gets the parameters that are passed into the CTagger
-        primary = tMap.getPrimary();
-        tValues = strtrim(char(tMap.getJsonValues()));
-        xml = fMap.getXml();
-        flags = setFlags();
-        eTitle = ['Tagging ' field ' values'];
+        p.primary = p.tMap.getPrimary();
+        p.tValues = strtrim(char(p.tMap.getJsonValues()));
+        p.xml = p.fMap.getXml();
+        p.flags = setFlags(p);
+        p.eTitle = ['Tagging ' p.field ' values'];
     end % getTaggerParameters
 
-    function flags = setFlags()
+    function flags = setFlags(p)
         % Sets the flags parameter based on the input arguments
         flags = 1;
-        if EditXml
+        if p.EditXml
             flags = bitor(flags,8);
         end
-        if preservePrefix
+        if p.preservePrefix
             flags = bitor(flags,2);
         end
     end % setFlags
 
-    function updateFieldMap(field, xml, taggedList)
+    function updateFieldMap(p)
         % Updates fMap if CTagger is submitted
-        if ~isempty(taggedList)
-            tValues = strtrim(char(taggedList(2, :)));
+        if ~isempty(p.taggedList)
+            tValues = strtrim(char(p.taggedList(2, :)));
         end
         tValues = tagMap.json2Values(tValues);
-        fMap.mergeXml(strtrim(xml));
-        fMap.removeMap(field);
-        fMap.addValues(field, tValues);
-        fMap.updateXml();
+        p.fMap.mergeXml(strtrim(p.xml));
+        p.fMap.removeMap(p.field);
+        p.fMap.addValues(p.field, tValues, 'Primary', p.tMap.getPrimary());
+        p.fMap.updateXml();
     end % updateFieldMap
 
 end % editmaps
