@@ -46,10 +46,10 @@ try
     values = {estruct.(type)};
     isNum = cell2mat(cellfun(@isnumeric, values, 'UniformOutput', false));
     tValues = unique(cellfun(@num2str, values, 'UniformOutput', false));
-    if sum(isNum) > 0 && sum(~cellfun(@isempty, strfind(tValues, '.'))) > 0
-        tValues = {};
-        return;
-    end
+%     if sum(isNum) > 0 && sum(~cellfun(@isempty, strfind(tValues, '.'))) > 0
+%         tValues = {};
+%         return;
+%     end
     tEmpty = cellfun(@isempty, tValues);
     tValues(tEmpty) = [];
     tNaN = strcmpi('NaN', tValues);

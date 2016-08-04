@@ -116,8 +116,10 @@ if isempty(fPaths)
 end
 fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
 fMapTag = fieldMap('PreservePrefix',  p.PreservePrefix);
+allFields = {};
 for k = 1:length(fPaths) % Assemble the list
     eegTemp = pop_loadset(fPaths{k});
+    allFields = union(allFields, fieldnames(eegTemp.event));
     [tMapNew, tMapTagNew] = findtags(eegTemp, 'PreservePrefix', ...
         p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, 'Fields', ...
         p.Fields);
@@ -141,7 +143,8 @@ canceled = false;
 fields = {};
 if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
+    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, ...
+        'ExcludeFields', excluded, 'PrimaryField', ...
         p.PrimaryField);
     excluded = union(excluded, exc);
 elseif ~isempty(p.PrimaryField)

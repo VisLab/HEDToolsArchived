@@ -301,7 +301,7 @@ classdef fieldMap < hgsetget
         
         function removeMap(obj, field)
             % Remove the tag map associated with specified field name
-            if ~isempty(field)
+            if ~isempty(field) && obj.GroupMap.isKey(field)
                 obj.GroupMap.remove(field);
             end
         end % removeMap

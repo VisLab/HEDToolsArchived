@@ -46,13 +46,13 @@
 
 function [fMap, fields, excluded, canceled] = selectmaps(fMap, varargin)
 p = parseArguments(fMap, varargin{:});
-fields = {};
 title = 'Please select the fields that you would like to tag';
+fields = {};
 canceled = false;
 
 % Figure out the fields to be used
-p.fields = p.fMap.getFields();
-excluded = {};
+excluded = p.ExcludeFields;
+p.fields = setdiff(p.fMap.getFields(), excluded);
 
 if isempty(p.fields) || ~p.selectFields
     return;
@@ -60,8 +60,8 @@ end
 
 p = movePrimaryField(p);
 
-loader = javaObjectEDT('edu.utsa.tagger.FieldSelectLoader', title, ...
-    {}, p.fields, p.primaryField);
+loader = javaObject('edu.utsa.tagger.FieldSelectLoader', title, ...
+    excluded, p.fields, p.primaryField);
 [notified, submitted] = checkStatus(loader);
 while (~notified)
     pause(0.5);
@@ -71,6 +71,7 @@ excludeUser = cell(loader.getExcludeFields());
 p.primaryField = char(loader.getPrimaryField());
 if ~submitted
     canceled = true;
+    return;
 end
 
 if ~isempty(p.primaryField)
@@ -110,7 +111,10 @@ excluded = union(excluded, excludeUser);
     function p = parseArguments(fMap, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
-        parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, 'fieldMap')));
+        parser.addRequired('fMap', @(x) (~isempty(x) && ...
+            isa(x, 'fieldMap')));
+        parser.addParamValue('ExcludeFields', {}, ...
+            @(x) (iscellstr(x)));
         parser.addParamValue('primaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
         parser.addParamValue('selectFields', true, @islogical);

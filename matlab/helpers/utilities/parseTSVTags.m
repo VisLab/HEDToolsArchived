@@ -7,7 +7,7 @@
 %   >>  [errors, warnings, extensions] = parseTSVTags(hedMaps, tsvFile, ...
 %       tsvTagColumns, hasHeaderRow, extensionAllowed);
 %
-% Input:
+% Inputs:
 %
 %       hedMaps
 %                   A structure that contains Maps associated with the HED
@@ -44,7 +44,7 @@
 %                   validation will not accept extension allowed tags and
 %                   errors will be generated for each tag present.
 %
-% Output:
+% Outputs:
 %
 %       errors
 %                   A cell array containing all of the validation errors.
