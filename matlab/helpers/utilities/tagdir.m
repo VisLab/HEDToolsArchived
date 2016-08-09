@@ -42,11 +42,6 @@
 %   'Fields'         A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty, only
 %                    these fields are tagged.
-%   'Precision'      The precision that the .data field should be converted
-%                    to. The options are 'Preserve', 'Double' and 'Single'.
-%                    'Preserve' retains the .data field precision, 'Double'
-%                    converts the .data field to double precision, and
-%                    'Single' converts the .data field to single precision.
 %   'PreservePrefix' If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
@@ -60,13 +55,6 @@
 %   'SaveMapFile'    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
-%   'SaveMode'       The options are 'OneFile' and 'TwoFiles'. 'OneFile'
-%                    saves the EEG structure in a .set file. 'TwoFiles'
-%                    saves the EEG structure without the data in a .set
-%                    file and the transposed data in a binary float .fdt
-%                    file. If the 'Precision' input argument is 'Preserve'
-%                    then the 'SaveMode' is ignored and the way that the
-%                    file is already saved will be retained.
 %   'SelectFields'   If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %   'UseGui'         If true (default), the CTAGGER GUI is displayed after
@@ -104,9 +92,8 @@
 
 function [fMap, fPaths, excluded] = tagdir(inDir, varargin)
 % Parse the input arguments
-p = parseArguments();
-
-fprintf('\n---Loading the data files to merge the tags---\n');
+p = parseArgs(inDir, varargin{:});
+canceled = false;
 fMap = '';
 excluded = '';
 fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
@@ -117,6 +104,7 @@ end
 fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
 fMapTag = fieldMap('PreservePrefix',  p.PreservePrefix);
 allFields = {};
+fprintf('\n---Loading the data files to merge the tags---\n');
 for k = 1:length(fPaths) % Assemble the list
     eegTemp = pop_loadset(fPaths{k});
     allFields = union(allFields, fieldnames(eegTemp.event));
@@ -128,7 +116,18 @@ for k = 1:length(fPaths) % Assemble the list
         tMapTagNew.getFields());
 end
 % Exclude the appropriate tags from baseTags
-excluded = p.ExcludeFields;
+fields = {};
+excluded = intersect(p.ExcludeFields, allFields);
+if p.UseGui && p.SelectFields && isempty(p.Fields)
+    fprintf('\n---Now select the fields you want to tag---\n');
+    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, ...
+        'ExcludeFields', excluded, 'PrimaryField', ...
+        p.PrimaryField);
+    excluded = union(excluded, exc);
+elseif ~isempty(p.PrimaryField)
+    fMapTag.setPrimaryMap(p.PrimaryField);
+end
+% excluded = p.ExcludeFields;
 if isa(p.BaseMap, 'fieldMap')
     baseTags = p.BaseMap;
 else
@@ -139,17 +138,7 @@ if ~isempty(baseTags) && ~isempty(p.Fields)
 end;
 fMap.merge(baseTags, 'Merge', excluded, p.Fields);
 fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
-canceled = false;
-fields = {};
-if p.UseGui && p.SelectFields && isempty(p.Fields)
-    fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, ...
-        'ExcludeFields', excluded, 'PrimaryField', ...
-        p.PrimaryField);
-    excluded = union(excluded, exc);
-elseif ~isempty(p.PrimaryField)
-    fMapTag.setPrimaryMap(p.PrimaryField);
-end
+
 
 if p.UseGui && ~canceled
     [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
@@ -174,35 +163,21 @@ if ~canceled
         for k = 1:length(fPaths) % Assemble the list
             EEG = pop_loadset(fPaths{k});
             EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
-            if isequal(p.Precision, 'double') && isa(EEG.data, 'single')
-                EEG.data = double(EEG.data);
-            elseif isequal(p.Precision, 'single') && isa(EEG.data, 'double')
-                EEG.data = single(EEG.data);
-            end
-            if isequal(p.SaveMode, 'onefile') || isequal(p.Precision, ...
-                    'double')
-                pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-                    EEG.filepath, 'savemode', 'onefile');
-            elseif isequal(p.SaveMode, 'twofiles') || findDatFile()
-                pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-                    EEG.filepath, 'savemode', 'twoFiles');
-            else
-                pop_saveset(EEG, 'filename', EEG.filename, 'filepath', ...
-                    EEG.filepath,'savemode', 'resave');
-            end
+            EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
+                'filepath', EEG.filepath);
         end
     end
     return;
 end
 fprintf('Tagging was canceled\n');
 
-    function found = findDatFile()
-        % Looks for a .dat file
-        [~, fName] = fileparts(EEG.filename);
-        found = 2 == exist([EEG.filepath filesep fName '.dat'], 'file');
-    end % findDatFile
+%     function found = findDatFile()
+%         % Looks for a .dat file
+%         [~, fName] = fileparts(EEG.filename);
+%         found = 2 == exist([EEG.filepath filesep fName '.dat'], 'file');
+%     end % findDatFile
 
-    function p = parseArguments()
+    function p = parseArgs(inDir, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('InDir', @(x) (~isempty(x) && ischar(x)));
@@ -214,20 +189,15 @@ fprintf('Tagging was canceled\n');
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('Precision', 'Preserve', ...
-            @(x) any(validatestring(lower(x), ...
-            {'Double', 'Preserve', 'Single'})));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
         parser.addParamValue('SaveDatasets', true, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
-        parser.addParamValue('SaveMode', 'TwoFiles', ...
-            @(x) any(validatestring(lower(x), {'OneFile', 'TwoFiles'})));
         parser.addParamValue('SelectFields', true, @islogical);
         parser.addParamValue('UseGui', true, @islogical);
         parser.parse(inDir, varargin{:});
         p = parser.Results;
-    end % parseArguments
+    end % parseArgs
 
 end % tagdir

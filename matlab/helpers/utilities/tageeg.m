@@ -157,6 +157,6 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('UseGui', true, @islogical);
         parser.parse(EEG, varargin{:});
         p = parser.Results;
-    end % parseArguments
+    end % parseArgs
 
 end % tageeg

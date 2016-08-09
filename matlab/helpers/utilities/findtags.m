@@ -70,7 +70,8 @@ end
     function p = intializeFMaps(p)
         % Initialized the field maps
         xml = '';
-        if isfield(p.edata.etc.tags, 'xml')
+        if isfield(p.edata.etc, ...
+                'tags') && isfield(p.edata.etc.tags, 'xml')
             xml = p.edata.etc.tags.xml;
         end
         p.fMap1 = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
@@ -81,8 +82,8 @@ end
         % Creates and populates the field maps from the .event and
         % .urevent fields
         p = intializeFMaps(p);
-        p = getEventFields(p);
-        for k = 1:length(p.allFields)
+        [p.allEventFields, p.taggedEventFields] = getEventFields(p);
+        for k = 1:length(p.allEventFields)
             p = addEventValues(p, k);
         end
         fMap1 = p.fMap1;
@@ -141,22 +142,24 @@ end
         p.fMap1.addValues(p.allEventFields{index}, valueForm);
     end % addEventValues
 
-    function [allFields, taggedFields] = getEventFields(p)
+    function [allEventFields, taggedEventFields] = getEventFields(p)
         % Gets all of the event fields from the .event and .urevent fields
-        allFields = {};
-        taggedFields = {};
+        allEventFields = {};
+        taggedEventFields = {};
         if isfield(p.edata, 'event') && isstruct(p.edata.event)
-            allFields = fieldnames(p.edata.event);
-            taggedFields = fieldnames(p.edata.event);
+            allEventFields = fieldnames(p.edata.event);
+            taggedEventFields = fieldnames(p.edata.event);
         end
         if isfield(p.edata, 'urevent') && isstruct(p.edata.urevent)
-            allFields = union(allFields, fieldnames(p.edata.urevent));
-            taggedFields = union(allFields, fieldnames(p.edata.urevent));
+            allEventFields = union(allEventFields, ...
+                fieldnames(p.edata.urevent));
+            taggedEventFields = union(allEventFields, ...
+                fieldnames(p.edata.urevent));
         end
         %         allFields = setdiff(allFields, p.ExcludeFields);
         %         taggedFields = setdiff(taggedFields, p.ExcludeFields);
         if ~isempty(p.Fields)
-            taggedFields = intersect(p.Fields, allFields);
+            taggedEventFields = intersect(p.Fields, allEventFields);
         end
     end % getEventFields
 
