@@ -65,7 +65,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function [errors, errorTags] = checkForValidationErrors(hedMaps, ...
-    originalTags, formattedTags, extensionAllowed)
+    originalTags, formattedTags)
 errors = '';
 errors = [errors checkRequiredTags(hedMaps, formattedTags)];
 errors = [errors checkRequireChildTags(hedMaps, originalTags, ...
@@ -74,6 +74,6 @@ errors = [errors checkTakeValueTags(hedMaps, originalTags, formattedTags)];
 errors = [errors checkGroupTildes(originalTags)];
 errors = [errors checkUniqueTags(hedMaps, originalTags, formattedTags)];
 [validationErrors, errorTags] = checkValidTags(hedMaps, originalTags, ...
-    formattedTags, extensionAllowed);
+    formattedTags, true);
 errors = [errors validationErrors];
 end % checkForValidationErrors
