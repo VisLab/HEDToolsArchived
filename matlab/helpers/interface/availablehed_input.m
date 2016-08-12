@@ -1,4 +1,4 @@
-function [okay, success] = createUpdateAvailableLayout(version)
+function [okay, success] = availablehed_input(version)
 title = 'Update Available';
 okay = false;
 success = false;
@@ -116,4 +116,4 @@ uiwait(fig);
         close(fig);
     end % skipCallback
 
-end
+end % availablehed_input

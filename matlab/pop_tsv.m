@@ -29,7 +29,7 @@
 function pop_tsv()
 % Prevent an annoying warning msg
 addJars();
-title = 'HEDTools Validation';
+title = 'Tab-separated HEDTools';
 fig = createFigure(title);
 tabGroup = uitabgroup('Parent', fig);
 tabs = createTabs(tabGroup);
@@ -51,21 +51,21 @@ createTabLayouts(tabs);
 
     function createTabLayouts(tabs)
         % Creates the layouts for the figure
-        createTagValidationLayout(tabs.tab1);
-        createRemapTagsLayout(tabs.tab2);
-        checkForUpdatesLayout(tabs.tab3);
+        validatetsv_input(tabs.tab1);
+        replacetsv_input(tabs.tab2);
+        updatehed_input(tabs.tab3);
     end % createTabLayouts
 
     function tabs = createTabs(tabGroup)
         % Creates the tab panels in the figure
         warning off all;
         tabs.tab1 = uitab('Parent', tabGroup, 'title', ...
-            'Validate Tab-Delimited File Tags');
+            'Validate');
         tabs.tab2 = uitab('Parent', tabGroup, 'title', ...
-            'Update Tab-Delimited File Tags');
+            'Find and Replace');
         tabs.tab3 = uitab('Parent', tabGroup, 'title', ...
-            'Check for Latest HED');
+            'Updates');
         warning on all;
     end % createTabs
 
-end % pop_hedtagvalidate
+end % pop_tsv
