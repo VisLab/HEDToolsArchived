@@ -9,66 +9,89 @@
 % Usage:
 %
 %   >>  [EEG, fMap, canceled] = tageeg(EEG)
+%
 %   >>  [EEG, fMap, canceled] = tageeg(EEG, 'key1', 'value1', ...)
 %
-% Inputs:
+% Input:
 %
-%   EEG              
+%      Required:
+%
+%      EEG              
 %                    The EEG dataset structure that will be tagged. The
 %                    dataset will need to have a .event field. 
-%   fMap
-%                    A fieldMap object that stores all of the tags. 
-%   canceled
-%                    True if the tagging has been canceled, False if
-%                    otherwise.
 %
-% Optional:
-%   'BaseMap'        
+%      Optional (key/value):
+%
+%      'BaseMap'        
 %                    A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used to initialize tag
 %                    information.
-%   'EditXml'        
+%
+%      'EditXml'        
 %                    If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can be
 %                    modified using the tagger GUI.
-%   'ExcludeFields'  
+%
+%      'ExcludeFields'  
 %                    A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process.
 %                    By default the following subfields of the event
 %                    structure are ignored: .latency, .epoch, .urevent,
 %                    .hedtags, and .usertags. The user can over-ride these
 %                    tags using this name-value parameter.
-%   'Fields'         A cell array of field names of the fields to include
+%
+%      'Fields'         
+%                    A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty, only
 %                    these fields are tagged.
-%   'PreservePrefix' 
+%
+%      'PreservePrefix' 
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%   'PrimaryField'   
+%
+%      'PrimaryField'   
 %                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description. The default is the type
 %                    field.
-%   'SaveMapFile'    
+%
+%      'SaveMapFile'    
 %                    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
-%   'SaveMode'       
+%
+%      'SaveMode'       
 %                    The options are 'OneFile' and 'TwoFiles'. 'OneFile'
 %                    saves the EEG structure in a .set file. 'TwoFiles'
 %                    saves the EEG structure without the data in a .set
 %                    file and the transposed data in a binary float .fdt
 %                    file. If the 'Precision' input argument is 'Preserve'
 %                    then the 'SaveMode' is ignored and the way that the
-%                    file is already saved will be retained.zzz
-%   'SelectFields'   
+%                    file is already saved will be retained.
+%
+%      'SelectFields'   
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
-%   'UseGui'         
+%
+%      'UseGui'         
 %                    If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
+%
+% Output:
+%
+%       EEG              
+%                    The EEG dataset structure that has been tagged. The
+%                    tags will be written to the .usertags field under
+%                    the .event field.
+%
+%       fMap
+%                    A fieldMap object that stores all of the tags. 
+%
+%       canceled
+%                    True if the tagging has been canceled, False if
+%                    otherwise.
 %
 % Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
 % krobbins@cs.utsa.edu
@@ -89,7 +112,7 @@
 
 function [EEG, fMap, canceled] = tageeg(EEG, varargin)
 % Parse the input arguments
-p = parseArgs(EEG, varargin{:});
+p = parseArguments(EEG, varargin{:});
 canceled = false;
 % Get the existing tags for the EEG
 [fMap, fMapTag] = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
@@ -137,7 +160,7 @@ if ~canceled
 end
 fprintf('Tagging was canceled\n');
 
-    function p = parseArgs(EEG, varargin)
+    function p = parseArguments(EEG, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
@@ -157,6 +180,6 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('UseGui', true, @islogical);
         parser.parse(EEG, varargin{:});
         p = parser.Results;
-    end % parseArgs
+    end % parseArguments
 
 end % tageeg

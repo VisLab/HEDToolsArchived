@@ -1,11 +1,12 @@
-% This function takes in a tab-delimited text file containing HED tags
-% associated with a particular study and validates them based on the
-% tags and attributes in the HED XML file.
+% This function takes in a tab-separated file containing HED tags
+% and validates them against a HED schema. The validatetsv function calls
+% this function to parse the tab-separated file and generate any issues
+% found through the validation. 
 %
 % Usage:
 %
-%   >>  [errors, warnings, extensions] = parseTSVTags(hedMaps, tsvFile, ...
-%       tsvTagColumns, hasHeaderRow, extensionAllowed);
+%   >>  [issues, replaceTags, success] = parsetsv(hedMaps, tsvFile, ...
+%       tagColumns, hasHeader, generateWarnings)
 %
 % Inputs:
 %
@@ -23,48 +24,39 @@
 %                   that contains the tags are are unique.
 %
 %       tsvFile
-%                   The name or the path of a tab-delimited text file
-%                   containing HED tags associated with a particular study.
+%                   The name or the path of a tab-separated file
+%                   containing HED tags in a single column or multiple
+%                   columns.
 %
-%       tsvTagColumns
-%                   The columns that contain the HED study tags. The
-%                   columns can be a scalar value or a vector (e.g. 1 or
-%                   [1,2,3]).
+%       tagColumns
+%                   The columns in the tab-separated file that contains the
+%                   HED tags. The columns are either a scalar value or a
+%                   vector (e.g. 2 or [2,3,4]).
 %
-%       hasHeaderRow
-%                   True(default)if the tab-delimited text file containing
-%                   the HED study tags has a header row. This row will be
-%                   skipped and not validated. False if the file doesn't
-%                   have a header row.
+%       hasHeader
+%                   True (default) if the the tab-separated input file has
+%                   a header. The first row will not be validated otherwise
+%                   it will and this can generate issues.
 %
-%       extensionAllowed
-%                   True(default) if the validation accepts extension
-%                   allowed tags. There will be warnings generated for each
-%                   extension allowed tag that is present. If false, the
-%                   validation will not accept extension allowed tags and
-%                   errors will be generated for each tag present.
+%       generateWarnings
+%                   True to include warnings in the log file in addition
+%                   to errors. If false (default) only errors are included
+%                   in the log file.
 %
-% Outputs:
+% Output:
 %
-%       errors
-%                   A cell array containing all of the validation errors.
-%                   Each cell is associated with the validation errors on a
-%                   particular line.
+%       issues
+%                   A cell array containing all of the issues found through
+%                   the validation. Each cell corresponds to the issues
+%                   found on a particular line.
 %
-%       warnings
-%                   A cell array containing all of the validation warnings.
-%                   Each cell is associated with the validation warnings on
-%                   a particular line.
+%       replaceTags
+%                   A cell array containing all of the tags that generated
+%                   issues. These tags will be written to a replace file.
 %
-%       extensions
-%                   A cell array containing all of the extension allowed
-%                   validation warnings. Each cell is associated with the
-%                   extension allowed validation warnings on a particular
-%                   line.
-%
-%       uniqueErrorTags
-%                   A cell array containing all of the unique validation
-%                   error tags.
+%       success
+%                   True if the validation finishes without throwing any
+%                   exceptions, false if otherwise. 
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -83,11 +75,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [issues, remapTags, success] = parsetsv(hedMaps, tsvFile, ...
+function [issues, replaceTags, success] = parsetsv(hedMaps, tsvFile, ...
     tagColumns, hasHeader, generateWarnings)
 p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
     generateWarnings);
-[issues, remapTags, success] = readLines(p);
+[issues, replaceTags, success] = readLines(p);
 
     function [line, lineNumber] = checkFileHeader(hasHeader, fileId)
         % Checks to see if the file has a header line
@@ -101,8 +93,9 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
 
     function p = findErrors(p)
         % Errors will be generated for the line if found
-        [p.lineErrors, lineRemapTags] = checkForValidationErrors(p.hedMaps, ...
-            p.cellTags, p.formattedCellTags);
+        [p.lineErrors, lineRemapTags] = ...
+            checkForValidationErrors(p.hedMaps, p.cellTags, ...
+            p.formattedCellTags);
         p.remapTags = union(p.remapTags, lineRemapTags);
     end % findErrors
 
@@ -133,7 +126,7 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         p = parser.Results;
     end % parseArguments
 
-    function [issues, remapTags, success] = readLines(p)
+    function [issues, replaceTags, success] = readLines(p)
         % Reads the tab-delimited file line by line and validates the tags
         p.issues = {};
         p.remapTags = {};
@@ -150,14 +143,13 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
             end
             fclose(fileId);
             issues = p.issues;
-            remapTags = p.remapTags;
+            replaceTags = p.remapTags;
             success = true;
-            handleEmptyOutput(p);
         catch ME
             fclose(fileId);
             warning('Unable to parse TSV file on line %d', p.lineNumber);
             issues = '';
-            remapTags = {};
+            replaceTags = {};
             success = false;
         end
     end % readLines
@@ -202,12 +194,5 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
             end
         end
     end % validateLineTags
-
-    function handleEmptyOutput(p)
-        % Handles empty output
-        if isempty(p.issues)
-            p.issues{1} = sprintf('No issues were found.');
-        end
-    end % handleEmptyOutput
 
 end % parsetags

@@ -1,4 +1,3 @@
-% tagtsv
 % Reads in a tab separated file and stores the events and associated tags
 % in a TagMap
 %
@@ -65,17 +64,17 @@ if ~isempty(s)
         event = readEvent(s, rowNum, colNames, eventColumn);
         tags = readTags(s, rowNum, colNames, tagColumns);
         if ~isempty(event) && ~strcmpi(event, 'NaN') && ~isempty(tags)
-            addTagsToTagMap(tsvTagMap, event, tags);
+            addTags2TagMap(tsvTagMap, event, tags);
         end
     end
 end
 
-    function addTagsToTagMap(tsvTagMap, event, tags)
+    function addTags2TagMap(tsvTagMap, event, tags)
         % Adds tags to a TagMap
         tList = tagList(event);
         tList.addString(tags);
         tsvTagMap.addValue(tList);
-    end % addTagsToTagMap
+    end % addTags2TagMap
 
     function event = readEvent(s, rowNum, colNames, eventColumn)
         % Reads the event column from a tab separated row

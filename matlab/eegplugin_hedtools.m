@@ -84,7 +84,7 @@ uimenu(parentMenu, 'Label', 'Tag current dataset', 'Callback', ...
     'Separator', 'on');
 
 % Processing for 'Validate current EEG'
-finalcmd = '[~, ~, ~, LASTCOM] = pop_validateeeg(EEG);';
+finalcmd = '[~, LASTCOM] = pop_validateeeg(EEG);';
 
 % Add 'Validate current EEG' to 'Edit'
 uimenu(parentMenu, 'Label', 'Validate current dataset', 'Callback', ...

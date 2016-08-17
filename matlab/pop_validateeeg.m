@@ -1,14 +1,11 @@
 % Allows a user to validate a EEG structure using a GUI
 %
 % Usage:
-%   >>  [errorLog, warningLog, extensionLog, com] = pop_validateeeg(EEG);
+%
+%   >>  issues = pop_validateeeg(EEG);
 %
 % Note: The primary purpose of pop_tageeg is to package up parameter input
 % and calling of tageeg for use as a plugin for EEGLAB (Edit menu).
-%
-%
-% See also:
-%   eeglab, tageeg, tagdir, tagstudy, and eegplugin_ctagger
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -27,11 +24,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-
-function [errorLog, warningLog, extensionLog, com] = pop_validateeeg(EEG)
-errorLog = '';
-warningLog = '';
-extensionLog = '';
+function [issues, com] = pop_validateeeg(EEG)
+issues = '';
 com = '';
 
 if nargin < 1
@@ -39,31 +33,30 @@ if nargin < 1
     return;
 end;
 
-[cancelled, errorLogOnly, extensionsAllowed, hedXML, outDir] = ...
+[cancelled, generateWarnings, hedXML, outputDirectory] = ...
     validateeeg_input();
 if cancelled
     return;
 end
 
-[errorLog, warningLog, extensionLog] = validateeeg(EEG, ...
-    'errorLogOnly', errorLogOnly, ...
-    'extensionAllowed', extensionsAllowed, ...
+issues = validateeeg(EEG, ...
+    'generateWarnings', generateWarnings, ...
     'hedXML', hedXML, ...
-    'outDir', outDir, ...
+    'outputDirectory', outputDirectory, ...
     'writeOutput', true);
 com = char(['validateeeg(EEG, ' ...
-    '''errorLogOnly'', ' logical2str(errorLogOnly) ', ' ...
-    '''extensionAllowed'', ' logical2str(extensionsAllowed) ', ' ...
+    '''generateWarnings'', ' logical2str(generateWarnings) ', ' ...
     '''hedXML'', ''' hedXML ''', ' ...
-    '''outDir'', ''' outDir ''', ' ...
+    '''outputDirectory'', ''' outputDirectory ''', ' ...
     '''writeOutput'', ' 'true)']);
-end % pop_validateeeg
 
-function s = logical2str(b)
-% Converts a logical value to a string
-if b
-    s = 'true';
-else
-    s = 'false';
-end
-end % logical2str
+    function s = logical2str(b)
+        % Converts a logical value to a string
+        if b
+            s = 'true';
+        else
+            s = 'false';
+        end
+    end % logical2str
+
+end % pop_validateeeg

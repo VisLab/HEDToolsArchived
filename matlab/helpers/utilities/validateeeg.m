@@ -1,57 +1,53 @@
-% This function takes in a EEG structure and validates the tags against the
-% lastest HED schema. 
+% This function validates the HED tags in a EEG dataset structure against
+% a HED schema.
 %
 % Usage:
 %
-%   >>  [errors, warnings, extensions] = validateeeg(eeg);
-%   >>  [errors, warnings, extensions] = validateeeg(eeg, varargin);
+%   >>  issues = validateeeg(eeg);
+%
+%   >>  issues = validateeeg(eeg, 'key1', 'value1', ...);
 %
 % Input:
 %
-%       eeg         The EEG dataset structure containing HED tags in the
-%                   .event field.
+%       eeg         A EEG dataset structure containing HED tags.
 %
 %       Optional:
 %
-%       'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
+%       'generateWarnings'
+%                   True to include warnings in the log file in addition
+%                   to errors. If false (default) only errors are included
+%                   in the log file.
 %
 %       'hedXML'
-%                   The name or the path of the HED XML file containing
-%                   all of the tags.
+%                   A XML file containing every single HED tag and its
+%                   attributes. This by default will be the HED.xml file
+%                   found in the hed directory.
 %
-%       'outDir'
+%       'outputDirectory'
 %                   The directory where the validation output will be
-%                   written to if the 'writeOutput' argument is true.
-%                   There will be three separate files generated, one
-%                   containing the validation errors, one containing the
-%                   validation  warnings, and one containing the extension
-%                   allowed validation warnings. The default directory will
-%                   be the directory that contains the tab-delimited text
-%                  file.
+%                   written to if the 'writeOutput' argument is set to
+%                   true. There will be log file containing any issues that
+%                   were found while validating the HED tags. If there were
+%                   issues found then a replace file will be created in
+%                   addition to the log file if an optional one isn't
+%                   already provided. The default output directory will be
+%                   the current directory.
+%
+%       'tagField'
+%                   The field in .event that contains the HED tags.
+%                   This by default is .usertags.
 %
 %       'writeOutput'
-%                   If false(default) the validation output is not written
-%                   to separate files. If true the validation output is
-%                   written to separate files.
+%                  True if the validation output is written to a log file
+%                  in addition to the workspace. False (default) if the
+%                  validation output is only written to the workspace.
 %
 % Output:
 %
-%       errorLog
-%                   A cell array containing the error log. Each cell is
-%                   associated with the validation errors on a particular
-%                   line.
-%
-%       warningLog
-%                   A cell array containing the warning log. Each cell is
-%                   associated with the validation warnings on a particular
-%                   line.
-%
-%       extensionLog
-%                   A cell array containing the extension log. Each cell is
-%                   associated with the extension allowed validation
-%                   warnings on a particular line.
+%       issues
+%                   A cell array containing all of the issues found through
+%                   the validation. Each cell corresponds to the issues
+%                   found on a particular line.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -70,27 +66,22 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errorLog, warningLog, extensionLog] = validateeeg(eeg, varargin)
-p = parseArguments();
-validate(p);
+function issues = validateeeg(eeg, varargin)
+p = parseArguments(eeg, varargin{:});
+issues = validate(p);
 
-    function validate(p)
+    function issues = validate(p)
         % Validates the eeg structure
         p.hedMaps = getHEDMaps(p);
         if isfield(p.eeg.event, p.tagField)
-            [p.errorLog, p.warningLog, p.extensionLog] = ...
-                parseStructTags(p.hedMaps, p.eeg.event, p.tagField, ...
-                p.extensionAllowed);
-            errorLog = p.errorLog;
-            warningLog = p.warningLog;
-            extensionLog = p.extensionLog;
-            if p.writeOutput
-                createLogs(p);
+            [p.issues, p.remapTags, success] = parseeeg(p.hedMaps, ...
+                p.eeg.event, p.tagField, p.generateWarnings);
+            issues = p.issues;
+            if success && p.writeOutput
+                writeOutputFiles(p);
             end
         else
-            errorLog = '';
-            warningLog = '';
-            extensionLog = '';
+            issues = '';
             fprintf(['The ''.%s'' field does not exist in the EEG' ...
                 ' events. Please tag the dataseet before running the' ...
                 ' validation.\n'], p.tagField);
@@ -115,67 +106,57 @@ validate(p);
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
-    function p = parseArguments()
+    function p = parseArguments(eeg, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('eeg', @(x) (~isempty(x) && isstruct(x)));
-        p.addParamValue('errorLogOnly', true, ...
-            @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('extensionAllowed', true, ...
+        p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('tagField', 'usertags', ...
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('outDir', pwd, ...
+        p.addParamValue('outputDirectory', pwd, ...
             @(x) ischar(x) && 7 == exist(x, 'dir'));
         p.addParamValue('writeOutput', false, @islogical);
         p.parse(eeg, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function createErrorLog(p)
-        % Creates a error log
-        numErrors = length(p.errorLog);
-        errorFile = fullfile(p.outDir, [p.file '_error_log' p.ext]);
-        fileId = fopen(errorFile,'w');
-        for a = 1:numErrors
-            fprintf(fileId, '%s\n', p.errorLog{a});
-        end
-        fclose(fileId);
-    end % createErrorLog
-
-    function createExtensionLog(p)
-        % Creates a extension log
-        numExtensions = length(p.extensionLog);
-        extensionFile = fullfile(p.outDir, [p.file '_extension_log' p.ext]);
-        fileId = fopen(extensionFile,'w');
-        for a = 1:numExtensions
-            fprintf(fileId, '%s\n', p.extensionLog{a});
-        end
-        fclose(fileId);
-    end % createExtensionLog
-
-    function createLogs(p)
-        % Creates the log files
+    function writeOutputFiles(p)
+        % Writes the errors, warnings, extension allowed warnings to
+        % the output files
+        p.dir = p.outputDirectory;
         [~, p.file] = fileparts(p.eeg.filename);
         p.ext = '.txt';
-        createErrorLog(p);
-        if ~p.errorLogOnly
-            createWarningLog(p);
-            createExtensionLog(p);
+        p.mapExt = '.tsv';
+        try
+            if ~isempty(p.issues)
+                createLogFile(p, false);
+%                 createRemapFile(p);
+            else
+                createLogFile(p, true);
+            end
+        catch
+            throw(MException('validatetsv:cannotWrite', ...
+                'Could not write output files'));
         end
-    end % createLogs
+    end % writeOutputFiles
 
-    function createWarningLog(p)
-        % Creates a warning log
-        numWarnings = length(p.warningLog);
-        warningFile = fullfile(p.outDir, [p.file '_warning_log' p.ext]);
-        fileId = fopen(warningFile,'w');
-        for a = 1:numWarnings
-            fprintf(fileId, '%s\n', p.warningLog{a});
+    function createLogFile(p, empty)
+        % Creates a log file containing any issues
+        numErrors = length(p.issues);
+        errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
+        fileId = fopen(errorFile,'w');
+        if ~empty
+        fprintf(fileId, '%s', p.issues{1});
+        for a = 2:numErrors
+            fprintf(fileId, '\n%s', p.issues{a});
+        end
+        else
+            fprintf(fileId, 'No issues were found.');
         end
         fclose(fileId);
-    end % createWarningLog
+    end % createLogFile
 
 end % validateeeg

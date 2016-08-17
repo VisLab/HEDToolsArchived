@@ -1,15 +1,4 @@
-% tagdir
-% Allows a user to tag an entire tree directory of similar EEG .set files
-%
-% Usage:
-%   >>  [fMap, fPaths, excluded] = tagdir(inDir)
-%   >>  [fMap, fPaths, excluded] = tagdir(inDir, 'key1', 'value1', ...)
-%
-% Description:
-% [fMap, fPaths, excluded] = tagdir(inDir) extracts a consolidated
-% fieldMap object from the data files in the directory tree inDir. The
-% inDir must be a valid path.
-%
+% Allows a user to tag an entire tree directory of similar EEG .set files.
 % First the events and tags from all data files are extracted and
 % consolidated into a single fieldMap object by merging all of the
 % existing tags. Then the user is presented with a GUI for choosing
@@ -17,56 +6,94 @@
 % edit/modify the tags. The GUI is launched in asynchronous mode.
 % Finally the tags are rewritten to the data files.
 %
-% The final, consolidated and edited fieldMap object is returned in fMap,
-% and fPaths is a cell array containing the full path names of all of the
-% matched files that were affected. If fPaths is empty, then fMap will
-% not contain any tag information.
+% Usage:
 %
-% [fMap, fPaths, excluded] = tagdir(inDir, 'key1', 'value1', ...) specifies
-% optional name/value parameter pairs:
-%   'BaseMap'        A fieldMap object or the name of a file that contains
+%   >>  [fMap, fPaths, excluded] = tagdir(inDir)
+%
+%   >>  [fMap, fPaths, excluded] = tagdir(inDir, 'key1', 'value1', ...)
+%
+% Description:
+% [fMap, fPaths, excluded] = tagdir(inDir) extracts a consolidated
+% fieldMap object from the data files in the directory tree inDir. The
+% inDir must be a valid path.
+%
+% Input:
+%
+%       Required:
+%
+%       inDir
+%                    A directory that contains similar EEG .set files.
+%
+%       Optional (key/value):
+%
+%       'BaseMap'
+%                    A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used to initialize tag
 %                    information.
-%   'DoSubDirs'      If true (default), the entire inDir directory tree is
+%
+%       'DoSubDirs'
+%                    If true (default), the entire inDir directory tree is
 %                    searched. If false, only the inDir directory is
 %                    searched.
-%   'EditXml'        If false (default), the HED XML cannot be modified
+%
+%       'EditXml'
+%                    If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can be
 %                    modified using the tagger GUI.
-%   'ExcludeFields'  A cell array of field names in the .event and .urevent
+%
+%       'ExcludeFields'
+%                    A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process. By
 %                    default the following subfields of the event structure
 %                    are ignored: .latency, .epoch, .urevent, .hedtags, and
 %                    .usertags. The user can over-ride these tags using
 %                    this name-value parameter.
-%   'Fields'         A cell array of field names of the fields to include
+%
+%       'Fields'
+%                    A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty, only
 %                    these fields are tagged.
-%   'PreservePrefix' If false (default), tags for the same field value that
+%
+%       'PreservePrefix'
+%                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%   'PrimaryField'   The name of the primary field. Only one field can be
+%
+%       'PrimaryField'
+%                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description. The default is the type
 %                    field.
-%   'SaveDatasets'   If true (default), save the tags to the underlying
+%
+%       'SaveDatasets'
+%                    If true (default), save the tags to the underlying
 %                    dataset files in the directory.
-%   'SaveMapFile'    A string representing the file name for saving the
+%
+%       'SaveMapFile'
+%                    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
-%   'SelectFields'   If true (default), the user is presented with a
+%
+%       'SelectFields'
+%                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
-%   'UseGui'         If true (default), the CTAGGER GUI is displayed after
+%
+%       'UseGui'
+%                    If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for tagdir:
+% Output:
 %
-%    doc tagdir
+%       fMap         A fieldMap object that contains the tag map
+%                    information.
 %
-% See also: tageeg and tagstudy
+%       fPaths       A list of full file names of the datasets to be
+%                    tagged.
+%
+%       excluded     A cell array containing the fields that were excluded
+%                    from tagging.
+%
 %
 % Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
 % krobbins@cs.utsa.edu
@@ -84,15 +111,10 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: tagdir.m,v $
-% $Revision: 1.0 21-Apr-2013 09:25:25 krobbins $
-% $Initial version $
-%
 
 function [fMap, fPaths, excluded] = tagdir(inDir, varargin)
 % Parse the input arguments
-p = parseArgs(inDir, varargin{:});
+p = parseArguments(inDir, varargin{:});
 canceled = false;
 fMap = '';
 excluded = '';
@@ -171,13 +193,7 @@ if ~canceled
 end
 fprintf('Tagging was canceled\n');
 
-%     function found = findDatFile()
-%         % Looks for a .dat file
-%         [~, fName] = fileparts(EEG.filename);
-%         found = 2 == exist([EEG.filepath filesep fName '.dat'], 'file');
-%     end % findDatFile
-
-    function p = parseArgs(inDir, varargin)
+    function p = parseArguments(inDir, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('InDir', @(x) (~isempty(x) && ischar(x)));
@@ -198,6 +214,6 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('UseGui', true, @islogical);
         parser.parse(inDir, varargin{:});
         p = parser.Results;
-    end % parseArgs
+    end % parseArguments
 
 end % tagdir

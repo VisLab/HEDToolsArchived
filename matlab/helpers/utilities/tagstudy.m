@@ -1,63 +1,77 @@
-% tagstudy
-% Allows a user to tag a EEGLAB study
+% Allows a user to tag a study file and its associated EEG .set files
+% First all of the tag information and potential fields are extracted from
+% EEG.event, EEG.urevent, and EEG.etc.tags structures. After existing event
+% tags are extracted and merged with an optional input fieldMap, the user
+% is presented with a GUI to accept or exclude potential fields from
+% tagging. Then the user is presented with the CTagger GUI to edit and tag.
+% Finally, the tags are rewritten to the EEG structure.
 %
 % Usage:
+%
 %   >>  [fMap, fPaths, excluded] = tagstudy(studyFile)
+%
 %   >>  [fMap, fPaths, excluded] = tagstudy(studyFile, 'key1', ...
 %       'value1', ...)
+% Input:
 %
-% Description:
-% [fMap, fPaths, excluded] = tagstudy(studyFile)extracts a consolidated
-% fMap object from the study and its associated EEGLAB .set files.
-% First the events and tags from all EEGLAB .set files are extracted and
-% consolidated into a single fMap object by merging all of the
-% existing tags. Then any tags from the study itself are extracted.
-% The ctagger GUI is then displayed so that users can
-% edit/modify the tags. The GUI is launched in synchronous mode, meaning
-% that it behaves like a modal dialog and must be closed before execution
-% continues. Finally the tags for each EEG file are updated.
+%       Required:
 %
-% The final, consolidated and edited fMap object is returned in eTags
-% and fPaths is a cell array containing the full path names of all of the
-% .set files that were affected.
+%       studyFile
+%                    The path to a EEG study.
 %
-%
-% [fMap, fPaths, excluded] = tagstudy(studyFile, 'key1', 'value1', ...)
-% specifies optional name/value parameter pairs:
-%   'BaseMap'        A fieldMap object or the name of a file that contains
+%       Optional (key/value):
+% 
+%       'BaseMap'        
+%                    A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used for initial tag
 %                    information.
-%   'EditXml'        If false (default), the HED XML cannot be modified
+%
+%       'EditXml'        
+%                    If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can be
 %                    modified using the tagger GUI.
-%   'ExcludeFields'  A cell array of field names in the .event and .urevent
+%
+%       'ExcludeFields'  
+%                    A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process.
 %                    By default the following subfields of the event
 %                    structure are ignored: .latency, .epoch, .urevent,
 %                    .hedtags, and .usertags. The user can over-ride these
 %                    tags using this name-value parameter.
-%   'Fields'         A cell array of field names of the fields to include
+%
+%       'Fields'        
+%                    A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty,
 %                    only these fields are tagged.
-%   'PreservePrefix' If false (default), tags of the same event type that
+%
+%       'PreservePrefix' 
+%                    If false (default), tags of the same event type that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%   'PrimaryField'   The name of the primary field. Only one field can be
+%                    
+%       'PrimaryField'   
+%                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description. The default is the type
 %                    field.
-%   'SaveDatasets'   If true (default), save the tags to the underlying
+%
+%       'SaveDatasets'   
+%                    If true (default), save the tags to the underlying
 %                    dataset files in the directory.
-%   'SaveMapFile'    The full path name of the file for saving the final,
+%
+%       'SaveMapFile'    
+%                    The full path name of the file for saving the final,
 %                    consolidated fieldMap object that results from the
 %                    tagging process.
-%   'SelectFields'   If true (default), the user is presented with a
-%                    GUI that allow users to select which fields to tag.
-%   'UseGui'         If true (default), the CTAGGER GUI is displayed after
-%                    initialization.
 %
-% See also: tageeg, tagstudy
+%       'SelectFields'   
+%                    If true (default), the user is presented with a
+%                    GUI that allow users to select which fields to tag.
+%
+%       'UseGui'         
+%                    If true (default), the CTAGGER GUI is displayed after
+%                    initialization.
 %
 % Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
 % krobbins@cs.utsa.edu
@@ -75,11 +89,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: tagdir.m,v $
-% $Revision: 1.0 21-Apr-2013 09:25:25 krobbins $
-% $Initial version $
-%
 
 function [fMap, fPaths, excluded] = tagstudy(studyFile, varargin)
 % Tag all of the EEG files in a study

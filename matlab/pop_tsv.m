@@ -1,9 +1,5 @@
-% This function calls the HED validation utilities pop-up gui menu. The
-% pop-up gui menu contains three tools separated through tabs. The three
-% tabs are 'Validate Tab-Delimited HED Tags' which calls the
-% 'validateTSVTags' function, 'Remap Tab-Delimited HED Tags' which calls
-% the 'remapTSVTags' function, and 'Check for Updates' which calls the
-% 'updateHED' function.
+% This function calls a menu that provides HED validation tools for 
+% tab-separated files.
 %
 % Usage:
 %   >>  pop_tsv();
@@ -28,7 +24,9 @@
 
 function pop_tsv()
 % Prevent an annoying warning msg
-addJars();
+% addJars();
+warning off MATLAB:uitabgroup:OldVersion
+warning off MATLAB:uitabgroup:DeprecatedFunction
 title = 'Tab-separated HEDTools';
 fig = createFigure(title);
 tabGroup = uitabgroup('Parent', fig);
