@@ -146,10 +146,12 @@ if p.UseGui && p.SelectFields && isempty(p.Fields)
         'ExcludeFields', excluded, 'PrimaryField', ...
         p.PrimaryField);
     excluded = union(excluded, exc);
-elseif ~isempty(p.PrimaryField)
+else
     fMapTag.setPrimaryMap(p.PrimaryField);
+    for k = 1:length(excluded)
+        fMapTag.removeMap(excluded{k});
+    end
 end
-% excluded = p.ExcludeFields;
 if isa(p.BaseMap, 'fieldMap')
     baseTags = p.BaseMap;
 else
@@ -189,6 +191,7 @@ if ~canceled
                 'filepath', EEG.filepath);
         end
     end
+    fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');

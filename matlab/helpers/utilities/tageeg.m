@@ -123,8 +123,11 @@ if p.UseGui && p.SelectFields && isempty(p.Fields)
     fprintf('\n---Now select the fields you want to tag---\n');
     [fMapTag, fields, excluded, canceled] = selectmaps(fMapTag, ...
         'ExcludeFields', excluded, 'PrimaryField', p.PrimaryField);
-elseif ~isempty(p.PrimaryField)
+else
     fMapTag.setPrimaryMap(p.PrimaryField);
+    for k = 1:length(excluded)
+        fMapTag.removeMap(excluded{k});
+    end
 end
 
 % Exclude the appropriate tags from baseTags
@@ -156,6 +159,7 @@ if ~canceled
     end    
     % Now finish writing the tags to the EEG structure
     EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
+    fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');
