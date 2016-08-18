@@ -114,21 +114,9 @@ function [EEG, fMap, canceled] = tageeg(EEG, varargin)
 % Parse the input arguments
 p = parseArguments(EEG, varargin{:});
 canceled = false;
-% Get the existing tags for the EEG
-[fMap, fMapTag] = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
-     'Fields', p.Fields);
-fields = {};
-excluded = intersect(p.ExcludeFields, fieldnames(EEG.event));
-if p.UseGui && p.SelectFields && isempty(p.Fields)
-    fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, fields, excluded, canceled] = selectmaps(fMapTag, ...
-        'ExcludeFields', excluded, 'PrimaryField', p.PrimaryField);
-else
-    fMapTag.setPrimaryMap(p.PrimaryField);
-    for k = 1:length(excluded)
-        fMapTag.removeMap(excluded{k});
-    end
-end
+% Get the existing tags (we want all the fields not just selected ones)
+fMap = findtags(p.EEG, 'PreservePrefix', p.PreservePrefix, ...
+    'ExcludeFields', {}, 'Fields', {});
 
 % Exclude the appropriate tags from baseTags
 if isa(p.BaseMap, 'fieldMap')
@@ -136,11 +124,26 @@ if isa(p.BaseMap, 'fieldMap')
 else
     baseTags = fieldMap.loadFieldMap(p.BaseMap);
 end
-if ~isempty(baseTags) && ~isempty(p.Fields)
-    excluded = setdiff(baseTags.getFields(), p.Fields);
-end;
-fMap.merge(baseTags, 'Merge', excluded, p.Fields);
-fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
+% if ~isempty(baseTags) && ~isempty(p.Fields)
+%     excluded = setdiff(baseTags.getFields(), p.Fields);
+% end;
+% Get the existing base map tags (we want all the fields not just selected ones)
+fMap.merge(baseTags, 'Merge', {}, {});
+% fMap.merge(baseTags, 'Merge', excluded, p.Fields);
+% fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
+
+% fields = {};
+excluded = intersect(p.ExcludeFields, fieldnames(EEG.event));
+% if p.UseGui && p.SelectFields && isempty(p.Fields)
+    [fMapTag, fields, excluded, canceled] = selectmaps(fMap, ...
+        'ExcludeFields', excluded, 'Fields', p.Fields, ...
+        'PrimaryField', p.PrimaryField, 'SelectFields', p.SelectFields);
+% else
+%     fMapTag.setPrimaryMap(p.PrimaryField);
+%     for k = 1:length(excluded)
+%         fMapTag.removeMap(excluded{k});
+%     end
+% end
 
 if p.UseGui && ~canceled
     [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
