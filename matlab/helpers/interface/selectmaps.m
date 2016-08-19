@@ -38,47 +38,44 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: selectmaps.m,v $
-% $Revision: 2.0 10-Jul-2015 14:39:42 $
-% $Initial version $
-%
 
 function [fMap, fields, excluded, canceled] = selectmaps(fMap, varargin)
 p = parseArguments(fMap, varargin{:});
 canceled = false;
-excluded = p.ExcludeFields;
+selectFields = p.selectFields;
 primaryField = p.primaryField;
-fields = p.Fields;
-
-if isempty(fields) && p.selectFields
-    fields = setdiff(fMap.getFields(), excluded);
-    [fields, primaryField] = movePrimaryFirst(primaryField, fields);
-    [loader, submitted] = showSelectionMenu(excluded, fields, ...
+fields = intersect(p.Fields, fMap.getFields(), 'stable');
+excluded = setdiff(p.ExcludeFields, fields);
+if isempty(fields) && selectFields
+    [fields, excluded, canceled] = selectFields2Tag(fields, excluded, ...
         primaryField);
-    excludeUser = cell(loader.getExcludeFields());
-    primaryField = char(loader.getPrimaryField());
-    if ~submitted
-        canceled = true;
-        return;
-    end
-    
-    %     if ~isempty(primaryField)
-    fMap.setPrimaryMap(primaryField);
-    %     end
-    
-    % p = movePrimaryField(p);
-    fields = cell(loader.getTagFields());
-    excluded = union(excluded, excludeUser);
-    %     if isempty(excludeUser)
-    %         return;
-    %     end
 end
+fMap = removeExcludedFields(fMap, excluded);
+fMap.setPrimaryMap(primaryField);
 
-% Remove the excluded fields
-for k = 1:length(excluded)
-    fMap.removeMap(excluded{k});
-end
+    function [fields, excluded, canceled] = selectFields2Tag(fields, ...
+            excluded, primaryField)
+        % Select fields to tag with a menu
+        canceled = false;
+        [fields, primaryField] = putPrimaryFirst(primaryField, fields);
+        [loader, submitted] = showSelectionMenu(excluded, fields, ...
+            primaryField);
+        excludeUser = cell(loader.getExcludeFields());
+        primaryField = char(loader.getPrimaryField());
+        if ~submitted
+            canceled = true;
+            return;
+        end
+        fields = cell(loader.getTagFields());
+        excluded = setdiff(union(excluded, excludeUser), fields);
+    end % selectFields2Tag
+
+    function fMap = removeExcludedFields(fMap, excluded)
+        % Remove the excluded fields from the fMap
+        for k = 1:length(excluded)
+            fMap.removeMap(excluded{k});
+        end
+    end % removeExcludedFields
 
     function [loader, submitted] = showSelectionMenu(excluded, fields, ...
             primaryField)
@@ -87,20 +84,20 @@ end
         title = 'Please select the fields that you would like to tag';
         loader = javaObject('edu.utsa.tagger.FieldSelectLoader', title, ...
             excluded, fields, primaryField);
-        [notified, submitted] = checkStatus(loader);
+        [notified, submitted] = checkMenuStatus(loader);
         while (~notified)
             pause(0.5);
-            [notified, submitted] = checkStatus(loader);
+            [notified, submitted] = checkMenuStatus(loader);
         end
     end % showSelectionMenu
 
-    function [notified, submitted] = checkStatus(loader)
+    function [notified, submitted] = checkMenuStatus(loader)
         % Check the status of the java field selection menu
         notified = loader.isNotified();
         submitted = loader.isSubmitted();
-    end % checkStatus
+    end % checkMenuStatus
 
-    function [fields, primaryField] = movePrimaryFirst(primaryField, ...
+    function [fields, primaryField] = putPrimaryFirst(primaryField, ...
             fields)
         % Moves the primary field to the beginning of the list of fields
         if sum(strcmp(fields, primaryField)) == 0
@@ -111,7 +108,7 @@ end
             fields{pos} = fields{1};
             fields{1} = temp;
         end
-    end % movePrimaryFirst
+    end % putPrimaryFirst
 
     function p = parseArguments(fMap, varargin)
         % Parses the input arguments and returns the results
