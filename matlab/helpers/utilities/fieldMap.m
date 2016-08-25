@@ -1,31 +1,37 @@
-% fieldMap
-% Object encapsulating xml tags and type-tagMap association
+% Creates an object encapsulating xml tags and type-tagMap association.
+% This object can produce output in either JSON or a structure array.
 %
 % Usage:
+%
 %   >>  obj = fieldMap()
+%
 %   >>  obj = fieldMap('key1', 'value1', ...)
 %
-% Description:
-% obj = fieldMap() creates an object representing the
-%    tag hierarchy for community tagging. The object knows how to merge and
-%    can produce output in either JSON or semicolon separated
-%    text format.
+% Input:
 %
-% obj = fieldMap('key1', 'value1', ...) where the key-value pairs are:
+%    Optional (key/value):
 %
 %   'Description'      String describing the purpose of this fieldMap.
+%
 %   'PreservePrefix'   Logical if false (default) tags with matching
-%                      prefixes are merged to be the longest
+%                      prefixes are merged to be the longest.
+%
 %   'XML'              XML string specifying tag hierarchy to be used.
 %
-% addTags mergeOptions:
+% Notes:
+%
+%   Merge options:
+%
 %   'Merge'           If an event with that key is not part of this
 %                     object, add it as is.
+%
 %   'None'            Don't update anything in the structure
+%
 %   'Replace'         If an event with that key is not part of this
 %                     object, do nothing. Otherwise, if an event with that
 %                     key is part of this object then completely replace
 %                     that event with the new one.
+%
 %   'Update'          If an event with that key is not part of this
 %                     object, do nothing. Otherwise, if an event with that
 %                     key is part of this object, then update the tags of
@@ -34,31 +40,6 @@
 %                     combine the tags. Also update any empty code
 %                     fields by using the values in the
 %                     input event.
-%
-% Notes:
-%
-% Event string format:
-%    Each values for a field are stored in comma separated form as
-%    code and tags. The specifications for the individual
-%    unique values are separated by semicolumns.
-%
-% Example 1: The unique event types in the EEG structure are 'RT' and
-%            'flash'. The output string is:
-%
-%             'RT,RT;flash,flash'
-%
-% Example 2: The unique event types in the EEG structure are the numerical
-%            values: 1, 302, and 43. The output string is:
-%
-%            '1,1;302,302;43,43'
-%
-% Class documentation:
-% Execute the following in the MATLAB command window to view the class
-% documentation for fieldMap:
-%
-%    doc fieldMap
-%
-% See also: findtags, tageeg, tagdir, tagstudy, tagMap
 %
 % Copyright (C) Kay Robbins and Thomas Rognon, UTSA, ...
 % 2011-2013, krobbins@cs.utsa.edu
@@ -76,11 +57,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: fieldMap.m,v $
-% $Revision: 1.00 15-Feb-2013 08:03:48 krobbins $
-% $Initial version $
-%
 
 classdef fieldMap < hgsetget
     properties (Constant = true)
@@ -91,7 +67,7 @@ classdef fieldMap < hgsetget
     properties (Access = private)
         Description          % String describing this field map
         PreservePrefix       % If true, don't eliminate duplicate
-                             % prefixes (default false)
+        % prefixes (default false)
         GroupMap             % Map for matching event labels
         Xml                  % Tag hierarchy as an XML string
         XmlSchema            % String containing the XML schema
@@ -100,17 +76,11 @@ classdef fieldMap < hgsetget
     methods
         function obj = fieldMap(varargin)
             % Constructor parses parameters and sets up initial data
-            parser = inputParser;
-            parser.addParamValue('Description', '', @(x) (ischar(x)));
-            parser.addParamValue('PreservePrefix', false, ...
-                @(x) validateattributes(x, {'logical'}, {}));
-            parser.addParamValue('XML', '', @(x) (ischar(x)));
-            parser.parse(varargin{:})
-            obj.Description = parser.Results.Description;
-            obj.PreservePrefix = parser.Results.PreservePrefix;
+            p = fieldMap.parseArguments(varargin{:});
+            obj.Description = p.Description;
+            obj.PreservePrefix = p.PreservePrefix;
             obj.Xml = fileread(fieldMap.DefaultXml);
             obj.XmlSchema = fileread(fieldMap.DefaultSchema);
-            obj.mergeXml(parser.Results.XML);
             obj.GroupMap = containers.Map('KeyType', 'char', ...
                 'ValueType', 'any');
         end % fieldMap constructor
@@ -134,7 +104,6 @@ classdef fieldMap < hgsetget
             else
                 eTag = obj.GroupMap(type);
             end
-            
             if iscell(values)
                 for k = 1:length(values)
                     eTag.addValue(values{k}, ...
@@ -149,7 +118,6 @@ classdef fieldMap < hgsetget
                 end
             end
             obj.GroupMap(type) = eTag;
-            
         end % addValues
         
         function newMap = clone(obj)
@@ -165,7 +133,7 @@ classdef fieldMap < hgsetget
                 tMap(values{k}.getField()) = values{k};
             end
             newMap.GroupMap = tMap;
-        end %clone
+        end % clone
         
         function description = getDescription(obj)
             % Return a string describing the purpose of the fieldMap
@@ -259,7 +227,6 @@ classdef fieldMap < hgsetget
             if isempty(fMap)
                 return;
             end
-            obj.mergeXml(fMap.getXml);
             fields = fMap.getFields();
             fields = setdiff(fields, excludeFields);
             if ~isempty(includeFields)
@@ -276,28 +243,6 @@ classdef fieldMap < hgsetget
                 obj.GroupMap(type) = myMap;
             end
         end % merge
-        
-        function mergeXml(obj, xmlMerge)
-            % Merge the xml string xmlMerge with obj.XML if valid
-            if isempty(xmlMerge)
-                return;
-            end
-            try
-                fieldMap.validateXml(xmlMerge, obj.XmlSchema);
-            catch ex
-                warning('fieldMap:mergeXml', ['Could not merge XML ' ...
-                    ' [' ex.message ']']);
-                return;
-            end
-            obj.Xml = ...
-                char(edu.utsa.tagger.database.ManageDB.mergeXML( ...
-                obj.Xml, xmlMerge));
-        end % mergeXml
-        
-        function updateXml(obj)
-            % Update the XML with the defaualt XML file
-            obj.Xml = fileread(obj.DefaultXml);
-        end
         
         function removeMap(obj, field)
             % Remove the tag map associated with specified field name
@@ -321,6 +266,11 @@ classdef fieldMap < hgsetget
             % Set the description of the fieldMap
             obj.Description = description;
         end % setDescription
+        
+        function xml = setXml(obj, xml)
+            % Set the XML of the fieldMap
+            obj.Xml = xml;
+        end % setXml
         
     end % public methods
     
@@ -355,17 +305,17 @@ classdef fieldMap < hgsetget
             end
         end % saveFieldMap
         
-        function validateXml(hed, schema)
-            % Validate xmlString as empty or valid XML (invalid throws
-            % exception)
-            if isempty(hed)
-                return;
-            end
-            edu.utsa.tagger.database.ManageDB.validateSchemaString(...
-                hed, schema);
-        end % validateXml
+        function p = parseArguments(varargin)
+            % Parses the input arguments and returns the results
+            parser = inputParser;
+            parser.addParamValue('Description', '', @(x) (ischar(x)));
+            parser.addParamValue('PreservePrefix', false, ...
+                @(x) validateattributes(x, {'logical'}, {}));
+            parser.addParamValue('XML', '', @(x) (ischar(x)));
+            parser.parse(varargin{:})
+            p = parser.Results;
+        end % parseArguments
         
     end % static methods
     
-end %fieldMap
-
+end % fieldMap

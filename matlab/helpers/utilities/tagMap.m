@@ -1,49 +1,52 @@
-% tagMap
-% Object encapsulating the tags and value labels of one type
+% Object encapsulating a field to tag mapping. This class is called by the
+% fieldMap class to store tags associated with each and every field. 
 %
 % Usage:
+%
 %   >>  tMap = tagMap()
+%
 %   >>  tMap = tagMap('key1', 'value1', ...)
 %
-% Description:
-% tMap = tagMap() creates an object that holds the associations of
-% tags and values for one type or group name. By default the name
-% of the field or type is 'type'.
+% Input:
 %
-% tMap = tagMap('key1', 'value1') where the key-value pair is:
+%    Optional (key/value):
 %
 %        'Field'                Name of field for this group of tags
 %
+%        'Primary'              True if the field is a primary field, False
+%                               if otherwise. Primary fields require
+%                               description, category, and label tags. 
+%
 % Notes:
 %
+% Merge options:
 %
-% Description of update options for addValue:
-%    'merge'         If the structure code is not a key of this map, add
+%    'Merge'         
+%                    If the structure code is not a key of this map, add
 %                    the entire structure as is. Otherwise, if the
 %                    structure code is a key for this map, then merge the
 %                    tags with those of the existing structure, using the
 %                    PreservePrefix value to determine how to combine the
 %                    tags.
-%    'replace'       If the structure code is not a key of this map,
+%
+%    'None'          
+%                    Don't do any updating
+%
+%    'Replace'       
+%                    If the structure code is not a key of this map,
 %                    do nothing. Otherwise, if the structure code is a
 %                    key for this map, then completely replace the map
 %                    value structure with this structure.
-%    'update'        If the structure code is not a key of this map,
+%
+%    'Update'        
+%                    If the structure code is not a key of this map,
 %                    do nothing. Otherwise, if the structure code is a
 %                    key for this map, then merge the tags with those
 %                    of the existing structure, using the PreservePrefix
 %                    value to determine how to combine the tags.
-%    'none'          Don't do any updating
 %
-% Class documentation:
-% Execute the following in the MATLAB command window to view the class
-% documentation for tagMap:
-%
-%    doc tagMap
-%
-% See also: findtags, tageeg, tagdir, tagstudy, dataTags
-%
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, krobbins@cs.utsa.edu
+% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, 
+% krobbins@cs.utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -58,11 +61,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: tagMap.m,v $
-% $Revision: 1.00 15-Feb-2013 08:03:48 krobbins $
-% $Initial version $
-%
 
 classdef tagMap < hgsetget
     

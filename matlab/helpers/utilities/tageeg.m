@@ -33,12 +33,12 @@
 %                    modified using the tagger GUI.
 %
 %      'ExcludeFields'
-%                    A cell array of field names in the .event and .urevent
-%                    substructures to ignore during the tagging process.
-%                    By default the following subfields of the event
-%                    structure are ignored: .latency, .epoch, .urevent,
-%                    .hedtags, and .usertags. The user can over-ride these
-%                    tags using this name-value parameter.
+%                    A cell array of field names in the .event substructure
+%                    to ignore during the tagging process. By default the
+%                    following subfields of the event structure are
+%                    ignored: .latency, .epoch, .urevent, .hedtags, and
+%                    .usertags. The user can over-ride these tags using
+%                    this name-value parameter.
 %
 %      'Fields'
 %                    A cell array of field names of the fields to include
@@ -76,8 +76,8 @@
 %                    GUI that allow users to select which fields to tag.
 %
 %      'UseGui'
-%                    If true (default), the CTAGGER GUI is displayed after
-%                    initialization.
+%                    If true (default), the CTAGGER GUI is used to edit
+%                    field tags.
 %
 % Output:
 %
@@ -142,7 +142,8 @@ fprintf('Tagging was canceled\n');
             p.SelectFields = false;
         end
         excluded = intersect(p.ExcludeFields, fieldnames(EEG.event));
-        [fMapTag, fields, excluded, canceled] = selectmaps(fMap, ...
+        fMapTag = clone(fMap);
+        [fMapTag, fields, excluded, canceled] = selectmaps(fMapTag, ...
             'ExcludeFields', excluded, 'Fields', p.Fields, ...
             'PrimaryField', p.PrimaryField, 'SelectFields', ...
             p.SelectFields);
@@ -151,9 +152,7 @@ fprintf('Tagging was canceled\n');
     function EEG = write2EEG(EEG, fMap, fMapTag, saveMapFile, ...
             excluded, preservePrefix)
         % Merges the tags and writes them to EEG dataset structure
-        % Replace the existing tags, and then add any new codes found
         fMap.merge(fMapTag, 'Replace', excluded, fMapTag.getFields());
-        fMap.merge(fMapTag, 'Merge', excluded, fMapTag.getFields());
         % Save the fieldmap
         if ~isempty(saveMapFile) && ...
                 ~fieldMap.saveFieldMap(saveMapFile, fMap)
@@ -171,7 +170,7 @@ fprintf('Tagging was canceled\n');
         else
             baseTags = fieldMap.loadFieldMap(baseMap);
         end
-        fMap.merge(baseTags, 'Merge', {}, {});
+        fMap.merge(baseTags, 'Update', {}, fMap.getFields());
     end % mergeBaseTags
 
     function p = parseArguments(EEG, varargin)

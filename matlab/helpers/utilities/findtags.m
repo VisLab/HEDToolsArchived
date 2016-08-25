@@ -102,14 +102,8 @@ end
     end % addEtcValues
 
     function fMap = addEventValues(p, fMap, eventField)
-        % Adds the field values to the field maps from the .event and
-        % .urevent fields
+        % Adds the field values to the field maps from the .event field
         tValues = getutypes(p.edata.event, eventField);
-        % why are we doing this?
-        %         if isfield(p.edata, 'urevent')
-        %             tValues = union(tValues, getutypes(p.edata.urevent, ...
-        %                 eventField);
-        %         end
         if isempty(tValues)
             return;
         end

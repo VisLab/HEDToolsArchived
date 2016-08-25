@@ -1,26 +1,37 @@
-% selectmaps
-% Allows a user to select the fields to be used
+% Allows a user to select the fields to be tagged using the CTagger.
 %
 % Usage:
+%
 %   >>  [fMap, excluded] = selectmaps(fMap)
+%
 %   >>  [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...)
 %
-% Description
-% [fMap, excluded] = selectmaps(fMap) removes the fields that are excluded
-% by the user during selection.
+% Inputs:
 %
-% [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...) specifies
-% optional name/value parameter pairs:
-%   'selectFields'   If true (default), the user is presented with a GUI
-%                    that allows users to select which fields to tag.
+% Required:
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for selectmaps:
+%   edata
+%                    The EEG dataset structure that tags will be extracted
+%                    from. The dataset will need to have a .event field.
 %
-%    doc selectmaps
+%   Optional (key/value):
 %
-% See also: pop_tageeg, pop_tagstudy, pop_tagdir, pop_tagcsv
+%   'ExcludeFields'
+%                    A cell array containing the field names to exclude
+%
+%   'Fields'
+%                    A cell array containing the field names to extract
+%                    tags for.
+%
+%   'PrimaryField'
+%                    The name of the primary field. Only one field can be
+%                    the primary field. A primary field requires a label,
+%                    category, and a description. The default is the type
+%                    field.
+%
+%   'SelectFields'
+%                    If true (default), the user is presented with a
+%                    GUI that allow users to select which fields to tag.
 %
 % Copyright (C) Kay Robbins, Jeremy Cockfield, and Thomas Rognon, UTSA,
 % 2011-2015, kay.robbins.utsa.edu jeremy.cockfield.utsa.edu
@@ -42,11 +53,12 @@
 function [fMap, fields, excluded, canceled] = selectmaps(fMap, varargin)
 p = parseArguments(fMap, varargin{:});
 canceled = false;
-selectFields = p.selectFields;
-primaryField = p.primaryField;
+selectFields = p.SelectFields;
+primaryField = p.PrimaryField;
 fields = intersect(p.Fields, fMap.getFields(), 'stable');
 excluded = setdiff(p.ExcludeFields, fields);
 if isempty(fields) && selectFields
+    fields = setdiff(fMap.getFields(), excluded);
     [fields, excluded, canceled] = selectFields2Tag(fields, excluded, ...
         primaryField);
 end
@@ -118,9 +130,9 @@ fMap.setPrimaryMap(primaryField);
         parser.addParamValue('ExcludeFields', {}, ...
             @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('primaryField', 'type', @(x) ...
+        parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('selectFields', true, @islogical);
+        parser.addParamValue('SelectFields', true, @islogical);
         parser.parse(fMap, varargin{:});
         p = parser.Results;
     end % parseArguments
