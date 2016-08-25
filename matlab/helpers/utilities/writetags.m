@@ -1,14 +1,15 @@
-% writetags
-% Writes tags to a structure from the fieldMap information
+% Writes tags to a structure from the fieldMap information. The tags in the
+% dataset structure are written to the .etc field and in each individual
+% event in the .event field. 
 %
 % Usage:
+%
 %   >>  eData = writetags(eData, fMap)
+%
 %   >>  eData = writetags(eData, fMap, 'key1', 'value1', ...)
 %
 % Description:
-% eData = writetags(eData, fMap) inserts the tags in the eData structure
-% as specified by the fMap fieldMap object, both in summary form and
-% individually.
+% eData = writetags(eData, fMap) 
 %
 % eData = writetags(eData, fMap, 'key1', 'value1', ...) specifies optional
 % name/value parameter pairs:
@@ -25,7 +26,8 @@
 %
 % See also: tageeg, fieldMap, and tagMap
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, krobbins@cs.utsa.edu
+% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, 
+% krobbins@cs.utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -40,11 +42,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: writetags.m,v $
-% $Revision: 1.0 21-Apr-2013 09:25:25 krobbins $
-% $Initial version $
-%
 
 function eData = writetags(eData, fMap, varargin)
 p = parseArguments(eData, fMap, varargin{:});

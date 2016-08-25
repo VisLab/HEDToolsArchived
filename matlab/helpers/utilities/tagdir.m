@@ -113,56 +113,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [fMap, fPaths, excluded] = tagdir(inDir, varargin)
-% Parse the input arguments
 p = parseArguments(inDir, varargin{:});
 canceled = false;
-fMap = '';
-excluded = '';
-fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
-if isempty(fPaths)
-    warning('tagdir:nofiles', 'No files met tagging criteria\n');
-    return;
-end
-fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
-fMapTag = fieldMap('PreservePrefix',  p.PreservePrefix);
-allFields = {};
-fprintf('\n---Loading the data files to merge the tags---\n');
-for k = 1:length(fPaths) % Assemble the list
-    eegTemp = pop_loadset(fPaths{k});
-    allFields = union(allFields, fieldnames(eegTemp.event));
-    [tMapNew, tMapTagNew] = findtags(eegTemp, 'PreservePrefix', ...
-        p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, 'Fields', ...
-        p.Fields);
-    fMap.merge(tMapNew, 'Merge', p.ExcludeFields, tMapNew.getFields());
-    fMapTag.merge(tMapTagNew, 'Merge', p.ExcludeFields, ...
-        tMapTagNew.getFields());
-end
-% Exclude the appropriate tags from baseTags
-fields = {};
-excluded = intersect(p.ExcludeFields, allFields);
-if p.UseGui && p.SelectFields && isempty(p.Fields)
-    fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, ...
-        'ExcludeFields', excluded, 'PrimaryField', ...
-        p.PrimaryField);
-    excluded = union(excluded, exc);
-else
-    fMapTag.setPrimaryMap(p.PrimaryField);
-    for k = 1:length(excluded)
-        fMapTag.removeMap(excluded{k});
-    end
-end
-if isa(p.BaseMap, 'fieldMap')
-    baseTags = p.BaseMap;
-else
-    baseTags = fieldMap.loadFieldMap(p.BaseMap);
-end
-if ~isempty(baseTags) && ~isempty(p.Fields)
-    excluded = setdiff(baseTags.getFields(), p.Fields);
-end;
-fMap.merge(baseTags, 'Merge', excluded, p.Fields);
-fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
-
+[fPaths, fMap, dirFields] = findDirTags(p);
+fMap = mergeBaseTags(fMap, p.BaseMap);
+[fMapTag, fields, excluded, canceled] = extractSelectedFields(p, ...
+    fMap, dirFields);
 
 if p.UseGui && ~canceled
     [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
@@ -170,31 +126,80 @@ if p.UseGui && ~canceled
 end
 
 if ~canceled
-    % Replace the existing tags, and then add any new codes found
-    fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
-    fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
-    % Save the tags file for next step
-    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, ...
-            fMap)
-        warning('tagdir:invalidFile', ...
-            ['Couldn''t save fieldMap to ' p.SaveMapFile]);
-    end
-    
-    if p.SaveDatasets
-        % Rewrite all of the EEG files with updated tag information
-        fprintf(['\n---Now rewriting the tags to the individual data' ...
-            ' files---\n']);
-        for k = 1:length(fPaths) % Assemble the list
-            EEG = pop_loadset(fPaths{k});
-            EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
-            EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
-                'filepath', EEG.filepath);
-        end
-    end
+    write2dir(fPaths, fMap, fMapTag, excluded, p.PreservePrefix, ...
+        p.SaveMapFile, p.SaveDatasets);
     fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');
+
+    function [fMapTag, fields, excluded, canceled] = ...
+            extractSelectedFields(p, fMap, dirFields)
+        % Exclude the appropriate tags from baseTags
+        if ~p.UseGui
+            p.SelectFields = false;
+        end
+        excluded = intersect(p.ExcludeFields, dirFields);
+        fMapTag = clone(fMap);
+        [fMapTag, fields, excluded, canceled] = selectmaps(fMapTag, ...
+            'ExcludeFields', excluded, 'Fields', p.Fields, ...
+            'PrimaryField', p.PrimaryField, 'SelectFields', ...
+            p.SelectFields);
+    end % extractSelectedFields
+
+    function [fPaths, fMap, dirFields] = findDirTags(p)
+        % Find the existing tags from the directory datasets
+        fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
+        if isempty(fPaths)
+            warning('tagdir:nofiles', 'No files met tagging criteria\n');
+            return;
+        end
+        fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
+        dirFields = {};
+        fprintf('\n---Loading the data files to merge the tags---\n');
+        for k = 1:length(fPaths) % Assemble the list
+            eegTemp = pop_loadset(fPaths{k});
+            dirFields = union(dirFields, fieldnames(eegTemp.event));
+            fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
+                p.PreservePrefix, 'ExcludeFields', {}, 'Fields', {});
+            fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
+        end
+    end % findDirTags
+
+    function fMap = mergeBaseTags(fMap, baseMap)
+        % Merge baseMap and fMap tags
+        if isa(baseMap, 'fieldMap')
+            baseTags = baseMap;
+        else
+            baseTags = fieldMap.loadFieldMap(baseMap);
+        end
+        fMap.merge(baseTags, 'Update', {}, fMap.getFields());
+    end % mergeBaseTags
+
+    function write2dir(fPaths, fMap, fMapTag, excluded, preservePrefix, ...
+            saveMapFile, saveDatasets)
+        % Merges the tags and writes them to the directory EEG dataset
+        % structures
+        fMap.merge(fMapTag, 'Replace', excluded, fMapTag.getFields());
+        % Save the tags file for next step
+        if ~isempty(saveMapFile) && ~fieldMap.saveFieldMap(saveMapFile, ...
+                fMap)
+            warning('tagdir:invalidFile', ...
+                ['Couldn''t save fieldMap to ' saveMapFile]);
+        end
+        if saveDatasets
+            % Rewrite all of the EEG files with updated tag information
+            fprintf(['\n---Now rewriting the tags to the individual' ...
+                ' data files---\n']);
+            for k = 1:length(fPaths) % Assemble the list
+                EEG = pop_loadset(fPaths{k});
+                EEG = writetags(EEG, fMap, 'PreservePrefix', ...
+                    preservePrefix);
+                EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
+                    'filepath', EEG.filepath);
+            end
+        end
+    end %  write2dir
 
     function p = parseArguments(inDir, varargin)
         % Parses the input arguments and returns the results

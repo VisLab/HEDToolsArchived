@@ -32,7 +32,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function [fMap, fPaths, com] = pop_tagdir()
-% Create the tagger for this EEG set
 fMap = '';
 fPaths = '';
 com = '';

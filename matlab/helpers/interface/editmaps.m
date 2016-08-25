@@ -179,7 +179,7 @@ canceled = p.canceled;
     function updatefMap(p)
         % Updates the fMap tags if the current field is submitted in the
         % CTagger or a new fMap is loaded
-        xml = strtrim(char(p.taggedList(1, :)));
+        p.xml = strtrim(char(p.taggedList(1, :)));
         tValues = strtrim(char(p.taggedList(2, :)));
         tValues = tagMap.json2Values(tValues);
         p.fMap.removeMap(p.field);
