@@ -8,26 +8,28 @@
 %
 %   >>  eData = writetags(eData, fMap, 'key1', 'value1', ...)
 %
-% Description:
-% eData = writetags(eData, fMap) 
+% Input:
 %
-% eData = writetags(eData, fMap, 'key1', 'value1', ...) specifies optional
-% name/value parameter pairs:
-%   'ExcludeFields'  A cell array containing the field names to exclude
-%   'PreservePrefix' If false (default), tags associated with same value that
-%                    share prefixes are combined and only the most specific
-%                    is retained (e.g., /a/b/c and /a/b become just
-%                    /a/b/c). If true, then all unique tags are retained.
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for writetags:
+%   Required:
 %
-%    doc writetags
+%   EEG
+%                    The EEG dataset structure that will be tagged. The
+%                    dataset will need to have a .event field.
 %
-% See also: tageeg, fieldMap, and tagMap
+%   Optional (key/value):
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, 
-% krobbins@cs.utsa.edu
+%   'ExcludeFields'  
+%                    A cell array containing the field names to exclude.
+%
+%   'PreservePrefix' If false (default), tags associated with same value 
+%                    that share prefixes are combined and only the most
+%                    specific is retained (e.g., /a/b/c and /a/b become
+%                    just /a/b/c). If true, then all unique tags are
+%                    retained.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by

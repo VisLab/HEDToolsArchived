@@ -7,15 +7,23 @@
 % to allow users to edit the tags.
 %
 % Usage:
+%
 %   >>  [fMap, fPaths, com] = pop_tagdir()
 %
 % Output:
-%    fMap   - a fieldMap object that contains the tag map information
-%    fPaths - a list of full file names of the datasets to be tagged
-%    com    - string containing call to tagstudy with all parameters
 %
-% Copyright (C) 2012-2013 Thomas Rognon tcrognon@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%   fMap             A fieldMap object that contains the tag map
+%                    information.
+%
+%   fPaths           A list of full file names of the datasets to be
+%                    tagged.
+%
+%   com              String containing call to tagstudy with all
+%                    parameters.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -65,6 +73,6 @@ com = char(['tagdir(''' inDir ''', ' ...
         else
             s = 'false';
         end
-    end
+    end % logical2str
 
 end % pop_tagdir

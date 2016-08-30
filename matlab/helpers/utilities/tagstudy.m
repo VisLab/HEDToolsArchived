@@ -73,8 +73,9 @@
 %                    If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
-% krobbins@cs.utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -94,100 +95,104 @@ function [fMap, fPaths, excluded] = tagstudy(studyFile, varargin)
 % Tag all of the EEG files in a study
 p = parseArguments(studyFile, varargin{:});
 canceled = false;
-excluded = '';
-
-% Consolidate all of the tags from the study
-[s, fPaths] = loadstudy(p.StudyFile);
-[fMap, fMapTag] = findtags(s.STUDY, 'ExcludeFields', p.ExcludeFields, ...
-    'Fields', p.Fields, 'PreservePrefix', p.PreservePrefix);
-
-% Merge the tags for the study from individual files
+[study, fPaths] = loadstudy(p.StudyFile);
 if isempty(fPaths)
+    fMap = '';
+    excluded = '';
     warning('tagstudy:nofiles', 'No files in study\n');
     return;
 end
-
-allFields = {};
-for k = 1:length(fPaths) % Assemble the list
-    eegTemp = pop_loadset(fPaths{k});
-    allFields = union(allFields, fieldnames(eegTemp.event));
-    [tMapNew, tMapTagNew] = findtags(eegTemp, 'PreservePrefix', ...
-        p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, 'Fields', ...
-        p.Fields);
-    fMap.merge(tMapNew, 'Merge', p.ExcludeFields, tMapNew.getFields());
-    fMapTag.merge(tMapTagNew, 'Merge', p.ExcludeFields, p.Fields);
-end
-% Exclude the appropriate tags from baseTags
-fields = {};
-excluded = intersect(p.ExcludeFields, allFields);
-if p.UseGui && p.SelectFields && isempty(p.Fields)
-    fprintf('\n---Now select the fields you want to tag---\n');
-    [fMapTag, fields, exc, canceled] = selectmaps(fMapTag, 'PrimaryField', ...
-        p.PrimaryField);
-    excluded = union(excluded, exc);
-else
-    fMapTag.setPrimaryMap(p.PrimaryField);
-    for k = 1:length(excluded)
-        fMapTag.removeMap(excluded{k});
-    end
-end
-if isa(p.BaseMap, 'fieldMap')
-    baseTags = p.BaseMap;
-else
-    baseTags = fieldMap.loadFieldMap(p.BaseMap);
-end
-if ~isempty(baseTags) && ~isempty(p.Fields)
-    excluded = setdiff(baseTags.getFields(), p.Fields);
-end;
-fMap.merge(baseTags, 'Merge', excluded, p.Fields);
-fMapTag.merge(baseTags, 'Update', excluded, p.Fields);
-
+[fMap, studyFields] = findStudyTags(p, fPaths);
+fMap = mergeBaseTags(fMap, p.BaseMap);
+[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap, ...
+    studyFields);
 
 if p.UseGui && ~canceled
-    [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix, 'Fields', fields);
+    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
+        'PreservePrefix', p.PreservePrefix, 'ExcludedField', ...
+        excluded, 'Fields', fields);
 end
 
 if ~canceled
-    % Replace the existing tags, and then add any new codes found
-    fMap.merge(fMapTag, 'Replace', p.ExcludeFields, fMapTag.getFields());
-    fMap.merge(fMapTag, 'Merge', p.ExcludeFields, fMapTag.getFields());
-    % Save the tags file for next step
-    if ~isempty(p.SaveMapFile) && ~fieldMap.saveFieldMap(p.SaveMapFile, ...
-            fMap)
-        warning('tagstudy:invalidFile', ...
-            ['Couldn''t save fieldMap to ' p.SaveMapFile]);
-    end
-    
-    if p.SaveDatasets
-        % Rewrite all of the EEG files with updated tag information
-        fprintf('\n---Now rewriting the tags to the individual data files---\n');
-        for k = 1:length(fPaths) % Assemble the list
-            EEG = pop_loadset(fPaths{k});
-            EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
-            EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
-                'filepath', EEG.filepath);
-        end
-    end
-    
-    % Rewrite to the study file
-    s.STUDY = writetags(s.STUDY, fMap, 'PreservePrefix', ...
-        p.PreservePrefix);  %#ok<NASGU>
-    save(p.StudyFile, '-struct', 's');
+    write2study(p, fPaths, fMap, study);
     fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');
 
-    function [s, fNames] = loadstudy(studyFile)
+
+    function write2study(p, fPaths, fMap, study)
+        % Writes the tags to the directory datasets
+        if ~isempty(p.SaveMapFile) && ...
+                ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
+            warning('tagstudy:invalidFile', ...
+                ['Couldn''t save fieldMap to ' p.SaveMapFile]);
+        end
+        if p.SaveDatasets
+            % Rewrite all of the EEG files with updated tag information
+            fprintf(['\n---Now rewriting the tags to the individual' ...
+                ' data files---\n']);
+            for k = 1:length(fPaths) % Assemble the list
+                EEG = pop_loadset(fPaths{k});
+                EEG = writetags(EEG, fMap, 'PreservePrefix', ...
+                    p.PreservePrefix);
+                EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
+                    'filepath', EEG.filepath);
+            end
+        end
+        % Rewrite to the study file
+        study.STUDY = writetags(study.STUDY, fMap, 'PreservePrefix', ...
+            p.PreservePrefix);  %#ok<NASGU>
+        save(p.studyFile, '-struct', 's');
+    end % write2study
+
+    function fMap = mergeBaseTags(fMap, baseMap)
+        % Merge baseMap and fMap tags
+        if isa(baseMap, 'fieldMap')
+            baseTags = baseMap;
+        else
+            baseTags = fieldMap.loadFieldMap(baseMap);
+        end
+        fMap.merge(baseTags, 'Update', {}, fMap.getFields());
+    end % mergeBaseTags
+
+    function [fMap, fields, excluded, canceled] = ...
+            extractSelectedFields(p, fMap, studyFields)
+        % Exclude the appropriate tags from baseTags
+        if ~p.UseGui
+            p.SelectFields = false;
+        end
+        excluded = intersect(p.ExcludeFields, studyFields);
+        [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
+            'ExcludeFields', excluded, 'Fields', p.Fields, ...
+            'PrimaryField', p.PrimaryField, 'SelectFields', ...
+            p.SelectFields);
+    end % extractSelectedFields
+
+    function [fMap, studyFields] = findStudyTags(p, fPaths)
+        % Find the existing tags from the study datasets
+        fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
+        studyFields = {};
+        for k = 1:length(fPaths) % Assemble the list
+            eegTemp = pop_loadset(fPaths{k});
+            studyFields = union(studyFields, fieldnames(eegTemp.event));
+            fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
+                p.PreservePrefix, 'ExcludeFields', {}, 'Fields', {});
+            fMap.merge(tMapNew, 'Merge', p.ExcludeFields, ...
+                tMapNew.getFields());
+            fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
+        end
+    end % findStudyTags
+
+    function [study, fNames] = loadstudy(studyFile)
         % Set baseTags if tagsFile contains an tagMap object
         try
-            s = load('-mat', studyFile);
+            study = load('-mat', studyFile);
             sPath = fileparts(studyFile);
-            fNames = getstudyfiles(s.STUDY, sPath);
+            fNames = getstudyfiles(study.STUDY, sPath);
         catch ME %#ok<NASGU>
             warning('tagstudy:loadStudyFile', 'Invalid study file');
-            s = '';
+            study = '';
             fNames = '';
         end
     end % loadstudy

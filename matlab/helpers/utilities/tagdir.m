@@ -12,36 +12,31 @@
 %
 %   >>  [fMap, fPaths, excluded] = tagdir(inDir, 'key1', 'value1', ...)
 %
-% Description:
-% [fMap, fPaths, excluded] = tagdir(inDir) extracts a consolidated
-% fieldMap object from the data files in the directory tree inDir. The
-% inDir must be a valid path.
-%
 % Input:
 %
-%       Required:
+%   Required:
 %
-%       inDir
+%   inDir
 %                    A directory that contains similar EEG .set files.
 %
-%       Optional (key/value):
+%   Optional (key/value):
 %
-%       'BaseMap'
+%   'BaseMap'
 %                    A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used to initialize tag
 %                    information.
 %
-%       'DoSubDirs'
+%   'DoSubDirs'
 %                    If true (default), the entire inDir directory tree is
 %                    searched. If false, only the inDir directory is
 %                    searched.
 %
-%       'EditXml'
+%   'EditXml'
 %                    If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can be
 %                    modified using the tagger GUI.
 %
-%       'ExcludeFields'
+%   'ExcludeFields'
 %                    A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process. By
 %                    default the following subfields of the event structure
@@ -49,54 +44,57 @@
 %                    .usertags. The user can over-ride these tags using
 %                    this name-value parameter.
 %
-%       'Fields'
+%   'Fields'
 %                    A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty, only
 %                    these fields are tagged.
 %
-%       'PreservePrefix'
+%   'PreservePrefix'
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
 %
-%       'PrimaryField'
+%   'PrimaryField'
 %                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description. The default is the type
 %                    field.
 %
-%       'SaveDatasets'
+%   'SaveDatasets'
 %                    If true (default), save the tags to the underlying
 %                    dataset files in the directory.
 %
-%       'SaveMapFile'
+%   'SaveMapFile'
 %                    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
 %                    the tagging process.
 %
-%       'SelectFields'
+%   'SelectFields'
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %
-%       'UseGui'
+%   'UseGui'
 %                    If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
 %
 % Output:
 %
-%       fMap         A fieldMap object that contains the tag map
+%   fMap         
+%                    A fieldMap object that contains the tag map
 %                    information.
 %
-%       fPaths       A list of full file names of the datasets to be
+%   fPaths       
+%                    A list of full file names of the datasets to be
 %                    tagged.
 %
-%       excluded     A cell array containing the fields that were excluded
+%   excluded     
+%                    A cell array containing the fields that were excluded
 %                    from tagging.
 %
-%
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
-% krobbins@cs.utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -115,45 +113,47 @@
 function [fMap, fPaths, excluded] = tagdir(inDir, varargin)
 p = parseArguments(inDir, varargin{:});
 canceled = false;
-[fPaths, fMap, dirFields] = findDirTags(p);
+fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
+if isempty(fPaths)
+    fMap = '';
+    excluded = '';
+    warning('tagdir:nofiles', 'No files met tagging criteria\n');
+    return;
+end
+[fMap, dirFields] = findDirTags(p, fPaths);
 fMap = mergeBaseTags(fMap, p.BaseMap);
-[fMapTag, fields, excluded, canceled] = extractSelectedFields(p, ...
+[fMap, fields, excluded, canceled] = extractSelectedFields(p, ...
     fMap, dirFields);
 
 if p.UseGui && ~canceled
-    [fMapTag, canceled] = editmaps(fMapTag, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix, 'Fields', fields);
+    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
+        'PreservePrefix', p.PreservePrefix, 'ExcludedField', ...
+        excluded, 'Fields', fields);
 end
 
 if ~canceled
-    write2dir(fPaths, fMap, fMapTag, excluded, p.PreservePrefix, ...
-        p.SaveMapFile, p.SaveDatasets);
+    write2dir(fPaths, fMap, p.PreservePrefix, p.SaveMapFile, ...
+        p.SaveDatasets);
     fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');
 
-    function [fMapTag, fields, excluded, canceled] = ...
+    function [fMap, fields, excluded, canceled] = ...
             extractSelectedFields(p, fMap, dirFields)
         % Exclude the appropriate tags from baseTags
         if ~p.UseGui
             p.SelectFields = false;
         end
         excluded = intersect(p.ExcludeFields, dirFields);
-        fMapTag = clone(fMap);
-        [fMapTag, fields, excluded, canceled] = selectmaps(fMapTag, ...
+        [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
             'ExcludeFields', excluded, 'Fields', p.Fields, ...
             'PrimaryField', p.PrimaryField, 'SelectFields', ...
             p.SelectFields);
     end % extractSelectedFields
 
-    function [fPaths, fMap, dirFields] = findDirTags(p)
+    function [fMap, dirFields] = findDirTags(p, fPaths)
         % Find the existing tags from the directory datasets
-        fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
-        if isempty(fPaths)
-            warning('tagdir:nofiles', 'No files met tagging criteria\n');
-            return;
-        end
         fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
         dirFields = {};
         fprintf('\n---Loading the data files to merge the tags---\n');
@@ -176,12 +176,9 @@ fprintf('Tagging was canceled\n');
         fMap.merge(baseTags, 'Update', {}, fMap.getFields());
     end % mergeBaseTags
 
-    function write2dir(fPaths, fMap, fMapTag, excluded, preservePrefix, ...
-            saveMapFile, saveDatasets)
-        % Merges the tags and writes them to the directory EEG dataset
-        % structures
-        fMap.merge(fMapTag, 'Replace', excluded, fMapTag.getFields());
-        % Save the tags file for next step
+    function write2dir(fPaths, fMap, preservePrefix, saveMapFile, ...
+            saveDatasets)
+        % Writes the tags to the directory datasets 
         if ~isempty(saveMapFile) && ~fieldMap.saveFieldMap(saveMapFile, ...
                 fMap)
             warning('tagdir:invalidFile', ...
@@ -199,7 +196,7 @@ fprintf('Tagging was canceled\n');
                     'filepath', EEG.filepath);
             end
         end
-    end %  write2dir
+    end % write2dir
 
     function p = parseArguments(inDir, varargin)
         % Parses the input arguments and returns the results

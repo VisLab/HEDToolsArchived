@@ -40,8 +40,9 @@
 %                    /a/b/c). If true, then all unique tags are retained.
 %
 %
-% Copyright (C) Kay Robbins, Jeremy Cockfield, and Thomas Rognon, UTSA,
-% 2011-2015, kay.robbins.utsa.edu jeremy.cockfield.utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by

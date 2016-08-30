@@ -6,13 +6,12 @@
 %
 %   >>  [fMap, excluded] = selectmaps(fMap, 'key1', 'value1', ...)
 %
-% Inputs:
+% Input:
 %
 % Required:
 %
-%   edata
-%                    The EEG dataset structure that tags will be extracted
-%                    from. The dataset will need to have a .event field.
+%   fMap             A fieldMap object that contains the tag map
+%                    information.
 %
 %   Optional (key/value):
 %
@@ -33,8 +32,9 @@
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %
-% Copyright (C) Kay Robbins, Jeremy Cockfield, and Thomas Rognon, UTSA,
-% 2011-2015, kay.robbins.utsa.edu jeremy.cockfield.utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ if isempty(fields) && selectFields
     [fields, excluded, canceled] = selectFields2Tag(fields, excluded, ...
         primaryField);
 end
-fMap = removeExcludedFields(fMap, excluded);
 fMap.setPrimaryMap(primaryField);
 
     function [fields, excluded, canceled] = selectFields2Tag(fields, ...
@@ -81,13 +80,6 @@ fMap.setPrimaryMap(primaryField);
         fields = cell(loader.getTagFields());
         excluded = setdiff(union(excluded, excludeUser), fields);
     end % selectFields2Tag
-
-    function fMap = removeExcludedFields(fMap, excluded)
-        % Remove the excluded fields from the fMap
-        for k = 1:length(excluded)
-            fMap.removeMap(excluded{k});
-        end
-    end % removeExcludedFields
 
     function [loader, submitted] = showSelectionMenu(excluded, fields, ...
             primaryField)
