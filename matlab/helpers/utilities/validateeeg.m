@@ -9,21 +9,22 @@
 %
 % Input:
 %
-%       eeg         A EEG dataset structure containing HED tags.
+%   eeg         
+%                   A EEG dataset structure containing HED tags.
 %
-%       Optional:
+%   Optional:
 %
-%       'generateWarnings'
+%   'generateWarnings'
 %                   True to include warnings in the log file in addition
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
-%       'hedXML'
+%   'hedXML'
 %                   A XML file containing every single HED tag and its
 %                   attributes. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%       'outputDirectory'
+%   'outputDirectory'
 %                   The directory where the validation output will be
 %                   written to if the 'writeOutput' argument is set to
 %                   true. There will be log file containing any issues that
@@ -33,18 +34,18 @@
 %                   already provided. The default output directory will be
 %                   the current directory.
 %
-%       'tagField'
+%   'tagField'
 %                   The field in .event that contains the HED tags.
 %                   This by default is .usertags.
 %
-%       'writeOutput'
+%   'writeOutput'
 %                  True if the validation output is written to a log file
 %                  in addition to the workspace. False (default) if the
 %                  validation output is only written to the workspace.
 %
 % Output:
 %
-%       issues
+%   issues
 %                   A cell array containing all of the issues found through
 %                   the validation. Each cell corresponds to the issues
 %                   found on a particular line.
@@ -74,7 +75,7 @@ issues = validate(p);
         % Validates the eeg structure
         p.hedMaps = getHEDMaps(p);
         if isfield(p.eeg.event, p.tagField)
-            [p.issues, p.remapTags, success] = parseeeg(p.hedMaps, ...
+            [p.issues, p.replaceTags, success] = parseeeg(p.hedMaps, ...
                 p.eeg.event, p.tagField, p.generateWarnings);
             issues = p.issues;
             if success && p.writeOutput
@@ -133,7 +134,6 @@ issues = validate(p);
         try
             if ~isempty(p.issues)
                 createLogFile(p, false);
-%                 createRemapFile(p);
             else
                 createLogFile(p, true);
             end

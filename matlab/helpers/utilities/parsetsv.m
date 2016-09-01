@@ -8,9 +8,9 @@
 %   >>  [issues, replaceTags, success] = parsetsv(hedMaps, tsvFile, ...
 %       tagColumns, hasHeader, generateWarnings)
 %
-% Inputs:
+% Input:
 %
-%       hedMaps
+%   hedMaps
 %                   A structure that contains Maps associated with the HED
 %                   XML tags. There is a map that contains all of the HED
 %                   tags, a map that contains all of the unit class units,
@@ -23,38 +23,38 @@
 %                   contains the tags that are extension allowed, and map
 %                   that contains the tags are are unique.
 %
-%       tsvFile
+%   tsvFile
 %                   The name or the path of a tab-separated file
 %                   containing HED tags in a single column or multiple
 %                   columns.
 %
-%       tagColumns
+%   tagColumns
 %                   The columns in the tab-separated file that contains the
 %                   HED tags. The columns are either a scalar value or a
 %                   vector (e.g. 2 or [2,3,4]).
 %
-%       hasHeader
+%   hasHeader
 %                   True (default) if the the tab-separated input file has
 %                   a header. The first row will not be validated otherwise
 %                   it will and this can generate issues.
 %
-%       generateWarnings
+%   generateWarnings
 %                   True to include warnings in the log file in addition
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
 % Output:
 %
-%       issues
+%   issues
 %                   A cell array containing all of the issues found through
 %                   the validation. Each cell corresponds to the issues
 %                   found on a particular line.
 %
-%       replaceTags
+%   replaceTags
 %                   A cell array containing all of the tags that generated
 %                   issues. These tags will be written to a replace file.
 %
-%       success
+%   success
 %                   True if the validation finishes without throwing any
 %                   exceptions, false if otherwise. 
 %
@@ -93,10 +93,10 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
 
     function p = findErrors(p)
         % Errors will be generated for the line if found
-        [p.lineErrors, lineRemapTags] = ...
+        [p.lineErrors, lineReplaceTags] = ...
             checkForValidationErrors(p.hedMaps, p.cellTags, ...
             p.formattedCellTags);
-        p.remapTags = union(p.remapTags, lineRemapTags);
+        p.replaceTags = union(p.replaceTags, lineReplaceTags);
     end % findErrors
 
     function p = findWarnings(p)
@@ -129,7 +129,7 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
     function [issues, replaceTags, success] = readLines(p)
         % Reads the tab-delimited file line by line and validates the tags
         p.issues = {};
-        p.remapTags = {};
+        p.replaceTags = {};
         p.issueCount = 1;
         try
             fileId = fopen(p.tsvFile);
@@ -143,7 +143,7 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
             end
             fclose(fileId);
             issues = p.issues;
-            replaceTags = p.remapTags;
+            replaceTags = p.replaceTags;
             success = true;
         catch ME
             fclose(fileId);

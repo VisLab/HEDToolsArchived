@@ -9,36 +9,36 @@
 %
 % Input:
 %
-%       Required:
+%   Required:
 %
-%       tsvFile
+%   tsvFile
 %                   The name or the path of a tab-separated file
 %                   containing HED tags in a single column or multiple
 %                   columns.
 %
-%       tagColumns
+%   tagColumns
 %                   The columns in the tab-separated file that contains the
 %                   HED tags. The columns are either a scalar value or a
 %                   vector (e.g. 2 or [2,3,4]).
 %
-%       Optional (key/value):
+%   Optional (key/value):
 %
-%       'generateWarnings'
+%   'generateWarnings'
 %                   True to include warnings in the log file in addition
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
-%       'hasHeader'
+%   'hasHeader'
 %                   True (default) if the the tab-separated input file has
 %                   a header. The first row will not be validated otherwise
 %                   it will and this can generate issues.
 %
-%       'hedXML'
+%   'hedXML'
 %                   A XML file containing every single HED tag and its
 %                   attributes. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%       'outputDirectory'
+%   'outputDirectory'
 %                   The directory where the validation output will be
 %                   written to if the 'writeOutput' argument is set to
 %                   true. There will be log file containing any issues that
@@ -48,7 +48,7 @@
 %                   already provided. The default output directory will be
 %                   the current directory.
 %
-%       'replaceFile'
+%   'replaceFile'
 %                   A optional two column tab-separated file used to find
 %                   and replace the HED tags in the input file. The first
 %                   column will be the HED tags to find and the second
@@ -61,7 +61,7 @@
 %                   tags or you simply want to consolidate all of the
 %                   changes in one file instead of several.
 %
-%       'writeOutput'
+%   'writeOutput'
 %                  True if the validation output is written to a log file
 %                  in addition to the workspace. False (default) if the
 %                  validation output is only written to the workspace.
