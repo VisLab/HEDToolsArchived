@@ -1,17 +1,48 @@
+% Adds all of the components to the 'Find and Replace' tab in pop_tsv.
+%
+% Usage:
+%
+%   >>  replacetsv_input(tab)
+%
+% Input:
+%
+%   Required:
+%
+%   tab
+%                    The 'Find and Replace' tab object in pop_tsv.
+%
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
 function replacetsv_input(tab)
-latestHED = 'HED 2.026';
-mapFile = '';
+replaceFile = '';
 tsvFile = '';
 outputFile = '';
-tsvTagColumns = '2';
-mapCtrl = '';
+columns = '2';
+replaceCtrl = '';
 tsvCtrl = '';
 outputCtrl = '';
 createPanel(tab);
 
     function browseOutputCallback(src, eventdata, replaceOutputCtrl, ...
             myTitle) %#ok<INUSL>
-        % Callback for browse button sets a directory for control      
+        % Callback for 'Browse' button that sets the 'Output file' editbox
         defaultName = '';
         if ~isempty(tsvFile)
            [~, defaultName, ext] = fileparts(tsvFile); 
@@ -25,31 +56,33 @@ createPanel(tab);
         end
     end % browseOutputCallback
 
-    function browseMapCallback(src, eventdata, replaceTxtCtrl, ...
+    function browseReplaceCallback(src, eventdata, replaceTxtCtrl, ...
             myTitle) %#ok<INUSL>
-        % Callback for 'Browse' button that sets the 'replacement' editbox
+        % Callback for 'Browse' button that sets the 'Replace file'
+        % editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-separated files'; ...
             '*.txt', 'Text files'; '*.*', 'All files'}, myTitle);
         if tFile ~= 0
-            mapFile = fullfile(tPath, tFile);
-            set(replaceTxtCtrl, 'String', mapFile);
+            replaceFile = fullfile(tPath, tFile);
+            set(replaceTxtCtrl, 'String', replaceFile);
         end
-    end % browseMapCallback
+    end % browseReplaceCallback
 
-    function browseTagsCallback(src, eventdata, replaceTagCtrl, ...
+    function browseTSVCallback(src, eventdata, replaceTagCtrl, ...
             myTitle) %#ok<INUSL>
-        % Callback for 'Browse' button that sets the 'Tags' editbox
+        % Callback for 'Browse' button that sets the 'TSV input file'
+        % editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-separated files'; ...
             '*.txt', 'Text files'; '*.*', 'All files'}, myTitle);
         if tFile ~= 0
             tsvFile = fullfile(tPath, tFile);
             set(replaceTagCtrl, 'String', tsvFile);
         end
-    end % browseTagsCallback
+    end % browseTSVCallback
 
     function columnsCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'Columns' editbox
-        tsvTagColumns = str2num(get(src, 'String')); %#ok<ST2NM>
+        % Callback for user directly editing the 'HED tag columns' editbox
+        columns = str2num(get(src, 'String')); %#ok<ST2NM>
     end % columnsCtrlCallback
 
     function createButtons(panel)
@@ -60,7 +93,7 @@ createPanel(tab);
             'TooltipString', ['Press to choose tab-separated input' ...
             ' file.'], ...
             'Units','normalized',...
-            'Callback', {@browseTagsCallback, ...
+            'Callback', {@browseTSVCallback, ...
             tsvCtrl, ...
             'Browse for HED replacement file'}, ...
             'Position', [0.775 0.9 0.2 0.1]);
@@ -69,8 +102,8 @@ createPanel(tab);
             'Style', 'pushbutton', ...
             'TooltipString', 'Press to choose replacement file.', ...
             'Units','normalized',...
-            'Callback', {@browseMapCallback, ...
-            mapCtrl, 'Browse for tag file'}, ...
+            'Callback', {@browseReplaceCallback, ...
+            replaceCtrl, 'Browse for tag file'}, ...
             'Position', [0.775 0.75 0.2 0.1]);
         uicontrol('Parent', panel, ...
             'String', 'Browse', ...
@@ -111,7 +144,7 @@ createPanel(tab);
             'Units','normalized',...
             'Callback', {@tsvCtrlCallback}, ...
             'Position', [0.15 0.9 0.6 0.1]);
-        mapCtrl = uicontrol('Parent', panel, ...
+        replaceCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
             'BackgroundColor', 'w', ...
             'HorizontalAlignment', 'Left', ...
@@ -122,7 +155,7 @@ createPanel(tab);
             ' Any tags not in this file that generate issues will be' ...
             ' appended to first column.'], ...
             'Units','normalized',...
-            'Callback', {@mapCtrlCallback}, ...
+            'Callback', {@replaceCtrlCallback}, ...
             'Position', [0.15 0.75 0.6 0.1]);
         outputCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -185,27 +218,26 @@ createPanel(tab);
         createButtons(panel);
     end % createPanel
 
-
     function outputCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'Output' editbox
+        % Callback for user directly editing the 'Output file' editbox
         outputFile = get(src, 'String');
     end % outputCtrlCallback
 
     function replaceCallback(src, eventdata) %#ok<INUSD>
         % Callback for the tag validation button
         % Callback for convert button
-        if isempty(mapFile)
+        if isempty(replaceFile)
             errordlg('Replace file is empty');
         elseif isempty(tsvFile)
             errordlg('Tab-separated file is empty');
         elseif isempty(outputFile)
             errordlg('Output file is empty');
-        elseif isempty(tsvTagColumns)
+        elseif isempty(columns)
             errordlg('HED tag columns are empty');
         else
             wb = waitbar(.5,'Please wait...');
             try
-                remapTSVTags(mapFile, tsvFile, tsvTagColumns, ...
+                remapTSVTags(replaceFile, tsvFile, columns, ...
                     'OutputFile', outputFile);
                 msgbox('Complete!');
             catch
@@ -216,7 +248,7 @@ createPanel(tab);
     end % replaceCallback
 
     function helpCallback(src, eventdata) %#ok<INUSD>
-        % Callback for the 'Validate' button
+        % Callback for the 'Help' button
         helpdlg(sprintf(['Find and replace the HED tags in a' ...
             ' tab-separated file.\n\n**Options*** \n\nTSV input file' ...
             ' - A tab-separated file containing HED tags in a single' ...
@@ -234,13 +266,13 @@ createPanel(tab);
             'Instructions');
     end % helpCallback
 
-    function mapCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'replacement' editbox
-        mapFile = get(src, 'String');
-    end % mapCtrlCallback
+    function replaceCtrlCallback(src, eventdata) %#ok<INUSD>
+        % Callback for user directly editing the 'Replace file' editbox
+        replaceFile = get(src, 'String');
+    end % replaceCtrlCallback
 
     function tsvCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'Tags' editbox
+        % Callback for user directly editing the 'TSV input file' editbox
         tsvFile = get(src, 'String');
     end % tsvCtrlCallback
 

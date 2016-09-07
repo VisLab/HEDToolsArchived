@@ -1,22 +1,58 @@
-% tagdir_input
-% GUI for input needed to create inputs for tagdir function
+% GUI for input needed to create inputs for tagdir function.
 %
 % Usage:
-%   >>  tagdir_input()
 %
-% Description:
-% tagcsv_input() brings up a GUI for input needed to create inputs for
-% tagdir
+%   >>  [baseMap, canceled, doSubDirs,inDir, editXML, preservePrefix, ...
+%       saveDatasets, saveMapFile, selectFields, useGUI] = tagdir_input()
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for tagdir_input:
+% Output:
 %
-%    doc tagdir_input
-% See also: tagdir, pop_tagdir
+%   baseMap          A fieldMap object or the name of a file that contains
+%                    a fieldMap object to be used to initialize tag
+%                    information.
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
-% krobbins@cs.utsa.edu
+%   canceled
+%                    True if the cancel button is pressed. False if
+%                    otherwise.
+%
+%   doSubDirs        If true (default), the entire inDir directory tree is
+%                    searched. If false, only the inDir directory is
+%                    searched.
+%
+%   inDir
+%                    The input directory containing .set files.
+%
+%   editXML
+%                    If false (default), the HED XML cannot be modified
+%                    using the tagger GUI. If true, then the HED XML can be
+%                    modified using the tagger GUI.
+%
+%   preservePrefix
+%                    If false (default), tags for the same field value that
+%                    share prefixes are combined and only the most specific
+%                    is retained (e.g., /a/b/c and /a/b become just
+%                    /a/b/c). If true, then all unique tags are retained.
+%
+%   saveDatasets
+%                    If true (default), save the tags to the underlying
+%                    dataset files in the directory.
+%
+%   saveMapFile
+%                    A string representing the file name for saving the
+%                    final, consolidated fieldMap object that results from
+%                    the tagging process.
+%
+%   selectFields
+%                    If true (default), the user is presented with a
+%                    GUI that allow users to select which fields to tag.
+%
+%   useGUI
+%                    If true (default), the CTAGGER GUI is displayed after
+%                    initialization.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -31,23 +67,15 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: tagdir_input.m,v $
-% $Revision: 1.0 21-Apr-2013 09:25:25 krobbins $
-% $Initial version $
-%
 
-function [cancelled, inDir, baseMap, doSubDirs, editXml, ...
-    preservePrefix, saveDatasets, saveMapFile, selectFields, ...
-    useGUI] = tagdir_input()
-
-% Setup the variables used by the GUI
+function [baseMap, canceled, doSubDirs,inDir, editXML, preservePrefix, ...
+    saveDatasets, saveMapFile, selectFields, useGUI] = tagdir_input()
 baseMap = '';
-cancelled = true;
+canceled = true;
 doSubDirs = true;
 inDir = '';
 preservePrefix = false;
-editXml = false;
+editXML = false;
 saveDatasets = true;
 saveMapFile = '';
 selectFields = true;
@@ -69,13 +97,14 @@ movegui(inputFig); % Make sure it is visible
 uiwait(inputFig);
 
     function createLayout()
+        % Creates the GUI layout
         createBrowsePanel();
         createOptionsGroupPanel();
         createButtonPanel();
-    end
+    end % createLayout
 
     function browseSaveTagsCallback(~, ~)
-        % Callback for browse button sets a directory for control
+        % Callback for 'Browse' button that sets the 'Save tags' editbox
         [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Save field map', 'fMap.mat');
         if ischar(file) && ~isempty(file)
@@ -84,8 +113,8 @@ uiwait(inputFig);
         end
     end % browseSaveTagsCallback
 
-    function browseTagsCallback(~, ~)
-        % Callback for browse button sets a directory for control
+    function browseBaseTagsCallback(~, ~)
+        % Callback for 'Browse' button that sets the 'Base tags' editbox
         [file, path] = uigetfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Browse for base tags');
         tagsFile = fullfile(path, file);
@@ -93,10 +122,11 @@ uiwait(inputFig);
             baseMap = fullfile(path, file);
             set(findobj('Tag', 'BaseTags'), 'String', baseMap);
         end
-    end % browseTagsCallback
+    end % browseBaseTagsCallback
 
 
     function createBrowsePanel()
+        % Creates top panel used for browsing for files
         browsePanel = uipanel('BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
             'FontSize',12,...
@@ -122,7 +152,7 @@ uiwait(inputFig);
             'TooltipString', ...
             'Directory of .set files', ...
             'Units','normalized',...
-            'Callback', @dirCtrlCallback, ...
+            'Callback', @directoryEditboxCallback, ...
             'Position', [0.15 0.7 0.6 0.25]);
         uicontrol('Parent', browsePanel, 'style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
@@ -130,7 +160,7 @@ uiwait(inputFig);
             'TooltipString', ...
             'Complete path for loading the consolidated event tags', ...
             'Units','normalized',...
-            'Callback', @tagsCtrlCallback, ...
+            'Callback', @baseTagsEditboxCallback, ...
             'Position', [0.15 0.4 0.6 0.25]);
         uicontrol('Parent', browsePanel, 'Style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
@@ -138,20 +168,20 @@ uiwait(inputFig);
             'TooltipString', ...
             'Complete path for saving the consolidated event tags', ...
             'Units','normalized',...
-            'Callback', @saveTagsCtrlCallback, ...
+            'Callback', @saveTagsEditboxCallback, ...
             'Position', [0.15 0.1 0.6 0.25]);
         uicontrol('Parent', browsePanel, ...
             'string', 'Browse', ...
             'style', 'pushbutton', 'TooltipString', ...
             'Press to bring up directory chooser', ...
             'Units','normalized',...
-            'Callback', @browseDirCallback, ...
+            'Callback', @browseDirectoryCallback, ...
             'Position', [0.775 0.7 0.21 0.25]);
         uicontrol('Parent', browsePanel, ...
             'string', 'Browse', 'style', 'pushbutton', ...
             'TooltipString', 'Press to choose BaseTags file', ...
             'Units','normalized',...
-            'Callback', @browseTagsCallback, ...
+            'Callback', @browseBaseTagsCallback, ...
             'Position', [0.775 0.4 0.21 0.25]);
         uicontrol('Parent', browsePanel, ...
             'string', 'Browse', 'style', 'pushbutton', ...
@@ -162,7 +192,7 @@ uiwait(inputFig);
     end % createBrowsePanel
 
     function createOptionsGroupPanel()
-        % Create the button panel on the side of GUI
+        % Create the button panel in the middle of the GUI
         optionGroupPanel = uipanel('BackgroundColor',[.94,.94,.94],...
             'FontSize',12,...
             'Title','Other options', ...
@@ -173,7 +203,7 @@ uiwait(inputFig);
             'If checked, save tags to directory dataset files', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @saveCallback, ...
+            'Callback', @saveDatasetsCallback, ...
             'Position', [0.1 0.85 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'DoSubDirsCB', ...
@@ -189,15 +219,15 @@ uiwait(inputFig);
             'If checked, use CTagger for each selected field', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @useGUICallback, ...
+            'Callback', @useCTaggerCallback, ...
             'Position', [0.1 0.55 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'SelectFieldsCB', ...
-            'String', 'Choose fields to tag', 'Enable', 'on', 'Tooltip', ...
+            'String', 'Select fields to tag', 'Enable', 'on', 'Tooltip', ...
             'Choose fields to tag', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @selectCallback, ...
+            'Callback', @selectFieldsCallback, ...
             'Position', [0.1 0.39 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'EditXMLCB', ...
@@ -205,7 +235,7 @@ uiwait(inputFig);
             'If checked, HED can be edited', ...
             'Units','normalized', ...
             'Value', 0, ...
-            'Callback', @editXmlCallback, ...
+            'Callback', @editXMLCallback, ...
             'Position', [0.1 0.22 0.9 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'PreservePrefixCB', ...
@@ -218,7 +248,7 @@ uiwait(inputFig);
     end % createOptionsGroupPanel
 
     function createButtonPanel()
-        % Create the button panel on the side of GUI
+        % Create the button panel at the bottom of the GUI
         rewriteGroupPanel = uipanel('BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
             'FontSize',12,...
@@ -239,46 +269,50 @@ uiwait(inputFig);
             'Position',[0.515 0.3 0.45 0.4]);
     end % createButtonPanel
 
-
     function cancelCallback(src, eventdata)  %#ok<INUSD>
-        % Callback for browse button sets a directory for control
+        % Callback for 'Cancel' button
         baseMap = '';
-        cancelled = true;
+        canceled = true;
         preservePrefix = false;
         saveMapFile = '';
         selectFields = true;
         useGUI = true;
         close(inputFig);
-    end % browseTagsCallback
+    end % cancelCallback
 
     function okayCallback(src, eventdata)  %#ok<INUSD>
-        % Callback for closing GUI window
-        cancelled = false;
+        % Callback for 'Okay' button
+        canceled = false;
         close(inputFig);
     end % okayCallback
 
-    function saveTagsCtrlCallback(hObject, eventdata, saveTagsCtrl) %#ok<INUSD>
-        % Callback for user directly editing directory control textbox
-        saveMapFile = get(hObject, 'String');
-    end % saveTagsCtrlCallback
+    function saveTagsEditboxCallback(src, ~)
+        % Callback for user directly editing the 'Save tags' editbox
+        saveMapFile = get(src, 'String');
+    end % saveTagsEditboxCallback
 
-    function preservePrefixCallback(src, eventdata) %#ok<INUSD>
+    function preservePrefixCallback(src, ~)
+        % Callback for user directly editing the 'Preserve tag prefixes'
+        % checkbox
         preservePrefix = get(src, 'Max') == get(src, 'Value');
     end % preservePrefixCallback
 
-    function selectCallback(src, eventdata) %#ok<INUSD>
+    function selectFieldsCallback(src, eventdata) %#ok<INUSD>
+        % Callback for user directly editing the 'Select fields to tag'
+        % checkbox
         selectFields = get(src, 'Max') == get(src, 'Value');
-    end % selectCallback
+    end % selectFieldsCallback
 
-    function tagsCtrlCallback(hObject, eventdata, tagsCtrl) %#ok<INUSD>
-        % Callback for user directly editing directory control textbox
+    function baseTagsEditboxCallback(hObject, eventdata, tagsCtrl) %#ok<INUSD>
+        % Callback for user directly editing the 'Base tags' editbox
         tagsFile = get(src, 'String');
         if ~isempty(strtrim(tagsFile)) && validateBaseTags(tagsFile)
             baseMap = tagsFile;
         end
-    end % tagsCtrlCallback
+    end % baseTagsEditboxCallback
 
     function valid = validateBaseTags(tagsFile)
+        % Checks to see if the 'Base tags' passed in is valid
         valid = true;
         if isempty(fieldMap.loadFieldMap(tagsFile))
             valid = false;
@@ -288,7 +322,8 @@ uiwait(inputFig);
         end
     end % validateBaseTags
 
-    function useGUICallback(src, eventdata) %#ok<INUSD>
+    function useCTaggerCallback(src, ~)
+        % Callback for user directly editing the 'Use CTagger' checkbox
         useGUI = get(src, 'Max') == get(src, 'Value');
         if ~useGUI
             set(findobj('Tag', 'SelectFieldsCB'), 'Enable', 'off');
@@ -299,22 +334,26 @@ uiwait(inputFig);
             set(findobj('Tag', 'EditXMLCB'), 'Enable', 'on');
             set(findobj('Tag', 'PreservePrefixCB'), 'Enable', 'on');
         end
-    end % useGUICallback
+    end % useCTaggerCallback
 
-    function editXmlCallback(src, eventdata) %#ok<INUSD>
-        editXml = get(src, 'Max') == get(src, 'Value');
-    end % editXmlCallback
+    function editXMLCallback(src, ~)
+        % Callback for user directly editing the 'HED can be edited'
+        % checkbox
+        editXML = get(src, 'Max') == get(src, 'Value');
+    end % editXMLCallback
 
-    function browseDirCallback(~, ~)
-        % Callback for browse button sets a directory for control
+    function browseDirectoryCallback(~, ~)
+        % Callback for browse button that sets a input directory
         directory = uigetdir(pwd, 'Browse for input directory');
         if directory ~= 0
             set(findobj('Tag', 'Directory'), 'String', directory);
             inDir = directory;
         end
-    end % browseDirCallback
+    end % browseDirectoryCallback
 
-    function saveCallback(src, ~)
+    function saveDatasetsCallback(src, ~)
+        % Callback for user directly editing the 'Save to directory dataset
+        % files' checkbox
         saveDatasets = get(src, 'Max') == get(src, 'Value');
         if ~saveDatasets
             set(findall(findobj('Tag', 'WriteButtonGroup'), ...
@@ -323,19 +362,21 @@ uiwait(inputFig);
             set(findall(findobj('Tag', 'WriteButtonGroup'), ...
                 '-property', 'Enable'), 'Enable', 'on')
         end
-    end % saveAllCallback
+    end % saveDatasetsCallback
 
-    function dirCtrlCallback(src, ~)
-        % Callback for user directly editing directory control textbox
+    function directoryEditboxCallback(src, ~)
+        % Callback for user directly editing the 'Directory' editbox
         directoryName = get(src, 'String');
         if isdir(directoryName)
             inDir = directoryName;
         else  % if user entered invalid directory reset back
             set(src, 'String', inDir);
         end
-    end % dirCtrlCallback
+    end % directoryEditboxCallback
 
     function doSubDirsCallback(src, ~)
+        % Callback for user directly editing the 'Look in subdirectories'
+        % checkbox
         doSubDirs = get(src, 'Max') == get(src, 'Value');
     end % useGUICallback
 

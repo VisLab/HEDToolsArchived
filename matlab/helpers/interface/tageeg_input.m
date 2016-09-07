@@ -1,22 +1,49 @@
-% tageeg_input
 % GUI for input needed to create inputs for tageeg
 %
 % Usage:
-%   >>  tageeg_input()
 %
-% Description:
-% tageeg_input() brings up a GUI for input needed to create inputs for
-% tageeg
+%   >>  [baseMap, canceled, editXML, preservePrefix, saveMapFile, ...
+%       selectFields, useGUI] = tageeg_input()
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for tageeg_input:
 %
-%    doc tageeg_input
-% See also: tageeg, pop_tageeg
+% Output:
 %
-% Copyright (C) Kay Robbins, Jeremy Cockfield, and Thomas Rognon, UTSA,
-% 2011-2015, kay.robbins.utsa.edu jeremy.cockfield.utsa.edu
+%   baseMap          A fieldMap object or the name of a file that contains
+%                    a fieldMap object to be used to initialize tag
+%                    information.
+%
+%   canceled
+%                    True if the cancel button is pressed. False if
+%                    otherwise.
+%
+%
+%   editXML
+%                    If false (default), the HED XML cannot be modified
+%                    using the tagger GUI. If true, then the HED XML can be
+%                    modified using the tagger GUI.
+%
+%   preservePrefix
+%                    If false (default), tags for the same field value that
+%                    share prefixes are combined and only the most specific
+%                    is retained (e.g., /a/b/c and /a/b become just
+%                    /a/b/c). If true, then all unique tags are retained.
+%
+%   saveMapFile
+%                    A string representing the file name for saving the
+%                    final, consolidated fieldMap object that results from
+%                    the tagging process.
+%
+%   selectFields
+%                    If true (default), the user is presented with a
+%                    GUI that allow users to select which fields to tag.
+%
+%   useGUI
+%                    If true (default), the CTAGGER GUI is displayed after
+%                    initialization.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -31,19 +58,12 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: tageeg_input.m,v $
-% $Revision: 2.0 10-Jul-2015 14:43:38 $
-% $Initial version $
-%
 
-function [baseMap, canceled, editXml, preservePrefix, saveMapFile, ...
+function [baseMap, canceled, editXML, preservePrefix, saveMapFile, ...
     selectFields, useGUI] = tageeg_input()
-
-% Setup the variables used by the GUI
 baseMap = '';
 canceled = true;
-editXml = false;
+editXML = false;
 preservePrefix = false;
 saveMapFile = '';
 selectFields = true;
@@ -69,7 +89,7 @@ if ishandle(inputFig)
 end
 
     function browseSaveTagsCallback(~, ~)
-        % Callback for browse button sets a directory for control
+        % Callback for 'Browse' button that sets the 'Save tags' editbox
         [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Save field map', 'fMap.mat');
         if ischar(file) && ~isempty(file)
@@ -78,8 +98,8 @@ end
         end
     end % browseSaveTagsCallback
 
-    function browseTagsCallback(~, ~)
-        % Callback for browse button sets a directory for control
+    function browseBaseTagsCallback(~, ~)
+        % Callback for 'Browse' button that sets the 'Base tags' editbox
         [file, path] = uigetfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Browse for base tags');
         tagsFile = fullfile(path, file);
@@ -87,10 +107,10 @@ end
             baseMap = tagsFile;
             set(findobj('Tag', 'BaseTags'), 'String', baseMap);
         end
-    end % browseTagsCallback
+    end % browseBaseTagsCallback
 
-    function cancelCallback(src, eventdata)  %#ok<INUSD>
-        % Callback for browse button sets a directory for control
+    function cancelCallback(~, ~)
+        % Callback for 'Cancel' button
         baseMap = '';
         canceled = true;
         preservePrefix = false;
@@ -101,6 +121,7 @@ end
     end % browseTagsCallback
 
     function createBrowsePanel()
+        % Creates top panel used for browsing for files
         browsePanel = uipanel('BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
             'FontSize',12,...
@@ -121,7 +142,7 @@ end
             'TooltipString', ...
             'Complete path for loading the consolidated event tags', ...
             'Units','normalized',...
-            'Callback', @tagsCtrlCallback, ...
+            'Callback', @baseTagsCtrlCallback, ...
             'Position', [0.15 0.7 0.6 0.25]);
         uicontrol('Parent', browsePanel, 'Style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
@@ -135,7 +156,7 @@ end
             'string', 'Browse', 'style', 'pushbutton', ...
             'TooltipString', 'Press to choose BaseTags file', ...
             'Units','normalized',...
-            'Callback', @browseTagsCallback, ...
+            'Callback', @browseBaseTagsCallback, ...
             'Position', [0.775 0.7 0.21 0.25]);
         uicontrol('Parent', browsePanel, ...
             'string', 'Browse', 'style', 'pushbutton', ...
@@ -146,7 +167,7 @@ end
     end % createBrowsePanel
 
     function createButtonPanel()
-        % Create the button panel on the side of GUI
+        % Create the button panel at the bottom of the GUI
         rewriteGroupPanel = uipanel('BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
             'FontSize',12,...
@@ -168,13 +189,14 @@ end
     end % createButtonPanel
 
     function createLayout()
+        % Creates the GUI layout
         createBrowsePanel();
         createOptionsGroupPanel();
         createButtonPanel();
     end % createLayout
 
     function createOptionsGroupPanel()
-        % Create the button panel on the side of GUI
+        % Create the button panel in the middle of the GUI
         optionGroupPanel = uipanel('BackgroundColor',[.94,.94,.94],...
             'FontSize',12,...
             'Title','Other options', ...
@@ -185,7 +207,7 @@ end
             'If checked, use CTagger for each selected field', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @useGUICallback, ...
+            'Callback', @useCTaggerCallback, ...
             'Position', [0.1 0.8 0.8 0.15]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'SelectFieldsCB', ...
@@ -193,7 +215,7 @@ end
             'If checked, use menu to choose fields to tag', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @selectCallback, ...
+            'Callback', @selectFieldsCallback, ...
             'Position', [0.1 0.58 0.8 0.15]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'EditXMLCB', ...
@@ -201,7 +223,7 @@ end
             'If checked, HED can be edited', ...
             'Units','normalized', ...
             'Value', 0, ...
-            'Callback', @editXmlCallback, ...
+            'Callback', @editXMLCallback, ...
             'Position', [0.1 0.34 0.9 0.15]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'PreservePrefixCB', ...
@@ -214,12 +236,14 @@ end
     end % createOptionsGroupPanel
 
     function okayCallback(~, ~)
-        % Callback for closing GUI window
+        % Callback for 'Okay' button
         canceled = false;
         close(inputFig);
     end % okayCallback
 
     function preservePrefixCallback(src, ~)
+        % Callback for user directly editing the 'Preserve tag prefixes'
+        % checkbox
         preservePrefix = get(src, 'Max') == get(src, 'Value');
     end % useGUICallback
 
@@ -228,19 +252,22 @@ end
         saveMapFile = get(src, 'String');
     end % saveTagsCtrlCallback
 
-    function selectCallback(src, ~)
+    function selectFieldsCallback(src, ~)
+        % Callback for user directly editing the 'Select fields to tag'
+        % checkbox
         selectFields = get(src, 'Max') == get(src, 'Value');
-    end % selectCallback
+    end % selectFieldsCallback
 
-    function tagsCtrlCallback(src, ~)
+    function baseTagsCtrlCallback(src, ~)
         % Callback for user directly editing directory control textbox
         tagsFile = get(src, 'String');
         if ~isempty(strtrim(tagsFile)) && validateBaseTags(tagsFile)
             baseMap = tagsFile;
         end
-    end % tagsCtrlCallback
+    end % baseTagsCtrlCallback
 
     function valid = validateBaseTags(tagsFile)
+        % Checks to see if the 'Base tags' passed in is valid
         valid = true;
         if isempty(fieldMap.loadFieldMap(tagsFile))
             valid = false;
@@ -250,7 +277,8 @@ end
         end
     end % validateBaseTags
 
-    function useGUICallback(src, ~)
+    function useCTaggerCallback(src, ~)
+        % Callback for user directly editing the 'Use CTagger' checkbox
         useGUI = get(src, 'Max') == get(src, 'Value');
         if ~useGUI
             set(findobj('Tag', 'SelectFieldsCB'), 'Enable', 'off');
@@ -261,10 +289,12 @@ end
             set(findobj('Tag', 'EditXMLCB'), 'Enable', 'on');
             set(findobj('Tag', 'PreservePrefixCB'), 'Enable', 'on');
         end
-    end % useGUICallback
+    end % useCTaggerCallback
 
-    function editXmlCallback(src, ~)
-        editXml = get(src, 'Max') == get(src, 'Value');
-    end % editXmlCallback
+    function editXMLCallback(src, ~)
+        % Callback for user directly editing the 'HED can be edited'
+        % checkbox
+        editXML = get(src, 'Max') == get(src, 'Value');
+    end % editXMLCallback
 
 end % tageeg_input

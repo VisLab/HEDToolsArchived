@@ -104,20 +104,16 @@
 
 function [EEG, fMap, canceled] = tageeg(EEG, varargin)
 p = parseArguments(EEG, varargin{:});
-canceled = false;
-
 fMap = findtags(EEG, 'PreservePrefix', p.PreservePrefix, ...
     'ExcludeFields', {}, 'Fields', {});
 fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, EEG, ...
     fMap);
-
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
         'PreservePrefix', p.PreservePrefix, 'ExcludedFields', ...
         excluded, 'Fields', fields);
 end
-
 if ~canceled
     EEG = write2EEG(EEG, fMap, p.SaveMapFile, p.PreservePrefix);
     fprintf('Tagging complete\n');

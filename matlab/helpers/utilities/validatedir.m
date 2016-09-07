@@ -1,5 +1,5 @@
 % This function takes in a directory containing EEG datasets and validates
-% the tags the against the latest HED schema. 
+% the tags the against the latest HED schema.
 %
 % Usage:
 %
@@ -8,13 +8,13 @@
 %
 % Input:
 %
-%       inDir       
+%       inDir
 %                   A directory containing EEG datasets that will be
 %                   validated.
 %
 %       Optional:
 %
-%       'DoSubDirs'     
+%       'DoSubDirs'
 %                   If true (default), the entire inDir directory tree is
 %                   searched. If false, only the inDir directory is
 %                   searched.
@@ -28,14 +28,9 @@
 %                   all of the tags.
 %
 %       'outDir'
-%                   The directory where the validation output will be
-%                   written to if the 'writeOutput' argument is true.
-%                   There will be three separate files generated, one
-%                   containing the validation errors, one containing the
-%                   validation  warnings, and one containing the extension
-%                   allowed validation warnings. The default directory will
-%                   be the directory that contains the tab-delimited text
-%                  file.
+%                   The directory where the validation files are written
+%                   to. The default output directory will be the current
+%                   directory
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -81,10 +76,15 @@ fPaths = validate(p);
                 [p.errorLog, p.warningLog, p.extensionLog] = ...
                     parseStructTags(p.hedMaps, p.eeg.event, p.tagField, ...
                     p.extensionAllowed);
-                    createLogs(p);
+                [p.issues, p.replaceTags, success] = ...
+                    parseeeg(p.hedMaps, p.eeg.event,  p.tagField, ...
+                    p.generateWarnings);
+                if success
+                    writeOutputFiles(p);
+                end
             else
                 fprintf(['The ''.%s'' field does not exist in the' ...
-                    ' EEG events. Please tag the dataseet before' ...
+                    ' EEG events. Please tag the dataset before' ...
                     ' running the validation.\n'], p.tagField);
             end
         end
@@ -102,9 +102,7 @@ fPaths = validate(p);
         p = inputParser();
         p.addRequired('inDir', @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('doSubDirs', true, @islogical);
-        p.addParamValue('errorLogOnly', true, ...
-            @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('extensionAllowed', true, ...
+        p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('tagField', 'usertags', ...
             @(x) (~isempty(x) && ischar(x)));
@@ -116,51 +114,39 @@ fPaths = validate(p);
         p = p.Results;
     end % parseArguments
 
-    function createErrorLog(p)
-        % Creates a error log
-        numErrors = length(p.errorLog);
-        errorFile = fullfile(p.outDir, [p.file '_error_log' p.ext]);
-        if ~exist(p.outDir, 'dir')
-            mkdir(p.outDir);
-        end
-        fileId = fopen(errorFile,'w');
-        for a = 1:numErrors
-            fprintf(fileId, '%s\n', p.errorLog{a});
-        end
-        fclose(fileId);
-    end % createErrorLog
-
-    function createExtensionLog(p)
-        % Creates a extension log
-        numExtensions = length(p.extensionLog);
-        extensionFile = fullfile(p.outDir, [p.file '_extension_log' p.ext]);
-        fileId = fopen(extensionFile,'w');
-        for a = 1:numExtensions
-            fprintf(fileId, '%s\n', p.extensionLog{a});
-        end
-        fclose(fileId);
-    end % createExtensionLog
-
-    function createLogs(p)
-        % Creates the log files 
+    function writeOutputFiles(p)
+        % Writes the errors, warnings, extension allowed warnings to
+        % the output files
+        p.dir = p.outDir;
         [~, p.file] = fileparts(p.eeg.filename);
         p.ext = '.txt';
-        createErrorLog(p);
-        if ~p.errorLogOnly
-            createWarningLog(p);
-            createExtensionLog(p);
+        p.mapExt = '.tsv';
+        try
+            if ~isempty(p.issues)
+                createLogFile(p, false);
+            else
+                createLogFile(p, true);
+            end
+        catch
+            throw(MException('validatetsv:cannotWrite', ...
+                'Could not write output files'));
         end
-    end % createLogs
+    end % writeOutputFiles
 
-    function createWarningLog(p)
-        % Creates a warning log 
-        numWarnings = length(p.warningLog);
-        warningFile = fullfile(p.outDir, [p.file '_warning_log' p.ext]);
-        fileId = fopen(warningFile,'w');
-        for a = 1:numWarnings
-            fprintf(fileId, '%s\n', p.warningLog{a});
+    function createLogFile(p, empty)
+        % Creates a log file containing any issues
+        numErrors = length(p.issues);
+        errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
+        fileId = fopen(errorFile,'w');
+        if ~empty
+            fprintf(fileId, '%s', p.issues{1});
+            for a = 2:numErrors
+                fprintf(fileId, '\n%s', p.issues{a});
+            end
+        else
+            fprintf(fileId, 'No issues were found.');
         end
         fclose(fileId);
-    end % createWarningLog
+    end % createLogFile
 
 end % validatedir

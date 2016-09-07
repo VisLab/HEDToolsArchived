@@ -22,7 +22,7 @@
 %                   The name or the path of the HED XML file containing
 %                   all of the tags.
 %
-%       'outDir'
+%       'outputDirectory'
 %                   The directory where the validation output will be
 %                   written to if the 'writeOutput' argument is true.
 %                   There will be three separate files generated, one
@@ -143,7 +143,7 @@ fPaths = validate(p);
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('outDir', pwd, ...
+        p.addParamValue('outputDirectory', pwd, ...
             @(x) ischar(x));
         p.parse(studyFile, varargin{:});
         p = p.Results;
@@ -152,9 +152,9 @@ fPaths = validate(p);
     function createErrorLog(p)
         % Creates a error log
         numErrors = length(p.errorLog);
-        errorFile = fullfile(p.outDir, [p.file '_error_log' p.ext]);
-        if ~exist(p.outDir, 'dir')
-            mkdir(p.outDir);
+        errorFile = fullfile(p.outputDirectory, [p.file '_error_log' p.ext]);
+        if ~exist(p.outputDirectory, 'dir')
+            mkdir(p.outputDirectory);
         end
         fileId = fopen(errorFile,'w');
         for a = 1:numErrors
@@ -162,17 +162,6 @@ fPaths = validate(p);
         end
         fclose(fileId);
     end % createErrorLog
-
-    function createExtensionLog(p)
-        % Creates a extension log
-        numExtensions = length(p.extensionLog);
-        extensionFile = fullfile(p.outDir, [p.file '_extension_log' p.ext]);
-        fileId = fopen(extensionFile,'w');
-        for a = 1:numExtensions
-            fprintf(fileId, '%s\n', p.extensionLog{a});
-        end
-        fclose(fileId);
-    end % createExtensionLog
 
     function createLogs(p)
         % Creates the log files
@@ -184,16 +173,5 @@ fPaths = validate(p);
             createExtensionLog(p);
         end
     end % createLogs
-
-    function createWarningLog(p)
-        % Creates a warning log
-        numWarnings = length(p.warningLog);
-        warningFile = fullfile(p.outDir, [p.file '_warning_log' p.ext]);
-        fileId = fopen(warningFile,'w');
-        for a = 1:numWarnings
-            fprintf(fileId, '%s\n', p.warningLog{a});
-        end
-        fclose(fileId);
-    end % createWarningLog
 
 end % validatestudy

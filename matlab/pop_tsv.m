@@ -24,7 +24,6 @@
 
 function pop_tsv()
 % Prevent an annoying warning msg
-% addJars();
 warning off MATLAB:uitabgroup:OldVersion
 warning off MATLAB:uitabgroup:DeprecatedFunction
 title = 'Tab-separated HEDTools';

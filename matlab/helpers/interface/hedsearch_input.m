@@ -1,26 +1,45 @@
-% GUI input for specifying search tags in hedepoch function.
+% GUI input for specifying search tags in hedepoch function. Using the
+% Search Bar ("Search for"): The tag search uses boolean operators
+% (AND, OR, NOT) to widen or narrow the search. Two tags separated by a
+% comma use the AND operator by default which will only return events that
+% contain both of the tags. The OR operator looks for events that include
+% either one or both tags being specified. The NOT operator looks for
+% events that contain the first tag but not the second tag. To nest or
+% organize the search statements use square brackets. Nesting will change
+% the order in which the search statements are evaluated. For example,
+% "/attribute/visual/color/green AND [/item/2d shape/rectangle/square OR
+% /item/2d shape/ellipse/circle]" will look for events that have a green
+% square or a green circle. When using the search bar and typing in
+% something there will be a listbox below the search bar containing
+% possible matches. Pressing the "up" and "down" arrows on the keyboard
+% while the cursor is in the search bar will move to the next or previous
+% tag in the listbox. Pressing "Enter" will select the current tag in the
+% listbox and it will be added to the search bar. When done click the
+% "Ok" button and it will take you back to the main epoching menu.
 %
-% Using the Search Bar ("Search for"):
-% The tag search uses boolean operators (AND, OR, NOT) to widen or narrow
-% the search. Two tags separated by a comma use the AND operator by default
-% which will only return events that contain both of the tags. The OR
-% operator looks for events that include either one or both tags being
-% specified. The NOT operator looks for events that contain the first tag
-% but not the second tag. To nest or organize the search statements use
-% square brackets. Nesting will change the order in which the search
-% statements are evaluated. For example, "/attribute/visual/color/green AND
-% [/item/2d shape/rectangle/square OR /item/2d shape/ellipse/circle]"
-% will look for events that have a green square or a green circle. When
-% using the search bar and typing in something there will be a listbox
-% below the search bar containing possible matches. Pressing the "up" and
-% "down" arrows on the keyboard while the cursor is in the search bar will
-% move to the next or previous tag in the listbox. Pressing "Enter" will
-% select the current tag in the listbox and it will be added to the
-% search bar. When done click the "Ok" button and it will take you back to
-% the main epoching menu.
+% Usage:
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%   >>  [canceled, tags] = hedsearch_input(uniquetags)
+%
+% Input:
+%
+%   Required:
+%
+%   uniquetags
+%                    The unique HED tags in the EEG dataset loaded.
+%
+% Output:
+%
+%   canceled
+%                    True if the cancel button is pressed. False if
+%                    otherwise.
+%
+%   tags
+%                    The search tags that the user specified.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -29,7 +48,7 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License

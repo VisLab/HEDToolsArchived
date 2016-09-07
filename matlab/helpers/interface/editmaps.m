@@ -40,7 +40,7 @@
 %                    /a/b/c). If true, then all unique tags are retained.
 %
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -157,9 +157,6 @@ canceled = p.canceled;
     function flags = setCTaggerFlags(p)
         % Sets the flags parameter in CTagger
         flags = 1;
-%         if p.useJSON
-%             flags = bitor(flags,1);
-%         end
         if p.preservePrefix
             flags = bitor(flags,2);
         end
@@ -195,9 +192,9 @@ canceled = p.canceled;
         parser = inputParser;
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
-        parser.addParamValue('Fields', {}, @iscellstr);
         parser.addParamValue('EditXml', false, @islogical);
         parser.addParamValue('ExcludedFields', {}, @iscellstr);
+        parser.addParamValue('Fields', {}, @iscellstr);
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.parse(fMap, varargin{:});
         p = parser.Results;

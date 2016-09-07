@@ -8,7 +8,7 @@
 %
 % Input:
 %
-% Required:
+%   Required:
 %
 %   fMap             A fieldMap object that contains the tag map
 %                    information.

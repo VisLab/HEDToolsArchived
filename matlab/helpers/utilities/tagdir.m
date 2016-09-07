@@ -80,19 +80,19 @@
 %
 % Output:
 %
-%   fMap         
+%   fMap
 %                    A fieldMap object that contains the tag map
 %                    information.
 %
-%   fPaths       
+%   fPaths
 %                    A list of full file names of the datasets to be
 %                    tagged.
 %
-%   excluded     
-%                    A cell array containing the fields that were excluded
-%                    from tagging.
+%   canceled
+%                    True if the user canceled the tagging. False if
+%                    otherwise.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -110,13 +110,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [fMap, fPaths, excluded] = tagdir(inDir, varargin)
+function [fMap, fPaths, canceled] = tagdir(inDir, varargin)
 p = parseArguments(inDir, varargin{:});
-canceled = false;
 fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
 if isempty(fPaths)
     fMap = '';
-    excluded = '';
+    canceled = '';
     warning('tagdir:nofiles', 'No files met tagging criteria\n');
     return;
 end
@@ -124,13 +123,11 @@ end
 fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, ...
     fMap, dirFields);
-
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
         'PreservePrefix', p.PreservePrefix, 'ExcludedField', ...
         excluded, 'Fields', fields);
 end
-
 if ~canceled
     write2dir(fPaths, fMap, p.PreservePrefix, p.SaveMapFile, ...
         p.SaveDatasets);
@@ -178,7 +175,7 @@ fprintf('Tagging was canceled\n');
 
     function write2dir(fPaths, fMap, preservePrefix, saveMapFile, ...
             saveDatasets)
-        % Writes the tags to the directory datasets 
+        % Writes the tags to the directory datasets
         if ~isempty(saveMapFile) && ~fieldMap.saveFieldMap(saveMapFile, ...
                 fMap)
             warning('tagdir:invalidFile', ...
@@ -192,7 +189,7 @@ fprintf('Tagging was canceled\n');
                 EEG = pop_loadset(fPaths{k});
                 EEG = writetags(EEG, fMap, 'PreservePrefix', ...
                     preservePrefix);
-                EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
+                pop_saveset(EEG, 'filename', EEG.filename, ...
                     'filepath', EEG.filepath);
             end
         end

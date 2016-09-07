@@ -1,11 +1,13 @@
-% tagstudy_input
-% GUI for input needed to create inputs for validatestudy
+% GUI for input needed to create inputs for validatestudy.
 %
 % Usage:
-%   >>  validatestudy_input()
 %
-% Copyright (C) Kay Robbins and Jeremy Cockfield, UTSA, 2011-2013,
-% krobbins@cs.utsa.edu
+%   >>  [cancelled, generateWarnings, hedXML, outputDirectory] = ...
+%       validateeeg_input()
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -21,13 +23,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [cancelled, generateWarnings, hedXML, outputDirectory] = ...
+function [canceled, generateWarnings, hedXML, outDir] = ...
     validateeeg_input()
-% Setup the variables used by the GUI
-cancelled = true;
+canceled = true;
 generateWarnings = false;
 hedXML = which('HED.xml');
-outputDirectory = pwd;
+outDir = pwd;
 title = 'Inputs for validating HED tags in a EEG .set dataset';
 fig = createFigure(title);
 addFigureComponents(fig);
@@ -78,7 +79,7 @@ uiwait(fig);
             'BackgroundColor', 'w', ...
             'HorizontalAlignment', 'Left', ...
             'Tag', 'OutputDirEB', ...
-            'String', outputDirectory, ...
+            'String', outDir, ...
             'TooltipString', ['A directory where the validation output' ...
             ' is written to.'], ...
             'Units','normalized',...
@@ -194,13 +195,13 @@ uiwait(fig);
         dName = uigetdir(startPath, myTitle);
         if dName ~=0
             set(findobj('Tag', 'OutputDirEB'), 'String', dName);
-            outputDirectory = dName;
+            outDir = dName;
         end
     end % browseOutputDirectoryCallback
 
     function cancelButtonCallback(~, ~, fig)  
         % Callback for the cancel button
-        cancelled = true;
+        canceled = true;
         close(fig);
     end % cancelButtonCallback
 
@@ -239,7 +240,7 @@ uiwait(fig);
 
     function helpButtonCallback(~, ~)
         % Callback for the okay button
-        helpdlg(sprintf(['Validates the HED tags in a EEG dataset' ...
+        helpdlg(sprintf(['Validates the HED tags in a .set EEG dataset' ...
             ' against a HED schema. \n\n***Main Options***' ...
             ' \n\nHED schema - A XML file containing every single' ...
             ' HED tag and its attributes. This by default will be' ...
@@ -260,7 +261,7 @@ uiwait(fig);
 
     function okayButtonCallback(~, ~, fig)
         % Callback for the okay button
-        cancelled = false;
+        canceled = false;
         close(fig);
     end % okayButtonCallback
 
@@ -268,12 +269,12 @@ uiwait(fig);
         % Callback for user directly editing the output directory edit box
         directory = get(src, 'String');
         if exist(directory, 'dir')
-            outputDirectory = directory;
+            outDir = directory;
         else 
             errordlg(['Output directory is invalid. Setting the output' ...
                 ' directory back to the previous directory.'], ...
                 'Invalid output directory');
-            set(src, 'String', outputDirectory);
+            set(src, 'String', outDir);
         end
     end % outputDirectoryEditBoxCallback
 

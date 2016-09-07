@@ -1,13 +1,20 @@
-% Allows a user to validate a directory of datasets using a GUI
+% Allows a user to validate a directory of EEG .set datasets using a GUI.
 %
 % Usage:
+%
 %   >>  [fPaths, com] = pop_validatedir()
 %
-% See also:
-%   eeglab, tageeg, tagdir, tagstudy, and eegplugin_ctagger
+% Output:
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%   fPaths           A list of full file names of the datasets to be
+%                    validated.
+%
+%   com              String containing call to tagdir with all
+%                    parameters.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -39,6 +46,7 @@ fPaths = validatedir(inDir, ...
     'hedXML', hedXML, ...
     'outDir', outDir);
 
+% Create command string
 com = char(['validatedir(''' inDir ''', ' ...
     '''doSubDirs'', ' logical2str(doSubDirs) ', ' ...
     '''errorLogOnly'', ' logical2str(errorLogOnly) ', ' ...
@@ -46,14 +54,13 @@ com = char(['validatedir(''' inDir ''', ' ...
     '''hedXML'', ''' hedXML ''', ' ...
     '''outDir'', ''' outDir ''', '')']);
 
-end % pop_validatedir
-
-function s = logical2str(b)
-% Converts a logical value to a string
-if b
-    s = 'true';
-else
-    s = 'false';
-end % logical2str
+    function s = logical2str(b)
+        % Converts a logical value to a string
+        if b
+            s = 'true';
+        else
+            s = 'false';
+        end
+    end % logical2str
 
 end % pop_validatedir

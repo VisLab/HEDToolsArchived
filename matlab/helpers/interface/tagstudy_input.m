@@ -1,22 +1,53 @@
-% tagstudy_input
 % GUI for input needed to create inputs for tagstudy
 %
 % Usage:
-%   >>  tagstudy_input()
 %
-% Description:
-% tagstudy_input() brings up a GUI for input needed to create inputs for
-% tagstudy
+%   >>  [canceled, baseMap, editXML, preservePrefix, ...
+%       saveDatasets, saveMapFile, selectFields, studyFile, ...
+%       useGUI] = tagstudy_input()
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for tagstudy_input:
 %
-%    doc tagstudy_input
-% See also: tagstudy, pop_tagstudy
+% Output:
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
-% krobbins@cs.utsa.edu
+%   baseMap          A fieldMap object or the name of a file that contains
+%                    a fieldMap object to be used to initialize tag
+%                    information.
+%
+%   canceled
+%                    True if the cancel button is pressed. False if
+%                    otherwise.
+%
+%   editXML
+%                    If false (default), the HED XML cannot be modified
+%                    using the tagger GUI. If true, then the HED XML can be
+%                    modified using the tagger GUI.
+%
+%   preservePrefix
+%                    If false (default), tags for the same field value that
+%                    share prefixes are combined and only the most specific
+%                    is retained (e.g., /a/b/c and /a/b become just
+%                    /a/b/c). If true, then all unique tags are retained.
+%
+%   saveDatasets
+%                    If true (default), save the tags to the underlying
+%                    dataset files in the directory.
+%
+%   saveMapFile
+%                    A string representing the file name for saving the
+%                    final, consolidated fieldMap object that results from
+%                    the tagging process.
+%
+%   selectFields
+%                    If true (default), the user is presented with a
+%                    GUI that allow users to select which fields to tag.
+%
+%   useGUI
+%                    If true (default), the CTAGGER GUI is displayed after
+%                    initialization.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -31,24 +62,16 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: tagstudy_input.m,v $
-% $Revision: 1.0 21-Apr-2013 09:25:25 krobbins $
-% $Initial version $
-%
 
-function [cancelled, baseMap, editXml, preservePrefix, ...
-    saveDatasets, saveMapFile, selectOption, studyFile, ...
-    useGUI] = tagstudy_input()
-
-% Setup the variables used by the GUI
+function [canceled, baseMap, editXML, preservePrefix, saveDatasets, ...
+    saveMapFile, selectFields, studyFile, useGUI] = tagstudy_input()
 baseMap = '';
-cancelled = true;
+canceled = true;
 preservePrefix = false;
-editXml = false;
+editXML = false;
 saveDatasets = true;
 saveMapFile = '';
-selectOption = true;
+selectFields = true;
 studyFile = '';
 useGUI = true;
 title = 'Inputs for tagging EEG study';
@@ -68,7 +91,7 @@ movegui(inputFig); % Make sure it is visible
 uiwait(inputFig);
 
     function browseSaveTagsCallback(~, ~)
-        % Callback for browse button sets a directory for control
+        % Callback for 'Browse' button that sets the 'Save tags' editbox
         [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Save field map', 'fMap.mat');
         if ischar(file) && ~isempty(file)
@@ -77,8 +100,8 @@ uiwait(inputFig);
         end
     end % browseSaveTagsCallback
 
-    function browseTagsCallback(~, ~)
-        % Callback for browse button sets a directory for control
+    function browseBaseTagsCallback(~, ~)
+        % Callback for 'Browse' button that sets the 'Base tags' editbox
         [file, path] = uigetfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
             'Browse for base tags');
         tagsFile = fullfile(path, file);
@@ -86,15 +109,17 @@ uiwait(inputFig);
             baseMap = fullfile(path, file);
             set(findobj('Tag', 'BaseTags'), 'String', baseMap);
         end
-    end % browseTagsCallback
+    end % browseBaseTagsCallback
 
     function createLayout()
+        % Creates the GUI layout
         createBrowsePanel();
         createOptionsGroupPanel();
         createButtonPanel();
-    end
+    end % createLayout
 
     function createBrowsePanel()
+        % Creates top panel used for browsing for files
         browsePanel = uipanel('BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
             'FontSize',12,...
@@ -128,7 +153,7 @@ uiwait(inputFig);
             'TooltipString', ...
             'Complete path for loading the consolidated event tags', ...
             'Units','normalized',...
-            'Callback', @tagsCtrlCallback, ...
+            'Callback', @baseTagsCtrlCallback, ...
             'Position', [0.15 0.4 0.6 0.25]);
         uicontrol('Parent', browsePanel, 'Style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
@@ -149,7 +174,7 @@ uiwait(inputFig);
             'string', 'Browse', 'style', 'pushbutton', ...
             'TooltipString', 'Press to choose BaseTags file', ...
             'Units','normalized',...
-            'Callback', @browseTagsCallback, ...
+            'Callback', @browseBaseTagsCallback, ...
             'Position', [0.775 0.4 0.21 0.25]);
         uicontrol('Parent', browsePanel, ...
             'string', 'Browse', 'style', 'pushbutton', ...
@@ -160,7 +185,7 @@ uiwait(inputFig);
     end % createBrowsePanel
 
     function createOptionsGroupPanel()
-        % Create the button panel on the side of GUI
+        % Create the button panel in the middle of the GUI
         optionGroupPanel = uipanel('BackgroundColor',[.94,.94,.94],...
             'FontSize',12,...
             'Title','Other options', ...
@@ -171,7 +196,7 @@ uiwait(inputFig);
             'If checked, save tags to study datasets in addition to study file', ...
             'Value', 1, ...
             'Units','normalized', ...
-            'Callback', @saveCallback, ...
+            'Callback', @saveDatasetsCallback, ...
             'Position', [0.1 0.85 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'UseGUICB', ...
@@ -179,7 +204,7 @@ uiwait(inputFig);
             'If checked, use CTagger for each selected field', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @useGUICallback, ...
+            'Callback', @useCTaggerCallback, ...
             'Position', [0.1 0.68 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'SelectFieldsCB', ...
@@ -187,7 +212,7 @@ uiwait(inputFig);
             'Choose fields to tag', ...
             'Units','normalized', ...
             'Value', 1, ...
-            'Callback', @selectCallback, ...
+            'Callback', @selectFieldsCallback, ...
             'Position', [0.1 0.48 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'EditXMLCB', ...
@@ -195,7 +220,7 @@ uiwait(inputFig);
             'If checked, HED can be edited', ...
             'Units','normalized', ...
             'Value', 0, ...
-            'Callback', @editXmlCallback, ...
+            'Callback', @editXMLCallback, ...
             'Position', [0.1 0.29 0.8 0.1]);
         uicontrol('Parent', optionGroupPanel, ...
             'Style', 'CheckBox', 'Tag', 'PreservePrefixCB', ...
@@ -208,7 +233,7 @@ uiwait(inputFig);
     end % createOptionsGroupPanel
 
     function createButtonPanel()
-        % Create the button panel on the side of GUI
+        % Create the button panel at the bottom of the GUI
         buttonPanel = uipanel('BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
             'FontSize',12,...
@@ -241,29 +266,33 @@ uiwait(inputFig);
     end % browseStudyCallback
 
     function cancelCallback(src, eventdata)  %#ok<INUSD>
-        % Callback for browse button sets a directory for control
+        % Callback for 'Cancel' button
         baseMap = '';
-        cancelled = true;
+        canceled = true;
         preservePrefix = false;
         saveDatasets = true;
         saveMapFile = '';
-        selectOption = true;
+        selectFields = true;
         studyFile = '';
         useGUI = true;
         close(inputFig);
     end % cancelTagsCallback
 
     function okayCallback(~, ~)
-        % Callback for closing GUI window
-        cancelled = false;
+        % Callback for 'Okay' button
+        canceled = false;
         close(inputFig);
     end % okayCallback
 
     function preservePrefixCallback(src, ~)
+        % Callback for user directly editing the 'Preserve tag prefixes'
+        % checkbox
         preservePrefix = get(src, 'Max') == get(src, 'Value');
     end % preservePrefixCallback
 
-    function saveCallback(src, ~)
+    function saveDatasetsCallback(src, ~)
+        % Callback for user directly editing the 'Save to study dataset
+        % files' checkbox
         saveDatasets = get(src, 'Max') == get(src, 'Value');
         if ~saveDatasets
             set(findall(writeButtonGroup, '-property', 'Enable'), ...
@@ -272,19 +301,21 @@ uiwait(inputFig);
             set(findall(writeButtonGroup, '-property', 'Enable'), ...
                 'Enable', 'on')
         end
-    end % saveAllCallback
+    end % saveDatasetsCallback
 
     function saveTagsCtrlCallback(src, ~)
-        % Callback for user directly editing directory control textbox
+        % Callback for user directly editing the 'Save tags' editbox
         saveMapFile = get(src, 'String');
     end % tagsCtrlCallback
 
-    function selectCallback(src, ~)
-        selectOption = get(src, 'Max') == get(src, 'Value');
-    end % selectCallback
+    function selectFieldsCallback(src, ~)
+        % Callback for user directly editing the 'Select fields to tag'
+        % checkbox
+        selectFields = get(src, 'Max') == get(src, 'Value');
+    end % selectFieldsCallback
 
     function studyCtrlCallback(src, ~)
-        % Callback for user directly editing directory control textbox
+        % Callback for user directly editing the 'Study file' editbox
         study = get(src, 'String');
         if exist(study, 'file')
             studyFile = study;
@@ -293,15 +324,16 @@ uiwait(inputFig);
         end
     end % dirCtrlCallback
 
-    function tagsCtrlCallback(src, ~)
-        % Callback for user directly editing directory control textbox
+    function baseTagsCtrlCallback(src, ~)
+        % Callback for user directly editing the 'Base tags' editbox
         tagsFile = get(src, 'String');
         if ~isempty(strtrim(tagsFile)) && validateBaseTags(tagsFile)
             baseMap = tagsFile;
         end
-    end % tagsCtrlCallback
+    end % baseTagsCtrlCallback
 
-    function useGUICallback(src, ~)
+    function useCTaggerCallback(src, ~)
+        % Callback for user directly editing the 'Use CTagger' checkbox
         useGUI = get(src, 'Max') == get(src, 'Value');
         if ~useGUI
             set(findobj('Tag', 'SelectFieldsCB'), 'Enable', 'off');
@@ -312,9 +344,10 @@ uiwait(inputFig);
             set(findobj('Tag', 'EditXMLCB'), 'Enable', 'on');
             set(findobj('Tag', 'PreservePrefixCB'), 'Enable', 'on');
         end
-    end % useGUICallback
+    end % useCTaggerCallback
 
     function valid = validateBaseTags(tagsFile)
+        % Checks to see if the 'Base tags' passed in is valid
         valid = true;
         if isempty(fieldMap.loadFieldMap(tagsFile))
             valid = false;
@@ -324,8 +357,10 @@ uiwait(inputFig);
         end
     end % validateBaseTags
 
-    function editXmlCallback(src, eventdata) %#ok<INUSD>
-        editXml = get(src, 'Max') == get(src, 'Value');
-    end % editXmlCallback
+    function editXMLCallback(src, ~)
+        % Callback for user directly editing the 'HED can be edited'
+        % checkbox
+        editXML = get(src, 'Max') == get(src, 'Value');
+    end % editXMLCallback
 
 end % tagstudy_input

@@ -18,10 +18,10 @@
 %   fPaths           A list of full file names of the datasets to be
 %                    tagged.
 %
-%   com              String containing call to tagstudy with all
+%   com              String containing call to tagdir with all
 %                    parameters.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -43,12 +43,16 @@ function [fMap, fPaths, com] = pop_tagdir()
 fMap = '';
 fPaths = '';
 com = '';
-[cancelled, inDir, baseMap, doSubDirs, editXml, preservePrefix, ...
+
+% Get the input parameters
+[canceled, inDir, baseMap, doSubDirs, editXml, preservePrefix, ...
     saveDatasets, saveMapFile, selectFields, useGUI] = tagdir_input();
-if cancelled
+if canceled
     return;
 end
-[fMap, fPaths] = tagdir(inDir, 'BaseMap', baseMap, ...
+
+% Tag the EEG directory and return the command string
+[fMap, fPaths, canceled] = tagdir(inDir, 'BaseMap', baseMap, ...
     'DoSubDirs', doSubDirs,  ...
     'EditXml', editXml, ...
     'PreservePrefix', preservePrefix, ...
@@ -56,7 +60,11 @@ end
     'SaveMapFile', saveMapFile, ...
     'SelectFields', selectFields, ...
     'UseGUI', useGUI);
+if canceled
+    return;
+end
 
+% Create command string
 com = char(['tagdir(''' inDir ''', ' ...
     '''BaseMap'', ''' baseMap ''', ' ...
     '''DoSubDirs'', ' logical2str(doSubDirs) ', ' ...
@@ -68,6 +76,7 @@ com = char(['tagdir(''' inDir ''', ' ...
     '''UseGui'', ' logical2str(useGUI) ')']);
 
     function s = logical2str(b)
+        % Converts a logical to a string
         if b
             s = 'true';
         else

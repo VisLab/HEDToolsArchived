@@ -12,26 +12,27 @@
 %
 %   >>  [fMap, fPaths, excluded] = tagstudy(studyFile, 'key1', ...
 %       'value1', ...)
+%
 % Input:
 %
-%       Required:
+%   Required:
 %
-%       studyFile
+%   studyFile
 %                    The path to a EEG study.
 %
-%       Optional (key/value):
+%   Optional (key/value):
 %
-%       'BaseMap'
+%   'BaseMap'
 %                    A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used for initial tag
 %                    information.
 %
-%       'EditXml'
+%   'EditXml'
 %                    If false (default), the HED XML cannot be modified
 %                    using the tagger GUI. If true, then the HED XML can be
 %                    modified using the tagger GUI.
 %
-%       'ExcludeFields'
+%   'ExcludeFields'
 %                    A cell array of field names in the .event and .urevent
 %                    substructures to ignore during the tagging process.
 %                    By default the following subfields of the event
@@ -39,39 +40,52 @@
 %                    .hedtags, and .usertags. The user can over-ride these
 %                    tags using this name-value parameter.
 %
-%       'Fields'
+%   'Fields'
 %                    A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty,
 %                    only these fields are tagged.
 %
-%       'PreservePrefix'
+%   'PreservePrefix'
 %                    If false (default), tags of the same event type that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
 %
-%       'PrimaryField'
+%   'PrimaryField'
 %                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description. The default is the type
 %                    field.
 %
-%       'SaveDatasets'
+%   'SaveDatasets'
 %                    If true (default), save the tags to the underlying
 %                    dataset files in the directory.
 %
-%       'SaveMapFile'
+%   'SaveMapFile'
 %                    The full path name of the file for saving the final,
 %                    consolidated fieldMap object that results from the
 %                    tagging process.
 %
-%       'SelectFields'
+%   'SelectFields'
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %
-%       'UseGui'
+%   'UseGui'
 %                    If true (default), the CTAGGER GUI is displayed after
 %                    initialization.
+%
+% Output:
+%
+%   fMap
+%                    A fieldMap object that contains the tag map
+%                    information
+%
+%   fPaths
+%                    A fieldMap object that contains the tag map
+%                    information
+%   canceled
+%                    True if the user canceled the tagging. False if
+%                    otherwise.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -91,14 +105,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [fMap, fPaths, excluded] = tagstudy(studyFile, varargin)
-% Tag all of the EEG files in a study
+function [fMap, fPaths, canceled] = tagstudy(studyFile, varargin)
 p = parseArguments(studyFile, varargin{:});
-canceled = false;
 [study, fPaths] = loadstudy(p.StudyFile);
 if isempty(fPaths)
     fMap = '';
-    excluded = '';
+    canceled = '';
     warning('tagstudy:nofiles', 'No files in study\n');
     return;
 end
@@ -106,20 +118,17 @@ end
 fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap, ...
     studyFields);
-
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
         'PreservePrefix', p.PreservePrefix, 'ExcludedField', ...
         excluded, 'Fields', fields);
 end
-
 if ~canceled
     write2study(p, fPaths, fMap, study);
     fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');
-
 
     function write2study(p, fPaths, fMap, study)
         % Writes the tags to the directory datasets
@@ -136,13 +145,13 @@ fprintf('Tagging was canceled\n');
                 EEG = pop_loadset(fPaths{k});
                 EEG = writetags(EEG, fMap, 'PreservePrefix', ...
                     p.PreservePrefix);
-                EEG = pop_saveset(EEG, 'filename', EEG.filename, ...
+                pop_saveset(EEG, 'filename', EEG.filename, ...
                     'filepath', EEG.filepath);
             end
         end
         % Rewrite to the study file
         study.STUDY = writetags(study.STUDY, fMap, 'PreservePrefix', ...
-            p.PreservePrefix);  %#ok<NASGU>
+            p.PreservePrefix);  
         save(p.studyFile, '-struct', 's');
     end % write2study
 
@@ -158,7 +167,7 @@ fprintf('Tagging was canceled\n');
 
     function [fMap, fields, excluded, canceled] = ...
             extractSelectedFields(p, fMap, studyFields)
-        % Exclude the appropriate tags from baseTags
+        % Extract the selected fields from the fMap
         if ~p.UseGui
             p.SelectFields = false;
         end
@@ -185,7 +194,7 @@ fprintf('Tagging was canceled\n');
     end % findStudyTags
 
     function [study, fNames] = loadstudy(studyFile)
-        % Set baseTags if tagsFile contains an tagMap object
+        % Load the study file 
         try
             study = load('-mat', studyFile);
             sPath = fileparts(studyFile);
@@ -198,7 +207,7 @@ fprintf('Tagging was canceled\n');
     end % loadstudy
 
     function fNames = getstudyfiles(study, sPath)
-        % Set baseTags if tagsFile contains an tagMap object
+        % Go through the study and find all of the dataset file paths
         datasets = {study.datasetinfo.filename};
         paths = {study.datasetinfo.filepath};
         validPaths = true(size(paths));
