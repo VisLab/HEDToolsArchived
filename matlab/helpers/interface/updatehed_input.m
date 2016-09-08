@@ -6,9 +6,8 @@
 %
 % Input:
 %
-%   tab              A fieldMap object or the name of a file that contains
-%                    a fieldMap object to be used to initialize tag
-%                    information.
+%   tab              
+%                    The 'Updates' tab object in pop_tsv.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and

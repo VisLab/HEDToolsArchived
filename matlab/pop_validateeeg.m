@@ -2,13 +2,21 @@
 %
 % Usage:
 %
-%   >>  issues = pop_validateeeg(EEG);
+%   >>  [issues, com] = pop_validateeeg(EEG)
 %
-% Note: The primary purpose of pop_tageeg is to package up parameter input
-% and calling of tageeg for use as a plugin for EEGLAB (Edit menu).
+% Output:
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%   issues
+%                   A cell array containing all of the issues found through
+%                   the validation. Each cell corresponds to the issues
+%                   found on a particular line.
+%
+%   com              String containing call to tagdir with all
+%                    parameters.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -28,26 +36,31 @@ function [issues, com] = pop_validateeeg(EEG)
 issues = '';
 com = '';
 
+% Display help if inappropriate number of arguments
 if nargin < 1
     help pop_validateeeg;
     return;
 end;
 
-[cancelled, generateWarnings, hedXML, outputDirectory] = ...
+% Get the input parameters
+[canceled, generateWarnings, hedXML, outDir] = ...
     validateeeg_input();
-if cancelled
+if canceled
     return;
 end
 
+% Validate the EEG dataset
 issues = validateeeg(EEG, ...
     'generateWarnings', generateWarnings, ...
     'hedXML', hedXML, ...
-    'outputDirectory', outputDirectory, ...
+    'outDir', outDir, ...
     'writeOutput', true);
+
+% Create command string
 com = char(['validateeeg(EEG, ' ...
     '''generateWarnings'', ' logical2str(generateWarnings) ', ' ...
     '''hedXML'', ''' hedXML ''', ' ...
-    '''outputDirectory'', ''' outputDirectory ''', ' ...
+    '''outDir'', ''' outDir ''', ' ...
     '''writeOutput'', ' 'true)']);
 
     function s = logical2str(b)

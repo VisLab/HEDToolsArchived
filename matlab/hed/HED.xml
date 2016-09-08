@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="3.0.0">
+<HED version="3.0.2">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -198,6 +198,9 @@
             <node>
                <name>Activity</name>
                <description>Experiment-specific actions such as moving a piece in a chess game</description>
+               <node>
+                  <name>Participant action</name>
+               </node>
             </node>
             <node>
                <name>Synchronization</name>
@@ -840,6 +843,9 @@
       </node>
       <node>
          <name>Offset</name>
+      </node>
+      <node>
+         <name>Imagined This is used to identity that the (sub)</name>
       </node>
       <node requireChild="true">
          <name>State ID</name>

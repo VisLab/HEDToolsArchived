@@ -3,13 +3,13 @@
 %
 % Usage:
 %
-%   >>  issues = validateeeg(eeg);
+%   >>  issues = validateeeg(EEG);
 %
-%   >>  issues = validateeeg(eeg, 'key1', 'value1', ...);
+%   >>  issues = validateeeg(EEG, 'key1', 'value1', ...);
 %
 % Input:
 %
-%   eeg         
+%   EEG         
 %                   A EEG dataset structure containing HED tags.
 %
 %   Optional:
@@ -68,16 +68,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function issues = validateeeg(eeg, varargin)
-p = parseArguments(eeg, varargin{:});
+function issues = validateeeg(EEG, varargin)
+p = parseArguments(EEG, varargin{:});
 issues = validate(p);
 
     function issues = validate(p)
         % Validates the eeg structure
         p.hedMaps = getHEDMaps(p);
-        if isfield(p.eeg.event, p.tagField)
+        if isfield(p.EEG.event, p.tagField)
             [p.issues, p.replaceTags, success] = parseeeg(p.hedMaps, ...
-                p.eeg.event, p.tagField, p.generateWarnings);
+                p.EEG.event, p.tagField, p.generateWarnings);
             issues = p.issues;
             if success && p.writeOutput
                 writeOutputFiles(p);
@@ -108,10 +108,10 @@ issues = validate(p);
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
-    function p = parseArguments(eeg, varargin)
+    function p = parseArguments(EEG, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('eeg', @(x) (~isempty(x) && isstruct(x)));
+        p.addRequired('EEG', @(x) (~isempty(x) && isstruct(x)));
         p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('tagField', 'usertags', ...
@@ -121,14 +121,14 @@ issues = validate(p);
         p.addParamValue('outDir', pwd, ...
             @(x) ischar(x) && 7 == exist(x, 'dir'));
         p.addParamValue('writeOutput', false, @islogical);
-        p.parse(eeg, varargin{:});
+        p.parse(EEG, varargin{:});
         p = p.Results;
     end % parseArguments
 
     function writeOutputFiles(p)
         % Writes the issues to the log file
         p.dir = p.outDir;
-        [~, p.file] = fileparts(p.eeg.filename);
+        [~, p.file] = fileparts(p.EEG.filename);
         p.ext = '.txt';
         p.mapExt = '.tsv';
         try

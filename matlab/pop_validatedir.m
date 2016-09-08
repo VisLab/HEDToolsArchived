@@ -34,11 +34,15 @@
 function [fPaths, com] = pop_validatedir()
 fPaths = '';
 com = '';
+
+% Get the input parameters
 [cancelled, errorLogOnly, extensionsAllowed, hedXML, inDir, ...
     outDir, doSubDirs] = validatedir_input();
 if cancelled
     return;
 end
+
+% Validate the EEG directory
 fPaths = validatedir(inDir, ...
     'doSubDirs', doSubDirs, ...
     'errorLogOnly', errorLogOnly, ...

@@ -169,7 +169,7 @@ uiwait(fig);
             ' in for .set files'], ...
             'Value', doSubDirs, ...
             'Units','normalized', ...
-            'Callback', @validateAllCallback, ...
+            'Callback', @doSubDirsCallback, ...
             'Position', [0.1 0.6 0.8 0.3]);
         uicontrol('Parent', optionPanel, ...
             'Style', 'CheckBox', ...
@@ -212,8 +212,8 @@ uiwait(fig);
             'Position',[0.67 0.1 0.21 .5]);
     end % addSubmissionComponents
 
-      function [browserPanel, optionPanel, ...
-            sumissionPanel] = createPanels(fig)
+    function [browserPanel, optionPanel, sumissionPanel] = ...
+            createPanels(fig)
         % Creates the panels in the figure
         browserPanel = uipanel(fig, ...
             'BorderType','none', ...
@@ -242,8 +242,9 @@ uiwait(fig);
         end
     end % browseHedXMLCallback
 
-    function browseInputDirectoryCallback(~, ~, myTitle) 
-        % Callback for browse button to set the input directory editbox
+    function browseInputDirectoryCallback(~, ~, myTitle)
+        % Callback for 'Browse' button to set the 'Input directory'
+        % editbox
         startPath = get(findobj('Tag', 'OutputDirEB'), 'String');
         if isempty(startPath) || ~ischar(startPath) || ~isdir(startPath)
             startPath = pwd;
@@ -255,8 +256,9 @@ uiwait(fig);
         end
     end % browseInputDirectoryCallback
 
-    function browseOutputDirectoryCallback(~, ~, myTitle) 
-        % Callback for browse button to set the output directory editbox
+    function browseOutputDirectoryCallback(~, ~, myTitle)
+        % Callback for 'Browse' button to set the 'Output directory' 
+        % editbox
         startPath = get(findobj('Tag', 'OutputDirEB'), 'String');
         if isempty(startPath) || ~ischar(startPath) || ~isdir(startPath)
             startPath = pwd;
@@ -268,8 +270,8 @@ uiwait(fig);
         end
     end % browseOutputDirectoryCallback
 
-    function cancelButtonCallback(~, ~, fig)  
-        % Callback for the cancel button
+    function cancelButtonCallback(~, ~, fig)
+        % Callback for 'Cancel' button
         canceled = true;
         close(fig);
     end % cancelButtonCallback
@@ -289,17 +291,17 @@ uiwait(fig);
             'WindowStyle', 'modal');
     end % createFigure
 
-    function genearteWarningsCallback(src, ~) 
+    function genearteWarningsCallback(src, ~)
         % Callback for generate warnings checkbox
         generateWarnings = get(src, 'Max') == get(src, 'Value');
     end % genearteWarningsCallback
 
-    function hedEditBoxCallback(src, ~) 
+    function hedEditBoxCallback(src, ~)
         % Callback for user directly editing the HED XML editbox
         xml = get(src, 'String');
         if exist(xml, 'file')
             hedXML = xml;
-        else 
+        else
             errordlg(['XML file is invalid. Setting the XML' ...
                 ' file back to the previous file.'], ...
                 'Invalid XML file');
@@ -328,7 +330,7 @@ uiwait(fig);
             ' warnings in the log file in addition to errors. If' ...
             ' unchecked only errors are included in the log file.']), ...
             'Input Description')
-    end % okayButtonCallback
+    end % helpButtonCallback
 
     function okayButtonCallback(~, ~, fig)
         % Callback for the okay button
@@ -341,7 +343,7 @@ uiwait(fig);
         directory = get(src, 'String');
         if exist(directory, 'dir')
             outDir = directory;
-        else 
+        else
             errordlg(['Output directory is invalid. Setting the output' ...
                 ' directory back to the previous directory.'], ...
                 'Invalid output directory');
@@ -362,8 +364,10 @@ uiwait(fig);
         end
     end % inputDirEditBoxCallback
 
-    function validateAllCallback(src, ~)
+    function doSubDirsCallback(src, ~)
+        % Callback for user directly editing the 'Look in subdirectories'
+        % checkbox
         doSubDirs = get(src, 'Max') == get(src, 'Value');
-    end % validateAllCallback
+    end % doSubDirsCallback
 
 end % tagstudy_input

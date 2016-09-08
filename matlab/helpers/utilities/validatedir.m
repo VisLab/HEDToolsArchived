@@ -4,36 +4,38 @@
 % Usage:
 %
 %   >>  validateDir(inDir);
+%
 %   >>  validateDir(inDir, varargin);
 %
 % Input:
 %
-%       inDir
+%   inDir
 %                   A directory containing EEG datasets that will be
 %                   validated.
 %
-%       Optional:
+%   Optional (key/value):
 %
-%       'DoSubDirs'
+%   'doSubDirs'
 %                   If true (default), the entire inDir directory tree is
 %                   searched. If false, only the inDir directory is
 %                   searched.
 %
-%       'tagField'
+%   'tagField'
 %                   The field in .event that contains the HED tags.
 %                   The default field is .usertags.
 %
-%       'hedXML'
+%   'hedXML'
 %                   The name or the path of the HED XML file containing
 %                   all of the tags.
 %
-%       'outDir'
+%   'outDir'
 %                   The directory where the validation files are written
 %                   to. The default output directory will be the current
 %                   directory
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -42,12 +44,12 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function fPaths = validatedir(inDir, varargin)
 p = parseArguments(inDir, varargin{:});
@@ -115,15 +117,16 @@ fPaths = validate(p);
     end % parseArguments
 
     function writeOutputFiles(p)
-        % Writes the errors, warnings, extension allowed warnings to
-        % the output files
+        % Writes the issues and replace tags found to a log file and a
+        % replace file
         p.dir = p.outDir;
-        [~, p.file] = fileparts(p.eeg.filename);
+        [~, p.file] = fileparts(p.tsvFile);
         p.ext = '.txt';
         p.mapExt = '.tsv';
         try
             if ~isempty(p.issues)
                 createLogFile(p, false);
+                createReplaceFile(p);
             else
                 createLogFile(p, true);
             end
@@ -134,7 +137,8 @@ fPaths = validate(p);
     end % writeOutputFiles
 
     function createLogFile(p, empty)
-        % Creates a log file containing any issues
+        % Creates a log file containing any issues found through the
+        % validation
         numErrors = length(p.issues);
         errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
         fileId = fopen(errorFile,'w');

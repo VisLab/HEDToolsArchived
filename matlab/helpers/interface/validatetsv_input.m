@@ -1,8 +1,38 @@
+% GUI for input needed to create inputs for validatetsv.
+%
+% Usage:
+%
+%   >>  validatetsv_input(tab)
+%
+% Output:
+%
+%   tab
+%                    The 'Validate' tab object in pop_tsv.
+%                    
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
 function validatetsv_input(tab)
 latestHED = 'HED.xml';
 hedXMLPath = which(latestHED);
 hedXML = hedXMLPath;
-remapFile = '';
+replaceFile = '';
 tsvFile = '';
 outDir = pwd;
 tsvTagColumns = 2;
@@ -25,9 +55,9 @@ createPanel(tab);
         end
     end % browseHedXMLCallback
 
-    function browseOutputDirectoryCallback(src, eventdata, ...
-            outputTxtCtrl, myTitle) %#ok<INUSL>
-        % Callback for 'Browse' button that sets the 'Output' editbox
+    function browseOutputDirectoryCallback(~, ~, outputTxtCtrl, myTitle)
+        % Callback for 'Browse' button that sets the 'Output directory'
+        % editbox
         startPath = get(outputTxtCtrl, 'String');
         if isempty(startPath) || ~ischar(startPath) || ~isdir(startPath)
             startPath = pwd;
@@ -38,8 +68,7 @@ createPanel(tab);
         end
     end % browseOutputDirectoryCallback
 
-    function browseTSVFileCallback(src, eventdata, tagsCtrl, ...
-            myTitle) %#ok<INUSL>
+    function browseTSVFileCallback(~, ~, tagsCtrl, myTitle)
         % Callback for 'Browse' button that sets the 'Tags' editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-separated files'; ...
             '*.txt', 'Text files'; '*.*', 'All files'}, myTitle);
@@ -49,16 +78,15 @@ createPanel(tab);
         end
     end % browseTSVFileCallback
 
-    function browseReMapFileCallback(src, eventdata, remapCtrl, ...
-            myTitle) %#ok<INUSL>
+    function browseReplaceFileCallback(~, ~, remapCtrl, myTitle) 
         % Callback for 'Browse' button that sets the 'Tags' editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-separated files'; ...
             '*.txt', 'Text files'; '*.*', 'All files'}, myTitle);
         if tFile ~= 0
-            remapFile = fullfile(tPath, tFile);
-            set(remapCtrl, 'String', remapFile);
+            replaceFile = fullfile(tPath, tFile);
+            set(remapCtrl, 'String', replaceFile);
         end
-    end % browseReMapFileCallback
+    end % browseReplaceFileCallback
 
     function createButtons(panel)
         % Creates the buttons in the panel
@@ -84,7 +112,7 @@ createPanel(tab);
             'TooltipString', ...
             'Press to choose a replacement file', ...
             'Units','normalized',...
-            'Callback', {@browseReMapFileCallback, ...
+            'Callback', {@browseReplaceFileCallback, ...
             remapFileCtrl, ...
             'Browse for map file'}, ...
             'Position', [0.775 0.6 0.2 0.1]);
@@ -112,7 +140,7 @@ createPanel(tab);
             'TooltipString', ...
             'Press when finished', ...
             'Units','normalized',...
-            'Callback', {@validateTSVTagsCallback}, ...
+            'Callback', {@validateTSVCallback}, ...
             'Position', [0.775 0.025 0.2 0.1]);
     end % createButtons
 
@@ -142,7 +170,7 @@ createPanel(tab);
             ' file in addition to errors. If unchecked only errors are' ...
             ' included in the log file'], ...
             'Units','normalized',...
-            'Callback', {@errorLogCallback}, ...
+            'Callback', {@genearteWarningsCallback}, ...
             'Position', [0.04 0.1 0.9 0.4]);
     end % createCheckboxes
 
@@ -155,7 +183,7 @@ createPanel(tab);
             'String', hedXMLPath, ...
             'TooltipString', 'A HED XML file used for validation.', ...
             'Units','normalized',...
-            'Callback', {@hedCtrlCallback}, ...
+            'Callback', {@hedEditboxCallback}, ...
             'Position', [0.15 0.9 0.6 0.1]);
         tsvFileCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -165,7 +193,7 @@ createPanel(tab);
             'TooltipString', ['A tab-separated input file containing' ...
             ' HED tags.'], ...
             'Units','normalized',...
-            'Callback', {@tagsCtrlCallback}, ...
+            'Callback', {@tsvEditboxCallback}, ...
             'Position', [0.15 0.75 0.6 0.1]);
         remapFileCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -177,7 +205,7 @@ createPanel(tab);
             ' Any tags not in this file that generate issues will be' ...
             ' appended to first column.'], ...
             'Units','normalized',...
-            'Callback', {@remapCtrlCallback}, ...
+            'Callback', {@replaceEditboxCallback}, ...
             'Position', [0.15 0.6 0.6 0.1]);
         outputDirectoryCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -188,7 +216,7 @@ createPanel(tab);
             ' is written to if the ''Write Output'' checkbox' ...
             ' is checked.'], ...
             'Units','normalized',...
-            'Callback', {@outputCtrlCallback}, ...
+            'Callback', {@outputEditboxCallback}, ...
             'Position', [0.15 0.45 0.6 0.1]);
         uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -210,7 +238,7 @@ createPanel(tab);
         uicontrol('parent', panel, ...
             'Style', 'Text', ...
             'Units', 'normalized', ...
-            'String', 'HED schema', ...
+            'String', 'HED file', ...
             'HorizontalAlignment', 'Left', ...
             'Position', [0 0.9 0.12 0.08]);
         uicontrol('parent', panel, ...
@@ -252,35 +280,37 @@ createPanel(tab);
         createButtons(panel);
     end % createPanel
 
-    function tsvTagColumnsCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'Columns' editbox
+    function tsvTagColumnsCtrlCallback(src, ~)
+        % Callback for user directly editing the 'HED tag columns' editbox
         tsvTagColumns = str2num(get(src, 'String')); %#ok<ST2NM>
     end % tsvTagColumnsCtrlCallback
 
-    function hasHeaderCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'Header' checkbox
+    function hasHeaderCallback(src, ~) 
+        % Callback for user directly editing the 'Tab-separated input file
+        % has a header' checkbox
         hasHeader = get(src, 'Max') == get(src, 'Value');
     end % hasHeaderCallback
 
-    function errorLogCallback(src, eventdata) %#ok<INUSD>
-        % Callback for only generate error log checkbox
+    function genearteWarningsCallback(src, ~) 
+        % Callback for user directly editing the 'Include warnings in log
+        % file' checkbox
         generateWarnings = get(src, 'Max') == get(src, 'Value');
-    end % errorLogCallback
+    end % genearteWarningsCallback
 
-    function hedCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'HED' editbox
+    function hedEditboxCallback(src, ~) 
+        % Callback for user directly editing the 'HED file' editbox
         hedXML = get(src, 'String');
-    end % hedCtrlCallback
+    end % hedEditboxCallback
 
-    function remapCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'HED' editbox
-        remapFile = get(src, 'String');
-    end % remapCtrlCallback
+    function replaceEditboxCallback(src, ~) 
+        % Callback for user directly editing the 'Replace file' editbox
+        replaceFile = get(src, 'String');
+    end % replaceEditboxCallback
 
-    function outputCtrlCallback(src, eventdata) %#ok<INUSD>
-        % Callback for user directly editing the 'Output' editbox
+    function outputEditboxCallback(src, ~) 
+        % Callback for user directly editing the 'Output directory' editbox
         outDir = get(src, 'String');
-    end % outputCtrlCallback
+    end % outputEditboxCallback
 
     function setOutputDirectory(dName)
         % Sets the 'Output' edit box based on the 'Tags' editbox
@@ -288,16 +318,16 @@ createPanel(tab);
         set(outputDirectoryCtrl, 'String', outDir);
     end % setOutputDirectory
 
-    function tagsCtrlCallback(src, eventdata) %#ok<INUSD>
+    function tsvEditboxCallback(src, ~) 
         % Callback for user directly editing the 'Tags' editbox
         tsvFile = get(src, 'String');
-    end % tagsCtrlCallback
+    end % tsvEditboxCallback
 
-    function helpCallback(src, eventdata) %#ok<INUSD>
+    function helpCallback(~, ~) 
         % Callback for the 'Validate' button
         helpdlg(sprintf(['Validates the HED tags in a tab-separated' ...
             ' file against a HED schema. \n\n***Main Options***' ...
-            ' \n\nHED schema - A XML file containing every single' ...
+            ' \n\nHED file - A XML file containing every single' ...
             ' HED tag and its attributes. This by default will be' ...
             ' the HED.xml file found in the hed directory. If you want' ...
             ' to be sure that you are using the latest version click' ...
@@ -339,7 +369,7 @@ createPanel(tab);
             'Validation Instructions');
     end % helpCallback
 
-    function validateTSVTagsCallback(src, eventdata) %#ok<INUSD>
+    function validateTSVCallback(~, ~) 
         % Callback for the 'Validate' button
         if isempty(hedXML)
             errordlg('HED XML file is empty');
@@ -362,6 +392,6 @@ createPanel(tab);
             end
             close(wb);
         end
-    end % validateTSVTagsCallback
+    end % validateTSVCallback
 
 end % validatetsv_input

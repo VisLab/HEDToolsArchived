@@ -1,9 +1,33 @@
-% GUI for input needed to create inputs for validatestudy.
+% GUI for input needed to create inputs for validateeeg.
 %
 % Usage:
 %
-%   >>  [cancelled, generateWarnings, hedXML, outputDirectory] = ...
-%       validateeeg_input()
+%   >>  [canceled, generateWarnings, hedXML, outDir] = validateeeg_input()
+%
+% Output:
+%
+%   canceled
+%                   True if the GUI is canceled. False if otherwise.
+%
+%   generateWarnings
+%                   True to include warnings in the log file in addition
+%                   to errors. If false (default) only errors are included
+%                   in the log file.
+%
+%   hedXML
+%                   A XML file containing every single HED tag and its
+%                   attributes. This by default will be the HED.xml file
+%                   found in the hed directory.
+%
+%   outDir
+%                   The directory where the validation output will be
+%                   written to if the 'writeOutput' argument is set to
+%                   true. There will be log file containing any issues that
+%                   were found while validating the HED tags. If there were
+%                   issues found then a replace file will be created in
+%                   addition to the log file if an optional one isn't
+%                   already provided. The default output directory will be
+%                   the current directory.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -23,8 +47,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, generateWarnings, hedXML, outDir] = ...
-    validateeeg_input()
+function [canceled, generateWarnings, hedXML, outDir] = validateeeg_input()
 canceled = true;
 generateWarnings = false;
 hedXML = which('HED.xml');
@@ -260,7 +283,7 @@ uiwait(fig);
     end % helpButtonCallback
 
     function okayButtonCallback(~, ~, fig)
-        % Callback for the okay button
+        % Callback for the 'Okay' button
         canceled = false;
         close(fig);
     end % okayButtonCallback

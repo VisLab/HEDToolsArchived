@@ -40,8 +40,7 @@ tsvCtrl = '';
 outputCtrl = '';
 createPanel(tab);
 
-    function browseOutputCallback(src, eventdata, replaceOutputCtrl, ...
-            myTitle) %#ok<INUSL>
+    function browseOutputCallback(~, ~, replaceOutputCtrl, myTitle) 
         % Callback for 'Browse' button that sets the 'Output file' editbox
         defaultName = '';
         if ~isempty(tsvFile)
@@ -56,8 +55,7 @@ createPanel(tab);
         end
     end % browseOutputCallback
 
-    function browseReplaceCallback(src, eventdata, replaceTxtCtrl, ...
-            myTitle) %#ok<INUSL>
+    function browseReplaceCallback(~, ~, replaceTxtCtrl, myTitle) 
         % Callback for 'Browse' button that sets the 'Replace file'
         % editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-separated files'; ...
@@ -68,8 +66,7 @@ createPanel(tab);
         end
     end % browseReplaceCallback
 
-    function browseTSVCallback(src, eventdata, replaceTagCtrl, ...
-            myTitle) %#ok<INUSL>
+    function browseTSVCallback(~, ~, replaceTagCtrl, myTitle) 
         % Callback for 'Browse' button that sets the 'TSV input file'
         % editbox
         [tFile, tPath] = uigetfile({'*.tsv', 'Tab-separated files'; ...
@@ -80,7 +77,7 @@ createPanel(tab);
         end
     end % browseTSVCallback
 
-    function columnsCtrlCallback(src, eventdata) %#ok<INUSD>
+    function columnsCtrlCallback(src, ~) 
         % Callback for user directly editing the 'HED tag columns' editbox
         columns = str2num(get(src, 'String')); %#ok<ST2NM>
     end % columnsCtrlCallback
@@ -142,7 +139,7 @@ createPanel(tab);
             'TooltipString', ['A tab-separated input file containing' ...
             ' HED tags.'], ...
             'Units','normalized',...
-            'Callback', {@tsvCtrlCallback}, ...
+            'Callback', {@tsvEditboxCallback}, ...
             'Position', [0.15 0.9 0.6 0.1]);
         replaceCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -155,7 +152,7 @@ createPanel(tab);
             ' Any tags not in this file that generate issues will be' ...
             ' appended to first column.'], ...
             'Units','normalized',...
-            'Callback', {@replaceCtrlCallback}, ...
+            'Callback', {@replaceEditboxCallback}, ...
             'Position', [0.15 0.75 0.6 0.1]);
         outputCtrl = uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -165,7 +162,7 @@ createPanel(tab);
             'TooltipString', ['A tab-separated output file containing' ...
             ' the updated HED tags.'], ...
             'Units','normalized',...
-            'Callback', {@outputCtrlCallback}, ...
+            'Callback', {@outputEditboxCallback}, ...
             'Position', [0.15 0.6 0.6 0.1]);
         uicontrol('Parent', panel, ...
             'Style', 'edit', ...
@@ -218,14 +215,13 @@ createPanel(tab);
         createButtons(panel);
     end % createPanel
 
-    function outputCtrlCallback(src, eventdata) %#ok<INUSD>
+    function outputEditboxCallback(src, ~) 
         % Callback for user directly editing the 'Output file' editbox
         outputFile = get(src, 'String');
-    end % outputCtrlCallback
+    end % outputEditboxCallback
 
-    function replaceCallback(src, eventdata) %#ok<INUSD>
+    function replaceCallback(~, ~) 
         % Callback for the tag validation button
-        % Callback for convert button
         if isempty(replaceFile)
             errordlg('Replace file is empty');
         elseif isempty(tsvFile)
@@ -247,7 +243,7 @@ createPanel(tab);
         end
     end % replaceCallback
 
-    function helpCallback(src, eventdata) %#ok<INUSD>
+    function helpCallback(~, ~) 
         % Callback for the 'Help' button
         helpdlg(sprintf(['Find and replace the HED tags in a' ...
             ' tab-separated file.\n\n**Options*** \n\nTSV input file' ...
@@ -266,14 +262,14 @@ createPanel(tab);
             'Instructions');
     end % helpCallback
 
-    function replaceCtrlCallback(src, eventdata) %#ok<INUSD>
+    function replaceEditboxCallback(src, ~)
         % Callback for user directly editing the 'Replace file' editbox
         replaceFile = get(src, 'String');
-    end % replaceCtrlCallback
+    end % replaceEditboxCallback
 
-    function tsvCtrlCallback(src, eventdata) %#ok<INUSD>
+    function tsvEditboxCallback(src, ~) 
         % Callback for user directly editing the 'TSV input file' editbox
         tsvFile = get(src, 'String');
-    end % tsvCtrlCallback
+    end % tsvEditboxCallback
 
 end % replacetsv_input

@@ -11,12 +11,12 @@
 %   Required:
 %
 %   fMap             A fieldMap object that contains the tag map
-%                    information.
+%                    information prior to tagging.
 %
 %   Optional (key/value):
 %
 %   'ExcludeFields'
-%                    A cell array containing the field names to exclude
+%                    A cell array containing the field names to exclude.
 %
 %   'Fields'
 %                    A cell array containing the field names to extract
@@ -31,6 +31,18 @@
 %   'SelectFields'
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
+%
+% Output:
+%
+%   fMap             A fieldMap object that contains the tag map
+%                    information after tagging.
+%
+%   fields           The fields that the user decides to tag.
+%                    
+%   excluded         The fields that the user decides to exclude from
+%                    tagging.
+%
+%   canceled         True if the user cancels. False if otherwise.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -59,13 +71,13 @@ fields = intersect(p.Fields, fMap.getFields(), 'stable');
 excluded = setdiff(p.ExcludeFields, fields);
 if isempty(fields) && selectFields
     fields = setdiff(fMap.getFields(), excluded);
-    [fields, excluded, canceled] = selectFields2Tag(fields, excluded, ...
-        primaryField);
+    [fields, excluded, primaryField, canceled] = ...
+        selectFields2Tag(fields, excluded, primaryField);
 end
 fMap.setPrimaryMap(primaryField);
 
-    function [fields, excluded, canceled] = selectFields2Tag(fields, ...
-            excluded, primaryField)
+    function [fields, excluded, primaryField, canceled] = ...
+            selectFields2Tag(fields, excluded, primaryField)
         % Select fields to tag with a menu
         canceled = false;
         [fields, primaryField] = putPrimaryFirst(primaryField, fields);
@@ -101,8 +113,7 @@ fMap.setPrimaryMap(primaryField);
         submitted = loader.isSubmitted();
     end % checkMenuStatus
 
-    function [fields, primaryField] = putPrimaryFirst(primaryField, ...
-            fields)
+    function [fields, primaryField] = putPrimaryFirst(primaryField, fields)
         % Moves the primary field to the beginning of the list of fields
         if sum(strcmp(fields, primaryField)) == 0
             primaryField = '';

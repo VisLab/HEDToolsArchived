@@ -38,7 +38,7 @@
 %                   attributes. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'outputDirectory'
+%   'outDir'
 %                   The directory where the validation output will be
 %                   written to if the 'writeOutput' argument is set to
 %                   true. There will be log file containing any issues that
@@ -68,13 +68,14 @@
 %
 % Output:
 %
-%       issues
+%   issues
 %                   A cell array containing all of the issues found through
 %                   the validation. Each cell corresponds to the issues
 %                   found on a particular line.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -83,12 +84,12 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function issues = validatetsv(tsvFile, tagColumns, varargin)
 p = parseArguments(tsvFile, tagColumns, varargin{:});
@@ -136,7 +137,7 @@ issues = validate(p);
         p.addParamValue('hasHeader', true, @islogical);
         p.addParamValue('replaceFile', '', @(x) (~isempty(x) && ...
             ischar(x)));
-        p.addParamValue('outputDirectory', pwd);
+        p.addParamValue('outDir', pwd);
         p.addParamValue('writeOutput', false, @islogical);
         p.parse(tsvFile, tagColumns, varargin{:});
         p = p.Results;
@@ -184,7 +185,7 @@ issues = validate(p);
     function fileId = append2ReplaceFile(p)
         % Appends to an existing replace file
         numMapTags = size(p.replaceTags, 1);
-        [replaceFileDir, file]  = fileparts(p.replaceFile);
+        replaceFileDir  = fileparts(p.replaceFile);
         replaceFile = fullfile(p.dir, [p.file p.ext]);
         replaceMap = replaceFile2Map(replaceFile);
         if ~strcmp(dir, replaceFileDir)
@@ -222,7 +223,7 @@ issues = validate(p);
     function writeOutputFiles(p)
         % Writes the issues and replace tags found to a log file and a
         % replace file
-        p.dir = p.outputDirectory;
+        p.dir = p.outDir;
         [~, p.file] = fileparts(p.tsvFile);
         p.ext = '.txt';
         p.mapExt = '.tsv';

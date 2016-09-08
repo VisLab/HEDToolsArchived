@@ -11,6 +11,26 @@
 %                    True if the cancel button is pressed. False if
 %                    otherwise.
 %
+%   generateWarnings
+%                   True to include warnings in the log file in addition
+%                   to errors. If false (default) only errors are included
+%                   in the log file.
+%
+%   hedXML
+%                   A XML file containing every single HED tag and its
+%                   attributes. This by default will be the HED.xml file
+%                   found in the hed directory.
+% 
+%   'outDir'
+%                   The directory where the validation output will be
+%                   written to. There will be log file containing any
+%                   issues that were found while validating the HED tags.
+%                   If there were
+%                   issues found then a replace file will be created in
+%                   addition to the log file if an optional one isn't
+%                   already provided. The default output directory will be
+%                   the current directory.
+%
 %   studyFile
 %                    The path to a EEG study.
 %

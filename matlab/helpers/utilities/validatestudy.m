@@ -4,6 +4,7 @@
 % Usage:
 %
 %   >>  validateDir(study);
+%
 %   >>  validateDir(study, varargin);
 %
 % Input:

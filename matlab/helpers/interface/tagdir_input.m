@@ -378,6 +378,6 @@ uiwait(inputFig);
         % Callback for user directly editing the 'Look in subdirectories'
         % checkbox
         doSubDirs = get(src, 'Max') == get(src, 'Value');
-    end % useGUICallback
+    end % doSubDirsCallback
 
 end % tagdir_input
