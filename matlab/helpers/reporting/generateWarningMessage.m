@@ -1,31 +1,27 @@
 % This function generates the output for the HED tag validation warnings.
 %
 % Usage:
+%
 %   >>  warning = generateWarningMessage(type, line, tag, units);
 %
 % Input:
 %
-%       type        The type of warning that is generated.
+%   type            The type of warning that is generated.
 %
-%       line        The line that the warning was generated on.
+%   line            The line that the warning was generated on.
 %
-%       tag         The tag of tag group that generated the warning.
+%   tag             The tag of tag group that generated the warning.
 %
-%       units       The units that are associated with tag. Only unit
+%   units           The units that are associated with tag. Only unit
 %                   class tags will have units.
 % Output:
 %
-%       warning     A string that consists of the warning that was
+%   warning         A string that consists of the warning that was
 %                   generated.
 %
-% Examples:
-%                   To generate a 'cap' warning on from tag '/Event/label'.
-%
-%                   warning = generateWarningMessage('cap', [], ...
-%                   '/Event/label', []);
-%
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -39,7 +35,7 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function warning = generateWarningMessage(type, line, tag, units)
 warning = '';

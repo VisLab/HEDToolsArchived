@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="3.0.2">
+<HED version="3.0.3">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -866,15 +866,19 @@
             <name>Correct</name>
          </node>
          <node>
+            <name>Incorrect</name>
+            <description>Wrong choice but not time out</description>
+         </node>
+         <node>
+            <name>Indeterminate</name>
+            <description>It cannot be determined that the action was correct or incorrect.</description>
+         </node>
+         <node>
             <name>Time out</name>
             <node>
                <name>Missed</name>
                <description>Participant failed or could not have perceived the instruction due to their eyes being off-screen or a similar reason. Not easy to deduce this but it is possible</description>
             </node>
-         </node>
-         <node>
-            <name>Incorrect</name>
-            <description>Wrong choice but not time out</description>
          </node>
          <node>
             <name>Inappropriate</name>

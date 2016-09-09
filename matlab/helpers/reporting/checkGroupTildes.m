@@ -1,5 +1,6 @@
 % This function checks the number of tildes in a group. A group cannot have
-% more than 2 tildes. 
+% more than 2 tildes. A group with more than 2 tildes will generate an
+% error.
 %
 % Usage:
 %

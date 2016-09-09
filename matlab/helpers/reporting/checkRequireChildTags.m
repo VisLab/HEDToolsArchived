@@ -1,5 +1,7 @@
-% This function checks to see if the provided tags have the 'requireChild'
-% attribute. 
+% This function checks to see if the provided HED tags have the 
+% 'requireChild' attribute. Tags with this attribute should not be
+% present but instead have a tag that is a descendant of it. Tags found
+% with the 'requireChild' attribute will generate an error. 
 
 % Usage:
 %

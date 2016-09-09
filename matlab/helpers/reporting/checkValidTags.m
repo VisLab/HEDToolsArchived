@@ -1,11 +1,67 @@
-function [errors, errorTags, extensions, extensionTags] = ...
-    checkValidTags(Maps, originalTags, formattedTags, extensionAllowed)
+% This function checks to see if the provided HED tags are in the HED
+% schema. Tags not in the HED schema will be checked to see if they are a
+% descendant of a tag with the 'extensionAllowed' attribute. If they are
+% not then an error will be generated.    
+%
+% Usage:
+%
+%   >>  [errors, errorTags] = checkUniqueTags(hedMaps, originalTags, ...
+%       formattedTags)
+%
+% Input:
+%
+%   hedMaps
+%                   A structure that contains Maps associated with the HED
+%                   XML tags. There is a map that contains all of the HED
+%                   tags, a map that contains all of the unit class units,
+%                   a map that contains the tags that take in units, a map
+%                   that contains the default unit used for each unit
+%                   class, a map that contains the tags that take in
+%                   values, a map that contains the tags that are numeric,
+%                   a map that contains the required tags, a map that
+%                   contains the tags that require children, a map that
+%                   contains the tags that are extension allowed, and map
+%                   that contains the tags are are unique.
+%
+%   originalTags
+%                   A cell array of HED tags. These tags are used to report
+%                   the errors found. 
+%
+%   formattedTags
+%                   A cell array of HED tags. These tags are used to do the
+%                   validation.
+%
+% Output:
+%
+%   errors
+%                   A string containing the validation errors.
+%
+%   errorTags
+%                   A cell array containing validation error tags.  
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+function [errors, errorTags] = checkValidTags(hedMaps, originalTags, ...
+    formattedTags)
 errors = '';
-extensions = '';
 errorTags = {};
-extensionTags = {};
 errorsIndex = 1;
-extensionsIndex = 1;
 checkValidTags(originalTags, formattedTags, false);
 
     function checkValidTags(originalTags, formattedTags, isGroup)
@@ -18,20 +74,14 @@ checkValidTags(originalTags, formattedTags, false);
             end
             if isTilde(formattedTags{a}) || ...
                     tagTakesValue(formattedTags{a}) || ...
-                    Maps.tags.isKey(lower(formattedTags{a}))
+                    hedMaps.tags.isKey(lower(formattedTags{a}))
                 continue;
             end
-            [isExtensionTag, extensionParentTag] = ...
-                tagAllowExtensions(formattedTags{a});
-            if extensionAllowed && isExtensionTag
-                generateExtensions(originalTags, a, extensionParentTag, ...
-                    isGroup);
-            else
+            if ~tagAllowExtensions(formattedTags{a})
                 generateError(originalTags, a, isGroup);
             end
         end
         errorTags(cellfun('isempty', errorTags)) = [];
-        extensionTags(cellfun('isempty', extensionTags)) = [];
     end % checkValidTags
 
     function tilde = isTilde(tag)
@@ -62,22 +112,6 @@ checkValidTags(originalTags, formattedTags, false);
         errorsIndex = errorsIndex + 1;
     end % generateErrorMessages
 
-    function generateExtensions(originalTags, tagIndex, ...
-            extensionParentTag, isGroup)
-        % Generates extension warnings for tags that are children of
-        % extension allowed tags
-        tagString = originalTags{tagIndex};
-        if isGroup
-            tagString = [originalTags{tagIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTags),')'];
-        end
-        extensions = [extensions, ...
-            generateExtensionMessage('extensionAllowed', '', tagString, ...
-            extensionParentTag)];
-        extensionTags{extensionsIndex} = originalTags{tagIndex};
-        extensionsIndex = extensionsIndex + 1;
-    end % generateExtensions
-
     function [isExtensionTag, extensionParentTag] = tagAllowExtensions(tag)
         % Checks if the tag has the extensionAllowed attribute
         isExtensionTag = false;
@@ -85,7 +119,7 @@ checkValidTags(originalTags, formattedTags, false);
         slashIndexes = strfind(tag, '/');
         while size(slashIndexes, 2) > 1
             parent = tag(1:slashIndexes(end)-1);
-            if Maps.extensionAllowed.isKey(lower(parent))
+            if hedMaps.extensionAllowed.isKey(lower(parent))
                 extensionParentTag = parent;
                 isExtensionTag = true;
                 break;
@@ -99,7 +133,7 @@ checkValidTags(originalTags, formattedTags, false);
         isValueTag = false;
         valueTag = convertToValueTag(tag);
         while ~strncmp(valueTag, '/#', 2)
-            if Maps.takesValue.isKey(lower(valueTag))
+            if hedMaps.takesValue.isKey(lower(valueTag))
                 isValueTag = true;
                 break;
             end

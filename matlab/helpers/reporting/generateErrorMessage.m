@@ -6,29 +6,24 @@
 %
 % Input:
 %
-%       type        The type of warning that is generated.
+%   type            The type of warning that is generated.
 %
-%       line        The line that the warning was generated on.
+%   line            The line that the warning was generated on.
 %
-%       tag         The tag of tag group that generated the warning.
+%   tag             The tag of tag group that generated the warning.
 %
-%       prefix      The tag prefix that is associated with the tag.
+%   prefix          The tag prefix that is associated with the tag.
 %
-%       units       The units that are associated with tag. Only unit
+%   units           The units that are associated with tag. Only unit
 %                   class tags will have units.
 % Output:
 %
-%       error       A string that consists of the error that was
+%   error           A string that consists of the error that was
 %                   generated.
 %
-% Examples:
-%                   To generate a 'required' error from tag '/Event/label'.
-%
-%                   error = generateErrorMessage('required', [], ...
-%                   '/Event/label', [], [])
-%
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by

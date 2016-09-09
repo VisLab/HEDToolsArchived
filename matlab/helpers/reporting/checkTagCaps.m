@@ -1,6 +1,7 @@
-% This function checks for the capitalization of HED tags. The first word
-% of each tag must be capitalized and all subsequent words should be
-% lowercase.
+% This function checks for the capitalization of the provided HED tags. The
+% first word of each tag must be capitalized and all subsequent words
+% should be lowercase. Any tags not complying to these rules will generate
+% a warning.
 %
 % Usage:
 %
