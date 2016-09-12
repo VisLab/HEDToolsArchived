@@ -3,8 +3,7 @@
 %
 % Usage:
 %
-%   >>  warnings = checkForValidationWarnings(hedMaps, originalTags, ...
-%       formattedTags);
+%   >>  warnings = checkWarnings(hedMaps, originalTags, formattedTags);
 %
 % Input:
 %
@@ -55,12 +54,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function warnings = checkForValidationWarnings(hedMaps, originalTags, ...
-    formattedTags)
+function warnings = checkWarnings(hedMaps, originalTags, formattedTags)
 warnings = '';
 warnings = [warnings checkTagCaps(hedMaps, originalTags, formattedTags)];
 warnings = [warnings checkTagSlashes(originalTags)];
 [~, ~, takeValueWarnings] = checkTakeValueTags(hedMaps, originalTags, ...
     formattedTags);
 warnings = [warnings takeValueWarnings];
-end % checkForValidationWarnings
+end % checkWarnings

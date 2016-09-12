@@ -2,9 +2,11 @@
 % unit classes in a structure of Map objects.
 %
 % Usage:
-%   >>  Maps = mapHEDAttributes(xml)
+%
+%   >>  hedMaps = mapattributes(hedXML)
 %
 % Input:
+%
 %       hedXML
 %                   The name or the path of the HED XML file containing
 %                   all of the tags.
@@ -23,16 +25,9 @@
 %                   contains the tags that are extension allowed, and map
 %                   that contains the tags are are unique.
 %
-% Examples:
-%                   Parses a HED XML file 'HED2.027.xml' and returns a
-%                   structure of Map objects 'Maps' that contain all of the
-%                   tags,attributes and unit classes.
-%
-%                   Maps = parsehed('HED2.027.xml')
-%
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
-%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -46,9 +41,9 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function hedMaps = mapHEDAttributes(hedXML)
+function hedMaps = mapattributes(hedXML)
 try
     xDoc = xmlread(hedXML);
 catch
@@ -175,4 +170,4 @@ processNodeElements(rootElement, '');
         end
     end % processUnitClassElements
 
-end % mapHEDAttributes
+end % mapattributes

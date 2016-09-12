@@ -24,7 +24,7 @@
 %
 %   originalTags
 %                   A cell array of HED tags. These tags are used to report
-%                   the errors found. 
+%                   the errors found.
 %
 %   formattedTags
 %                   A cell array of HED tags. These tags are used to do the
@@ -36,7 +36,7 @@
 %                   A string containing the validation errors.
 %
 %   errorTags
-%                   A cell array containing validation error tags.  
+%                   A cell array containing validation error tags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -82,13 +82,13 @@ end
                 size(uniqueTags{uniqueTagsIndex},2));
             if sum(foundIndexes) > 1
                 foundIndexes = find(foundIndexes);
-                generateErrorMessages(uniqueTagsIndex, foundIndexes, ...
+                generateErrors(uniqueTagsIndex, foundIndexes, ...
                     originalTags, isGroup);
             end
         end
     end % checkUniqueTags
 
-    function generateErrorMessages(uniqueTagsIndex, foundIndexes, ...
+    function generateErrors(uniqueTagsIndex, foundIndexes, ...
             originalTags, isGroup)
         % Generates a unique tag error if two or more tags are descendants
         % of a unique tag
@@ -100,11 +100,11 @@ end
                     ' in group (' ,...
                     vTagList.stringifyElement(originalTags),')'];
             end
-            errors = [errors, generateErrorMessage('unique', '', ...
-                tagString, uniqueTags{uniqueTagsIndex}, '')];     %#ok<AGROW>
+            errors = [errors, generateError('unique', '', tagString, ...
+                uniqueTags{uniqueTagsIndex}, '')];     %#ok<AGROW>
             errorTags{end+1} = uniqueTags{uniqueTagsIndex}; %#ok<AGROW>
         end
-    end % generateErrorMessage
+    end % generateErrors
 
     function [originalEventTags, formattedEventTags] = ...
             getEventTags(originalTags, formattedTags)

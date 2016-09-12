@@ -1,4 +1,4 @@
-function fTags = formatTags(tags, isCanonical)
+function fTags = formattags(tags, isCanonical)
 % Formats the hed tags
 fTags = vTagList.deStringify(tags);
 if isCanonical
@@ -7,4 +7,4 @@ if isCanonical
         fTags{c} = vTagList.getUnsortedCanonical(fTags{c});
     end
 end
-end % formatTags
+end % formattags

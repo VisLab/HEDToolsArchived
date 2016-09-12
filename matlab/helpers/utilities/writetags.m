@@ -12,9 +12,12 @@
 %
 %   Required:
 %
-%   EEG
-%                    The EEG dataset structure that will be tagged. The
+%   eData
+%                    The structure that will be tagged. The
 %                    dataset will need to have a .event field.
+%
+%   fMap
+%                    A fieldMap object that stores all of the tags.
 %
 %   Optional (key/value):
 %
@@ -55,7 +58,6 @@ if isfield(eData, 'event') && isstruct(eData.event)
     eFields = intersect(fieldnames(eData.event), tFields);
     eData = writeIndividualTags(eData, fMap, eFields, p.PreservePrefix);
 end
-eFields = intersect(eFields, tFields);
 eData = writeSummaryTags(fMap, eData, tFields);
 
     function eData = writeIndividualTags(eData, fMap, eFields, ...

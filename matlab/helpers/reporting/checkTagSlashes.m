@@ -1,5 +1,5 @@
 % This function checks to see if the provided tags end with a slash. If
-% found at the end a warning will be generated. 
+% found at the end a warning will be generated.
 %
 % Usage:
 %
@@ -9,7 +9,7 @@
 %
 %   originalTags
 %                   A cell array of HED tags. These tags are used to report
-%                   the warnings found. 
+%                   the warnings found.
 %
 % Output:
 %
@@ -17,7 +17,7 @@
 %                   A string containing the validation warnings.
 %
 %   warningTags
-%                   A cell array containing validation warning tags. 
+%                   A cell array containing validation warning tags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -51,27 +51,23 @@ checkTagSlashes(originalTags, false);
             if ~ischar(originalTags{a})
                 checkTagSlashes(originalTags{a}, true);
             elseif findSlashes(originalTags{a})
-                generateWarning(originalTags, a, isGroup);
+                generateWarnings(originalTags, a, isGroup);
             end
         end
         warningTags(cellfun('isempty', warningTags)) = [];
     end % checkTagCaps
 
-    function generateWarning(originalTags, tagIndex, isGroup)
+    function generateWarnings(originalTags, tagIndex, isGroup)
         % Generates tag warnings if the tag ends with a slash
-        try
-            tagString = originalTags{tagIndex};
-            if isGroup
-                tagString = [originalTags{tagIndex}, ' in group (' ,...
-                    vTagList.stringifyElement(originalTags),')'];
-            end
-            warnings = [warnings, ...
-                generateWarningMessage('slash', '', tagString, '')];
-            warningTags{warningsIndex} = originalTags{tagIndex};
-            warningsIndex = warningsIndex + 1;
-        catch
+        tagString = originalTags{tagIndex};
+        if isGroup
+            tagString = [originalTags{tagIndex}, ' in group (' ,...
+                vTagList.stringifyElement(originalTags),')'];
         end
-    end % generateWarningMessageMessage
+        warnings = [warnings, generateWarning('slash', '', tagString, '')];
+        warningTags{warningsIndex} = originalTags{tagIndex};
+        warningsIndex = warningsIndex + 1;
+    end % generateWarnings
 
     function slashesFound = findSlashes(originalTag)
         % Returns true if the tag ends with a slash

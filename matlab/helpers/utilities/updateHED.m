@@ -3,7 +3,7 @@
 %
 % Usage:
 %
-%   >>  version = updateHED();
+%   >>  version = updatehed();
 %
 % Output:
 %
@@ -11,8 +11,9 @@
 %                   The version of the latest HED schema that is
 %                   downloaded.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -26,9 +27,9 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function version = updateHED()
-version = downloadHED();
-replaceHED();
-end % updateHED
+function version = updatehed()
+version = downloadhed();
+replacehed();
+end % updatehed

@@ -1,29 +1,34 @@
-% This function takes in a remap file and stores the old HED to new HED
+% This function takes in a replace file and stores the old HED to new HED
 % tag mappings in a Map object.
 %
 % Usage:
-%   >>  remapMap = remap2map(remapFile);
+%
+%   >>  replaceMap = replace2map(replaceFile)
 %
 % Input:
-%       'remap'     The name or the path of the map file containing
+%
+%   replaceFile     
+%                   The name or the path of the map file containing
 %                   the mappings of old tags to new tags. This
-%                   file is a two column tab-delimited file with the old
+%                   file is a two column tab-separated file with the old
 %                   HED tags in one column and the new HED tags in another
 %                   column.
 % Output:
-%       'remapMap'  A Map object the contains the old to new tag
-%                   mappings from the HED remap file. The old tags will
+%
+%   replaceMap  
+%                   A Map object the contains the old to new tag
+%                   mappings from the HED replace file. The old tags will
 %                   be the keys and the new tags will be the values.
 %
 % Examples:
-%                   To create a remap Map object 'remapMap' from the HED
-%                   remap file 'HEDRemap.txt'.
+%                   To create a replace Map object 'replaceMap' from the
+%                   HED replace file 'HED1To2Replace.txt'.
 %
-%                  remapMap = remap2map('HED1To2Remap.txt')
+%                   replaceMap = replace2map('HED1To2Replace.txt')
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
-%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -32,36 +37,36 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function remap = remap2Map(remapFile)
-p = parseArguments();
-remap = containers.Map('KeyType', 'char', 'ValueType', 'any');
-putInMap();
+function replaceMap = replace2map(replaceFile)
+p = parseArguments(replaceFile);
+replaceMap = putInMap(p);
 
-    function p = parseArguments()
+    function p = parseArguments(replaceFile)
         % Parses the input arguments and returns the results
         p = inputParser();
-        p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
-        p.parse(remapFile);
+        p.addRequired('replaceFile', @(x) ~isempty(x) && ischar(x));
+        p.parse(replaceFile);
         p = p.Results;
     end % parseArguments
 
-    function putInMap()
+    function replaceMap = putInMap(p)
         % Put each line of a remap file in a hash map
+        replaceMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
         try
-            fileId = fopen(p.remapFile);
+            fileId = fopen(p.replaceFile);
             tLine = fgetl(fileId);
             while ischar(tLine)
                 if ~isempty(tLine)
                     [originalTag, replacementTag] = parseLine(tLine);
                     if ~isempty(originalTag) && ~isempty(replacementTag)
-                        remap(lower(originalTag)) = replacementTag;
+                        replaceMap(lower(originalTag)) = replacementTag; 
                     end
                 end
                 tLine = fgetl(fileId);
@@ -74,7 +79,7 @@ putInMap();
     end % putInMap
 
     function [originalTag, replacementTag] = parseLine(tLine)
-        % Parses the map file line
+        % Parses the replace file line
         [originalTag, replacementTag] = strtok(tLine, char(9));
         originalTag = strtrim(originalTag);
         if originalTag(1) == '/'
@@ -83,4 +88,4 @@ putInMap();
         replacementTag = strtrim(replacementTag);
     end % parseLine
 
-end % remap2map
+end % replace2map

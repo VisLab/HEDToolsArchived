@@ -125,7 +125,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         % Checks the numerical tag
         tagName = getTagName(formattedTag{numericalIndex});
         if ~all(ismember(tagName, '<>=.0123456789'))
-            generateErrorMessages(originalTag, numericalIndex, isGroup, ...
+            generateErrors(originalTag, numericalIndex, isGroup, ...
                 'isNumeric', '');
         end
     end % checkNumericalTag
@@ -146,16 +146,16 @@ checkTakesValueTags(originalTags, formattedTags, false);
         end
         unitsRegexp = buildUnitsRegexp(unitClassUnits);
         if all(ismember(tagName, '<>=.0123456789'))
-            generateWarningMessages(originalTag, unitIndex, isGroup, ...
+            generateWarnings(originalTag, unitIndex, isGroup, ...
                 'unitClass', unitClassDefault)
         end
         if isempty(regexpi(tagName, unitsRegexp))
-            generateErrorMessages(originalTag, unitIndex, isGroup, ...
+            generateErrors(originalTag, unitIndex, isGroup, ...
                 'unitClass', unitClassUnits);
         end
     end % checkUnitClassTags
 
-    function generateErrorMessages(originalTag, valueIndex, isGroup, ...
+    function generateErrors(originalTag, valueIndex, isGroup, ...
             errorType, unitClassUnits)
         % Generates takes value and unit class tag errors
         tagString = originalTag{valueIndex};
@@ -163,12 +163,12 @@ checkTakesValueTags(originalTags, formattedTags, false);
             tagString = [originalTag{valueIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTag),')'];
         end
-        errors = [errors, generateErrorMessage(errorType, '', ...
-            tagString, '', unitClassUnits)];
+        errors = [errors, generateError(errorType, '', tagString, '', ...
+            unitClassUnits)];
         errorTags{end+1} = originalTag{valueIndex};
-    end % generateErrorMessages
+    end % generateErrors
 
-    function generateWarningMessages(originalTag, valueIndex, isGroup, ...
+    function generateWarnings(originalTag, valueIndex, isGroup, ...
             warningType, unitClassDefault)
         % Generates takes value and unit class tag errors
         tagString = originalTag{valueIndex};
@@ -176,10 +176,10 @@ checkTakesValueTags(originalTags, formattedTags, false);
             tagString = [originalTag{valueIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTag),')'];
         end
-        warnings = [warnings, generateWarningMessage(warningType, ...
-            '', tagString, unitClassDefault)];
+        warnings = [warnings, generateWarning(warningType, '', ...
+            tagString, unitClassDefault)];
         warningTags{end+1} = originalTag{valueIndex};
-    end % generateErrorMessages
+    end % generateWarnings
 
     function valueTag = convertToValueTag(tag)
         % Strips the tag name and replaces it with #

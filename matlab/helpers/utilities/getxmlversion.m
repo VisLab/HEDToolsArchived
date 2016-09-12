@@ -1,26 +1,25 @@
-% This function takes in a HED XML file and looks for the version number
-% contained the version attribute. If there is no version found then an
-% empty string will be returned.
+% This function takes in a XML text file containing all of the HED tags,
+% their attributes, and unit classes and looks for the version number.
 %
 % Usage:
 %
-%   >>  version = getXMLHEDVersion(hedXML);
+%   >>  version = getxmlversion(hedXML);
 %
 % Input:
 %
-%       hedXML
+%   hedXML
 %                   The name or the path of the HED XML file containing
 %                   all of the tags.
 %
 % Output:
 %
-%       version
+%   version
 %                   The version of the HED XML file. Will return an empty
-%                   string if there is no version attribute in the 
-%                   document.
+%                   string if there is no version number in the file.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -34,14 +33,15 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function version = getXMLHEDVersion(hed)
+function version = getxmlversion(hed)
 version = '';
 try
     xDoc = xmlread(hed);
     xRoot = xDoc.getDocumentElement;
     version =  strtrim(char(xRoot.getAttribute('version')));
 catch
+    warning('No version was found');
 end
-end % getXMLHEDVersion
+end % getxmlversion

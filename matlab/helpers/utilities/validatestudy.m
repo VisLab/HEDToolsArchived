@@ -9,21 +9,21 @@
 %
 % Input:
 %
-%       studyFile
+%   studyFile
 %                   A study file and the associated datasets that will be
 %                   validated.
 %
-%       Optional:
+%   Optional:
 %
-%       'tagField'
+%   'tagField'
 %                   The field in .event that contains the HED tags.
 %                   The default field is .usertags.
 %
-%       'hedXML'
+%   'hedXML'
 %                   The name or the path of the HED XML file containing
 %                   all of the tags.
 %
-%       'outputDirectory'
+%   'outputDirectory'
 %                   The directory where the validation output will be
 %                   written to if the 'writeOutput' argument is true.
 %                   There will be three separate files generated, one
@@ -33,8 +33,9 @@
 %                   be the directory that contains the tab-delimited text
 %                  file.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -48,7 +49,7 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function fPaths = validatestudy(studyFile, varargin)
 p = parseArguments(studyFile, varargin{:});

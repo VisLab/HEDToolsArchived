@@ -4,38 +4,38 @@
 %
 % Usage:
 %
-%   >>  remapTSVTags(remapFile, tsvFile, tsvTagColumns);
+%   >>  replacetsv(remapFile, tsvFile, tagColumns)
 %
-%   >>  remapTSVTags(remapFile, tsvFile, tsvTagColumns, varargin);
+%   >>  replacetsv(remapFile, tsvFile, tagColumns, 'key1', 'value1', ...)
 %
 % Input:
 %
-%       remapFile
+%   remapFile
 %                   The name or the path of the remap file containing
 %                   the mappings of old HED tags to new HED tags. This
 %                   file is a two column tab-delimited file with the old
 %                   HED tags in the first column and the new HED tags are
 %                   in the second column.
 %
-%       tsvFile
+%   tsvFile
 %                   The name or the path of a tab-delimited text file
 %                   containing HED tags associated with a particular study
 %                   or experiment.
 %
-%       tsvTagColumns
+%   tagColumns
 %                   The columns that contain the study or experiment HED
 %                   tags. The columns can be a scalar value or a vector
 %                   (e.g. 2 or [2,3,4]).
 %
-%       Optional:
+%   Optional (key/value):
 %
-%       'hasHeader'
+%   'hasHeader'
 %                   True(default)if the tab-delimited file containing
 %                   the HED study tags has a header. The header will be
 %                   skipped and not validated. False if the file doesn't
 %                   have a header.
 %
-%       'outputFile'
+%   'outputFile'
 %                   The name or the path to the file that the output is
 %                   written to. The output file will be a tab-delimited
 %                   text file consisting of the new HED tags which replaced
@@ -46,11 +46,12 @@
 %                   'Reward Two Back Study.txt' with new HED tags in the
 %                   fourth column using HED remap file 'HEDRemap.txt'.
 %
-%                   remapTSVTags('HEDRemap.txt', ...
+%                   replacetsv('HEDRemap.txt', ...
 %                   'Reward Two Back Study.txt', 4)
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -59,15 +60,15 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function remapTSVTags(remapFile, tsvFile, tsvTagColumns, varargin)
-p = parseArguments();
+function replacetsv(remapFile, tsvFile, tagColumns, varargin)
+p = parseArguments(remapFile, tsvFile, tagColumns, varargin{:});
 output = '';
 remapMap = remap2Map(p.remapFile);
 wildCardTags = getWildCardTags();
@@ -75,7 +76,7 @@ try
     fileId = fopen(p.tsvFile);
     tLine = checkForHeader(fileId);
     while ischar(tLine)
-        readTags(tLine, tsvTagColumns);
+        readTags(tLine, tagColumns);
         tLine = fgetl(fileId);
     end
     fclose(fileId);
@@ -146,19 +147,19 @@ end
         groupStr = [groupStr ')'];
     end % joinTagGroup
 
-    function p = parseArguments()
+    function p = parseArguments(remapFile, tsvFile, tagColumns, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
         p.addRequired('tsvFile', @(x) ~isempty(x) && ischar(x));
-        p.addRequired('tsvTagColumns', @(x) (~isempty(x) && ...
+        p.addRequired('tagColumns', @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
         [path, file] = fileparts(tsvFile);
         p.addParamValue('hasHeader', true, @islogical); 
-        p.addParamValue('OutputFile', ...
-            fullfile(path, [file '_update.tsv']), ...
+        p.addParamValue('outputFile', ...
+            fullfile(path, [file '_replace.tsv']), ...
             @(x) ~isempty(x) && ischar(x));
-        p.parse(remapFile, tsvFile, tsvTagColumns, varargin{:});
+        p.parse(remapFile, tsvFile, tagColumns, varargin{:});
         p = p.Results;
     end % parseArguments
 
@@ -214,15 +215,15 @@ end
 
     function tags = str2cell(tags)
         % Converts the tags from a string to a cell array
-        tags = formatTags(tags, true);
+        tags = formattags(tags, true);
     end % str2cell
 
     function writeOutput(output)
         % Writes the output to the file
-        outputFile = p.OutputFile;
+        outputFile = p.outputFile;
         fileId = fopen(outputFile,'w');
         fprintf(fileId, '%s', output);
         fclose(fileId);
     end % writeOutput
 
-end % remapTSVTags
+end % replacetsv

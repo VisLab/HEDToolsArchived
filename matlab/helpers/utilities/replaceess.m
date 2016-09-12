@@ -2,36 +2,37 @@
 %
 % Usage:
 %
-%   >>  essStruct = remapESSTags(remapFile, essStruct);
+%   >>  ESS = replaceess(replaceFile, ESS);
 %
-%   >>  essStruct = remapESSTags(remapFile, essStruct, varargin);
+%   >>  ESS = replaceess(replaceFile, ESS, 'key1', 'value1', ...);
 %
 % Input:
 %
-%       remapFile
-%                   The name or the path of the remap file containing
+%       replaceFile
+%                   The name or the path of the replace file containing
 %                   the mappings of old HED tags to new HED tags. This
 %                   file is a two column tab-delimited file with the old
 %                   HED tags in the first column and the new HED tags are
 %                   in the second column.
 %
-%       essStruct
+%       ESS
 %                   An ESS structure containing HED tags.
 %
 % Output:
 %
-%       essStruct
-%                   An ESS structure containing the remapped HED tags.
+%       ESS
+%                   An ESS structure containing the replaced HED tags.
 %
 % Examples:
 %                   To replace the old HED tags in Five-Box task ESS 
 %                   structure with new HED tags in the .
 %
-%                   remapESSTags('Five-Box_remap.tsv', ...
+%                   replaceess('Five-Box_remap.tsv', ...
 %                   'study_description.xml');
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -40,61 +41,61 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function essStruct = remapESSTags(remapFile, essStruct)
-p = parseArguments();
-remapMap = remap2Map(p.remapFile);
-essStruct.eventCodesInfo = readEventCodes(essStruct.eventCodesInfo);
+function ESS = replaceess(replaceFile, ESS)
+p = parseArguments(replaceFile, ESS);
+replaceMap = remap2Map(p.replaceFile);
+ESS.eventCodesInfo = readEventCodes(p.ESS.eventCodesInfo, replaceMap);
 
-    function p = parseArguments()
+    function p = parseArguments(replaceFile, ESS)
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
-        p.addRequired('essStruct', @(x) ~isempty(x));
-        p.parse(remapFile, essStruct);
+        p.addRequired('replaceFile', @(x) ~isempty(x) && ischar(x));
+        p.addRequired('ESS', @(x) ~isempty(x));
+        p.parse(replaceFile, ESS);
         p = p.Results;
     end % parseArguments
 
-    function eventCodes = readEventCodes(eventCodes)
+    function eventCodes = readEventCodes(eventCodes, replaceMap)
         % Reads the tag columns from a tab-delimited row
         numEvents = length(eventCodes);
         for a = 1:numEvents
             strTags = eventCodes(a).condition.tag;
             if ~isempty(strTags)
                 cellTags = str2cell(strTags);
-                replacedCellTags = remapTags(cellTags);
+                replacedCellTags = replaceTags(cellTags, replaceMap);
                 replacedStrTags = cell2str(replacedCellTags);
                 eventCodes(a).condition.tag = replacedStrTags;
             end
         end
     end % readEventCodes
 
-    function remappedTags = remapTags(tags)
+    function remappedTags = replaceTags(tags, replaceMap)
         % Remaps the old tags with the new tags
         remappedTags = {};
         for a = 1:length(tags)
             if iscellstr(tags{a})
-                remappedTags{end+1} = remapTags(tags{a}); %#ok<AGROW>
+                remappedTags{end+1} = replaceTags(tags{a}); %#ok<AGROW>
             else
-                if remapMap.isKey(lower(tags{a}))
+                if replaceMap.isKey(lower(tags{a}))
                     remappedTags{end+1} = ...
-                        remapMap(lower(tags{a}));   %#ok<AGROW>
+                        replaceMap(lower(tags{a}));   %#ok<AGROW>
                 else
                     remappedTags{end+1} = tags{a}; %#ok<AGROW>
                 end
             end
         end
-    end % remapTags
+    end % replaceTags
 
     function tags = str2cell(tags)
         % Converts the tags from a string to a cell array
-        tags = formatTags(tags, true);
+        tags = formattags(tags, true);
     end % str2cell
 
     function tagStr = cell2str(tags)

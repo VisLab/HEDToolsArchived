@@ -5,7 +5,7 @@
 %
 % Usage:
 %
-%   >>  [errors, errorTags] = checkUniqueTags(hedMaps, originalTags, ...
+%   >>  [errors, errorTags] = checkValidTags(hedMaps, originalTags, ...
 %       formattedTags)
 %
 % Input:
@@ -78,7 +78,7 @@ checkValidTags(originalTags, formattedTags, false);
                 continue;
             end
             if ~tagAllowExtensions(formattedTags{a})
-                generateError(originalTags, a, isGroup);
+                generateErrors(originalTags, a, isGroup);
             end
         end
         errorTags(cellfun('isempty', errorTags)) = [];
@@ -98,19 +98,17 @@ checkValidTags(originalTags, formattedTags, false);
         end
     end % convertToValueTag
 
-    function generateError(originalTags, tagIndex, isGroup)
+    function generateErrors(originalTags, tagIndex, isGroup)
         % Generates errors for tags that are not valid
         tagString = originalTags{tagIndex};
         if isGroup
-            tagString = [originalTags{tagIndex}, ...
-                ' in group (' ,...
+            tagString = [originalTags{tagIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTags),')'];
         end
-        errors = [errors, generateErrorMessage('valid', '', tagString, ...
-            '','')];
+        errors = [errors, generateError('valid', '', tagString, '','')];
         errorTags{errorsIndex} = originalTags{tagIndex};
         errorsIndex = errorsIndex + 1;
-    end % generateErrorMessages
+    end % generateError
 
     function [isExtensionTag, extensionParentTag] = tagAllowExtensions(tag)
         % Checks if the tag has the extensionAllowed attribute

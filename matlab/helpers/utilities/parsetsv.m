@@ -107,8 +107,8 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
 
     function [cellTags, formattedCellTags] = tags2cell(strTags)
         % Converts the tags from a str to a cellstr and formats them
-        cellTags = formatTags(strTags, false);
-        formattedCellTags = formatTags(strTags, true);
+        cellTags = formattags(strTags, false);
+        formattedCellTags = formattags(strTags, true);
     end % tags2cell
 
     function p = parseArguments(hedMaps, file, tagColumns, hasHeader, ...

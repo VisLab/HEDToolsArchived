@@ -2,7 +2,7 @@
 % 
 % Usage:
 %
-%   >> attributes = getHEDAttributes(tag)
+%   >> attributes = getattributes(tag)
 %
 % Inputs:
 %
@@ -20,11 +20,12 @@
 %
 % Find the attributes associated with the HED tag 
 % 'Sensory presentation/Auditory/Animal voice'. 
-% attributes = ...
-% getHEDAttributes('Sensory presentation/Auditory/Animal voice');
 %
-% Copyright (C) 2012-2013 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% attributes = getattributes('Sensory presentation/Auditory/Animal voice');
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -38,9 +39,9 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function attributes = getHEDAttributes(tag)
+function attributes = getattributes(tag)
 p = parseArguments(tag);
 maps = load('HEDMaps.mat');
 p.tag = lower(p.tag);
@@ -68,7 +69,6 @@ attributes = checkAttributes(p);
             index = index + 1;
             attributes{index} = ['unique = ' ...
                 logical2str(p.hedMaps.unique.isKey(p.tag))];
-            index = index + 1;
         end
     end
 
@@ -89,4 +89,4 @@ attributes = checkAttributes(p);
         p = parser.Results;
     end % parseArguments
 
-end % getHEDAttributes
+end % getattributes

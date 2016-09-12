@@ -66,18 +66,16 @@ checkTildeTags(originalTags);
         for a = 1:numTags
             if ~ischar(originalTags{a}) && ...
                     sum(strncmp('~',originalTags{a}, 1)) > 2
-                generateErrorMessages(originalTags, a);
+                generateErrors(originalTags, a);
             end
         end
     end % checkTags
 
-    function generateErrorMessages(original, groupIndex)
+    function generateErrors(original, groupIndex)
         % Generates errors when there are more than 2 tildes in a group
         tagString = vTagList.stringifyElement(original{groupIndex});
-        errors = [errors, ...
-            generateErrorMessage('tilde', '', tagString, '', ...
-            '')];
+        errors = [errors, generateError('tilde', '', tagString, '', '')];
         errorTags{end+1} = original{groupIndex};
-    end % generateErrorMessages
+    end % generateErrors
 
 end % checkGroupTildes

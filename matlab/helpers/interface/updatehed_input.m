@@ -72,7 +72,7 @@ createPanel(tab);
 
     function checkUpdateCallback(~, ~) 
         % Callback for 'Check' button
-        latestVersion = downloadHED();
+        latestVersion = downloadhed();
         if ~strcmp(currentVersion, latestVersion)
             [okay, success] = availablehed_input(latestVersion);
             if okay && success

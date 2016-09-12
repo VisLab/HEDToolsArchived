@@ -1,14 +1,14 @@
-% This function validates a cell array of HED tags and reports any warnings
+% This function validates a cell array of HED tags and reports any errors
 % that are found.
 %
 % Usage:
 %
-%   >>  extensions = checkForValidationWarnings(hedMaps, originalTags, ...
-%       formattedTags, extensionAllowed);
+%   >>  [errors, errorTags] = checkErrors(hedMaps, originalTags, ...
+%       formattedTags)
 %
 % Input:
 %
-%       hedMaps
+%   hedMaps
 %                   A structure that contains Maps associated with the HED
 %                   XML tags. There is a map that contains all of the HED
 %                   tags, a map that contains all of the unit class units,
@@ -21,29 +21,21 @@
 %                   contains the tags that are extension allowed, and map
 %                   that contains the tags are are unique.
 %
-%       originalTags
+%   originalTags
 %                   A cell array of HED tags. These tags are used to report
-%                   the errors found. A formatted version is used to do the
+%                   the errors found. 
+%
+%   formattedTags
+%                   A cell array of HED tags. These tags are used to do the
 %                   validation.
-%
-%       formattedTags
-%                   A cell array of HED tags formatted by the vTagList class
-%                   that is validated for errors. These tags are formatted
-%                   so that they are in the same format that the tags
-%                   contained in hedMaps are.
-%
-%       extensionAllowed
-%                   True(default) if the validation accepts extension
-%                   allowed tags. There will be warnings generated for each
-%                   extension allowed tag that is present. If false, the
-%                   validation will not accept extension allowed tags and
-%                   errors will be generated for each tag present.
 %
 % Output:
 %
-%       extensions
-%                   A string containing the extension allowed validation
-%                   warnings.
+%   errors
+%                   A string containing the validation errors.
+%
+%   errorTags
+%                   A cell array containing validation error tags. 
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -63,8 +55,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function extensions = checkForValidationExtensions(hedMaps, ...
-    originalTags, formattedTags, extensionAllowed)
-[~, ~, extensions] = checkValidTags(hedMaps, originalTags, ...
-    formattedTags, extensionAllowed);
-end % checkForValidationExtensions
+function [errors, errorTags] = checkErrors(hedMaps, originalTags, ...
+    formattedTags)
+errors = '';
+errors = [errors checkRequiredTags(hedMaps, formattedTags)];
+errors = [errors checkRequireChildTags(hedMaps, originalTags, ...
+    formattedTags)];
+errors = [errors checkTakeValueTags(hedMaps, originalTags, formattedTags)];
+errors = [errors checkGroupTildes(originalTags)];
+errors = [errors checkUniqueTags(hedMaps, originalTags, formattedTags)];
+[validationErrors, errorTags] = checkValidTags(hedMaps, originalTags, ...
+    formattedTags, true);
+errors = [errors validationErrors];
+end % checkErrors

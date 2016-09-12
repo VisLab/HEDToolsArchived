@@ -66,17 +66,17 @@ checkRequiredTags();
             requiredIndexes = strncmpi(eventLevelTags, requiredTags{a}, ...
                 length(requiredTags{a}));
             if sum(requiredIndexes) == 0
-                generateErrorMessages(a);
+                generateErrors(a);
             end
         end
     end % checkRequiredTags
 
-    function generateErrorMessages(requiredIndex)
+    function generateErrors(requiredIndex)
         % Generates a required tag errors if the required tag isn't present
         % in the tag list
-        errors = [errors, generateErrorMessage('required', '', ...
+        errors = [errors, generateError('required', '', ...
             requiredTags{requiredIndex}, '')];
         errorTags{end+1} = requiredTags{requiredIndex};
-    end % generateErrorMessages
+    end % generateErrors
 
 end % checkRequiredTags

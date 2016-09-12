@@ -72,12 +72,12 @@ checkTags(original, canonical, false);
                 checkTags(originalTags{a}, formattedTags{a}, true);
                 return;
             elseif requireChildTags.isKey(lower(formattedTags{a}))
-                generateErrorMessages(originalTags, a, isGroup);
+                generateErrors(originalTags, a, isGroup);
             end
         end
     end % checkTags
 
-    function generateErrorMessages(originalTags, tagIndex, isGroup)
+    function generateErrors(originalTags, tagIndex, isGroup)
         % Generates require child tag errors if the require child tag is
         % present in the tag list
         tagString = originalTags{tagIndex};
@@ -85,9 +85,9 @@ checkTags(original, canonical, false);
             tagString = [originalTags{tagIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTags),')'];
         end
-        errors = [errors, generateErrorMessage('requireChild', '', ...
-            tagString, '', '')];
+        errors = [errors, generateError('requireChild', '', tagString, ...
+            '', '')];
         errorTags{end+1} = originalTags{tagIndex};
-    end % generateErrorMessages
+    end % generateErrors
 
 end % checkRequireChildTags

@@ -1,26 +1,27 @@
-% This function finds the previous string based on the cursor position in
-% the tag search bar.
+% This function finds the next string based on the cursor position in the
+% tag search bar.
 %
 % Usage:
 %
-%   >> [str, first, last] = findPreviousString(text, pos)
+%   >> [str, first, last] = findnextstr(text, pos)
 %
-% Inputs:
+% Input:
 %
 %   text          The search bar text.
 %
 %   pos           The position of the cursor in the search bar.
 %
-% Outputs:
+% Output:
 %
-%   str           The previous string if found.
+%   str           The next string if found.
 %
-%   first         The first position of the previous string found.
+%   first         The first position of the next string found.
 %
-%   last          The last position of the previous string found.
+%   last          The last position of the next string found.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -36,14 +37,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [str, first, last] = findPreviousString(text, pos)
+function [str, first, last] = findnextstr(text, pos)
 str = '';
-first = 1;
-last = 1;
+first = length(text);
+last = length(text);
 inString = false;
-pos = findFirstPos(text, pos);
-if pos > 1
-    for pos = pos-1:-1:1
+pos = findLastPos(text, pos);
+if pos < length(text)
+    for pos = pos+1:length(text)
         if ~inString && isDelimitingChar(text(pos))
             str(end+1) = text(pos); %#ok<AGROW>
             first = pos;
@@ -51,35 +52,35 @@ if pos > 1
             break;
         elseif inString && isspace(text(pos)) || ...
                 isDelimitingChar(text(pos))
-            first = pos + 1;
+            last = pos - 1;
             break;
         elseif ~inString && ~isspace(text(pos)) && ...
                 ~isDelimitingChar(text(pos))
             str(end+1) = text(pos); %#ok<AGROW>
-            last = pos;
+            first = pos;
             inString = true;
         elseif ~isspace(text(pos)) && ~isDelimitingChar(text(pos))
             str(end+1) = text(pos); %#ok<AGROW>
         end
     end
-    str = fliplr(str);
 end
 
-    function first = findFirstPos(text, pos)
-        % Finds the first position of the current string
-        first = pos;
-        if isspace(text(first)) || isDelimitingChar(text(first))
+    function last = findLastPos(text, pos)
+        % Finds the last position of the current string
+        last = pos;
+        if isspace(text(last)) || isDelimitingChar(text(last))
             return;
         end
-        for first = pos:-1:1
-            if isspace(text(first)) || isDelimitingChar(text(first))
-                if ~(first + 1 > length(text))
-                    first = first + 1; %#ok<FXSET>
+        numChars = length(text);
+        for last = pos:numChars
+            if isspace(text(last)) || isDelimitingChar(text(last))
+                if ~(last - 1 < 1)
+                    last = last - 1; %#ok<FXSET>
                 end
                 break;
             end
         end
-    end % findFirstPos
+    end % findLastPos
 
     function isDelimiting = isDelimitingChar(character)
         % Returns true if the character is a delimiting character
@@ -87,4 +88,4 @@ end
         isDelimiting = any(strcmp(delimitingChars, character));
     end % isDelimitingChar
 
-end % findPreviousString
+end % findnextstr

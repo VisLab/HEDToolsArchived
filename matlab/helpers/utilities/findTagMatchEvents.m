@@ -5,7 +5,7 @@
 %
 %   >> positions = findTagMatchEvents(EEG, tags);
 %
-% Inputs:
+% Input:
 %
 %   data         A EEG dataset structure or a tab-delimited file containing
 %                event HED tags. If a EEG dataset is passed in then it
@@ -15,6 +15,7 @@
 %                needs to have at least one column that contains HED tags. 
 %                The default tag column will be the second column. 
 % Optional:
+%
 %   tags         A comma separated list of tags or a tag search string
 %                used to extract event positions that found a match. If no
 %                tags are passed in then a pop-up menu will appear allowing

@@ -233,7 +233,7 @@ createPanel(tab);
         else
             wb = waitbar(.5,'Please wait...');
             try
-                remapTSVTags(replaceFile, tsvFile, columns, ...
+                replacetsv(replaceFile, tsvFile, columns, ...
                     'OutputFile', outputFile);
                 msgbox('Complete!');
             catch

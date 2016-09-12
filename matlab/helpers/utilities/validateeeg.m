@@ -3,9 +3,9 @@
 %
 % Usage:
 %
-%   >>  issues = validateeeg(EEG);
+%   >>  issues = validateeeg(EEG)
 %
-%   >>  issues = validateeeg(EEG, 'key1', 'value1', ...);
+%   >>  issues = validateeeg(EEG, 'key1', 'value1', ...)
 %
 % Input:
 %

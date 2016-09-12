@@ -25,7 +25,7 @@
 %
 %   originalTags
 %                   A cell array of HED tags. These tags are used to report
-%                   the warnings found. 
+%                   the warnings found.
 %
 %   formattedTags
 %                   A cell array of HED tags. These tags are used to do the
@@ -37,7 +37,7 @@
 %                   A string containing the validation warnings.
 %
 %   warningTags
-%                   A cell array containing validation warning tags. 
+%                   A cell array containing validation warning tags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -81,18 +81,14 @@ checkTagCaps(originalTags, formattedTags, false);
     function generateWarnings(originalTags, tagIndex, isGroup)
         % Generates capitalization tag warnings if the tag isn't correctly
         % capitalized
-        try
-            tagString = originalTags{tagIndex};
-            if isGroup
-                tagString = [originalTags{tagIndex}, ' in group (' ,...
-                    vTagList.stringifyElement(originalTags),')'];
-            end
-            warnings = [warnings, ...
-                generateWarningMessage('cap', '', tagString, '')];
-            warningTags{warningsIndex} = originalTags{tagIndex};
-            warningsIndex = warningsIndex + 1;
-        catch
+        tagString = originalTags{tagIndex};
+        if isGroup
+            tagString = [originalTags{tagIndex}, ' in group (' ,...
+                vTagList.stringifyElement(originalTags),')'];
         end
+        warnings = [warnings, generateWarning('cap', '', tagString, '')];
+        warningTags{warningsIndex} = originalTags{tagIndex};
+        warningsIndex = warningsIndex + 1;
     end % generateWarnings
 
     function capsFound = findCaps(originalTag)
