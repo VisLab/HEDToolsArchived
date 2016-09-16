@@ -1,4 +1,4 @@
-function test_suite = test_checkRequiredTags%#ok<STOUT>
+function test_suite = test_checkrequired%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
@@ -19,18 +19,18 @@ fprintf('\nUnit tests for checkrequired\n');
 
 fprintf(['\nIt should return errors when there are no required tags' ...
     ' present\n']);
-[errors, tags] = checkRequiredTags(values.hedMaps, values.Tags1);
+[errors, tags] = checkrequired(values.hedMaps, values.Tags1);
 assertFalse(isempty(errors));
 assertEqual(length(tags), length(values.hedMaps.required.values()));
 assertEqual(tags, values.hedMaps.required.values());
 
 fprintf(['\nIt should return errors when there is one required tag' ...
     ' present and the others are missing\n']);
-[errors, tags] = checkRequiredTags(values.hedMaps, values.Tags2);
+[errors, tags] = checkrequired(values.hedMaps, values.Tags2);
 assertFalse(isempty(errors));
 assertEqual(length(tags), length(values.hedMaps.required.values())-1);
 
 fprintf('\nIt should return no errors when all required tags are present');
-[errors, tags] = checkRequiredTags(values.hedMaps, values.Tags3);
+[errors, tags] = checkrequired(values.hedMaps, values.Tags3);
 assertTrue(isempty(errors));
 assertEqual(length(tags), 0);

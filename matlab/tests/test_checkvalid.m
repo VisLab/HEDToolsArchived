@@ -1,4 +1,4 @@
-function test_suite = test_checkValidTags%#ok<STOUT>
+function test_suite = test_checkvalid%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
@@ -35,21 +35,21 @@ fprintf('\nUnit tests for checkrequirechild\n');
 fprintf(['\nIt should return no errors when there are no'  ...
     ' tags present\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags1, values.Tags1, false);
+    checkvalid(values.hedMaps, values.Tags1, values.Tags1);
 assertTrue(isempty(errors));
 assertTrue(isempty(errorTags));
 
 fprintf(['\nIt should return no errors when there are valid'  ...
     ' tags present\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags2, values.Tags2, false);
+    checkvalid(values.hedMaps, values.Tags2, values.Tags2);
 assertTrue(isempty(errors));
 assertTrue(isempty(errorTags));
 
 fprintf(['\nIt should return errors when there are no valid tags' ...
     ' present\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags3, values.Tags3, false);
+    checkvalid(values.hedMaps, values.Tags3, values.Tags3);
 assertFalse(isempty(errors));
 assertFalse(isempty(errorTags));
 assertEqual(length(errorTags), 2);
@@ -57,7 +57,7 @@ assertEqual(length(errorTags), 2);
 fprintf(['\nIt should return errors when there are extension allowed' ...
     ' tags present but the extension allowed option is set to false\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags4, values.Tags4, false);
+    checkvalid(values.hedMaps, values.Tags4, values.Tags4);
 assertFalse(isempty(errors));
 assertFalse(isempty(errorTags));
 assertEqual(length(errorTags), 2);
@@ -66,21 +66,21 @@ fprintf(['\nIt should return no errors when there are extension' ...
     ' allowed tags present and the extension allowed option is set to' ...
     ' true\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags4, values.Tags4, true);
+    checkvalid(values.hedMaps, values.Tags4, values.Tags4);
 assertTrue(isempty(errors));
 assertTrue(isempty(errorTags));
 
 fprintf(['\nIt should return no errors when there are valid'  ...
     ' tags in a tag group present\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags5, values.Tags5, false);
+    checkvalid(values.hedMaps, values.Tags5, values.Tags5);
 assertTrue(isempty(errors));
 assertTrue(isempty(errorTags));
 
 fprintf(['\nIt should return errors when there are no valid tags' ...
     ' in a tag group present\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags6, values.Tags6, false);
+    checkvalid(values.hedMaps, values.Tags6, values.Tags6);
 assertFalse(isempty(errors));
 assertFalse(isempty(errorTags));
 assertEqual(length(errorTags), 2);
@@ -89,7 +89,7 @@ fprintf(['\nIt should return errors when there are extension allowed' ...
     ' tags in a tag group present but the extension allowed option is' ...
     ' set to false\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags7, values.Tags7, false);
+    checkvalid(values.hedMaps, values.Tags7, values.Tags7);
 assertFalse(isempty(errors));
 assertFalse(isempty(errorTags));
 assertEqual(length(errorTags), 2);
@@ -98,6 +98,6 @@ fprintf(['\nIt should return no errors when there are extension ' ...
     ' allowed tags in a tag group present and the extension allowed' ...
     ' option is set to true\n']);
 [errors, errorTags] = ...
-    checkValidTags(values.hedMaps, values.Tags4, values.Tags4, true);
+    checkvalid(values.hedMaps, values.Tags4, values.Tags4);
 assertTrue(isempty(errors));
 assertTrue(isempty(errorTags));
