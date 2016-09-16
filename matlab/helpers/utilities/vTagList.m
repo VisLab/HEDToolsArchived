@@ -423,7 +423,7 @@ classdef vTagList < hgsetget
                         return;
                         
                     end
-                    tstring = [tstring ',' tnext]; %#ok<AGROW>
+                    tstring = [tstring ', ' tnext]; %#ok<AGROW>
                 end
             end
         end  % stringify
@@ -437,7 +437,7 @@ classdef vTagList < hgsetget
             elseif ischar(telement)
                 tstring = strtrim(telement);
             elseif iscellstr(telement)
-                tstring = strtrim(telement{1});
+                tstring = ['(' strtrim(telement{1})];
                 telementLength = length(telement);
                 for k = 2:telementLength
                     if strcmp('~', telement{k-1}) || ...
@@ -449,6 +449,7 @@ classdef vTagList < hgsetget
                             strtrim(telement{k})]; %#ok<AGROW>
                     end
                 end
+                tstring = [tstring ')'];
             else
                 errormsg = 'element is not string or cellstr';
             end

@@ -27,23 +27,17 @@
 %                    a fieldMap object to be used to initialize tag
 %                    information.
 %
-%   'EditXml'
-%                    If false (default), the HED XML cannot be modified
-%                    using the tagger GUI. If true, then the HED XML can be
-%                    modified using the tagger GUI.
-%
 %   'ExcludeFields'
-%                    A cell array of field names in the .event substructure
-%                    to ignore during the tagging process. By default the
-%                    following subfields of the event structure are
-%                    ignored: .latency, .epoch, .urevent, .hedtags, and
-%                    .usertags. The user can over-ride these tags using
-%                    this name-value parameter.
+%                    A one-dimensional cell array of field names in the
+%                    .event substructure to ignore during the tagging
+%                    process. By default the following subfields of the
+%                    .event structure are ignored: .latency, .epoch,
+%                    .urevent, .hedtags, and .usertags. The user can
+%                    over-ride these tags using this name-value parameter.
 %
 %   'Fields'
-%                    A cell array of field names of the fields to include
-%                    in the tagging. If this parameter is non-empty, only
-%                    these fields are tagged.
+%                    A one-dimensional cell array of fields to tag. If this
+%                    parameter is non-empty, only these fields are tagged.
 %
 %   'PreservePrefix'
 %                    If false (default), tags for the same field value that
@@ -54,8 +48,8 @@
 %   'PrimaryField'
 %                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
-%                    category, and a description. The default is the type
-%                    field.
+%                    category, and a description tag. The default is the
+%                    .type field.
 %
 %   'SaveMapFile'
 %                    A string representing the file name for saving the
@@ -110,9 +104,8 @@ fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, EEG, ...
     fMap);
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix, 'ExcludedFields', ...
-        excluded, 'Fields', fields);
+    [fMap, canceled] = editmaps(fMap, 'PreservePrefix', ...
+        p.PreservePrefix, 'ExcludedFields', excluded, 'Fields', fields);
 end
 if ~canceled
     EEG = write2EEG(EEG, fMap, p.SaveMapFile, p.PreservePrefix);
@@ -161,7 +154,6 @@ fprintf('Tagging was canceled\n');
         parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
         parser.addParamValue('BaseMap', '', ...
             @(x)(isempty(x) || ischar(x) || isa(x, 'fieldMap')));
-        parser.addParamValue('EditXml', false, @islogical);
         parser.addParamValue('ExcludeFields', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));

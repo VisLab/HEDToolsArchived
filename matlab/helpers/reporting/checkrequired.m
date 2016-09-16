@@ -3,8 +3,7 @@
 %
 % Usage:
 %
-%   >>  [errors, errorTags] = checkRequireChildTags(hedMaps, original, ...
-%       canonical)
+%   >>  [errors, errorTags] = checkrequired(hedMaps, original, canonical)
 %
 % Input:
 %
@@ -51,7 +50,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [errors, errorTags] = checkRequiredTags(hedMaps, formattedTags)
+function [errors, errorTags] = checkrequired(hedMaps, formattedTags)
 % Checks if all required tags are present in the tag list
 errors = '';
 errorTags = {};
@@ -74,9 +73,9 @@ checkRequiredTags();
     function generateErrors(requiredIndex)
         % Generates a required tag errors if the required tag isn't present
         % in the tag list
-        errors = [errors, generateError('required', '', ...
+        errors = [errors, generateerror('required', '', ...
             requiredTags{requiredIndex}, '')];
         errorTags{end+1} = requiredTags{requiredIndex};
     end % generateErrors
 
-end % checkRequiredTags
+end % checkrequired

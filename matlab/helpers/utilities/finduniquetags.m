@@ -59,4 +59,5 @@ uniquetags = getUniqueTags(tags);
         end
         tags =  tagList.getUnsortedCanonical(tags);
     end % formatTags
+
 end % finduniquetags

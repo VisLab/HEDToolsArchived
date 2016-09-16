@@ -81,12 +81,6 @@ p = parseArguments(hedMaps, cell, generateWarnings);
             p.cellTags, p.formattedCellTags);
     end % findWarnings
 
-    function [cellTags, formattedCellTags] = tags2cell(strTags)
-        % Converts the tags from a str to a cellstr and formats them
-        cellTags = formattags(strTags, false);
-        formattedCellTags = formattags(strTags, true);
-    end % tags2cell
-
     function p = parseArguments(hedMaps, cell, extensionAllowed)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
@@ -105,14 +99,15 @@ p = parseArguments(hedMaps, cell, generateWarnings);
         numCells = length(p.cell);
         try
             for a = 1:numCells
-                [p.cellTags, p.formattedCellTags] = tags2cell(p.cell{a});
+                p.cellTags = hed2cell(p.cell{a}, false);
+                p.formattedCellTags = hed2cell(p.cell{a}, true);
                 p.cellNumber = a;
                 p = validateCellTags(p);
             end
             issues = p.issues;
             replaceTags = p.replaceTags;
             success = true;
-        catch ME
+        catch
             warning(['Unable to parse tags in cell %d. Please check' ...
                 ' tags'], a);
             issues = '';

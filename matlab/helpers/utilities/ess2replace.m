@@ -3,31 +3,26 @@
 %
 % Usage:
 %
-%   >>  uniqueTags = createESSRemap(essFile);
+%   >>  uniqueTags = ess2replace(essFile);
 %
-%   >>  uniqueTags = createESSRemap(essFile, varargin);
+%   >>  uniqueTags = ess2replace(essFile, varargin);
 %
 % Input:
 %
-%       essFile
+%   essFile
 %                   The name or the path of a ESS file that contains tags.
 %
-%       Optional:
+%   Optional:
 %
-%       'outputDirectory'
+%   'outputDirectory'
 %                   A directory where the output is written to if the
 %                   'writeOuput' argument is true. There will be a remap
 %                   file generated with _remap appended to the essFile
 %                   filename.
 %
-%       'writeOutput'
-%                  True if the output is written to the workspace and a
-%                  remap file. False (default) if the output is only
-%                  written to the workspace.
-%
 % Output:
 %
-%       uniqueTags
+%   uniqueTags
 %                   A cell array containing all of the unique tags in a
 %                   ESS file.
 %
@@ -38,8 +33,9 @@
 %                   uniqueTags = ...
 %                   createESSRemap('Five-Box task\study_description.xml');
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -53,15 +49,14 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function uniqueTags = createESSRemap(essFile, varargin)
-p = parseArguments();
+function uniqueTags = ess2replace(essFile, varargin)
+p = parseArguments(essFile, varargin{:});
 xDoc = xmlread(p.essFile);
 uniqueTags = getUniqueTags(xDoc);
-if p.writeOutput
-    writeToReMapFile();
-end
+writeToReplaceFile(p, xDoc, uniqueTags);
+
 
     function uniqueTags = getUniqueTags(xDoc)
         % Gets all of the unique tags from the XML file
@@ -86,22 +81,21 @@ end
         studyTitle = strtrim(char(thisElement.getFirstChild.getData));
     end % getStudyTitle
 
-    function p = parseArguments()
+    function p = parseArguments(essFile, varargin)
         % Parses the input arguments and returns the results
         p = inputParser();
         p.addRequired('essFile', @ischar);
         p.addParamValue('outputDirectory', pwd, ...
             @(x) ischar(x) && 7 == exist(x, 'dir')); %#ok<NVREPL>
-        p.addParamValue('writeOutput', false, @islogical); %#ok<NVREPL>
         p.parse(essFile, varargin{:});
         p  = p.Results;
     end  % parseArguments
 
-    function writeToReMapFile()
-        % Writes to a new map file
+    function writeToReplaceFile(p, xDoc, uniqueTags)
+        % Writes to a new replace file
         dir = p.outputDirectory;
         studyTitle = getStudyTitle(xDoc);
-        file = [studyTitle '_remap'];
+        file = [studyTitle '_replace'];
         ext = '.tsv';
         numRemapTags = length(uniqueTags);
         remapFile = fullfile(dir, [file ext]);
@@ -113,6 +107,6 @@ end
             end
         end
         fclose(fileId);
-    end % writeToNewMapFile
+    end % writeToReplaceFile
 
-end % createESSRemap
+end % ess2replace

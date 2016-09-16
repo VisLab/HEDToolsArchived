@@ -57,7 +57,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [errors, errorTags] = checkValidTags(hedMaps, originalTags, ...
+function [errors, errorTags] = checkvalid(hedMaps, originalTags, ...
     formattedTags)
 errors = '';
 errorTags = {};
@@ -105,7 +105,7 @@ checkValidTags(originalTags, formattedTags, false);
             tagString = [originalTags{tagIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTags),')'];
         end
-        errors = [errors, generateError('valid', '', tagString, '','')];
+        errors = [errors, generateerror('valid', '', tagString, '','')];
         errorTags{errorsIndex} = originalTags{tagIndex};
         errorsIndex = errorsIndex + 1;
     end % generateError
@@ -144,4 +144,4 @@ checkValidTags(originalTags, formattedTags, false);
         end
     end % tagTakesValue
 
-end % checkValidTags
+end % checkvalid

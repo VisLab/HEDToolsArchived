@@ -3,7 +3,7 @@
 %
 % Usage:
 %
-%   >>  [errors, errorTags] = checkErrors(hedMaps, originalTags, ...
+%   >>  [errors, errorTags] = checkerrors(hedMaps, originalTags, ...
 %       formattedTags)
 %
 % Input:
@@ -55,16 +55,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [errors, errorTags] = checkErrors(hedMaps, originalTags, ...
+function [errors, errorTags] = checkerrors(hedMaps, originalTags, ...
     formattedTags)
 errors = '';
-errors = [errors checkRequiredTags(hedMaps, formattedTags)];
-errors = [errors checkRequireChildTags(hedMaps, originalTags, ...
+errors = [errors checkrequired(hedMaps, formattedTags)];
+errors = [errors checkrequirechild(hedMaps, originalTags, ...
     formattedTags)];
-errors = [errors checkTakeValueTags(hedMaps, originalTags, formattedTags)];
-errors = [errors checkGroupTildes(originalTags)];
-errors = [errors checkUniqueTags(hedMaps, originalTags, formattedTags)];
-[validationErrors, errorTags] = checkValidTags(hedMaps, originalTags, ...
-    formattedTags, true);
+errors = [errors checktakevalue(hedMaps, originalTags, formattedTags)];
+errors = [errors checktildes(originalTags)];
+errors = [errors checkunique(hedMaps, originalTags, formattedTags)];
+[validationErrors, errorTags] = checkvalid(hedMaps, originalTags, ...
+    formattedTags);
 errors = [errors validationErrors];
-end % checkErrors
+end % checkerrors

@@ -103,11 +103,11 @@ classdef tagMap < hgsetget
                 newStruct = tList.getStruct();
             end
             
-            theKey = newStruct.code();
+            theKey = newStruct.code;
             
             % Does this value exist in this object?
             if ~obj.TagMap.isKey(theKey) && strcmpi('Merge', p.UpdateType)
-                theValue = newStruct.tags();
+                theValue = newStruct.tags;
             elseif obj.TagMap.isKey(theKey) && ...
                     (strcmpi('Merge', p.UpdateType) || ...
                     strcmpi('Update', p.UpdateType))

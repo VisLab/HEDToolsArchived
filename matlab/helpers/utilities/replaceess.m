@@ -68,7 +68,7 @@ ESS.eventCodesInfo = readEventCodes(p.ESS.eventCodesInfo, replaceMap);
         for a = 1:numEvents
             strTags = eventCodes(a).condition.tag;
             if ~isempty(strTags)
-                cellTags = str2cell(strTags);
+                cellTags = hed2cell(strTags, true);
                 replacedCellTags = replaceTags(cellTags, replaceMap);
                 replacedStrTags = cell2str(replacedCellTags);
                 eventCodes(a).condition.tag = replacedStrTags;
@@ -92,11 +92,6 @@ ESS.eventCodesInfo = readEventCodes(p.ESS.eventCodesInfo, replaceMap);
             end
         end
     end % replaceTags
-
-    function tags = str2cell(tags)
-        % Converts the tags from a string to a cell array
-        tags = formattags(tags, true);
-    end % str2cell
 
     function tagStr = cell2str(tags)
         % Converts the tags from a cell array to a string

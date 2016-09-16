@@ -1,7 +1,7 @@
 % This function takes in a EEG event structure containing HED tags
 % and validates them against a HED schema. The validatetsv function calls
 % this function to parse the tab-separated file and generate any issues
-% found through the validation. 
+% found through the validation.
 %
 % Usage:
 %
@@ -50,7 +50,7 @@
 %
 %       success
 %                   True if the validation finishes without throwing any
-%                   exceptions, false if otherwise. 
+%                   exceptions, false if otherwise.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -69,31 +69,23 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [issues, replaceTags, success] = parseeeg(hedMaps, events, ...
+function [issues, replaceTags] = parseeeg(hedMaps, events, ...
     tagField, generateWarnings)
 p = parseArguments(hedMaps, events, tagField, generateWarnings);
-[issues, replaceTags, success] = readStructTags(p);
+[issues, replaceTags] = readStructTags(p);
 
     function p = findErrors(p)
-        % Finds errors in a given structure 
-        [p.structErrors, structRemapTags] = ...
-            checkForValidationErrors(p.hedMaps, p.cellTags, ...
-            p.formattedCellTags);
-        p.remapTags = union(p.remapTags, structRemapTags);
+        % Finds errors in a given structure
+        [p.structErrors, structReplaceTags] = checkerrors(p.hedMaps, ...
+            p.cellTags, p.formattedCellTags);
+        p.replaceTags = union(p.replaceTags, structReplaceTags);
     end % findErrors
 
     function p = findWarnings(p)
         % Find warnings in a given structure
-        p.structWarnings = checkForValidationWarnings(p.hedMaps, ...
-            p.cellTags, p.formattedCellTags);
+        p.structWarnings = checkwarnings(p.hedMaps, p.cellTags, ...
+            p.formattedCellTags);
     end % findWarnings
-
-    function [cellTags, formattedCellTags] = tags2cell(strTags)
-        % Converts the tags from a str to a cellstr and formats them
-        cellTags = formattags(strTags, false);
-        formattedCellTags = formattags(strTags, true);
-    end % tags2cell
-
 
     function p = parseArguments(hedMaps, events, tagField, ...
             generateWarnings)
@@ -107,21 +99,25 @@ p = parseArguments(hedMaps, events, tagField, generateWarnings);
         p = parser.Results;
     end % parseArguments
 
-    function [issues, replaceTags, success] = readStructTags(p)
+    function [issues, replaceTags] = readStructTags(p)
         % Extract the HED tags in a structure array and validate them
         p.issues = {};
-        p.remapTags = {};
+        p.replaceTags = {};
         p.issueCount = 1;
         numberEvents = length(p.events);
-        for a = 1:numberEvents
-            p.structNumber = a;
-            [p.cellTags, p.formattedCellTags] = ...
-                tags2cell(p.events(a).(p.tagField));
-            p = validateStructTags(p);
+        try
+            for a = 1:numberEvents
+                p.structNumber = a;
+                p.cellTags = hed2cell(p.events(a).(p.tagField), false);
+                p.formattedCellTags = hed2cell(p.events(a).(p.tagField), true);
+                p = validateStructTags(p);
+            end
+            issues = p.issues;
+            replaceTags = p.replaceTags;
+        catch
+            throw(MException('parseeeg:cannotRead', ...
+                'Unable to read event %d', a));
         end
-        issues = p.issues;
-        replaceTags = p.remapTags;
-        success = true;
     end % readStructTags
 
     function p = validateStructTags(p)

@@ -1,12 +1,34 @@
-% merge_tagstrings
-% Returns a merged cell array of tags
+% Returns a merged string of HED tags.
 %
 % Usage:
-%   >> mergedString = merge_tagstrings(string1, string2, preservePrefix)   
+%
+%   >>  mergedString = merge_tagstrings(string1, string2, preservePrefix)  
 %    
-% Description:
-% mergedString = merge_tagstrings(string1, string2, preservePrefix) returns
-% a merged cell array of tags
+%
+% Input:
+%
+%   string1
+%                    A string containing HED tags. Tags within parentheses
+%                    represent a tag group.
+%
+%   string2
+%                    A string containing HED tags. Tags within parentheses
+%                    represent a tag group.
+%
+%   preservePrefix
+%                    If false (default), tags for the same field value that
+%                    share prefixes are combined and only the most specific
+%                    is retained (e.g., /a/b/c and /a/b become just
+%                    /a/b/c). If true, then all unique tags are retained.
+%
+% Output:
+%
+%   mergedString
+%                   If true (default), the entire inDir directory tree is
+%                   searched. If false, only the inDir directory is
+%                   searched.
+%
+%   'tagField'
 %
 % Notes:
 %  - Tags are of a path-like form: /a/b/c
@@ -15,15 +37,9 @@
 %  - Tags that are prefixes of other tags are preserved by default
 %  - Whitespace is trimmed from outside of tags
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for merge_tagstrings:
-%
-%    doc merge_tagstrings
-%
-% See also: tageeg, tageeg_input, pop_tageeg
-%
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, krobbins@cs.utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -32,17 +48,12 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: merge_tagstrings.m,v $
-% $Revision: 1.0 21-Apr-2013 09:25:25 krobbins $
-% $Initial version $
-%
 
 function mergedString = merge_tagstrings(string1, string2, preservePrefix)
 mergedString = '';
@@ -51,8 +62,8 @@ if nargin < 3
         'function must have at 3 arguments');
     return;
 end
-parsed1 = regexpi(string1, ',', 'split');
-parsed2 = regexpi(string2, ',', 'split');
+parsed1 = vTagList.deStringify(string1);
+parsed2 = vTagList.deStringify(string2);
 merged = merge_taglists(parsed1, parsed2, preservePrefix);
 if isempty(merged)
     return;
@@ -60,9 +71,5 @@ elseif ischar(merged)
     mergedString = strtrim(merged);
     return;
 end
-
-mergedString = strtrim(merged{1});
-for k = 2:length(merged)
-    mergedString = [mergedString ',' merged{k}]; %#ok<AGROW>
-end
+mergedString = vTagList.stringify(merged);
 end % merge_tagstrings

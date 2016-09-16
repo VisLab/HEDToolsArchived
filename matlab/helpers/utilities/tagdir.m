@@ -31,23 +31,17 @@
 %                    searched. If false, only the inDir directory is
 %                    searched.
 %
-%   'EditXml'
-%                    If false (default), the HED XML cannot be modified
-%                    using the tagger GUI. If true, then the HED XML can be
-%                    modified using the tagger GUI.
-%
 %   'ExcludeFields'
-%                    A cell array of field names in the .event and .urevent
-%                    substructures to ignore during the tagging process. By
-%                    default the following subfields of the event structure
-%                    are ignored: .latency, .epoch, .urevent, .hedtags, and
-%                    .usertags. The user can over-ride these tags using
-%                    this name-value parameter.
+%                    A one-dimensional cell array of field names in the
+%                    .event substructure to ignore during the tagging
+%                    process. By default the following subfields of the
+%                    .event structure are ignored: .latency, .epoch,
+%                    .urevent, .hedtags, and .usertags. The user can
+%                    over-ride these tags using this name-value parameter.
 %
 %   'Fields'
-%                    A cell array of field names of the fields to include
-%                    in the tagging. If this parameter is non-empty, only
-%                    these fields are tagged.
+%                    A one-dimensional cell array of fields to tag. If this
+%                    parameter is non-empty, only these fields are tagged.
 %
 %   'PreservePrefix'
 %                    If false (default), tags for the same field value that
@@ -124,9 +118,8 @@ fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, ...
     fMap, dirFields);
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix, 'ExcludedField', ...
-        excluded, 'Fields', fields);
+    [fMap, canceled] = editmaps(fMap, 'PreservePrefix', ...
+        p.PreservePrefix, 'ExcludedField', excluded, 'Fields', fields);
 end
 if ~canceled
     write2dir(fPaths, fMap, p.PreservePrefix, p.SaveMapFile, ...
@@ -202,7 +195,6 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('BaseMap', '', ...
             @(x)(isempty(x) || (ischar(x))));
         parser.addParamValue('DoSubDirs', true, @islogical);
-        parser.addParamValue('EditXml', false, @islogical);
         parser.addParamValue('ExcludeFields', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));

@@ -4,6 +4,27 @@
 %
 %   >>  fPaths = getfilelist(inDir, fileExt, doSubDirs)
 %
+% Input:
+%
+%   Required:
+%
+%   inDir
+%                    The full path to a directory tree.
+%
+%   fileExt
+%                    The file extension of the files to search for in the
+%                    inDir directory tree.
+%
+%   doSubDirs        If true (default) the entire inDir directory tree is
+%                    searched. If false only the inDir directory is
+%                    searched.
+%
+% Output:
+%
+%   fPaths
+%                    A list of full file names of the datasets to be
+%                    tagged.
+%
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
@@ -54,4 +75,4 @@ end
         fileNames = fileNames(matches);
     end % processExts
 
-end % getFileList
+end % getfilelist

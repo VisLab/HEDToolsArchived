@@ -171,7 +171,7 @@ end
         for a = 1:numCols
             if ismember(a, tagColumns)
                 splitTags = splitLine{1}{a};
-                splitCellTags = str2cell(splitTags);
+                splitCellTags = hed2cell(splitTags, true);
                 replacedTags = remapTags(splitCellTags);
                 replacedTags = cell2str(replacedTags);
                 output = sprintf('%s%s\t', output, replacedTags);
@@ -212,11 +212,6 @@ end
         valueTag = remapMap([matchedTag '*']);
         replacementTag = strrep(valueTag, '*', restOfTag);
     end % replaceWildCardTag
-
-    function tags = str2cell(tags)
-        % Converts the tags from a string to a cell array
-        tags = formattags(tags, true);
-    end % str2cell
 
     function writeOutput(output)
         % Writes the output to the file

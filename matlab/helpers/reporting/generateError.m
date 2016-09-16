@@ -2,7 +2,7 @@
 %
 % Usage:
 %
-%   >>  error = generateError(type, line, tag, prefix, units);
+%   >>  error = generateerror(type, line, tag, prefix, units);
 %
 % Input:
 %
@@ -39,7 +39,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function error = generateError(type, line, tag, prefix, units)
+function error = generateerror(type, line, tag, prefix, units)
 switch(type)
     case 'cell'
         error = sprintf('Errors in cell %s:\n', num2str(line));
@@ -74,4 +74,4 @@ switch(type)
     case 'unitClass'
         error = sprintf(['\t"%s" should have one of "%s" as a unit,' ...
             ' or, no unit\n'], tag, units);
-end % generateError
+end % generateerror

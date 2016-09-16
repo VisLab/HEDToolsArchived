@@ -7,21 +7,28 @@
 %
 % Input:
 %
-%      Required:
+%   Required:
 %
-%      tList1
+%   tList1
 %                    A cell array containing HED tags. A cell array within
 %                    the cell array represents a tag group.
 %
-%      tList2
+%   tList2
 %                    A cell array containing HED tags. A cell array within
 %                    the cell array represents a tag group.
 %
-%      PreservePrefix
+%   preservePrefix
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
+%
+% Output:
+%
+%   mergedList
+%                   A merged cell array consisting of tags from tList1 and
+%                   tList2 based on the preserve prefix option.
+%
 % Notes:
 %
 %  - Tags are of a path-like form: /a/b/c
@@ -30,7 +37,9 @@
 %  - Tags that are prefixes of other tags are preserved by default
 %  - Whitespace is trimmed from outside of tags
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, krobbins@cs.utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -39,7 +48,7 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License

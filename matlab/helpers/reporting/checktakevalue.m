@@ -66,7 +66,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [errors, errorTags, warnings, warningTags] = ...
-    checkTakeValueTags(hedMaps, originalTags, formattedTags)
+    checktakevalue(hedMaps, originalTags, formattedTags)
 errors = '';
 errorTags = {};
 warnings = '';
@@ -163,7 +163,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
             tagString = [originalTag{valueIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTag),')'];
         end
-        errors = [errors, generateError(errorType, '', tagString, '', ...
+        errors = [errors, generateerror(errorType, '', tagString, '', ...
             unitClassUnits)];
         errorTags{end+1} = originalTag{valueIndex};
     end % generateErrors
@@ -176,7 +176,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
             tagString = [originalTag{valueIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTag),')'];
         end
-        warnings = [warnings, generateWarning(warningType, '', ...
+        warnings = [warnings, generatewarning(warningType, '', ...
             tagString, unitClassDefault)];
         warningTags{end+1} = originalTag{valueIndex};
     end % generateWarnings
@@ -203,4 +203,4 @@ checkTakesValueTags(originalTags, formattedTags, false);
         tagName = valueTag{1}{end};
     end % getTagName
 
-end % checkTakeValueTags
+end % checktakevalue

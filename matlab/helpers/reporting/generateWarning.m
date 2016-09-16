@@ -2,7 +2,7 @@
 %
 % Usage:
 %
-%   >>  warning = generateWarning(type, line, tag, units);
+%   >>  warning = generatewarning(type, line, tag, units);
 %
 % Input:
 %
@@ -37,7 +37,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function warning = generateWarning(type, line, tag, units)
+function warning = generatewarning(type, line, tag, units)
 warning = '';
 switch(type)
     case 'cap'
@@ -55,4 +55,4 @@ switch(type)
     case 'unitClass'
         warning = sprintf(['\t No units were specified for "%s" so the' ...
             ' unit %s is being used by default\n'], tag, units);
-end % generateWarning
+end % generatewarning

@@ -29,7 +29,7 @@
 
 function updatehed_input(tab)
 versionCtrl = '';
-currentVersion = getXMLHEDVersion('HED.xml');
+currentVersion = getxmlversion('HED.xml');
 createPanel(tab);
 
     function createButtons(panel)

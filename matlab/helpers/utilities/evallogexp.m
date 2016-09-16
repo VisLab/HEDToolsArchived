@@ -6,7 +6,7 @@
 %
 % Input:
 %
-%   exp
+%   expression
 %                A short-circuit logical expression that will be evaluated.
 %
 %   tags
@@ -40,7 +40,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function tagsFound = evallogexp(exp, tags, nonGrouptags, groupTags) %#ok<INUSD>
+function tagsFound = evallogexp(expression, tags, nonGrouptags, ...
+    groupTags) %#ok<INUSD>
 tagsFound = false;
 if ~isempty(expression)
     try

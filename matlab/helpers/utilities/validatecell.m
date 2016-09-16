@@ -67,7 +67,7 @@ issues = validate(p);
         % tags
         hedMaps = loadHEDMap();
         mapVersion = hedMaps.version;
-        xmlVersion = getXMLHEDVersion(p.hedXML);
+        xmlVersion = getxmlversion(p.hedXML);
         if ~strcmp(mapVersion, xmlVersion);
             hedMaps = mapHEDAttributes(p.hedXML);
         end

@@ -1,10 +1,12 @@
-% This function checks the number of tildes in a group. A group cannot have
-% more than 2 tildes. A group with more than 2 tildes will generate an
-% error.
-%
+% This function checks to see if the provided HED tags have the 
+% 'requireChild' attribute. Tags with this attribute should not be
+% present but instead have a tag that is a descendant of it. Tags found
+% with the 'requireChild' attribute will generate an error. 
+
 % Usage:
 %
-%   >>  [errors, errorTags] = checkGroupTildes(originalTags)
+%   >>  [errors, errorTags] = checkrequirechildtags(hedMaps, original, ...
+%       canonical)
 %
 % Input:
 %
@@ -55,27 +57,37 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [errors, errorTags] = checkGroupTildes(originalTags)
+function [errors, errorTags] = checkrequirechild(hedMaps, original, ...
+    canonical)
 errors = '';
 errorTags = {};
-checkTildeTags(originalTags);
+requireChildTags = hedMaps.requireChild;
+checkTags(original, canonical, false);
 
-    function checkTildeTags(originalTags)
-        % Checks if the tags in the group have no more than 2 tildes
-        numTags = length(originalTags);
+    function checkTags(originalTags, formattedTags, isGroup)
+        % Checks the tags that require children
+        numTags = length(formattedTags);
         for a = 1:numTags
-            if ~ischar(originalTags{a}) && ...
-                    sum(strncmp('~',originalTags{a}, 1)) > 2
-                generateErrors(originalTags, a);
+            if ~ischar(formattedTags{a})
+                checkTags(originalTags{a}, formattedTags{a}, true);
+                return;
+            elseif requireChildTags.isKey(lower(formattedTags{a}))
+                generateErrors(originalTags, a, isGroup);
             end
         end
     end % checkTags
 
-    function generateErrors(original, groupIndex)
-        % Generates errors when there are more than 2 tildes in a group
-        tagString = vTagList.stringifyElement(original{groupIndex});
-        errors = [errors, generateError('tilde', '', tagString, '', '')];
-        errorTags{end+1} = original{groupIndex};
+    function generateErrors(originalTags, tagIndex, isGroup)
+        % Generates require child tag errors if the require child tag is
+        % present in the tag list
+        tagString = originalTags{tagIndex};
+        if isGroup
+            tagString = [originalTags{tagIndex}, ' in group (' ,...
+                vTagList.stringifyElement(originalTags),')'];
+        end
+        errors = [errors, generateError('requireChild', '', tagString, ...
+            '', '')];
+        errorTags{end+1} = originalTags{tagIndex};
     end % generateErrors
 
-end % checkGroupTildes
+end % checkrequirechild

@@ -15,11 +15,6 @@
 %
 %   Optional (key/value):
 %
-%   'EditXml'
-%                    If false (default), the HED XML cannot be modified
-%                    using the CTagger GUI. If true, then the HED XML can
-%                    be modified using the CTagger GUI.
-%
 %   'ExcludeFields'
 %                    A cell array of field names in the .event substructure
 %                    to ignore during the tagging process. By default the
@@ -62,24 +57,22 @@ function [fMap, canceled] = editmaps(fMap, varargin)
 % Check the input arguments for validity and initialize
 p = parseArguments(fMap, varargin{:});
 p = setDefaultParameters(p);
-while (~p.canceled && p.k <= length(p.fields))
-    fprintf('Tagging %s\n', p.fields{p.k});
-    p.field = p.fields{p.k};
+while (~p.canceled && p.k <= length(p.Fields))
+    fprintf('Tagging %s\n', p.Fields{p.k});
+    p.field = p.Fields{p.k};
     p = editFieldTags(p);
 end
 canceled = p.canceled;
 
     function p = setDefaultParameters(p)
         % Set the default parameters for this function
-        p.EditXml = p.EditXml;
-        p.preservePrefix = p.PreservePrefix;
         p.initialDepth = 3;
         p.standAlone = false;
         p.useJSON = true;
         if ~isempty(p.Fields)
-            p.fields = intersect(p.Fields, p.fMap.getFields(), 'stable');
+            p.Fields = intersect(p.Fields, p.fMap.getFields(), 'stable');
         else
-            p.fields = setdiff(p.fMap.getFields(), p.ExcludedFields);
+            p.Fields = setdiff(p.fMap.getFields(), p.ExcludedFields);
         end
         p.canceled = false;
         p.k = 1;
@@ -96,7 +89,7 @@ canceled = p.canceled;
         p = executeCTagger(p);
         if p.loaded
             baseTags = fieldMap.loadFieldMap(char(p.loader.getFMapPath));
-            p.fMap.merge(baseTags, 'Update', {}, p.fields);
+            p.fMap.merge(baseTags, 'Update', {}, p.Fields);
             if p.loader.isStartOver()
                 p.k = 1;
                 p.firstField = true;
@@ -157,11 +150,8 @@ canceled = p.canceled;
     function flags = setCTaggerFlags(p)
         % Sets the flags parameter in CTagger
         flags = 1;
-        if p.preservePrefix
+        if p.PreservePrefix
             flags = bitor(flags,2);
-        end
-        if p.EditXml
-            flags = bitor(flags,8);
         end
         if p.standAlone
             flags = bitor(flags,16);
@@ -182,9 +172,6 @@ canceled = p.canceled;
         tValues = tagMap.json2Values(tValues);
         p.fMap.removeMap(p.field);
         p.fMap.addValues(p.field, tValues, 'Primary', p.tMap.getPrimary());
-        if p.EditXml
-            p.fMap.setXml(strtrim(p.xml));
-        end
     end % updatefMap
 
     function p = parseArguments(fMap, varargin)
@@ -192,7 +179,6 @@ canceled = p.canceled;
         parser = inputParser;
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
-        parser.addParamValue('EditXml', false, @islogical);
         parser.addParamValue('ExcludedFields', {}, @iscellstr);
         parser.addParamValue('Fields', {}, @iscellstr);
         parser.addParamValue('PreservePrefix', false, @islogical);

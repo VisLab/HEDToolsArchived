@@ -12,9 +12,8 @@
 %   Required:
 %
 %   tsvFile
-%                   The name or the path of a tab-separated file
-%                   containing HED tags in a single column or multiple
-%                   columns.
+%                   The full path of a tab-separated file containing HED
+%                   tags in a single column or multiple columns.
 %
 %   tagColumns
 %                   The columns in the tab-separated file that contains the
@@ -34,8 +33,8 @@
 %                   it will and this can generate issues.
 %
 %   'hedXML'
-%                   A XML file containing every single HED tag and its
-%                   attributes. This by default will be the HED.xml file
+%                   The full path to a HED XML file containing all of the
+%                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
 %   'outDir'
@@ -73,7 +72,11 @@
 %                   the validation. Each cell corresponds to the issues
 %                   found on a particular line.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+%   success
+%                   True if the validation finishes without throwing any
+%                   exceptions. False if otherwise.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -98,10 +101,10 @@ issues = validate(p);
     function issues = validate(p)
         % Validates the HED tags in the tab-separated file
         p.hedMaps = getHEDMaps(p);
-        [p.issues, p.replaceTags, success] = parsetsv(p.hedMaps, ...
+        [p.issues, p.replaceTags] = parsetsv(p.hedMaps, ...
             p.tsvFile, p.tagColumns, p.hasHeader, p.generateWarnings);
         issues = p.issues;
-        if success && p.writeOutput
+        if p.writeOutput
             writeOutputFiles(p);
         end
     end % validate
@@ -111,7 +114,7 @@ issues = validate(p);
         % their attributes
         hedMaps = loadHEDMap();
         mapVersion = hedMaps.version;
-        xmlVersion = getXMLHEDVersion(p.hedXML);
+        xmlVersion = getxmlversion(p.hedXML);
         if ~strcmp(mapVersion, xmlVersion);
             hedMaps = mapHEDAttributes(p.hedXML);
         end
@@ -147,17 +150,22 @@ issues = validate(p);
         % Creates a log file containing any issues found through the
         % validation
         numErrors = length(p.issues);
-        errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
-        fileId = fopen(errorFile,'w');
-        if ~empty
-            fprintf(fileId, '%s', p.issues{1});
-            for a = 2:numErrors
-                fprintf(fileId, '\n%s', p.issues{a});
+        logFile = fullfile(p.outDir, [p.file '_log' p.ext]);
+        try
+            fileId = fopen(logFile,'w');
+            if ~empty
+                for a = 1:numErrors-1
+                    fprintf(fileId, '%s\n', p.issues{a});
+                end
+                fprintf(fileId, '%s', strtrim(p.issues{numErrors}));               
+            else
+                fprintf(fileId, 'No issues were found.');
             end
-        else
-            fprintf(fileId, 'No issues were found.');
+            fclose(fileId);
+        catch
+            throw(MException('validatetsv:cannotWrite', ...
+                'Cannot write log file'));
         end
-        fclose(fileId);
     end % createLogFile
 
     function createReplaceFile(p)
@@ -174,11 +182,16 @@ issues = validate(p);
     function fileId = write2ReplaceFile(p)
         % Creates and writes to a new replace file
         numReplaceTags = length(p.replaceTags);
-        replaceFile = fullfile(p.dir, [p.file '_remap' p.mapExt]);
+        replaceFile = fullfile(p.outDir, [p.file '_replace' p.replaceExt]);
+        try
         fileId = fopen(replaceFile,'w');
         fprintf(fileId, '%s', p.replaceTags{1});
         for a = 2:numReplaceTags
             fprintf(fileId, '\n%s', p.replaceTags{a});
+        end
+        catch 
+            throw(MException('validatetsv:cannotWrite', ...
+                'Cannot write to replace file %d', lineNumber));
         end
     end % write2ReplaceFile
 
@@ -201,8 +214,7 @@ issues = validate(p);
 
     function replaceMap = replaceFile2Map(replaceFile)
         % Puts the replace file tags in a Map container
-        replaceMap = ...
-            containers.Map('KeyType', 'char', 'ValueType', 'any');
+        replaceMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
         lineNumber = 1;
         try
             fileId = fopen(replaceFile);
@@ -215,28 +227,22 @@ issues = validate(p);
             fclose(fileId);
         catch ME
             fclose(fileId);
-            throw(MException('validatetsv:cannotParse', ...
-                'Unable to parse TSV file on line %d', lineNumber));
+            throw(MException('validatetsv:cannotRead', ...
+                'Unable to read replace file %d', lineNumber));
         end
     end % replaceFile2Map
 
     function writeOutputFiles(p)
         % Writes the issues and replace tags found to a log file and a
         % replace file
-        p.dir = p.outDir;
         [~, p.file] = fileparts(p.tsvFile);
         p.ext = '.txt';
-        p.mapExt = '.tsv';
-        try
-            if ~isempty(p.issues)
-                createLogFile(p, false);
-                createReplaceFile(p);
-            else
-                createLogFile(p, true);
-            end
-        catch
-            throw(MException('validatetsv:cannotWrite', ...
-                'Could not write output files'));
+        p.replaceExt = '.tsv';
+        if ~isempty(p.issues)
+            createLogFile(p, false);
+            createReplaceFile(p);
+        else
+            createLogFile(p, true);
         end
     end % writeOutputFiles
 

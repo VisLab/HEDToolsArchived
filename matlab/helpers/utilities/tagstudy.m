@@ -27,23 +27,17 @@
 %                    a fieldMap object to be used for initial tag
 %                    information.
 %
-%   'EditXml'
-%                    If false (default), the HED XML cannot be modified
-%                    using the tagger GUI. If true, then the HED XML can be
-%                    modified using the tagger GUI.
-%
 %   'ExcludeFields'
-%                    A cell array of field names in the .event and .urevent
-%                    substructures to ignore during the tagging process.
-%                    By default the following subfields of the event
-%                    structure are ignored: .latency, .epoch, .urevent,
-%                    .hedtags, and .usertags. The user can over-ride these
-%                    tags using this name-value parameter.
+%                    A one-dimensional cell array of field names in the
+%                    .event substructure to ignore during the tagging
+%                    process. By default the following subfields of the
+%                    .event structure are ignored: .latency, .epoch,
+%                    .urevent, .hedtags, and .usertags. The user can
+%                    over-ride these tags using this name-value parameter.
 %
 %   'Fields'
-%                    A cell array of field names of the fields to include
-%                    in the tagging. If this parameter is non-empty,
-%                    only these fields are tagged.
+%                    A one-dimensional cell array of fields to tag. If this
+%                    parameter is non-empty, only these fields are tagged.
 %
 %   'PreservePrefix'
 %                    If false (default), tags of the same event type that
@@ -59,7 +53,7 @@
 %
 %   'SaveDatasets'
 %                    If true (default), save the tags to the underlying
-%                    dataset files in the directory.
+%                    dataset files in the study.
 %
 %   'SaveMapFile'
 %                    The full path name of the file for saving the final,

@@ -382,15 +382,16 @@ createPanel(tab);
         else
             wb = waitbar(.5,'Please wait...');
             try
-                validatetsv(tsvFile, tsvTagColumns, 'hedXML', ...
-                    hedXML, 'outDir', outDir, ...
+                validatetsv(tsvFile, tsvTagColumns, ...
+                    'hedXML', hedXML, 'outDir', outDir, ...
                     'hasHeader', hasHeader, 'writeOutput', true, ...
                     'generateWarnings', generateWarnings);
                 msgbox('Complete!');
+                close(wb);
             catch ME
-                errordlg(['Failed!' ME.message]);
+                close(wb);
+                errordlg(ME.message);
             end
-            close(wb);
         end
     end % validateTSVCallback
 

@@ -1,7 +1,7 @@
 % This function takes in a tab-separated file containing HED tags
 % and validates them against a HED schema. The validatetsv function calls
 % this function to parse the tab-separated file and generate any issues
-% found through the validation. 
+% found through the validation.
 %
 % Usage:
 %
@@ -54,10 +54,6 @@
 %                   A cell array containing all of the tags that generated
 %                   issues. These tags will be written to a replace file.
 %
-%   success
-%                   True if the validation finishes without throwing any
-%                   exceptions, false if otherwise. 
-%
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
@@ -75,11 +71,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [issues, replaceTags, success] = parsetsv(hedMaps, tsvFile, ...
+function [issues, replaceTags] = parsetsv(hedMaps, tsvFile, ...
     tagColumns, hasHeader, generateWarnings)
 p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
     generateWarnings);
-[issues, replaceTags, success] = readLines(p);
+[issues, replaceTags] = readLines(p);
 
     function [line, lineNumber] = checkFileHeader(hasHeader, fileId)
         % Checks to see if the file has a header line
@@ -93,23 +89,16 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
 
     function p = findErrors(p)
         % Errors will be generated for the line if found
-        [p.lineErrors, lineReplaceTags] = ...
-            checkForValidationErrors(p.hedMaps, p.cellTags, ...
-            p.formattedCellTags);
+        [p.lineErrors, lineReplaceTags] = checkerrors(p.hedMaps, ...
+            p.cellTags, p.formattedCellTags);
         p.replaceTags = union(p.replaceTags, lineReplaceTags);
     end % findErrors
 
     function p = findWarnings(p)
         % Warnings will be generated for the line if found
-        p.lineWarnings = checkForValidationWarnings(p.hedMaps, ...
-            p.cellTags, p.formattedCellTags);
+        p.lineWarnings = checkwarnings(p.hedMaps, p.cellTags, ...
+            p.formattedCellTags);
     end % findWarnings
-
-    function [cellTags, formattedCellTags] = tags2cell(strTags)
-        % Converts the tags from a str to a cellstr and formats them
-        cellTags = formattags(strTags, false);
-        formattedCellTags = formattags(strTags, true);
-    end % tags2cell
 
     function p = parseArguments(hedMaps, file, tagColumns, hasHeader, ...
             generateWarnings)
@@ -126,7 +115,7 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         p = parser.Results;
     end % parseArguments
 
-    function [issues, replaceTags, success] = readLines(p)
+    function [issues, replaceTags] = readLines(p)
         % Reads the tab-delimited file line by line and validates the tags
         p.issues = {};
         p.replaceTags = {};
@@ -144,13 +133,10 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
             fclose(fileId);
             issues = p.issues;
             replaceTags = p.replaceTags;
-            success = true;
-        catch ME
+        catch
             fclose(fileId);
-            warning('Unable to parse TSV file on line %d', p.lineNumber);
-            issues = '';
-            replaceTags = {};
-            success = false;
+            throw(MException('parsetsv:cannotRead', ...
+                'Unable to read TSV file on line %d', p.lineNumber));
         end
     end % readLines
 
@@ -172,7 +158,8 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
                         delimitedLine{1}{tagColumns(a)}]; %#ok<AGROW>
                 end
             end
-            [cellTags, formattedCellTags] = tags2cell(splitTags);
+            cellTags = hed2cell(splitTags, false);
+            formattedCellTags = hed2cell(splitTags, true);
         end
     end % getLineTags
 

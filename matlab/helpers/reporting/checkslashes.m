@@ -3,7 +3,7 @@
 %
 % Usage:
 %
-%   >>  [warnings, warningTags] = checkTagSlashes(originalTags)
+%   >>  [warnings, warningTags] = checkslashes(originalTags)
 %
 % Input:
 %
@@ -37,7 +37,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [warnings, warningTags] = checkTagSlashes(originalTags)
+function [warnings, warningTags] = checkslashes(originalTags)
 numElements = findNumElements(originalTags);
 warnings = '';
 warningTags = cell(1, numElements);
@@ -64,7 +64,7 @@ checkTagSlashes(originalTags, false);
             tagString = [originalTags{tagIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTags),')'];
         end
-        warnings = [warnings, generateWarning('slash', '', tagString, '')];
+        warnings = [warnings, generatewarning('slash', '', tagString, '')];
         warningTags{warningsIndex} = originalTags{tagIndex};
         warningsIndex = warningsIndex + 1;
     end % generateWarnings
@@ -84,4 +84,4 @@ checkTagSlashes(originalTags, false);
         end
     end % findNumElements
 
-end  % checkTagSlashes
+end  % checkslashes

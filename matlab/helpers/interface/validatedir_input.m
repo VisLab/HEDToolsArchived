@@ -2,8 +2,8 @@
 %
 % Usage:
 %
-%   >>  [canceled, generateWarnings, hedXML, inDir, outDir, ...
-%       doSubDirs] = validatedir_input()
+%   >>  [canceled, doSubDirs, generateWarnings, hedXML, inDir, outDir] ...
+%        = validatedir_input()
 %
 % Output:
 %
@@ -14,6 +14,11 @@
 %   doSubDirs        If true (default), the entire inDir directory tree is
 %                    searched. If false, only the inDir directory is
 %                    searched.
+% 
+%   generateWarnings
+%                   If true, include warnings in the log file in addition
+%                   to errors. If false (default), only errors are included
+%                   in the log file.
 %
 %   hedXML
 %                   The name or the path of the HED XML file containing

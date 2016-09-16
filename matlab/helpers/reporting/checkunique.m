@@ -56,7 +56,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [errors, errorTags] = checkUniqueTags(hedMaps, originalTags, ...
+function [errors, errorTags] = checkunique(hedMaps, originalTags, ...
     formattedTags)
 % Checks to see if a row of tags contain two or more tags that are
 % descendants of a unique tag
@@ -100,7 +100,7 @@ end
                     ' in group (' ,...
                     vTagList.stringifyElement(originalTags),')'];
             end
-            errors = [errors, generateError('unique', '', tagString, ...
+            errors = [errors, generateerror('unique', '', tagString, ...
                 uniqueTags{uniqueTagsIndex}, '')];     %#ok<AGROW>
             errorTags{end+1} = uniqueTags{uniqueTagsIndex}; %#ok<AGROW>
         end
@@ -122,4 +122,4 @@ end
             formattedTags));
     end % getGroupTags
 
-end % checkUniqueTags
+end % checkunique

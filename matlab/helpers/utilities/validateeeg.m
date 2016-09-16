@@ -20,28 +20,23 @@
 %                   in the log file.
 %
 %   'hedXML'
-%                   A XML file containing every single HED tag and its
-%                   attributes. This by default will be the HED.xml file
+%                   The full path to a HED XML file containing all of the
+%                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
 %   'outDir'
-%                   The directory where the validation output will be
-%                   written to if the 'writeOutput' argument is set to
-%                   true. There will be log file containing any issues that
-%                   were found while validating the HED tags. If there were
-%                   issues found then a replace file will be created in
-%                   addition to the log file if an optional one isn't
-%                   already provided. The default output directory will be
-%                   the current directory.
+%                   The directory where the validation output is written 
+%                   to. There will be a log file generated for each study
+%                   dataset validated.
 %
 %   'tagField'
 %                   The field in .event that contains the HED tags.
 %                   This by default is .usertags.
 %
 %   'writeOutput'
-%                  True if the validation output is written to a log file
-%                  in addition to the workspace. False (default) if the
-%                  validation output is only written to the workspace.
+%                   If true (default), write the validation issues to a
+%                   log file in addition to the workspace. If false only
+%                   write the issues to the workspace. 
 %
 % Output:
 %
@@ -76,17 +71,17 @@ issues = validate(p);
         % Validates the eeg structure
         p.hedMaps = getHEDMaps(p);
         if isfield(p.EEG.event, p.tagField)
-            [p.issues, p.replaceTags, success] = parseeeg(p.hedMaps, ...
+            [p.issues, p.replaceTags] = parseeeg(p.hedMaps, ...
                 p.EEG.event, p.tagField, p.generateWarnings);
             issues = p.issues;
-            if success && p.writeOutput
+            if p.writeOutput
                 writeOutputFiles(p);
             end
         else
             issues = '';
-            fprintf(['The ''.%s'' field does not exist in the EEG' ...
-                ' events. Please tag the dataseet before running the' ...
-                ' validation.\n'], p.tagField);
+            fprintf(['The ''.%s'' field does not exist in' ...
+                ' the events. Please tag this dataset before' ...
+                ' running the validation.\n'], p.tagField);
         end
     end % validate
 
@@ -95,7 +90,7 @@ issues = validate(p);
         % tags
         hedMaps = loadHEDMap();
         mapVersion = hedMaps.version;
-        xmlVersion = getXMLHEDVersion(p.hedXML);
+        xmlVersion = getxmlversion(p.hedXML);
         if ~strcmp(mapVersion, xmlVersion);
             hedMaps = mapHEDAttributes(p.hedXML);
         end
@@ -120,7 +115,7 @@ issues = validate(p);
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('outDir', pwd, ...
             @(x) ischar(x) && 7 == exist(x, 'dir'));
-        p.addParamValue('writeOutput', false, @islogical);
+        p.addParamValue('writeOutput', true, @islogical);
         p.parse(EEG, varargin{:});
         p = p.Results;
     end % parseArguments
@@ -128,7 +123,11 @@ issues = validate(p);
     function writeOutputFiles(p)
         % Writes the issues to the log file
         p.dir = p.outDir;
+        if ~isempty(p.EEG.filename)
         [~, p.file] = fileparts(p.EEG.filename);
+        else
+        [~, p.file] = fileparts(p.EEG.setname);    
+        end
         p.ext = '.txt';
         p.mapExt = '.tsv';
         try
@@ -138,8 +137,8 @@ issues = validate(p);
                 createLogFile(p, true);
             end
         catch
-            throw(MException('validatetsv:cannotWrite', ...
-                'Could not write output files'));
+            throw(MException('validateeeg:cannotWrite', ...
+                'Could not write log file'));
         end
     end % writeOutputFiles
 

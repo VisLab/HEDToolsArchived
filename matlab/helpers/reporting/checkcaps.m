@@ -57,7 +57,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [warnings, warningTags] = checkTagCaps(hedMaps, originalTags, ...
+function [warnings, warningTags] = checkcaps(hedMaps, originalTags, ...
     formattedTags)
 numElements = findNumElements(originalTags);
 warnings = '';
@@ -86,7 +86,7 @@ checkTagCaps(originalTags, formattedTags, false);
             tagString = [originalTags{tagIndex}, ' in group (' ,...
                 vTagList.stringifyElement(originalTags),')'];
         end
-        warnings = [warnings, generateWarning('cap', '', tagString, '')];
+        warnings = [warnings, generatewarning('cap', '', tagString, '')];
         warningTags{warningsIndex} = originalTags{tagIndex};
         warningsIndex = warningsIndex + 1;
     end % generateWarnings
@@ -117,4 +117,4 @@ checkTagCaps(originalTags, formattedTags, false);
         end
     end % findNumElements
 
-end % checkTagCaps
+end % checkcaps
