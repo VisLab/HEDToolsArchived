@@ -1,29 +1,25 @@
-% pop_tagstudy
-% Allows a user to tag a EEGLAB study using a GUI
+% Allows a user to tag a EEGLAB study using a GUI.
 %
 % Usage:
+%
 %   >>  [fMap, com] = pop_tagstudy()
 %
-% Outputs:
-%    fMap   - a fieldMap object that contains the tag map information
-%    com    - string containing call to tagstudy with all parameters
+% Output:
 %
-% Notes:
-%  -  pop_tagstudy() is meant to be used as the callback under the
-%     EEGLAB Study menu. It is a singleton and clicking
-%     the menu item again will not create a new window if one already
-%     exists.
-%  -  The function first brings up a GUI to enter the parameters to
-%     override the default values for tagstudy and then optionally allows
-%     the user to use the ctagger GUI to modify the tags.
+%   fMap
+%                    A fieldMap object that contains the tag map
+%                    information
 %
-% See also:
-%   eeglab, tageeg, tagdir, and eegplugin_ctagger
+%   fPaths
+%                    A fieldMap object that contains the tag map
+%                    information
+%   com
+%                    String containing call to tagstudy with all
+%                    parameters.
 %
-%
-% Copyright (C) 2012-2013 Thomas Rognon tcrognon@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
-%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -37,49 +33,49 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: pop_ctagger.m,v $
-% Revision 1.0 21-Apr-2013 09:25:25  kay
-% Initial version
-%
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [fMap, fPaths, com] = pop_tagstudy()
-% Create the tagger for this EEG study
-[cancelled, baseMap, editXml, precision, preservePrefix, ...
-    saveDatasets, saveMapFile, saveMode, selectFields, studyFile, ...
-    useGUI] = tagstudy_input();
-if cancelled
-    fMap = '';
-    com = '';
+fMap = '';
+fPaths = '';
+com = '';
+
+% Get the input parameters
+[baseMap, canceled, editXML, preservePrefix, saveDatasets, ...
+    saveMapFile, selectFields, studyFile, useGUI] = tagstudy_input();
+if canceled
     return;
 end
-[fMap, fPaths] = tagstudy(studyFile,'BaseMap', baseMap, ...
-    'EditXml', editXml, ...
-    'Precision', precision, ...
+
+% Tag the EEG study and return the command string
+[fMap, fPaths, canceled] = tagstudy(studyFile,'BaseMap', baseMap, ...
+    'EditXml', editXML, ...
     'PreservePrefix', preservePrefix, ...
     'SaveDatasets', saveDatasets, ...
     'SaveMapFile', saveMapFile, ...
-    'SaveMode', saveMode, ...
     'SelectFields', selectFields, ...
     'UseGUI', useGUI);
+if canceled
+    return;
+end
 
+% Create command string
 com = char(['tagstudy(''' studyFile ''', ' ...
     '''BaseMap'', ''' baseMap ''', '...
-    '''EditXml'', ' logical2str(editXml) ', ' ...
-    '''Precision'', ''' precision ''', ' ...
+    '''EditXml'', ' logical2str(editXML) ', ' ...
     '''PreservePrefix'', ' logical2str(preservePrefix) ', ' ...
     '''SaveDatasets'', ' logical2str(saveDatasets) ', ' ...
     '''SaveMapFile'', ''' saveMapFile ''', ' ...
-    '''SaveMode'', ''' saveMode ''', ' ...
     '''SelectFields'', ' logical2str(selectFields) ', ' ...
     '''UseGui'', ' logical2str(useGUI) ')']);
-end % pop_tagstudy
 
-function s = logical2str(b)
-if b
-    s = 'true';
-else
-    s = 'false';
-end
-end
+    function s = logical2str(b)
+        % Converts a logical to a string
+        if b
+            s = 'true';
+        else
+            s = 'false';
+        end
+    end % logical2str
+
+end % pop_tagstudy

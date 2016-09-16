@@ -1,26 +1,12 @@
-% vTagList
-% Object encapsulating a list of valid tags and tag groups
+% Object encapsulating a list of valid tags and tag groups.
 %
 % Usage:
+%
 %   >>  tList = vTagList(code)
 %
-% Description:
-% tList = vTagList(code) creates an object that holds a list of valid tags
-%         and tag groups associated with code
-%
-% Additional information:
-%   The vTagList group also contains static methods for validating groups
-%   and tags.
-%
-% Class documentation:
-% Execute the following in the MATLAB command window to view the class
-% documentation for vTagList:
-%
-%    doc vTagList
-%
-% See also: findtags, tageeg, tagdir, tagstudy, dataTags
-%
-% Copyright (C) Kay Robbins, UTSA, 2015, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -35,11 +21,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-%
-% $Log: vTagList.m,v $
-% $Revision: 1.00 07-Jun-2015 08:17:15 krobbins $
-% $Initial version $
-%
 
 classdef vTagList < hgsetget
     
@@ -442,7 +423,7 @@ classdef vTagList < hgsetget
                         return;
                         
                     end
-                    tstring = [tstring ',' tnext]; %#ok<AGROW>
+                    tstring = [tstring ', ' tnext]; %#ok<AGROW>
                 end
             end
         end  % stringify
@@ -456,7 +437,7 @@ classdef vTagList < hgsetget
             elseif ischar(telement)
                 tstring = strtrim(telement);
             elseif iscellstr(telement)
-                tstring = strtrim(telement{1});
+                tstring = ['(' strtrim(telement{1})];
                 telementLength = length(telement);
                 for k = 2:telementLength
                     if strcmp('~', telement{k-1}) || ...
@@ -468,6 +449,7 @@ classdef vTagList < hgsetget
                             strtrim(telement{k})]; %#ok<AGROW>
                     end
                 end
+                tstring = [tstring ')'];
             else
                 errormsg = 'element is not string or cellstr';
             end

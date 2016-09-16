@@ -1,9 +1,11 @@
 % GUI for input needed to create inputs for hedepoch.
 %
-% Options:
+% Menu Options:
 %
-%   Time-locking A comma separated list of tags or a tag search string
-%   HED tag(s)   consisting of tags to extract data epochs.
+%   Time-locking 
+%   HED tag(s)   
+%                A comma separated list of tags or a tag search string                 
+%                consisting of tags to extract data epochs.
 %                The tag search uses boolean operators (AND, OR, NOT) to
 %                widen or narrow the search. Two tags separated by a comma
 %                use the AND operator by default which will only return
@@ -18,17 +20,23 @@
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]".
 %
-%   Epoch limits Epoch latency limits [start end] in seconds relative to
+%   Epoch limits 
+%                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event. The default is [-1 2].
 %
-%   New dataset  New dataset name. The default is "[old_dataset] epochs".
+%   New dataset  
+%                New dataset name. The default is "[old_dataset] epochs".
 %
-%   Out-of-      [min max] data limits. If one positive value is given,
-%   bounds EEG   the opposite value is used for lower bound. For example,
-%   limits       use [-50 50].
+%   Out-of-      
+%   bounds EEG   
+%   limits       
+%                [min max] data limits. If one positive value is given,            
+%                the opposite value is used for lower bound. For example,
+%                use [-50 50].
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -37,7 +45,7 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License

@@ -3,20 +3,21 @@
 % will be converted into an XML node contained in the HED XML file.
 %
 % Usage:
-%   >>  xmlDoc = wiki2XML(wikiFile);
 %
-%   >>  xmlDoc = wiki2XML(wikiFile, varargin);
+%   >>  xmlDoc = wiki2xml(wikiFile)
+%
+%   >>  xmlDoc = wiki2xml(wikiFile, varargin)
 %
 % Input:
 %
-%       wikiFile    The name or the path of the wiki text file containing
+%   wikiFile        The name or the path of the wiki text file containing
 %                   all of the HED tags. Each tag and unit class in this
 %                   file will be converted into an XML node in the
 %                   HED XML file that is generated from this function.
 %
-%       Optional:
+%   Optional (key/value):
 %
-%       OutputFile    
+%   'outputFile'   
 %                   The name or the path to the HED XML output file
 %                   that the HED tags in the 'wiki' text file are written
 %                   to. If not specified then the output file path will be
@@ -25,24 +26,15 @@
 %
 % Output:
 %
-%       xmlDoc     
+%   xmlDoc     
 %                   Returns a handle to the newly created XML document
 %                   object. This XML document object can be converted to
 %                   a string, saved to another file, and traversed through
 %                   to access each element (tags in this case).
 %
-% Examples:
-%                   To convert a wiki text file 'HED2.027.txt' containing
-%                   all of the HED tags into a HED XML file 'HED2.027.xml'.
-%                   The wiki text file passed into the function is included
-%                   in the path so the name only has to be specified.
-%                   If a file that is not included in the path is passed
-%                   in then its full path has to be specified.
-%
-%                   wiki2XML('HED.md');
-%
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -56,9 +48,9 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function xmlDoc = wiki2XML(wikiFile, varargin)
+function xmlDoc = wiki2xml(wikiFile, varargin)
 p = parseArguments();
 attributeUnits = '';
 hedLines = false;
@@ -299,7 +291,7 @@ end
         p = inputParser();
         p.addRequired('wikiFile', @(x) ~isempty(x) && ischar(x));
         [path, file] = fileparts(wikiFile);
-        p.addOptional('OutputFile', fullfile(path, [file '.xml']), ...
+        p.addOptional('outputFile', fullfile(path, [file '.xml']), ...
             @(x) ~isempty(x) && ischar(x));
         p.parse(wikiFile, varargin{:});
         p = p.Results;
@@ -377,7 +369,7 @@ end
 
     function writeDocumentObjectModel()
         % Writes the document object model to a XML file
-        xmlwrite(p.OutputFile, xmlDoc);
+        xmlwrite(p.outputFile, xmlDoc);
     end % writeDocumentObjectModel
 
-end % Wiki2HED
+end % wiki2xml

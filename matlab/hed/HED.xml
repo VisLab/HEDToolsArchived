@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="2.3.5">
+<HED version="3.0.3">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -200,25 +200,6 @@
                <description>Experiment-specific actions such as moving a piece in a chess game</description>
                <node>
                   <name>Participant action</name>
-                  <description>Actions such as moving a chess piece</description>
-                  <node>
-                     <name>Correct</name>
-                  </node>
-                  <node>
-                     <name>Time out</name>
-                     <node>
-                        <name>Missed</name>
-                        <description>Participant failed or could not have perceived the instruction due to their eyes being off-screen or a similar reason. Not easy to deduce this but it is possible</description>
-                     </node>
-                  </node>
-                  <node>
-                     <name>Incorrect</name>
-                     <description>Wrong choice but not time out</description>
-                  </node>
-                  <node>
-                     <name>Inappropriate</name>
-                     <description>A choice that is not allowed such as moving a chess piece to a location it should not go based on game rules</description>
-                  </node>
                </node>
             </node>
             <node>
@@ -856,6 +837,66 @@
    </node>
    <node requireChild="true">
       <name>Attribute</name>
+      <node>
+         <name>Onset</name>
+         <description>Default</description>
+      </node>
+      <node>
+         <name>Offset</name>
+      </node>
+      <node>
+         <name>Imagined This is used to identity that the (sub)</name>
+      </node>
+      <node requireChild="true">
+         <name>State ID</name>
+         <description>This is used to identify a group of events that are changing the state of a variable where the onset means the offset of any other and a change in the state</description>
+         <node takesValue="true">
+            <name>#</name>
+            <description>ID which could be a number or any string</description>
+         </node>
+      </node>
+      <node requireChild="true">
+         <name>Repetition</name>
+         <description>When the same type of event such as a fixation on the exact same object happens multiple times and it might be necessary to distinguish the first look vs. others</description>
+      </node>
+      <node>
+         <name>Action judgment</name>
+         <description>External judgment (assumed to be ground truth, e.g. from an experiment control software or an annotator) about participant actions such as answering a question, failing to answer in time, etc.</description>
+         <node>
+            <name>Correct</name>
+         </node>
+         <node>
+            <name>Incorrect</name>
+            <description>Wrong choice but not time out</description>
+         </node>
+         <node>
+            <name>Indeterminate</name>
+            <description>It cannot be determined that the action was correct or incorrect.</description>
+         </node>
+         <node>
+            <name>Time out</name>
+            <node>
+               <name>Missed</name>
+               <description>Participant failed or could not have perceived the instruction due to their eyes being off-screen or a similar reason. Not easy to deduce this but it is possible</description>
+            </node>
+         </node>
+         <node>
+            <name>Inappropriate</name>
+            <description>A choice that is not allowed such as moving a chess piece to a location it should not go based on game rules</description>
+         </node>
+      </node>
+      <node>
+         <name>Social</name>
+         <description>Involving interactions among multiple agents such as humans or dogs or robots</description>
+         <node isNumeric="true" takesValue="true">
+            <name>#</name>
+            <description>Number starting from 1 where 1 indicates the first occurrence and 2 indicates the second occurrence</description>
+         </node>
+      </node>
+      <node>
+         <name>Peak</name>
+         <description>Peak velocity or  acceleration or jerk</description>
+      </node>
       <node requireChild="true">
          <name>Object side</name>
          <description>Could be the left,  right, or both sides of a person or a vehicle</description>
@@ -905,37 +946,6 @@
          <node>
             <name>Stern</name>
             <description>Back of the ship</description>
-         </node>
-      </node>
-      <node>
-         <name>Onset</name>
-         <description>Default</description>
-      </node>
-      <node>
-         <name>Offset</name>
-      </node>
-      <node>
-         <name>Peak</name>
-         <description>Peak velocity or  acceleration or jerk</description>
-      </node>
-      <node requireChild="true">
-         <name>State ID</name>
-         <description>This is used to identify a group of events that are changing the state of a variable where the onset means the offset of any other and a change in the state</description>
-         <node takesValue="true">
-            <name>#</name>
-            <description>ID which could be a number or any string</description>
-         </node>
-      </node>
-      <node>
-         <name>Social</name>
-         <description>Involving interactions among multiple agents such as humans or dogs or robots</description>
-      </node>
-      <node requireChild="true">
-         <name>Repetition</name>
-         <description>When the same type of event such as a fixation on the exact same object happens multiple times and it might be necessary to distinguish the first look vs. others</description>
-         <node isNumeric="true" takesValue="true">
-            <name>#</name>
-            <description>Number starting from 1 where 1 indicates the first occurrence and 2 indicates the second occurrence</description>
          </node>
       </node>
       <node requireChild="true">
@@ -1774,6 +1784,20 @@
             <description>For example something  drops from subjectâ€™s hand</description>
          </node>
       </node>
+      <node>
+         <name>Make fist</name>
+         <node>
+            <name>Open and close</name>
+            <description>Continue to open and close the fist, for example in motor imagery paradigms.</description>
+         </node>
+      </node>
+      <node>
+         <name>Curl toes</name>
+         <node>
+            <name>Open and close</name>
+            <description>Continue to curl and uncurl toes, for example in motor imagery paradigms.</description>
+         </node>
+      </node>
       <node extensionAllowed="true">
          <name>Button press</name>
          <node>
@@ -1824,10 +1848,34 @@
       <node>
          <name>Eye close</name>
          <description>Close eyes and keep closed for more than approximately 0.1 s</description>
+         <node>
+            <name>Keep</name>
+            <description>Keep the eye closed. If a value is provided it indicates the duration for this.</description>
+            <node isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+               <description>the duration (by default in seconds) that they keep their eye closed.</description>
+            </node>
+         </node>
       </node>
       <node>
          <name>Eye open</name>
          <description>Open eyes and keep open for more than approximately 0.1 s</description>
+         <node>
+            <name>Keep</name>
+            <description>Keep the eye open. If a value is provided it indicates the duration for this.</description>
+            <node isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+               <description>the duration (by default in seconds) that they keep their eye open.</description>
+            </node>
+            <node>
+               <name>With blinking</name>
+               <description>Default. Allow blinking during the eye-open period.</description>
+            </node>
+            <node>
+               <name>Without blinking</name>
+               <description>Without blinking during the eye-open period.</description>
+            </node>
+         </node>
       </node>
       <node>
          <name>Turn</name>

@@ -1,22 +1,35 @@
-% tagstudy_input
-% GUI for input needed to create inputs for validatedir
+% GUI for input needed to create inputs for validatedir.
 %
 % Usage:
-%   >>  validatedir_input()
 %
-% Description:
-% validatedir_input() brings up a GUI for input needed to create inputs
-% for validatedir
+%   >>  [canceled, doSubDirs, generateWarnings, hedXML, inDir, outDir] ...
+%        = validatedir_input()
 %
-% Function documentation:
-% Execute the following in the MATLAB command window to view the function
-% documentation for tagstudy_input:
+% Output:
 %
-%    doc tagstudy_input
-% See also: validatedir, pop_validatedir
+%   canceled
+%                    True if the cancel button is pressed. False if
+%                    otherwise.
 %
-% Copyright (C) Kay Robbins and Jeremy Cockfield, UTSA, 2011-2013,
-% krobbins@cs.utsa.edu
+%   doSubDirs        If true (default), the entire inDir directory tree is
+%                    searched. If false, only the inDir directory is
+%                    searched.
+% 
+%   generateWarnings
+%                   If true, include warnings in the log file in addition
+%                   to errors. If false (default), only errors are included
+%                   in the log file.
+%
+%   hedXML
+%                   The name or the path of the HED XML file containing
+%                   all of the tags.
+%
+%   inDir
+%                    The input directory containing .set files.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -32,12 +45,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [cancelled, errorLogOnly, extensionsAllowed, hedXML, inDir, ...
-    outDir, doSubDirs] = validatedir_input()
+function [canceled, doSubDirs, generateWarnings, hedXML, inDir, outDir] ...
+    = validatedir_input()
 % Setup the variables used by the GUI
-cancelled = true;
-errorLogOnly = true;
-extensionsAllowed = true;
+canceled = true;
+generateWarnings = false;
 hedXML = which('HED.xml');
 inDir = '';
 outDir = pwd;
@@ -162,29 +174,19 @@ uiwait(fig);
             ' in for .set files'], ...
             'Value', doSubDirs, ...
             'Units','normalized', ...
-            'Callback', @validateAllCallback, ...
-            'Position', [0.1 0.7 0.8 0.3]);
+            'Callback', @doSubDirsCallback, ...
+            'Position', [0.1 0.6 0.8 0.3]);
         uicontrol('Parent', optionPanel, ...
             'Style', 'CheckBox', ...
-            'String', 'Extensions allowed', ...
+            'String', 'Include warnings in log file', ...
             'Enable', 'on', ...
-            'Tooltip', ['If checked, tags not in the HED are accepted' ...
-            ' that start with the prefix of a tag that has the' ...
-            ' extension allowed attribute or is a leaf tag.'], ...
-            'Value', extensionsAllowed, ...
+            'Tooltip', ['Check to include warnings in the log file in' ...
+            ' addition to errors. If unchecked only errors are' ...
+            ' included in the log file'], ...
+            'Value', generateWarnings, ...
             'Units','normalized', ...
-            'Callback', @extensionsAllowedCallback, ...
-            'Position', [0.1 0.4 0.8 0.3]);
-        uicontrol('Parent', optionPanel, ...
-            'Style', 'CheckBox', ...
-            'String', 'Generate additional log files', ...
-            'Enable', 'on', ...
-            'Tooltip', ['If checked, warning and extension log files' ...
-            ' will be generated in addition to a error log file.'], ...
-            'Value', ~errorLogOnly, ...
-            'Units','normalized', ...
-            'Callback', @errorLogCallback, ...
-            'Position', [0.1 0.1 0.8 0.3]);
+            'Callback', @genearteWarningsCallback, ...
+            'Position', [0.1 0.15 0.8 0.3]);
     end % addOptionComponents
 
     function addSubmissionComponents(fig, submissionPanel)
@@ -215,8 +217,8 @@ uiwait(fig);
             'Position',[0.67 0.1 0.21 .5]);
     end % addSubmissionComponents
 
-      function [browserPanel, optionPanel, ...
-            sumissionPanel] = createPanels(fig)
+    function [browserPanel, optionPanel, sumissionPanel] = ...
+            createPanels(fig)
         % Creates the panels in the figure
         browserPanel = uipanel(fig, ...
             'BorderType','none', ...
@@ -227,7 +229,7 @@ uiwait(fig);
             'BackgroundColor',[.94,.94,.94],...
             'FontSize', 12,...
             'Title','Additional options', ...
-            'Position',[0.15 0.3 0.6 0.3]);
+            'Position',[0.15 0.3 0.6 0.2]);
         sumissionPanel = uipanel(fig, ...
             'BorderType','none', ...
             'BackgroundColor',[.94 .94 .94],...
@@ -245,8 +247,9 @@ uiwait(fig);
         end
     end % browseHedXMLCallback
 
-    function browseInputDirectoryCallback(~, ~, myTitle) 
-        % Callback for browse button to set the input directory editbox
+    function browseInputDirectoryCallback(~, ~, myTitle)
+        % Callback for 'Browse' button to set the 'Input directory'
+        % editbox
         startPath = get(findobj('Tag', 'OutputDirEB'), 'String');
         if isempty(startPath) || ~ischar(startPath) || ~isdir(startPath)
             startPath = pwd;
@@ -258,8 +261,9 @@ uiwait(fig);
         end
     end % browseInputDirectoryCallback
 
-    function browseOutputDirectoryCallback(~, ~, myTitle) 
-        % Callback for browse button to set the output directory editbox
+    function browseOutputDirectoryCallback(~, ~, myTitle)
+        % Callback for 'Browse' button to set the 'Output directory' 
+        % editbox
         startPath = get(findobj('Tag', 'OutputDirEB'), 'String');
         if isempty(startPath) || ~ischar(startPath) || ~isdir(startPath)
             startPath = pwd;
@@ -271,9 +275,9 @@ uiwait(fig);
         end
     end % browseOutputDirectoryCallback
 
-    function cancelButtonCallback(~, ~, fig)  
-        % Callback for the cancel button
-        cancelled = true;
+    function cancelButtonCallback(~, ~, fig)
+        % Callback for 'Cancel' button
+        canceled = true;
         close(fig);
     end % cancelButtonCallback
 
@@ -292,22 +296,17 @@ uiwait(fig);
             'WindowStyle', 'modal');
     end % createFigure
 
-    function errorLogCallback(src, ~) 
-        % Callback for only generate error log checkbox
-        errorLogOnly = ~get(src, 'Max') == get(src, 'Value');
-    end % errorLogCallback
+    function genearteWarningsCallback(src, ~)
+        % Callback for generate warnings checkbox
+        generateWarnings = get(src, 'Max') == get(src, 'Value');
+    end % genearteWarningsCallback
 
-    function extensionsAllowedCallback(src, ~) 
-        % Callback for extensions allowed checkbox
-        extensionsAllowed = get(src, 'Max') == get(src, 'Value');
-    end % extensionAllowedCallback
-
-    function hedEditBoxCallback(src, ~) 
+    function hedEditBoxCallback(src, ~)
         % Callback for user directly editing the HED XML editbox
         xml = get(src, 'String');
         if exist(xml, 'file')
             hedXML = xml;
-        else 
+        else
             errordlg(['XML file is invalid. Setting the XML' ...
                 ' file back to the previous file.'], ...
                 'Invalid XML file');
@@ -317,7 +316,10 @@ uiwait(fig);
 
     function helpButtonCallback(~, ~)
         % Callback for the okay button
-        helpdlg(sprintf(['Input directory - Please specify a' ...
+        helpdlg(sprintf(['Validates the HED tags in a directory' ...
+            ' containing .set EEG datasets against a HED schema.' ...
+            ' \n\n***Main Options***' ...
+            '\n\nInput directory - Please specify a' ...
             ' directory of datasets that you want to be validated.' ...
             ' The dataset files should have the .set extension.' ...
             ' \n\nHED file - The latest HED' ...
@@ -329,20 +331,15 @@ uiwait(fig);
             ' Look in subdirectories - By default the validation looks' ...
             ' in the subdirectories for more datasets. To only look in' ...
             ' the top level of the directory uncheck this.' ...
-            '\n\nExtensions allowed - By default tags not in the HED are' ...
-            ' accepted that start with the prefix of a tag that has' ...
-            ' the extension allowed attribute or is a leaf tag. If you' ...
-            ' don''t want this behavior uncheck ''Extensions' ...
-            ' allowed.''\n\nGenerate additional log files - ' ...
-            ' There will be a error log file generated for each study' ...
-            ' dataset that is validated. To generate warning and' ...
-            ' extension log files in addition check ''Generate additional' ...
-            ' log files''.']),'Input Description')
-    end % okayButtonCallback
+            ' \n\nInclude warnings in log file - Check to include' ...
+            ' warnings in the log file in addition to errors. If' ...
+            ' unchecked only errors are included in the log file.']), ...
+            'Input Description')
+    end % helpButtonCallback
 
     function okayButtonCallback(~, ~, fig)
         % Callback for the okay button
-        cancelled = false;
+        canceled = false;
         close(fig);
     end % okayButtonCallback
 
@@ -351,7 +348,7 @@ uiwait(fig);
         directory = get(src, 'String');
         if exist(directory, 'dir')
             outDir = directory;
-        else 
+        else
             errordlg(['Output directory is invalid. Setting the output' ...
                 ' directory back to the previous directory.'], ...
                 'Invalid output directory');
@@ -372,8 +369,10 @@ uiwait(fig);
         end
     end % inputDirEditBoxCallback
 
-    function validateAllCallback(src, ~)
+    function doSubDirsCallback(src, ~)
+        % Callback for user directly editing the 'Look in subdirectories'
+        % checkbox
         doSubDirs = get(src, 'Max') == get(src, 'Value');
-    end % validateAllCallback
+    end % doSubDirsCallback
 
 end % tagstudy_input

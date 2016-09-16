@@ -19,8 +19,9 @@
 %
 %   finish        The last position of the sequence.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -29,7 +30,7 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
@@ -77,7 +78,7 @@ sequence = strtrim(text(start:finish));
                 startMatchFinish = tagFinish;
             else
                 start = tagFinish;
-                [~, start, finish] = findNextString(text, start);
+                [~, start, finish] = findnextstr(text, start);
             end
         end
     end % findSequenceStart
@@ -102,7 +103,7 @@ sequence = strtrim(text(start:finish));
                 finish = tagFinish;
             else
                 finish = tagStart;
-                [~,start, finish] = findPreviousString(text, finish);
+                [~,start, finish] = findpreviousstr(text, finish);
             end
         end
     end % findSequenceFinish
@@ -122,7 +123,7 @@ sequence = strtrim(text(start:finish));
         end
         while hasPreviousString(text, foundStart)
             [currentStr, foundStart] = ...
-                findPreviousString(text, foundStart);
+                findpreviousstr(text, foundStart);
             concatStr = [currentStr ' ' concatStr]; %#ok<AGROW>
             if isSpecialString(concatStr)
                 found = true;
@@ -145,7 +146,7 @@ sequence = strtrim(text(start:finish));
         end
         while hasNextString(text, foundFinish)
             [currentStr, ~, foundFinish] = ...
-                findNextString(text, foundFinish);
+                findnextstr(text, foundFinish);
             concatStr = [concatStr ' ' currentStr]; %#ok<AGROW>
             if isSpecialString(concatStr)
                 found = true;
@@ -166,7 +167,7 @@ sequence = strtrim(text(start:finish));
     function [hasNext, start, finish] = hasNextString(text, pos)
         % Returns true if there is a next string
         hasNext = false;
-        [nextString, start, finish] = findNextString(text, pos);
+        [nextString, start, finish] = findnextstr(text, pos);
         if ~isempty(nextString)
             hasNext = true;
         end
@@ -175,7 +176,7 @@ sequence = strtrim(text(start:finish));
     function [hasPrevious, start, finish] = hasPreviousString(text, pos)
         % Returns true if there is a previous string
         hasPrevious = false;
-        [previousString, start, finish] = findPreviousString(text, pos);
+        [previousString, start, finish] = findpreviousstr(text, pos);
         if ~isempty(previousString)
             hasPrevious = true;
         end

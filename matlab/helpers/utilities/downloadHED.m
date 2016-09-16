@@ -1,17 +1,19 @@
-% This function downloads the HED schema from the HED repository under
+% This function downloads the wiki HED schema from the HED repository under
 % BigEEGConsortium.
 %
-% Examples:
+% Usage:
 %
-%                   Download the latest HED schema from the HED repository
-%                   under BigEEGConsortium first and then replace the
-%                   current HED schema with it.
+%   >>  version = downloadhed()
 %
-%                   downloadHED();
-%                   replaceHED();
+% Output:
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%   version
+%                   The version of the wiki file. Will return an empty
+%                   string if there is no version number in the file.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -25,11 +27,12 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function wikiVersion = downloadHED()
-wikiURL = 'https://raw.githubusercontent.com/wiki/BigEEGConsortium/HED/HED-Schema.mediawiki';
+function version = downloadhed()
+wikiURL = ['https://raw.githubusercontent.com/wiki/BigEEGConsortium/' ...
+    'HED/HED-Schema.mediawiki'];
 wikiPath = [tempdir 'temp.mediawiki'];
 urlwrite(wikiURL, wikiPath);
-wikiVersion = getWikiHEDVersion(wikiPath);
-end % downloadHED
+version = getwikiversion(wikiPath);
+end % downloadhed

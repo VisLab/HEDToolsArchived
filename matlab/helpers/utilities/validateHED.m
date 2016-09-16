@@ -39,15 +39,8 @@
 %
 % Output:
 %
-%       errors
+%       issues
 %                   A cell array containing all of the validation errors.
-%                   Each cell is associated with the validation errors on a
-%                   particular line.
-%
-%       warnings
-%                   A cell array containing all of the validation warnings.
-%                   Each cell is associated with the validation warnings on
-%                   a particular line.
 %
 % Examples:
 %
@@ -73,62 +66,67 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [errors, warnings] = validateHED(hedSchema, hedXML, varargin)
-p = parseArguments();
-addJars();
+function issues = validatehed(hedSchema, hedXML, varargin)
+p = parseArguments(hedSchema, hedXML, varargin{:});
 validator = edu.utsa.hedschema.XMLValidator(hedSchema, hedXML);
 validator.validateXml();
-errors = cell(validator.getErrors())';
-warnings = cell(validator.getWarnings())';
+issues = cell(validator.getErrors())';
+if p.generateWarnings
+    issues = [issues cell(validator.getWarnings())'];
+end
 if p.writeOutput
     writeOutputFiles();
 end
 
-    function p = parseArguments()
+    function p = parseArguments(hedSchema, hedXML, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('hedSchema', @(x) ~isempty(x) && ischar(x) && ...
             exist(hedSchema, 'file') == 2);
         p.addRequired('hedXML', @(x) ~isempty(x) && ischar(x) && ...
             exist(hedXML, 'file') == 2);
+        p.addParamValue('generateWarnings', false, ...
+            @(x) validateattributes(x, {'logical'}, {}));
         dir = fileparts(hedXML);
-        p.addOptional('outputDirectory', dir, ...
+        p.addOptional('outDir', dir, ...
             @(x) ~isempty(x) && ischar(x));
         p.addParamValue('writeOutput', false, @islogical);
         p.parse(hedSchema, hedXML, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function writeErrorFile(dir, file, ext)
-        % Writes the errors to a file
-        numErrors = size(errors, 2);
-        errorFile = fullfile(dir, [file '_err' ext]);
-        fileId = fopen(errorFile,'w');
-        for a = 1:numErrors
-            fprintf(fileId, '%s\n', errors{a});
+    function writeOutputFiles(p)
+        % Writes the issues and replace tags found to a log file and a
+        % replace file
+        [~, p.file] = fileparts(p.tsvFile);
+        p.ext = '.txt';
+        try
+            if ~isempty(p.issues)
+                createLogFile(p, false);
+            else
+                createLogFile(p, true);
+            end
+        catch
+            throw(MException('validatehed:cannotWrite', ...
+                'Could not write output file'));
         end
-        fclose(fileId);
-    end % writeErrorFile
-
-    function writeOutputFiles()
-        % Writes the errors, warnings, extension allowed warnings to
-        % the output files
-        dir = p.outputDirectory;
-        [~, file] = fileparts(p.tsvFile);
-        ext = '.txt';
-        writeErrorFile(dir, file, ext);
-        writeWarningFile(dir, file, ext);
     end % writeOutputFiles
 
-    function writeWarningFile(dir, file, ext)
-        % Writes the warnings to a file
-        numWarnings = size(warnings, 2);
-        warningFile = fullfile(dir, [file '_wrn' ext]);
-        fileId = fopen(warningFile,'w');
-        for a = 1:numWarnings
-            fprintf(fileId, '%s\n', warnings{a});
+    function createLogFile(p, empty)
+        % Creates a log file containing any issues found through the
+        % validation
+        numErrors = length(p.issues);
+        errorFile = fullfile(p.outDir, [p.file '_log' p.ext]);
+        fileId = fopen(errorFile,'w');
+        if ~empty
+            fprintf(fileId, '%s', p.issues{1});
+            for a = 2:numErrors
+                fprintf(fileId, '\n%s', p.issues{a});
+            end
+        else
+            fprintf(fileId, 'No issues were found.');
         end
         fclose(fileId);
-    end % writeWarningFile
+    end % createLogFile
 
-end % validateHED
+end % validatehed

@@ -1,92 +1,84 @@
-% This function takes in a tab-delimited text file containing HED tags
-% associated with a particular study and validates them based on the
-% tags and attributes in the HED XML file.
+% This function validates the HED tags in a tab-separated file against a
+% HED schema.
 %
 % Usage:
 %
-%   >>  [errors, warnings, extensions] = ...
-%        validateTSVTags(tsvFile, tsvTagColumns);
+%   >>  issues = validatetsv(tsvFile, tagColumns);
 %
-%   >>  [errors, warnings, extensions] = ...
-%        validateTSVTags(tsvFile, tsvTagColumns, varargin);
+%   >>  issues = validatetsv(tsvFile, tagColumns, 'key1', 'value1', ...);
 %
 % Input:
 %
-%       tsvFile
-%                   The name or the path of a tab-delimited text file
-%                   containing HED tags associated with a particular study.
+%   Required:
 %
-%       columns
-%                   The columns that contain the study or experiment HED
-%                   tags. The columns can be a scalar value or a vector
-%                   (e.g. 2 or [2,3,4]).
+%   tsvFile
+%                   The full path of a tab-separated file containing HED
+%                   tags in a single column or multiple columns.
 %
-%       Optional:
+%   tagColumns
+%                   The columns in the tab-separated file that contains the
+%                   HED tags. The columns are either a scalar value or a
+%                   vector (e.g. 2 or [2,3,4]).
 %
-%       'extensionAllowed'
-%                   True(default) if descendants of extension allowed tags
-%                   are accepted which will generate warnings, False if
-%                   they are not accepted which will generate errors.
+%   Optional (key/value):
 %
-%       'hasHeader'
-%                   True(default)if the tab-delimited file containing
-%                   the HED study tags has a header. The header will be
-%                   skipped and not validated. False if the file doesn't
-%                   have a header.
+%   'generateWarnings'
+%                   True to include warnings in the log file in addition
+%                   to errors. If false (default) only errors are included
+%                   in the log file.
 %
-%       'hedXML'
-%                   The name or the path of the XML file containing
-%                   all of the HED tags and their attributes.
+%   'hasHeader'
+%                   True (default) if the the tab-separated input file has
+%                   a header. The first row will not be validated otherwise
+%                   it will and this can generate issues.
 %
-%       'outputDirectory'
-%                   A directory where the validation output is written to
-%                   if the 'writeOuput' argument is true.
-%                   There will be four separate files generated, one
-%                   containing the validation errors, one containing the
-%                   validation  warnings, one containing the extension
-%                   allowed validation warnings, and a remap file. The
-%                   default directory will be the directory that contains
-%                   the tab-delimited 'tsvFile'.
+%   'hedXML'
+%                   The full path to a HED XML file containing all of the
+%                   tags. This by default will be the HED.xml file
+%                   found in the hed directory.
 %
-%       'writeOutput'
-%                  True if the validation output is written to the
-%                  workspace and a set of files in the same directory,
-%                  false (default) if the validation output is only written
-%                  to the workspace.
+%   'outDir'
+%                   The directory where the validation output will be
+%                   written to if the 'writeOutput' argument is set to
+%                   true. There will be log file containing any issues that
+%                   were found while validating the HED tags. If there were
+%                   issues found then a replace file will be created in
+%                   addition to the log file if an optional one isn't
+%                   already provided. The default output directory will be
+%                   the current directory.
+%
+%   'replaceFile'
+%                   A optional two column tab-separated file used to find
+%                   and replace the HED tags in the input file. The first
+%                   column will be the HED tags to find and the second
+%                   column will be HED tags that will replace them. If a
+%                   replace file is provided then any HED tags not already
+%                   in the first column of this file that generate issues
+%                   from the validation will be appended to the end of it.
+%                   Reusing a replace file comes in handy when you have
+%                   multiple tab-separated files that have the same HED
+%                   tags or you simply want to consolidate all of the
+%                   changes in one file instead of several.
+%
+%   'writeOutput'
+%                  True if the validation output is written to a log file
+%                  in addition to the workspace. False (default) if the
+%                  validation output is only written to the workspace.
 %
 % Output:
 %
-%       errors
-%                   A cell array containing all of the validation errors.
-%                   Each cell is associated with the validation errors on a
-%                   particular line.
+%   issues
+%                   A cell array containing all of the issues found through
+%                   the validation. Each cell corresponds to the issues
+%                   found on a particular line.
 %
-%       warnings
-%                   A cell array containing all of the validation warnings.
-%                   Each cell is associated with the validation warnings on
-%                   a particular line.
+%   success
+%                   True if the validation finishes without throwing any
+%                   exceptions. False if otherwise.
 %
-%       extensions
-%                   A cell array containing all of the extension allowed
-%                   validation warnings. Each cell is associated with the
-%                   extension allowed validation warnings on a particular
-%                   line.
-%
-%       uniqueErrorTags
-%                   A cell array containing all of the unique validation
-%                   error tags.
-%
-% Examples:
-%                   To validate the HED study tags in file
-%                   'LSIE_06_Outdoor_all_events.txt' in the third column
-%                   using HED XML file 'HED2.026.xml' (default) to validate
-%                   them with no header.
-%
-%                   validateTSVTags('LSIE_01_Indoor_all_events.txt', 3, ...
-%                   'hasHeader', false);
-%
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -95,182 +87,163 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [errorLog, warningLog, extensionLog] = validatetsv(tsvFile, ...
-    columns, varargin)
-p = parseArguments(tsvFile, columns, varargin{:});
-[success, p] = validate(p);
-if ~success
-    errorLog = '';
-    warningLog = '';
-    extensionLog = '';
-    return;
-end
-errorLog = p.errorLog;
-warningLog = p.warningLog;
-extensionLog = p.extensionLog;
+function issues = validatetsv(tsvFile, tagColumns, varargin)
+p = parseArguments(tsvFile, tagColumns, varargin{:});
+issues = validate(p);
 
-    function [success, p] = validate(p)
-        % Validates a tsv file
+    function issues = validate(p)
+        % Validates the HED tags in the tab-separated file
         p.hedMaps = getHEDMaps(p);
-        [p.errorLog, p.warningLog, p.extensionLog, p.uniqueErrorTags] = ...
-            parseTSVTags(p.hedMaps, p.tsvFile, p.columns, ...
-            p.hasHeader, p.extensionAllowed);
+        [p.issues, p.replaceTags] = parsetsv(p.hedMaps, ...
+            p.tsvFile, p.tagColumns, p.hasHeader, p.generateWarnings);
+        issues = p.issues;
         if p.writeOutput
             writeOutputFiles(p);
         end
-        success = true;
     end % validate
 
     function hedMaps = getHEDMaps(p)
-        % Gets a structure that contains Maps associated with the HED XML
-        % tags
+        % Gets a structure full of Maps containings all of the HED tags and
+        % their attributes
         hedMaps = loadHEDMap();
         mapVersion = hedMaps.version;
-        xmlVersion = getXMLHEDVersion(p.hedXML);
+        xmlVersion = getxmlversion(p.hedXML);
         if ~strcmp(mapVersion, xmlVersion);
             hedMaps = mapHEDAttributes(p.hedXML);
         end
     end % getHEDMaps
 
     function hedMaps = loadHEDMap()
-        % Loads a structure that contains Maps associated with the HED XML
-        % tags
+        % Loads a structure full of Maps containings all of the HED tags
+        % and their attributes
         Maps = load('hedMaps.mat');
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
-    function p = parseArguments(tsvFile, columns, varargin)
+    function p = parseArguments(tsvFile, tagColumns, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('tsvFile', @(x) (~isempty(x) && ischar(x)));
-        p.addRequired('columns', @(x) (~isempty(x) && ...
+        p.addRequired('tagColumns', @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
-        p.addParamValue('errorLogOnly', true, ...
+        p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('extensionAllowed', true, ...
-            @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('hasHeader', true, @islogical);
-        p.addParamValue('remapFile', '', @(x) (~isempty(x) && ...
+        p.addParamValue('replaceFile', '', @(x) (~isempty(x) && ...
             ischar(x)));
         p.addParamValue('outDir', pwd);
         p.addParamValue('writeOutput', false, @islogical);
-        p.parse(tsvFile, columns, varargin{:});
+        p.parse(tsvFile, tagColumns, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function createErrorLog(p)
-        % Creates a error log
-        numErrors = length(p.errorLog);
-        errorFile = fullfile(p.dir, [p.file '_error_log' p.ext]);
-        fileId = fopen(errorFile,'w');
-        for a = 1:numErrors
-            fprintf(fileId, '%s\n', p.errorLog{a});
+    function createLogFile(p, empty)
+        % Creates a log file containing any issues found through the
+        % validation
+        numErrors = length(p.issues);
+        logFile = fullfile(p.outDir, [p.file '_log' p.ext]);
+        try
+            fileId = fopen(logFile,'w');
+            if ~empty
+                for a = 1:numErrors-1
+                    fprintf(fileId, '%s\n', p.issues{a});
+                end
+                fprintf(fileId, '%s', strtrim(p.issues{numErrors}));               
+            else
+                fprintf(fileId, 'No issues were found.');
+            end
+            fclose(fileId);
+        catch
+            throw(MException('validatetsv:cannotWrite', ...
+                'Cannot write log file'));
         end
-        fclose(fileId);
-    end % createErrorLog
+    end % createLogFile
 
-    function createExtensionLog(p)
-        % Creates a extension log
-        numExtensions = length(p.extensionLog);
-        extensionFile = fullfile(p.dir, [p.file '_extension_log' p.ext]);
-        fileId = fopen(extensionFile,'w');
-        for a = 1:numExtensions
-            fprintf(fileId, '%s\n', p.extensionLog{a});
-        end
-        fclose(fileId);
-    end % createExtensionLog
-
-    function writeRemapFile(p)
-        % Writes a remap file
-        if isempty(p.remapFile)
-            fileId = writeToNewMapFile(p);
+    function createReplaceFile(p)
+        % Creates a replace file containing all unique tags that generated
+        % issues
+        if isempty(p.replaceFile)
+            fileId = write2ReplaceFile(p);
         else
-            fileId = writeToExistingMapFile(p);
+            fileId = append2ReplaceFile(p);
         end
         fclose(fileId);
-    end % writeRemapFile
+    end % createReplaceFile
 
-    function fileId = writeToNewMapFile(p)
-        % Writes to a new map file
-        numMapTags = length(p.uniqueErrorTags);
-        remapFile = fullfile(p.dir, [p.file '_remap' p.mapExt]);
-        fileId = fopen(remapFile,'w');
-        for a = 1:numMapTags
-            fprintf(fileId, '%s\n', p.uniqueErrorTags{a});
+    function fileId = write2ReplaceFile(p)
+        % Creates and writes to a new replace file
+        numReplaceTags = length(p.replaceTags);
+        replaceFile = fullfile(p.outDir, [p.file '_replace' p.replaceExt]);
+        try
+        fileId = fopen(replaceFile,'w');
+        fprintf(fileId, '%s', p.replaceTags{1});
+        for a = 2:numReplaceTags
+            fprintf(fileId, '\n%s', p.replaceTags{a});
         end
-    end % writeToNewMapFile
+        catch 
+            throw(MException('validatetsv:cannotWrite', ...
+                'Cannot write to replace file %d', lineNumber));
+        end
+    end % write2ReplaceFile
 
-    function fileId = writeToExistingMapFile(p)
-        % Writes to an existing map file
-        numMapTags = size(p.uniqueErrorTags, 1);
-        [mapFileDir, file]  = fileparts(p.remapFile);
-        remapFile = fullfile(p.dir, [p.file p.ext]);
-        mapTagMap = putMapFileInHash(remapFile);
-        if ~strcmp(dir, mapFileDir)
-            copyfile(p.remapFile, remapFile);
+    function fileId = append2ReplaceFile(p)
+        % Appends to an existing replace file
+        numMapTags = size(p.replaceTags, 1);
+        replaceFileDir  = fileparts(p.replaceFile);
+        replaceFile = fullfile(p.dir, [p.file p.ext]);
+        replaceMap = replaceFile2Map(replaceFile);
+        if ~strcmp(dir, replaceFileDir)
+            copyfile(p.replaceFile, replaceFile);
         end
-        fileId = fopen(remapFile,'a');
+        fileId = fopen(replaceFile,'a');
         for a = 1:numMapTags
-            if ~mapTagMap.isKey(lower(p.uniqueErrorTags{a}))
-                fprintf(fileId, '\n%s', p.uniqueErrorTags{a});
+            if ~replaceMap.isKey(lower(p.replaceTags{a}))
+                fprintf(fileId, '\n%s', p.replaceTags{a});
             end
         end
-    end % writeToExistingMapFile
+    end % append2ReplaceFile
 
-    function mapTagMap = putMapFileInHash(remapFile)
-        % Put map file tags in a hash map
-        mapTagMap = ...
-            containers.Map('KeyType', 'char', 'ValueType', 'any');
+    function replaceMap = replaceFile2Map(replaceFile)
+        % Puts the replace file tags in a Map container
+        replaceMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
         lineNumber = 1;
         try
-            fileId = fopen(remapFile);
+            fileId = fopen(replaceFile);
             tsvLine = fgetl(fileId);
             while ischar(tsvLine)
-                mapTagMap(lower(tsvLine)) = tsvLine;
+                replaceMap(lower(tsvLine)) = tsvLine;
                 lineNumber = lineNumber + 1;
                 tsvLine = fgetl(fileId);
             end
             fclose(fileId);
         catch ME
             fclose(fileId);
-            throw(MException('ValidateTags:cannotParse', ...
-                'Unable to parse TSV file on line %d', lineNumber));
+            throw(MException('validatetsv:cannotRead', ...
+                'Unable to read replace file %d', lineNumber));
         end
-    end % putMapTagsInHash
+    end % replaceFile2Map
 
     function writeOutputFiles(p)
-        % Writes the errors, warnings, extension allowed warnings to
-        % the output files
-        p.dir = p.outDir;
+        % Writes the issues and replace tags found to a log file and a
+        % replace file
         [~, p.file] = fileparts(p.tsvFile);
         p.ext = '.txt';
-        p.mapExt = '.tsv';
-        createErrorLog(p);
-        writeRemapFile(p);
-        if ~p.errorLogOnly
-            createWarningLog(p);
-            createExtensionLog(p);
+        p.replaceExt = '.tsv';
+        if ~isempty(p.issues)
+            createLogFile(p, false);
+            createReplaceFile(p);
+        else
+            createLogFile(p, true);
         end
     end % writeOutputFiles
-
-    function createWarningLog(p)
-        % Creates a warning log
-        numWarnings = length(p.warningLog);
-        warningFile = fullfile(p.dir, [p.file '_warning_log' p.ext]);
-        fileId = fopen(warningFile,'w');
-        for a = 1:numWarnings
-            fprintf(fileId, '%s\n', p.warningLog{a});
-        end
-        fclose(fileId);
-    end % createWarningLog
 
 end % validatetsv

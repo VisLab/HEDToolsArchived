@@ -1,17 +1,22 @@
 % Allows a user to validate a EEG structure using a GUI
 %
 % Usage:
-%   >>  [errorLog, warningLog, extensionLog, com] = pop_validateeeg(EEG);
 %
-% Note: The primary purpose of pop_tageeg is to package up parameter input
-% and calling of tageeg for use as a plugin for EEGLAB (Edit menu).
+%   >>  [issues, com] = pop_validateeeg(EEG)
 %
+% Output:
 %
-% See also:
-%   eeglab, tageeg, tagdir, tagstudy, and eegplugin_ctagger
+%   issues
+%                   A cell array containing all of the issues found through
+%                   the validation. Each cell corresponds to the issues
+%                   found on a particular line.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%   com              String containing call to tagdir with all
+%                    parameters.
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -27,43 +32,44 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-
-function [errorLog, warningLog, extensionLog, com] = pop_validateeeg(EEG)
-errorLog = '';
-warningLog = '';
-extensionLog = '';
+function [issues, com] = pop_validateeeg(EEG)
+issues = '';
 com = '';
 
+% Display help if inappropriate number of arguments
 if nargin < 1
     help pop_validateeeg;
     return;
 end;
 
-[cancelled, errorLogOnly, extensionsAllowed, hedXML, outDir] = ...
+% Get the input parameters
+[canceled, generateWarnings, hedXML, outDir] = ...
     validateeeg_input();
-if cancelled
+if canceled
     return;
 end
 
-[errorLog, warningLog, extensionLog] = validateeeg(EEG, ...
-    'errorLogOnly', errorLogOnly, ...
-    'extensionAllowed', extensionsAllowed, ...
+% Validate the EEG dataset
+issues = validateeeg(EEG, ...
+    'generateWarnings', generateWarnings, ...
     'hedXML', hedXML, ...
     'outDir', outDir, ...
     'writeOutput', true);
+
+% Create command string
 com = char(['validateeeg(EEG, ' ...
-    '''errorLogOnly'', ' logical2str(errorLogOnly) ', ' ...
-    '''extensionAllowed'', ' logical2str(extensionsAllowed) ', ' ...
+    '''generateWarnings'', ' logical2str(generateWarnings) ', ' ...
     '''hedXML'', ''' hedXML ''', ' ...
     '''outDir'', ''' outDir ''', ' ...
     '''writeOutput'', ' 'true)']);
-end % pop_validateeeg
 
-function s = logical2str(b)
-% Converts a logical value to a string
-if b
-    s = 'true';
-else
-    s = 'false';
-end
-end % logical2str
+    function s = logical2str(b)
+        % Converts a logical value to a string
+        if b
+            s = 'true';
+        else
+            s = 'false';
+        end
+    end % logical2str
+
+end % pop_validateeeg

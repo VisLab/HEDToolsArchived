@@ -1,27 +1,30 @@
-% pop_tageeg
-% Allows a user to tag a EEG structure using a GUI
+% Allows a user to tag a EEG structure using a GUI.
 %
 % Usage:
+%
 %   >>  [EEG, com] = pop_tageeg(EEG)
 %
-% [EEG, com] = pop_tageeg(EEG) takes an input EEGLAB EEG structure,
-% brings up a GUI to enter parameters for tageeg, and calls
-% tageeg to extracts the EEG structure's tags, if any.
+% Input:
 %
-% The tageeg function may optionally connect to a community tag database.
+%   Required:
 %
-% Note: The primary purpose of pop_tageeg is to package up parameter input
-% and calling of tageeg for use as a plugin for EEGLAB (Edit menu).
+%   EEG
+%                    The EEG dataset structure that will be tagged. The
+%                    dataset will need to have a .event field.
 %
+% Output:
 %
-% See also:
-%   eeglab, tageeg, tagdir, tagstudy, and eegplugin_ctagger
+%   EEG
+%                    The EEG dataset structure that has been tagged. The
+%                    tags will be written to the .usertags field under
+%                    the .event field.
 %
-
+%   com
+%                    String containing call to tageeg with all parameters.
 %
-% Copyright (C) 2012-2013 Thomas Rognon tcrognon@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
-%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -35,13 +38,7 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: pop_tageeg.m,v $
-% Revision 1.0 21-Apr-2013 09:25:25  kay
-% Initial version
-%
-
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [EEG, com] = pop_tageeg(EEG)
 % Create the tagger for a single EEG file
@@ -53,16 +50,15 @@ if nargin < 1
     return;
 end;
 
-% Get the tagger input parameters
-[baseMap, canceled, editXml, preservePrefix, saveMapFile, ...
+% Get the input parameters
+[baseMap, canceled, preservePrefix, saveMapFile, ...
     selectFields, useGUI] = tageeg_input();
 if canceled
     return;
 end
 
-% Tag the EEG structure and return the command string
-[EEG, ~, ~, canceled] = tageeg(EEG, 'BaseMap', baseMap, ...
-    'EditXml', editXml, ...
+% Tag the EEG structure
+[EEG, ~, canceled] = tageeg(EEG, 'BaseMap', baseMap, ...
     'PreservePrefix', preservePrefix, ...
     'SaveMapFile', saveMapFile, ...
     'SelectFields', selectFields, ...
@@ -70,20 +66,21 @@ end
 if canceled
     return;
 end
+
+% Create command string
 com = char(['tageeg(''BaseMap'', ''' baseMap ''', ' ...
-    '''EditXml'', ' logical2str(editXml) ', ' ...
     '''PreservePrefix'', ' logical2str(preservePrefix) ', ' ...
     '''SaveMapFile'', ''' saveMapFile ''', ' ...
     '''SelectFields'', ' logical2str(selectFields) ', ' ...
     '''UseGui'', ' logical2str(useGUI) ')']);
+
+    function s = logical2str(b)
+        % Converts a logical to a string
+        if b
+            s = 'true';
+        else
+            s = 'false';
+        end 
+    end % logical2str
+
 end % pop_tageeg
-
-function s = logical2str(b)
-if b
-    s = 'true';
-else
-    s = 'false';
-end
-
-end % logical2str
-

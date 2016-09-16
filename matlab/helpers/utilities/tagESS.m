@@ -1,26 +1,22 @@
-% This function takes in a ESS structure and tags it using the ctagger. 
+% This function takes in a ESS structure and tags it using the CTagger. 
 %
 % Usage:
 %
-%   >>  essStruct = tagESS(essStruct);
+%   >>  ESS = tagess(ESS);
 %
 % Input:
 %
-%       essStruct
-%                   An ESS structure containing HED tags.
+%   ESS
+%                   An ESS structure with or without HED tags.
 %
 % Output:
 %
-%       essStruct
-%                   An ESS structure that is newly tagged from the ctagger.
+%   ESS
+%                   An ESS structure that is newly tagged from the CTagger.
 %
-% Examples:
-%                   Tag the ESS structure 'essStruct' with ctagger.
-%
-%                   essStruct = tagESS(essStruct);
-%
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -29,38 +25,39 @@
 %
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function essStruct = tagESS(essStruct)
-eegStruct = struct('event', []);
-eegStruct.event = copyESSTags(essStruct.eventCodesInfo);
-eegStruct = tageeg(eegStruct);
-essStruct.eventCodesInfo = ...
-    copyEEGTags(essStruct.eventCodesInfo, eegStruct.event);
+function ESS = tagess(ESS)
+EEG = struct('event', [], 'etc', []);
+EEG = ess2eeg(ESS, EEG);
+EEG = tageeg(EEG);
+ESS = eeg2ess(EEG, ESS);
 
-    function eegEventsStruct = copyESSTags(essEvents)
-        % Copy tags from ESS events structure into EEG events structure 
-        numEvents = length(essEvents);
-        eegEventsStruct(numEvents).type = '';
-        eegEventsStruct(numEvents).usertags = '';
+    function EEG = ess2eeg(ESS, EEG)
+        % Copy tags from ESS structure into EEG structure
+        numEvents = length(ESS.eventCodesInfo);
         for a = 1:numEvents
-            eegEventsStruct(a).type = essEvents(a).code;
-            eegEventsStruct(a).usertags = essEvents(a).condition.tag;
+            EEG.event(a).type = ESS.eventCodesInfo(a).code;
+            values(a).code = ESS.eventCodesInfo(a).code; %#ok<AGROW>
+            values(a).tags = ...
+                tagList.deStringify(ESS.eventCodesInfo(a).condition.tag); %#ok<AGROW>
         end
-    end % copyESSTags
+        map = struct('field', 'type', 'values', values);
+        EEG.etc.tags = struct('xml', '', 'map', map);
+    end % ess2eeg
 
-    function essEventsStruct = copyEEGTags(essEvents, eegEvents)
-        % Copy tags from EEG events structure into ESS events structure
-        essEventsStruct = essEvents;
-        numEvents = length(essEvents);
+    function ESS = eeg2ess(EEG, ESS)
+        % Copy tags from EEG structure into ESS structure
+        numEvents = length(EEG.etc.tags.map(1).values);
         for a = 1:numEvents
-            essEventsStruct(a).condition.tag = eegEvents(a).usertags;
+            ESS.eventCodesInfo(a).condition.tag = ...
+                tagList.stringify(EEG.etc.tags.map(1).values(a).tags);
         end
-    end % copyEEGTags
+    end % eeg2ess
 
-end % tagESS
+end % tagess
