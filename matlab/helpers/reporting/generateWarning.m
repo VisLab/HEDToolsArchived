@@ -51,7 +51,7 @@ switch(type)
     case 'line'
         warning = sprintf('Warnings on line %s:\n', num2str(line));
     case 'slash'
-        warning = sprintf('\t"%s" should not end with a slash\n', tag);
+        warning = sprintf('\t"%s" should not start or end with a slash\n', tag);
     case 'unitClass'
         warning = sprintf(['\t No units were specified for "%s" so the' ...
             ' unit %s is being used by default\n'], tag, units);

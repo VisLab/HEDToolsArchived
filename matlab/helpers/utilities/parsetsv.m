@@ -166,19 +166,17 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
     function p = validateLineTags(p)
         % This function validates the tags on a line in a tab-delimited
         % file
-        if ~isempty(p.cellTags)
-            p = findErrors(p);
-            p.lineIssues = p.lineErrors;
-            if(p.generateWarnings)
-                p = findWarnings(p);
-                p.lineIssues = [p.lineErrors p.lineWarnings];
-            end
-            if ~isempty(p.lineIssues)
-                p.issues{p.issueCount} = ...
-                    [sprintf('Issues on line %d:\n', p.lineNumber), ...
-                    p.lineIssues];
-                p.issueCount = p.issueCount + 1;
-            end
+        p = findErrors(p);
+        p.lineIssues = p.lineErrors;
+        if(p.generateWarnings)
+            p = findWarnings(p);
+            p.lineIssues = [p.lineErrors p.lineWarnings];
+        end
+        if ~isempty(p.lineIssues)
+            p.issues{p.issueCount} = ...
+                [sprintf('Issues on line %d:\n', p.lineNumber), ...
+                p.lineIssues];
+            p.issueCount = p.issueCount + 1;
         end
     end % validateLineTags
 

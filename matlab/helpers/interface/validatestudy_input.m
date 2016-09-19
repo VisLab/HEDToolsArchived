@@ -335,6 +335,11 @@ uiwait(fig);
         end
     end % outputDirEditBoxCallback
 
+    function genearteWarningsCallback(src, ~)
+        % Callback for generate warnings checkbox
+        generateWarnings = get(src, 'Max') == get(src, 'Value');
+    end % genearteWarningsCallback
+
     function studyEditBoxCallback(src, ~)
         % Callback for user directly editing the study edit box
         study = get(src, 'String');

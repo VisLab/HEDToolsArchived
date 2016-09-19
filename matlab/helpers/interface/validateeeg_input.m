@@ -245,7 +245,7 @@ uiwait(fig);
 
     function genearteWarningsCallback(src, ~) 
         % Callback for generate warnings checkbox
-        generateWarnings = ~get(src, 'Max') == get(src, 'Value');
+        generateWarnings = get(src, 'Max') == get(src, 'Value');
     end % genearteWarningsCallback
 
     function hedEditBoxCallback(src, ~) 

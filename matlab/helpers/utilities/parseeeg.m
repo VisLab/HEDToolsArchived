@@ -122,19 +122,17 @@ p = parseArguments(hedMaps, events, tagField, generateWarnings);
 
     function p = validateStructTags(p)
         % Validates the HED tags in a structure
-        if ~isempty(p.cellTags)
-            p = findErrors(p);
-            p.structIssues = p.structErrors;
-            if(p.generateWarnings)
-                p = findWarnings(p);
-                p.structIssues = [p.structErrors p.structWarnings];
-            end
-            if ~isempty(p.structIssues)
-                p.issues{p.issueCount} = ...
-                    [sprintf('Issues in event %d:\n', p.structNumber), ...
-                    p.structIssues];
-                p.issueCount = p.issueCount + 1;
-            end
+        p = findErrors(p);
+        p.structIssues = p.structErrors;
+        if(p.generateWarnings)
+            p = findWarnings(p);
+            p.structIssues = [p.structErrors p.structWarnings];
+        end
+        if ~isempty(p.structIssues)
+            p.issues{p.issueCount} = ...
+                [sprintf('Issues in event %d:\n', p.structNumber), ...
+                p.structIssues];
+            p.issueCount = p.issueCount + 1;
         end
     end % validateStructTags
 

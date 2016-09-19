@@ -71,7 +71,7 @@ checkTagSlashes(originalTags, false);
 
     function slashesFound = findSlashes(originalTag)
         % Returns true if the tag ends with a slash
-        slashesFound = originalTag(end) == '/';
+        slashesFound = originalTag(1) == '/' || originalTag(end) == '/';
     end % findSlashes
 
     function numElements = findNumElements(originalTags)
