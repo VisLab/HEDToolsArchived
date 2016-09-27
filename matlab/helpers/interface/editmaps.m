@@ -179,7 +179,7 @@ canceled = p.canceled;
         parser = inputParser;
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
-        parser.addParamValue('ExcludedFields', {}, @iscellstr);
+        parser.addParamValue('ExcludeFields', {}, @iscellstr);
         parser.addParamValue('Fields', {}, @iscellstr);
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.parse(fMap, varargin{:});

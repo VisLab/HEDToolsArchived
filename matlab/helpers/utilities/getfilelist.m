@@ -22,8 +22,8 @@
 % Output:
 %
 %   fPaths
-%                    A list of full file names of the datasets to be
-%                    tagged.
+%                    A one-dimensional cell array of full file names that
+%                    have the file extension 'fileExt'.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and

@@ -1,6 +1,6 @@
 % Writes tags to a structure from the fieldMap information. The tags in the
 % dataset structure are written to the .etc field and in each individual
-% event in the .event field. 
+% event in the .event field.
 %
 % Usage:
 %
@@ -21,16 +21,16 @@
 %
 %   Optional (key/value):
 %
-%   'ExcludeFields'  
+%   'ExcludeFields'
 %                    A cell array containing the field names to exclude.
 %
-%   'PreservePrefix' If false (default), tags associated with same value 
+%   'PreservePrefix' If false (default), tags associated with same value
 %                    that share prefixes are combined and only the most
 %                    specific is retained (e.g., /a/b/c and /a/b become
 %                    just /a/b/c). If true, then all unique tags are
 %                    retained.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -51,12 +51,18 @@
 function eData = writetags(eData, fMap, varargin)
 p = parseArguments(eData, fMap, varargin{:});
 
-% Prepare the values to be written
-tFields = intersect(fieldnames(eData.event), ...
-    setdiff(fMap.getFields(), p.ExcludeFields));
 if isfield(eData, 'event') && isstruct(eData.event)
-    eFields = intersect(fieldnames(eData.event), tFields);
-    eData = writeIndividualTags(eData, fMap, eFields, p.PreservePrefix);
+    if ~isempty(p.Fields)
+        tFields = intersect(fieldnames(eData.event), ...
+            intersect(fMap.getFields(), p.Fields));
+    else
+        tFields = intersect(fieldnames(eData.event), ...
+            setdiff(fMap.getFields(), p.ExcludeFields));
+    end
+    %     eFields = intersect(fieldnames(eData.event), tFields);
+    eData = writeIndividualTags(eData, fMap, tFields, p.PreservePrefix);
+else
+    tFields = intersect(fMap.getFields(), p.Fields);
 end
 eData = writeSummaryTags(fMap, eData, tFields);
 
@@ -117,11 +123,18 @@ eData = writeSummaryTags(fMap, eData, tFields);
             map = '';
         else
             map(length(tFields)) = struct('field', '', 'values', '');
-            for k = 1:length(tFields)
-                map(k) = removeMapValues(fMap, eData, tFields{k});
+            if isfield(eData, 'event') && isstruct(eData.event)
+                for k = 1:length(tFields)
+                    map(k) = removeMapValues(fMap, eData, tFields{k});
+                end
+            else
+                for k = 1:length(tFields)
+                    map(k) = fMap.getMap(tFields{k}).getStruct();
+                end
             end
         end
-        eData.etc.tags = struct('xml', fMap.getXml(), 'map', map);
+        eData.etc.tags = struct('description', fMap.getDescription(), ...
+            'xml', fMap.getXml(), 'map', map);
     end % writeSummaryTags
 
     function map = removeMapValues(fMap, eData, tField)
@@ -142,6 +155,7 @@ eData = writeSummaryTags(fMap, eData, tFields);
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
         parser.addParamValue('ExcludeFields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.parse(eData, fMap, varargin{:});
         p = parser.Results;

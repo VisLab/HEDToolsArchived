@@ -56,8 +56,10 @@
 %                    field.
 %
 %   'SaveDatasets'
-%                    If true (default), save the tags to the underlying
-%                    dataset files in the directory.
+%                    If true, save the tags to the underlying
+%                    dataset files in the directory. If false (default),
+%                    do not save the tags to the underlying dataset files
+%                    in the directory.
 %
 %   'SaveMapFile'
 %                    A string representing the file name for saving the
@@ -79,8 +81,8 @@
 %                    information.
 %
 %   fPaths
-%                    A list of full file names of the datasets to be
-%                    tagged.
+%                    A one-dimensional cell array of full file names of the
+%                    datasets to be tagged.
 %
 %   canceled
 %                    True if the user canceled the tagging. False if
@@ -119,11 +121,10 @@ fMap = mergeBaseTags(fMap, p.BaseMap);
     fMap, dirFields);
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'PreservePrefix', ...
-        p.PreservePrefix, 'ExcludedField', excluded, 'Fields', fields);
+        p.PreservePrefix, 'ExcludeField', excluded, 'Fields', fields);
 end
 if ~canceled
-    write2dir(fPaths, fMap, p.PreservePrefix, p.SaveMapFile, ...
-        p.SaveDatasets);
+    write2dir(p, fMap);
     fprintf('Tagging complete\n');
     return;
 end
@@ -166,25 +167,14 @@ fprintf('Tagging was canceled\n');
         fMap.merge(baseTags, 'Update', {}, fMap.getFields());
     end % mergeBaseTags
 
-    function write2dir(fPaths, fMap, preservePrefix, saveMapFile, ...
-            saveDatasets)
+    function write2dir(p, fMap)
         % Writes the tags to the directory datasets
-        if ~isempty(saveMapFile) && ~fieldMap.saveFieldMap(saveMapFile, ...
-                fMap)
-            warning('tagdir:invalidFile', ...
-                ['Couldn''t save fieldMap to ' saveMapFile]);
+        if ~isempty(p.SaveMapFile)
+            savefmap(fMap, p.SaveMapFile);
         end
-        if saveDatasets
-            % Rewrite all of the EEG files with updated tag information
-            fprintf(['\n---Now rewriting the tags to the individual' ...
-                ' data files---\n']);
-            for k = 1:length(fPaths) % Assemble the list
-                EEG = pop_loadset(fPaths{k});
-                EEG = writetags(EEG, fMap, 'PreservePrefix', ...
-                    preservePrefix);
-                pop_saveset(EEG, 'filename', EEG.filename, ...
-                    'filepath', EEG.filepath);
-            end
+        if p.SaveDatasets
+            overwritedataset(fMap, p.InDir, 'DoSubDirs', p.DoSubDirs, ...
+                'PreservePrefix', p.PreservePrefix);
         end
     end % write2dir
 
@@ -193,7 +183,7 @@ fprintf('Tagging was canceled\n');
         parser = inputParser;
         parser.addRequired('InDir', @(x) (~isempty(x) && ischar(x)));
         parser.addParamValue('BaseMap', '', ...
-            @(x)(isempty(x) || (ischar(x))));
+            @(x) isa(x, 'fieldMap') || ischar(x));
         parser.addParamValue('DoSubDirs', true, @islogical);
         parser.addParamValue('ExcludeFields', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
@@ -202,7 +192,7 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('SaveDatasets', true, @islogical);
+        parser.addParamValue('SaveDatasets', false, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
         parser.addParamValue('SelectFields', true, @islogical);
         parser.addParamValue('UseGui', true, @islogical);

@@ -52,8 +52,10 @@
 %                    field.
 %
 %   'SaveDatasets'
-%                    If true (default), save the tags to the underlying
-%                    dataset files in the study.
+%                    If true, save the tags to the underlying study and
+%                    dataset files in the study. If false (default), do not
+%                    save the tags to the underlying study and dataset
+%                    files in the study.
 %
 %   'SaveMapFile'
 %                    The full path name of the file for saving the final,
@@ -75,8 +77,8 @@
 %                    information
 %
 %   fPaths
-%                    A fieldMap object that contains the tag map
-%                    information
+%                    A one-dimensional cell array of full file names of the
+%                    datasets to be tagged.
 %   canceled
 %                    True if the user canceled the tagging. False if
 %                    otherwise.
@@ -101,7 +103,7 @@
 
 function [fMap, fPaths, canceled] = tagstudy(studyFile, varargin)
 p = parseArguments(studyFile, varargin{:});
-[study, fPaths] = loadstudy(p.StudyFile);
+[~, fPaths] = loadstudy(p.StudyFile);
 if isempty(fPaths)
     fMap = '';
     canceled = '';
@@ -113,40 +115,25 @@ fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap, ...
     studyFields);
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'EditXml', p.EditXml, ...
-        'PreservePrefix', p.PreservePrefix, 'ExcludedField', ...
-        excluded, 'Fields', fields);
+    [fMap, canceled] = editmaps(fMap, 'PreservePrefix', ...
+        p.PreservePrefix, 'ExcludeField', excluded, 'Fields', fields);
 end
 if ~canceled
-    write2study(p, fPaths, fMap, study);
+    write2study(p, fMap);
     fprintf('Tagging complete\n');
     return;
 end
 fprintf('Tagging was canceled\n');
 
-    function write2study(p, fPaths, fMap, study)
+    function write2study(p, fMap)
         % Writes the tags to the directory datasets
-        if ~isempty(p.SaveMapFile) && ...
-                ~fieldMap.saveFieldMap(p.SaveMapFile, fMap)
-            warning('tagstudy:invalidFile', ...
-                ['Couldn''t save fieldMap to ' p.SaveMapFile]);
+        if ~isempty(p.SaveMapFile)
+            savefmap(fMap, saveMapFile);
         end
         if p.SaveDatasets
-            % Rewrite all of the EEG files with updated tag information
-            fprintf(['\n---Now rewriting the tags to the individual' ...
-                ' data files---\n']);
-            for k = 1:length(fPaths) % Assemble the list
-                EEG = pop_loadset(fPaths{k});
-                EEG = writetags(EEG, fMap, 'PreservePrefix', ...
-                    p.PreservePrefix);
-                pop_saveset(EEG, 'filename', EEG.filename, ...
-                    'filepath', EEG.filepath);
-            end
+            overwritedataset(fMap, p.StudyFile, 'PreservePrefix', ...
+                p.PreservePrefix);
         end
-        % Rewrite to the study file
-        study.STUDY = writetags(study.STUDY, fMap, 'PreservePrefix', ...
-            p.PreservePrefix);  
-        save(p.studyFile, '-struct', 's');
     end % write2study
 
     function fMap = mergeBaseTags(fMap, baseMap)
@@ -181,48 +168,9 @@ fprintf('Tagging was canceled\n');
             studyFields = union(studyFields, fieldnames(eegTemp.event));
             fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
                 p.PreservePrefix, 'ExcludeFields', {}, 'Fields', {});
-            fMap.merge(tMapNew, 'Merge', p.ExcludeFields, ...
-                tMapNew.getFields());
             fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
         end
     end % findStudyTags
-
-    function [study, fNames] = loadstudy(studyFile)
-        % Load the study file 
-        try
-            study = load('-mat', studyFile);
-            sPath = fileparts(studyFile);
-            fNames = getstudyfiles(study.STUDY, sPath);
-        catch ME %#ok<NASGU>
-            warning('tagstudy:loadStudyFile', 'Invalid study file');
-            study = '';
-            fNames = '';
-        end
-    end % loadstudy
-
-    function fNames = getstudyfiles(study, sPath)
-        % Go through the study and find all of the dataset file paths
-        datasets = {study.datasetinfo.filename};
-        paths = {study.datasetinfo.filepath};
-        validPaths = true(size(paths));
-        fNames = cell(size(paths));
-        for ik = 1:length(paths)
-            fName = fullfile(paths{ik}, datasets{ik}); % Absolute path
-            if ~exist(fName, 'file')  % Relative to stored study path
-                fName = fullfile(study.filepath, paths{ik}, datasets{ik});
-            end
-            if ~exist(fName, 'file') % Relative to actual study path
-                fName = fullfile(sPath, paths{ik}, datasets{ik});
-            end
-            if ~exist(fName, 'file') % Give up
-                warning('tagstudy:getStudyFiles', ...
-                    ['Study file ' fname ' doesn''t exist']);
-                validPaths(ik) = false;
-            end
-            fNames{ik} = fName;
-        end
-        fNames(~validPaths) = [];  % Get rid of invalid paths
-    end % getstudyfiles
 
     function p = parseArguments(studyFile, varargin)
         % Parses the input arguments and returns the results
@@ -230,8 +178,7 @@ fprintf('Tagging was canceled\n');
         parser.addRequired('StudyFile', ...
             @(x) (~isempty(x) && exist(studyFile, 'file')));
         parser.addParamValue('BaseMap', '', ...
-            @(x)(isempty(x) || (ischar(x))));
-        parser.addParamValue('EditXml', false, @islogical);
+            @(x) isa(x, 'fieldMap') || ischar(x));
         parser.addParamValue('ExcludeFields', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
@@ -239,7 +186,7 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('SaveDatasets', true, @islogical);
+        parser.addParamValue('SaveDatasets', false, @islogical);
         parser.addParamValue('SaveMapFile', '', ...
             @(x)(isempty(x) || (ischar(x))));
         parser.addParamValue('SelectFields', true, @islogical);

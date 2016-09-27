@@ -51,6 +51,11 @@
 %                    category, and a description tag. The default is the
 %                    .type field.
 %
+%   'SaveDataset'
+%                    If true, save the tags to the underlying dataset. If
+%                    false (default), do not save the tags to the
+%                    underlying dataset.
+%
 %   'SaveMapFile'
 %                    A string representing the file name for saving the
 %                    final, consolidated fieldMap object that results from
@@ -105,10 +110,10 @@ fMap = mergeBaseTags(fMap, p.BaseMap);
     fMap);
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'PreservePrefix', ...
-        p.PreservePrefix, 'ExcludedFields', excluded, 'Fields', fields);
+        p.PreservePrefix, 'ExcludeFields', excluded, 'Fields', fields);
 end
 if ~canceled
-    EEG = write2EEG(EEG, fMap, p.SaveMapFile, p.PreservePrefix);
+    EEG = write2EEG(p, EEG, fMap);
     fprintf('Tagging complete\n');
     return;
 end
@@ -127,15 +132,17 @@ fprintf('Tagging was canceled\n');
             p.SelectFields);
     end % extractSelectedFields
 
-    function EEG = write2EEG(EEG, fMap, saveMapFile, preservePrefix)
+    function EEG = write2EEG(p, EEG, fMap)
         % Writes the tags to the EEG dataset structure  
-        if ~isempty(saveMapFile) && ...
-                ~fieldMap.saveFieldMap(saveMapFile, fMap)
-            warning('tageeg:invalidFile', ...
-                ['Couldn''t save fieldMap to ' saveMapFile]);
+        if ~isempty(p.SaveMapFile)
+            savefmap(fMap, p.SaveMapFile);
         end
-        % Now finish writing the tags to the EEG structure
-        EEG = writetags(EEG, fMap, 'PreservePrefix', preservePrefix);
+        if p.SaveDataset
+            EEG = overwritedataset(fMap, EEG, 'PreservePrefix', ...
+                p.PreservePrefix);
+        else
+            EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
+        end
     end % write2EEG
 
     function fMap = mergeBaseTags(fMap, baseMap)
@@ -152,8 +159,8 @@ fprintf('Tagging was canceled\n');
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
-        parser.addParamValue('BaseMap', '', ...
-            @(x)(isempty(x) || ischar(x) || isa(x, 'fieldMap')));
+        parser.addParamValue('BaseMap', '', @(x) isa(x, 'fieldMap') || ...
+            ischar(x));
         parser.addParamValue('ExcludeFields', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
@@ -161,6 +168,7 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
+        parser.addParamValue('SaveDataset', false, @islogical);
         parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || ...
             (ischar(x))));
         parser.addParamValue('SelectFields', true, @islogical);

@@ -2,8 +2,7 @@
 %
 % Usage:
 %
-%   >>  [canceled, baseMap, preservePrefix, ...
-%       saveDatasets, saveMapFile, selectFields, studyFile, ...
+%   >>  [canceled, baseMap, preservePrefix, selectFields, studyFile, ...
 %       useGUI] = tagstudy_input()
 %
 %
@@ -22,15 +21,6 @@
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%
-%   saveDatasets
-%                    If true (default), save the tags to the underlying
-%                    dataset files in the directory.
-%
-%   saveMapFile
-%                    A string representing the file name for saving the
-%                    final, consolidated fieldMap object that results from
-%                    the tagging process.
 %
 %   selectFields
 %                    If true (default), the user is presented with a
@@ -58,13 +48,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, baseMap, preservePrefix, saveDatasets, ...
-    saveMapFile, selectFields, studyFile, useGUI] = tagstudy_input()
+function [canceled, baseMap, preservePrefix, selectFields, studyFile, ...
+    useGUI] = tagstudy_input()
 baseMap = '';
 canceled = true;
 preservePrefix = false;
-saveDatasets = true;
-saveMapFile = '';
 selectFields = true;
 studyFile = '';
 useGUI = true;
@@ -83,16 +71,6 @@ inputFig = figure( ...
 createLayout();
 movegui(inputFig); % Make sure it is visible
 uiwait(inputFig);
-
-    function browseSaveTagsCallback(~, ~)
-        % Callback for 'Browse' button that sets the 'Save tags' editbox
-        [file,path] = uiputfile({'*.mat', 'MATLAB Files (*.mat)'}, ...
-            'Save event tags', 'fMap.mat');
-        if ischar(file) && ~isempty(file)
-            saveMapFile = fullfile(path, file);
-            set(findobj('Tag', 'SaveTags'), 'String', saveMapFile);
-        end
-    end % browseSaveTagsCallback
 
     function browseBaseTagsCallback(~, ~)
         % Callback for 'Browse' button that sets the 'Base tags' editbox
@@ -128,11 +106,6 @@ uiwait(inputFig);
             'Units','normalized',...
             'HorizontalAlignment', 'Left', ...
             'Position', [0.015 0.5 0.13 0.13]);
-        uicontrol('Parent', browsePanel, ...
-            'Style','text', 'String', 'Export tags', ...
-            'Units','normalized',...
-            'HorizontalAlignment', 'Left', ...
-            'Position', [0.015 .2 0.13 0.13]);
         uicontrol('Parent', browsePanel, 'Style', 'edit', ...
             'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
             'Tag', 'Study', 'String', '', ...
@@ -149,14 +122,6 @@ uiwait(inputFig);
             'Units','normalized',...
             'Callback', @baseTagsCtrlCallback, ...
             'Position', [0.15 0.4 0.6 0.25]);
-        uicontrol('Parent', browsePanel, 'Style', 'edit', ...
-            'BackgroundColor', 'w', 'HorizontalAlignment', 'Left', ...
-            'Tag', 'SaveTags', 'String', '', ...
-            'TooltipString', ...
-            'Complete path for saving the consolidated event tags', ...
-            'Units','normalized',...
-            'Callback', @saveTagsCtrlCallback, ...
-            'Position', [0.15 0.1 0.6 0.25]);
         uicontrol('Parent', browsePanel, ...
             'string', 'Browse', ...
             'style', 'pushbutton', 'TooltipString', ...
@@ -170,12 +135,6 @@ uiwait(inputFig);
             'Units','normalized',...
             'Callback', @browseBaseTagsCallback, ...
             'Position', [0.775 0.4 0.21 0.25]);
-        uicontrol('Parent', browsePanel, ...
-            'string', 'Browse', 'style', 'pushbutton', ...
-            'TooltipString', 'Press to choose export event tag file', ...
-            'Units','normalized',...
-            'Callback', @browseSaveTagsCallback, ...
-            'Position', [0.775 0.1 0.21 0.25]);
     end % createBrowsePanel
 
     function createOptionsGroupPanel()
@@ -248,8 +207,6 @@ uiwait(inputFig);
         baseMap = '';
         canceled = true;
         preservePrefix = false;
-        saveDatasets = true;
-        saveMapFile = '';
         selectFields = true;
         studyFile = '';
         useGUI = true;
@@ -267,24 +224,6 @@ uiwait(inputFig);
         % checkbox
         preservePrefix = get(src, 'Max') == get(src, 'Value');
     end % preservePrefixCallback
-
-    function saveDatasetsCallback(src, ~)
-        % Callback for user directly editing the 'Save to study dataset
-        % files' checkbox
-        saveDatasets = get(src, 'Max') == get(src, 'Value');
-        if ~saveDatasets
-            set(findall(writeButtonGroup, '-property', 'Enable'), ...
-                'Enable', 'off')
-        else
-            set(findall(writeButtonGroup, '-property', 'Enable'), ...
-                'Enable', 'on')
-        end
-    end % saveDatasetsCallback
-
-    function saveTagsCtrlCallback(src, ~)
-        % Callback for user directly editing the 'Save tags' editbox
-        saveMapFile = get(src, 'String');
-    end % tagsCtrlCallback
 
     function selectFieldsCallback(src, ~)
         % Callback for user directly editing the 'Select fields to tag'

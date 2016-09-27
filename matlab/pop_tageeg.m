@@ -51,26 +51,40 @@ if nargin < 1
 end;
 
 % Get the input parameters
-[baseMap, canceled, preservePrefix, saveMapFile, ...
-    selectFields, useGUI] = tageeg_input();
+[baseMap, canceled, preservePrefix, selectFields, useGUI] = tageeg_input();
 if canceled
     return;
 end
 
 % Tag the EEG structure
-[EEG, ~, canceled] = tageeg(EEG, 'BaseMap', baseMap, ...
+[EEG, fMap, canceled] = tageeg(EEG, 'BaseMap', baseMap, ...
     'PreservePrefix', preservePrefix, ...
-    'SaveMapFile', saveMapFile, ...
     'SelectFields', selectFields, ...
     'UseGUI', useGUI);
 if canceled
     return;
 end
 
+[overwriteDataset, savefMap, fMapPath, fMapDescription] = pop_savetags();
+
+if fMapDescription
+    fMap.setDescription(fMapDescription);
+    EEG.etc.tags.description = fMapDescription;
+end
+
+if savefMap && ~isempty(fMapPath)
+    savefmap(fMap, fMapPath);
+end
+
+if overwriteDataset
+    EEG = overwritedataset(fMap, EEG, 'PreservePrefix', preservePrefix);
+end
+
 % Create command string
 com = char(['tageeg(''BaseMap'', ''' baseMap ''', ' ...
     '''PreservePrefix'', ' logical2str(preservePrefix) ', ' ...
-    '''SaveMapFile'', ''' saveMapFile ''', ' ...
+    '''SaveDataset'', ''' logical2str(overwriteDataset) ''', ' ...
+    '''SaveMapFile'', ''' fMapPath ''', ' ...
     '''SelectFields'', ' logical2str(selectFields) ', ' ...
     '''UseGui'', ' logical2str(useGUI) ')']);
 
@@ -80,7 +94,7 @@ com = char(['tageeg(''BaseMap'', ''' baseMap ''', ' ...
             s = 'true';
         else
             s = 'false';
-        end 
+        end
     end % logical2str
 
 end % pop_tageeg

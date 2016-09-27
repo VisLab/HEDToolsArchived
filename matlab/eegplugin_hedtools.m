@@ -73,9 +73,11 @@ parentMenu = findobj(fig, 'Label', 'Edit');
 % Processing for 'Tag current EEG'
 finalcmd = '[EEG LASTCOM] = pop_tageeg(EEG);';
 ifeegcmd = 'if ~isempty(LASTCOM) && ~isempty(EEG)';
-savecmd = '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET);';
-redrawcmd = 'eeglab redraw;';
-finalcmd =  [trystrs.no_check finalcmd ifeegcmd savecmd ...
+% savecmd = '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET);';
+redrawcmd = ' eeglab redraw;';
+% finalcmd =  [trystrs.no_check finalcmd ifeegcmd savecmd ...
+%     redrawcmd 'end;' catchstrs.add_to_hist];
+finalcmd =  [trystrs.no_check finalcmd ifeegcmd ...
     redrawcmd 'end;' catchstrs.add_to_hist];
 
 % Add 'Tag current EEG' to 'Edit'

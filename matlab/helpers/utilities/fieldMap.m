@@ -176,7 +176,8 @@ classdef fieldMap < hgsetget
         
         function thisStruct = getStruct(obj)
             % Return the fieldMap as a structure array
-            thisStruct = struct('xml', obj.Xml, 'map', '');
+            thisStruct = struct('description', obj.Description, ...
+                'xml', obj.Xml, 'map', '');
             types = obj.GroupMap.keys();
             if isempty(types)
                 return;
@@ -298,8 +299,7 @@ classdef fieldMap < hgsetget
             % Save the fieldMap tagsObject in a file tagsFile
             successful = true;
             try
-                eval([inputname(2) '= tagsObject;']);
-                save(tagsFile, inputname(2));
+                save(tagsFile, 'tagsObject');
             catch ME         %#ok<NASGU>
                 successful = false;
             end
