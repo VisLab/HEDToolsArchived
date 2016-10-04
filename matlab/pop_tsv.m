@@ -26,7 +26,7 @@ function pop_tsv()
 % Prevent an annoying warning msg
 warning off MATLAB:uitabgroup:OldVersion
 warning off MATLAB:uitabgroup:DeprecatedFunction
-title = 'Tab-separated HEDTools';
+title = 'Tab-separated HED Validation Tools';
 fig = createFigure(title);
 tabGroup = uitabgroup('Parent', fig);
 tabs = createTabs(tabGroup);

@@ -70,6 +70,8 @@ classdef fieldMap < hgsetget
         % prefixes (default false)
         GroupMap             % Map for matching event labels
         Xml                  % Tag hierarchy as an XML string
+        XmlEdited            % If true, the HED has been modified through
+        % the CTagger (default false)
         XmlSchema            % String containing the XML schema
     end % private properties
     
@@ -223,6 +225,11 @@ classdef fieldMap < hgsetget
             xml = obj.Xml;
         end % getXml
         
+        function xmlEdited = getXmlEdited(obj)
+            % Returns true if the XML was edited through the CTagger
+            xmlEdited = obj.xmlEdited;
+        end % getXmlEdited
+        
         function merge(obj, fMap, updateType, excludeFields, includeFields)
             % Combine this object with the fMap fieldMap
             if isempty(fMap)
@@ -272,6 +279,11 @@ classdef fieldMap < hgsetget
             % Set the XML of the fieldMap
             obj.Xml = xml;
         end % setXml
+        
+        function xmlEdited = setXmlEdited(obj, xmlEdited)
+            % Set the XML of the fieldMap
+            obj.XmlEdited = xmlEdited;
+        end % setXmlEdited
         
     end % public methods
     

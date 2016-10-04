@@ -5,7 +5,7 @@
 %
 %   >>  validatestudy(study);
 %
-%   >>  validatestudy(study, varargin);
+%   >>  validatestudy(study, 'key1', 'value1', ...);
 %
 % Input:
 %
@@ -24,15 +24,15 @@
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
-%
 %   'outDir'
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each study
 %                   dataset validated. The default directory will be the
 %                   current directory. 
+%
+%   'tagField'
+%                   The field in .event that contains the HED tags.
+%                   The default field is .usertags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and

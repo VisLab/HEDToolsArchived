@@ -153,6 +153,12 @@ canceled = p.canceled;
         if p.PreservePrefix
             flags = bitor(flags,2);
         end
+        if p.ExtensionsAllowed
+            flags = bitor(flags,4);
+        end
+        if p.ExtensionsAnywhere
+            flags = bitor(flags,8);
+        end
         if p.standAlone
             flags = bitor(flags,16);
         end
@@ -180,6 +186,8 @@ canceled = p.canceled;
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
         parser.addParamValue('ExcludeFields', {}, @iscellstr);
+        parser.addParamValue('ExtensionsAllowed', true, @islogical);
+        parser.addParamValue('ExtensionsAnywhere', false, @islogical);
         parser.addParamValue('Fields', {}, @iscellstr);
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.parse(fMap, varargin{:});

@@ -5,7 +5,7 @@
 %
 %   >>  validateDir(inDir);
 %
-%   >>  validateDir(inDir, varargin);
+%   >>  validateDir(inDir, 'key1', 'value1', ...);
 %
 % Input:
 %
@@ -25,10 +25,6 @@
 %                   to errors. If false (default), only errors are included
 %                   in the log file.
 %
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
-%
 %   'hedXML'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
@@ -39,6 +35,10 @@
 %                   There will be a log file generated for each directory
 %                   dataset validated. The default directory will be the
 %                   current directory. 
+%
+%   'tagField'
+%                   The field in .event that contains the HED tags.
+%                   The default field is .usertags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and

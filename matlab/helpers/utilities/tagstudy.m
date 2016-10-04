@@ -18,7 +18,7 @@
 %   Required:
 %
 %   studyFile
-%                    The path to a EEG study.
+%                    The path to an EEG study.
 %
 %   Optional (key/value):
 %
