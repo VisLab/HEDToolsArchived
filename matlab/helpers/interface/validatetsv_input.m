@@ -372,13 +372,16 @@ createPanel(tab);
     function validateTSVCallback(~, ~) 
         % Callback for the 'Validate' button
         if isempty(hedXML)
-            errordlg('HED XML file is empty');
+            errordlg('HED XML file is empty', 'Input required', 'modal');
         elseif isempty(tsvFile)
-            errordlg('Tab-separated input file is empty');
+            errordlg('Tab-separated input file is empty', ...
+                'Input required', 'modal');
         elseif isempty(outDir)
-            errordlg('Output directory is empty');
+            errordlg('Output directory is empty', 'Input required', ...
+                'modal');
         elseif isempty(tsvTagColumns)
-            errordlg('HED tag columns are empty');
+            errordlg('HED tag columns are empty', 'Input required', ...
+                'modal');
         else
             wb = waitbar(.5,'Please wait...');
             try

@@ -256,9 +256,9 @@ uiwait(fig);
         else 
             errordlg(['XML file is invalid. Setting the XML' ...
                 ' file back to the previous file.'], ...
-                'Invalid XML file');
-            set(src, 'String', hedXML);
+                'Invalid XML file', 'modal');
         end
+        set(src, 'String', hedXML);
     end % hedEditBoxCallback
 
     function helpButtonCallback(~, ~)
@@ -296,7 +296,7 @@ uiwait(fig);
         else 
             errordlg(['Output directory is invalid. Setting the output' ...
                 ' directory back to the previous directory.'], ...
-                'Invalid output directory');
+                'Invalid output directory', 'modal');
             set(src, 'String', outDir);
         end
     end % outputDirectoryEditBoxCallback

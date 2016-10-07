@@ -3,6 +3,7 @@
 % Usage:
 %
 %   >>  fMap = findtags(edata)
+%
 %   >>  fMap = findtags(edata, 'key1', 'value1', ...)
 %
 % Inputs:
@@ -90,11 +91,12 @@ end
 
     function fMap = intializefMap(p)
         % Initialized the field maps
-        xml = '';
         if hasXML(p)
             xml = p.edata.etc.tags.xml;
+            fMap = fieldMap('Xml', xml, 'PreservePrefix', p.PreservePrefix);
+        else
+            fMap = fieldMap('PreservePrefix', p.PreservePrefix);
         end
-        fMap = fieldMap('XML', xml, 'PreservePrefix', p.PreservePrefix);
     end % intializefMap
 
     function fMap = events2fMap(p)

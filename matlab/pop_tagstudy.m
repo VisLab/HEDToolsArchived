@@ -57,6 +57,18 @@ if canceled
     return;
 end
 
+if fMap.getXmlEdited()
+[overwriteHED, saveHED, hedPath] = savehed_input();
+
+if overwriteHED
+   str2file(fMap.getXml(), which('HED.xml')); 
+end
+
+if saveHED && ~isempty(hedPath)
+    str2file(fMap.getXml(), hedPath);
+end
+end
+
 [overwriteDatasets, savefMap, fMapPath, fMapDescription] = ...
     savetags_input();
 

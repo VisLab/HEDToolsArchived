@@ -81,8 +81,8 @@ classdef fieldMap < hgsetget
             p = fieldMap.parseArguments(varargin{:});
             obj.Description = p.Description;
             obj.PreservePrefix = p.PreservePrefix;
-            obj.Xml = fileread(fieldMap.DefaultXml);
-            obj.XmlSchema = fileread(fieldMap.DefaultSchema);
+            obj.Xml = p.Xml;
+            obj.XmlSchema = p.XmlSchema;
             obj.GroupMap = containers.Map('KeyType', 'char', ...
                 'ValueType', 'any');
         end % fieldMap constructor
@@ -227,7 +227,7 @@ classdef fieldMap < hgsetget
         
         function xmlEdited = getXmlEdited(obj)
             % Returns true if the XML was edited through the CTagger
-            xmlEdited = obj.xmlEdited;
+            xmlEdited = obj.XmlEdited;
         end % getXmlEdited
         
         function merge(obj, fMap, updateType, excludeFields, includeFields)
@@ -320,10 +320,13 @@ classdef fieldMap < hgsetget
         function p = parseArguments(varargin)
             % Parses the input arguments and returns the results
             parser = inputParser;
-            parser.addParamValue('Description', '', @(x) (ischar(x)));
+            parser.addParamValue('Description', '', @ischar);
             parser.addParamValue('PreservePrefix', false, ...
                 @(x) validateattributes(x, {'logical'}, {}));
-            parser.addParamValue('XML', '', @(x) (ischar(x)));
+            parser.addParamValue('Xml', fileread(fieldMap.DefaultXml), ...
+                @(x) (ischar(x)));
+            parser.addParamValue('XmlSchema', ...
+                fileread(fieldMap.DefaultSchema), @ischar);
             parser.parse(varargin{:})
             p = parser.Results;
         end % parseArguments

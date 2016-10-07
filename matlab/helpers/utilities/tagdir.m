@@ -39,6 +39,20 @@
 %                    .urevent, .hedtags, and .usertags. The user can
 %                    over-ride these tags using this name-value parameter.
 %
+%   'ExtensionsAllowed'
+%                    If true (default), the HED can be extended. If
+%                    false, the HED can not be extended. The
+%                    'ExtensionAnywhere argument determines where the HED
+%                    can be extended if extension are allowed.
+%
+%
+%   'ExtensionsAnywhere'
+%                    If true, the HED can be extended underneath all tags.
+%                    If false (default), the HED can only be extended where
+%                    allowed. These are tags with the 'extensionAllowed'
+%                    attribute or leaf tags (tags that do not have
+%                    children).
+%
 %   'Fields'
 %                    A one-dimensional cell array of fields to tag. If this
 %                    parameter is non-empty, only these fields are tagged.
@@ -120,7 +134,9 @@ fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, ...
     fMap, dirFields);
 if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'PreservePrefix', ...
+    [fMap, canceled] = editmaps(fMap, 'ExtensionsAllowed', ...
+        p.ExtensionsAllowed, 'ExtensionsAnywhere', ...
+        p.ExtensionsAnywhere, 'PreservePrefix', ...
         p.PreservePrefix, 'ExcludeField', excluded, 'Fields', fields);
 end
 if ~canceled
@@ -188,6 +204,8 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('ExcludeFields', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
+        parser.addParamValue('ExtensionsAllowed', true, @islogical);
+        parser.addParamValue('ExtensionsAnywhere', false, @islogical);
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...

@@ -67,6 +67,7 @@ canceled = p.canceled;
     function p = setDefaultParameters(p)
         % Set the default parameters for this function
         p.initialDepth = 3;
+        p.hedExtended = false;
         p.standAlone = false;
         p.useJSON = true;
         if ~isempty(p.Fields)
@@ -95,7 +96,7 @@ canceled = p.canceled;
                 p.firstField = true;
             end
         elseif p.loader.isSubmitted()
-            updatefMap(p);
+            p = updatefMap(p);
             if p.loader.isBack()
                 p.k = p.k - 1;
             else
@@ -132,7 +133,7 @@ canceled = p.canceled;
         % Checks if an fieldMap has been saved
         if p.saved
             p.taggedList = p.loader.getXMLAndEvents();
-            updatefMap(p);
+            p = updatefMap(p);
             p.fMap.saveFieldMap(char(p.loader.getFMapPath), p.fMap);
             p.loader.setFMapSaved(false);
         end
@@ -168,9 +169,12 @@ canceled = p.canceled;
         if p.firstField
             flags = bitor(flags,64);
         end
+        if p.hedExtended
+            flags = bitor(flags,128);
+        end
     end % setCTaggerFlags
 
-    function updatefMap(p)
+    function p = updatefMap(p)
         % Updates the fMap tags if the current field is submitted in the
         % CTagger or a new fMap is loaded
         p.xml = strtrim(char(p.taggedList(1, :)));
@@ -178,6 +182,11 @@ canceled = p.canceled;
         tValues = tagMap.json2Values(tValues);
         p.fMap.removeMap(p.field);
         p.fMap.addValues(p.field, tValues, 'Primary', p.tMap.getPrimary());
+        if p.ExtensionsAllowed && p.loader.getHEDExtended()
+            p.hedExtended = true;
+            p.fMap.setXmlEdited(true);
+            p.fMap.setXml(p.xml);
+        end
     end % updatefMap
 
     function p = parseArguments(fMap, varargin)
