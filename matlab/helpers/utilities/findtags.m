@@ -129,6 +129,11 @@ end
             valueForm(j) = tagList(num2str(tValues{j}));
         end
         fMap.addValues(eventField, valueForm);
+        tMap = extractTags(p.edata.event, eventField);
+        tMapValues = getValues(tMap);
+        for j = 1:length(tMapValues)
+            fMap.addValues(eventField, tMapValues{j});
+        end
     end % addEventValues
 
     function eventFields  = getEventFields(p)
