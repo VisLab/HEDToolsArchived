@@ -37,7 +37,7 @@
 %  - Tags that are prefixes of other tags are preserved by default
 %  - Whitespace is trimmed from outside of tags
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -55,11 +55,18 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function mergedList = merge_taglists(tList1, tList2, preservePrefix)
-parseArguments(tList1, tList2, preservePrefix);
+function mergedList = merge_taglists(tList1, tList2, ...
+    preservePrefix, varargin)
+p = parseArguments(tList1, tList2, preservePrefix, varargin{:});
 myMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
-myMap = addList2Map(tList1, myMap);
-myMap = addList2Map(tList2, myMap);
+if strcmpi('Merge', p.UpdateType)
+    myMap = addList2Map(tList1, myMap);
+    myMap = addList2Map(tList2, myMap);
+elseif strcmpi('Diff', p.UpdateType) 
+    myMap = diffLists(myMap, tList1, tList2);    
+else
+    myMap = intersectLists(myMap, tList1, tList2);
+end
 if ~preservePrefix
     myMap = undoPrefix(myMap);
 end
@@ -74,6 +81,55 @@ mergedList = getMergedList(myMap);
             mergedList = mergedList{1};
         end
     end % getMergedList
+
+    function [myMap, otherMap] = intersectLists(myMap, otherMap, ...
+            tList1, tList2)
+        % Intersects two tag lists
+        [items1, itemKeys1] = getKeyValues(tList1);
+        [items2, itemKeys2] = getKeyValues(tList2);
+        [~, indecies] = intersect(itemKeys1,itemKeys2);
+        nIndecies = length(indecies);
+        for k = 1:nIndecies
+            myMap(itemKeys1{indecies(k)}) = items1{indecies(k)};
+        end
+        [~, indecies1, indecies2] = setxor(itemKeys1,itemKeys2);
+        nIndecies1 = length(indecies1);
+        for k = 1:nIndecies1
+            otherMap(itemKeys1{indecies1(k)}) = items1{indecies1(k)};
+        end
+        nIndecies2 = length(indecies2);
+        for k = 1:nIndecies2
+            otherMap(itemKeys2{indecies2(k)}) = items2{indecies2(k)};
+        end
+    end % intersectLists
+
+    function myMap = diffLists(myMap, tList1, tList2)
+        % Set difference of two tag lists
+        [items1, itemKeys1] = getKeyValues(tList1);
+        [~, itemKeys2] = getKeyValues(tList2);
+        [~, indecies] = setxor(itemKeys1,itemKeys2);
+        nIndecies = length(indecies);
+        for k = 1:nIndecies
+            myMap(itemKeys1{indecies(k)}) = items1{indecies(k)};
+        end
+    end % diffLists
+
+    function [items, itemKeys] = getKeyValues(tList)
+        % Gets the key/value pairs from a list
+        if ~isempty(tList) && ischar(tList)
+            tList = {tList};
+        end
+        nElements = length(tList);
+        items = cell(1, nElements);
+        itemKeys = cell(1, nElements);
+        for k = 1:nElements
+            items{k} = strtrim(tList{k});
+            itemKeys{k} = lower(items{k});
+            if iscellstr(itemKeys{k})
+                itemKeys{k} = ['(',strjoin(itemKeys{k},','),')'];
+            end
+        end
+    end % getKeyValues
 
     function myMap = addList2Map(tList, myMap)
         % Add a cell array tag list to a Map container
@@ -94,13 +150,16 @@ mergedList = getMergedList(myMap);
         end
     end % addList2Map
 
-    function p = parseArguments(tList1, tList2, preservePrefix)
+    function p = parseArguments(tList1, tList2, preservePrefix, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('tList1', @(x) ischar(x) || iscell(x));
         parser.addRequired('tList2', @(x) ischar(x) || iscell(x));
         parser.addRequired('PreservePrefix', @islogical);
-        parser.parse(tList1, tList2, preservePrefix);
+        parser.addOptional('UpdateType', 'Merge', ...
+            @(x) any(validatestring(lower(x), ...
+            {'Diff', 'Intersect', 'Merge'})));
+        parser.parse(tList1, tList2, preservePrefix, varargin{:});
         p = parser.Results;
     end % parseArguments
 

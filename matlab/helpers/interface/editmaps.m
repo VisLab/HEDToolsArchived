@@ -23,6 +23,19 @@
 %                    .usertags. The user can over-ride these tags using
 %                    this name-value parameter.
 %
+%   'ExtensionsAllowed'
+%                    If true (default), the HED can be extended. If
+%                    false, the HED can not be extended. The 
+%                    'ExtensionAnywhere argument determines where the HED
+%                    can be extended if extension are allowed.
+%                  
+%   'ExtensionsAnywhere'
+%                    If true, the HED can be extended underneath all tags.
+%                    If false (default), the HED can only be extended where
+%                    allowed. These are tags with the 'extensionAllowed'
+%                    attribute or leaf tags (tags that do not have
+%                    children).
+%
 %   'Fields'
 %                    A cell array of field names of the fields to include
 %                    in the tagging. If this parameter is non-empty, only

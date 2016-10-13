@@ -1,6 +1,6 @@
 % Writes tags to a structure from the fieldMap information. The tags in the
 % dataset structure are written to the .etc field and in each individual
-% event in the .event field. 
+% event in the .event field.
 %
 % Usage:
 %
@@ -20,7 +20,7 @@
 %                    The structure that will be tagged. The
 %                    dataset will need to have a .event field.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -39,16 +39,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function uniquetags = finduniquetags(tags)
-uniquetags = getUniqueTags(tags);
-
-    function uniquetags = getUniqueTags(tags)
-        % Gets the unique tags 
-        uniquetags = {};
-        numEvents = length(tags);
-        for a = 1:numEvents
-            uniquetags = union(uniquetags, formatTags(tags{a}));
-        end
-    end % getUniqueTags
+% Gets the unique tags
+uniquetags = {};
+numEvents = length(tags);
+for a = 1:numEvents
+    uniquetags = union(uniquetags, formatTags(tags{a}));
+end
 
     function tags = formatTags(tags)
         % Format the tags and puts them in a cellstr if they are in a

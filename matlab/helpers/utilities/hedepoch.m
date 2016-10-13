@@ -71,7 +71,7 @@
 
 function EEG = hedepoch(EEG, tags, varargin)
 p = parseArguments();
-positions = findTagMatchEvents(EEG, 'tags', tags);
+positions = findhedevents(EEG, 'tags', tags);
 allLatencies = [EEG.event.latency];
 matchedLatencies = allLatencies(positions);
 [newtimelimts, acceptedEventIndecies, epochevent] = epochData();

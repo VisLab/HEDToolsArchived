@@ -70,17 +70,17 @@ primaryField = p.PrimaryField;
 fields = intersect(p.Fields, fMap.getFields(), 'stable');
 excluded = setdiff(p.ExcludeFields, fields);
 if isempty(fields) && selectFields
-    fields = setdiff(fMap.getFields(), excluded);
     [fields, excluded, primaryField, canceled] = ...
-        selectFields2Tag(fields, excluded, primaryField);
+        selectFields2Tag(fMap, excluded, primaryField);
 end
 fMap.setPrimaryMap(primaryField);
 
     function [fields, excluded, primaryField, canceled] = ...
-            selectFields2Tag(fields, excluded, primaryField)
+            selectFields2Tag(fMap, excluded, primaryField)
         % Select fields to tag with a menu
         canceled = false;
-        [fields, primaryField] = putPrimaryFirst(primaryField, fields);
+        fields = setdiff(fMap.getFields(), excluded);
+        [fields, excluded, primaryField] = getLists(primaryField, fields);
         [loader, submitted] = showSelectionMenu(excluded, fields, ...
             primaryField);
         excludeUser = cell(loader.getExcludeFields());
@@ -113,17 +113,18 @@ fMap.setPrimaryMap(primaryField);
         submitted = loader.isSubmitted();
     end % checkMenuStatus
 
-    function [fields, primaryField] = putPrimaryFirst(primaryField, fields)
+    function [tFields, eFields, primaryField] = getLists(primaryField, ...
+            fields)
         % Moves the primary field to the beginning of the list of fields
         if sum(strcmp(fields, primaryField)) == 0
+            tFields = {};
+            eFields = fields;
             primaryField = '';
         else
-            pos = find(strcmp(fields, primaryField));
-            temp = fields{pos};
-            fields{pos} = fields{1};
-            fields{1} = temp;
+            tFields = {primaryField};
+            eFields = setdiff(fields, tFields);
         end
-    end % putPrimaryFirst
+    end % getLists
 
     function p = parseArguments(fMap, varargin)
         % Parses the input arguments and returns the results

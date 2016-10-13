@@ -42,7 +42,8 @@ if nargin < 1
 end;
 
 % Find all the unique tags in the events
-uniquetags = finduniquetags({EEG.event.usertags});
+uniquetags = finduniquetags(arrayfun(@concatEventTags, EEG.event, ...
+        'UniformOutput', false));
 
 % Get input arguments from GUI
 [canceled, tags, newName, timeLim, valueLim] = ...
@@ -59,5 +60,15 @@ com = char(['hedepoch(EEG,' ...
     '''timelim'', ' vector2str(timeLim) ', ' ...
     '''newname'', ''' newName ''', ' ...
     '''valuelim'', ' vector2str(valueLim) ')']);
+
+    function tags = concatEventTags(event)
+        % Concatenates the event .usertags and .hedtags fields (Anonymous
+        % function)
+        if isfield(event, 'hedtags') && isempty(event.hedtags)
+            tags = event.usertags;
+        else
+            tags = [event.usertags ',' event.hedtags];
+        end
+    end % concatEventTags
 
 end % pop_hedepoch

@@ -41,7 +41,6 @@
 %                    'ExtensionAnywhere argument determines where the HED
 %                    can be extended if extension are allowed.
 %                  
-%
 %   'ExtensionsAnywhere'
 %                    If true, the HED can be extended underneath all tags.
 %                    If false (default), the HED can only be extended where
@@ -118,7 +117,7 @@
 function [EEG, fMap, canceled] = tageeg(EEG, varargin)
 p = parseArguments(EEG, varargin{:});
 fMap = findtags(EEG, 'PreservePrefix', p.PreservePrefix, ...
-    'ExcludeFields', {}, 'Fields', {});
+    'ExcludeFields', p.ExcludeFields, 'Fields', {});
 fMap = mergeBaseTags(fMap, p.BaseMap);
 [fMap, fields, excluded, canceled] = extractSelectedFields(p, EEG, ...
     fMap);

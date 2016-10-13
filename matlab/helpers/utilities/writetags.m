@@ -69,12 +69,24 @@ eData = writeSummaryTags(fMap, eData, tFields);
     function eData = writeIndividualTags(eData, fMap, eFields, ...
             preservePrefix)
         % Write tags to individual events in usertags field
+        primaryField = fMap.getPrimaryField();
+        eFields = setdiff(eFields, primaryField);
+        hasHEDTags = isfield(eData.event, 'hedtags');
         for k = 1:length(eData.event)
-            uTags = {};
+            uTags = fMap.getTags(primaryField, ...
+                    num2str(eData.event(k).(primaryField)));
+            hTags = {};
             for l = 1:length(eFields)
                 tags = fMap.getTags(eFields{l}, ...
                     num2str(eData.event(k).(eFields{l})));
-                uTags = merge_taglists(uTags, tags, preservePrefix);
+                hTags = merge_taglists(hTags, tags, preservePrefix);
+                hTags = merge_taglists(hTags, uTags, preservePrefix, ...
+                    'Diff');
+                if hasHEDTags
+                    oldHTags = hed2cell(eData.event(k).hedtags, false);
+                    hTags = merge_taglists(hTags, oldHTags, ...
+                        preservePrefix);
+                end
             end
             if isempty(uTags)
                 eData.event(k).usertags = '';
@@ -82,6 +94,13 @@ eData = writeSummaryTags(fMap, eData, tFields);
                 eData.event(k).usertags = uTags;
             else
                 eData.event(k).usertags = addGroupTags(uTags);
+            end
+            if isempty(hTags)
+                eData.event(k).hedtags = '';
+            elseif ischar(hTags)
+                eData.event(k).hedtags = hTags;
+            else
+                eData.event(k).hedtags = addGroupTags(hTags);
             end
         end
     end % writeIndividualTags

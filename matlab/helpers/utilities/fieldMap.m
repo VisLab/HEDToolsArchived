@@ -66,9 +66,10 @@ classdef fieldMap < hgsetget
     
     properties (Access = private)
         Description          % String describing this field map
+        GroupMap             % Map for matching event labels
         PreservePrefix       % If true, don't eliminate duplicate
         % prefixes (default false)
-        GroupMap             % Map for matching event labels
+        PrimaryField
         Xml                  % Tag hierarchy as an XML string
         XmlEdited            % If true, the HED has been modified through
         % the CTagger (default false)
@@ -105,6 +106,9 @@ classdef fieldMap < hgsetget
                 eTag = tagMap('Field', type, 'Primary', primary);
             else
                 eTag = obj.GroupMap(type);
+            end
+            if primary
+                obj.PrimaryField = type;
             end
             if iscell(values)
                 for k = 1:length(values)
@@ -175,6 +179,11 @@ classdef fieldMap < hgsetget
             % Return the logical PreservePrefix flag of the fieldMap
             pPrefix = obj.PreservePrefix;
         end % getPreservePrefix
+        
+        function primaryField = getPrimaryField(obj)
+            % Return the field names of the fieldMap
+            primaryField = obj.PrimaryField;
+        end % getFields
         
         function thisStruct = getStruct(obj)
             % Return the fieldMap as a structure array

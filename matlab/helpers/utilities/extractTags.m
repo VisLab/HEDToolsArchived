@@ -1,24 +1,37 @@
-function tMap = extractTags(structure, field)
+function tMap = extracttags(events, valueField)
 % Extract a tagmap from the usertags in the event structure.
+parseArguments();
 tMap = tagMap();
-values = {structure.(field)};
-usertags = {structure.('usertags')};
-uniqueValues = unique(cellfun(@num2str, values, 'UniformOutput', false));  % sample data 'rt' and 'square' for 'type'
-uniqueValues = uniqueValues(~cellfun(@isempty, uniqueValues));
-% leftoverTags = tagList();
-for k = 1:length(uniqueValues)
-    theseValues = strcmpi(uniqueValues{k}, values); % events with this type
-    theseTags = usertags(theseValues);
-    myTagList = tagList(uniqueValues{k});
-    if ~isempty(theseTags)
-        myTagList.addString(theseTags{1});
-        for j = 2:length(theseTags)
-            newList = tagList(uniqueValues{k});
-            newList.addString(theseTags{j});
-            myTagList.intersect(newList);
-%             leftoverTags.union(newList);
-        end
-    end
-    tMap.addValue(myTagList);
+values = extractfield(events, valueField);
+tags = extractfield(events, 'usertags');
+if iscell(values)
+    values = cellfun(@num2str, values, 'UniformOutput', false);
+else
+    values = arrayfun(@num2str, values, 'UniformOutput', false);
 end
-%leftoverTags that didn't appear in the tMap
+uniqueValues = unique(cellfun(@num2str, values, 'UniformOutput', false));  
+for k = 1:length(uniqueValues)
+    if ~isempty(uniqueValues{k})
+        theseValues = strcmpi(uniqueValues{k}, values); 
+        theseTags = tags(theseValues);
+        myTagList = tagList(uniqueValues{k});
+        if ~isempty(theseTags)
+            myTagList.addString(theseTags{1});
+            for j = 2:length(theseTags)
+                newList = tagList(uniqueValues{k});
+                newList.addString(theseTags{j});
+                myTagList.intersect(newList);
+            end
+        end
+        tMap.addValue(myTagList);
+    end
+end
+
+    function p = parseArguments()
+        % Parses the arguments passed in and returns the results
+        p = inputParser();
+        p.addRequired('events', @(x) ~isempty(x) && isstruct(x));
+        p.addRequired('valueField', @(x) ~isempty(x) && ischar(x));
+    end % parseArguments
+
+end % extracttags
