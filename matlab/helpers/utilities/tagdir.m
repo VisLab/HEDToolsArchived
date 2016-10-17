@@ -168,7 +168,8 @@ fprintf('Tagging was canceled\n');
             eegTemp = pop_loadset(fPaths{k});
             dirFields = union(dirFields, fieldnames(eegTemp.event));
             fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
-                p.PreservePrefix, 'ExcludeFields', {}, 'Fields', {});
+                p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, ...
+                'Fields', {});
             fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
         end
     end % findDirTags
@@ -206,7 +207,7 @@ fprintf('Tagging was canceled\n');
             @(x) (iscellstr(x)));
         parser.addParamValue('ExtensionsAllowed', true, @islogical);
         parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('Fields', {'type'}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))

@@ -39,7 +39,8 @@ if any(strncmpi(tags, offsetTag, length(offsetTag)))
     onsetTag = 'Attribute/Onset';
     tags{end+1} = onsetTag;
 end
-found = any(strncmpi(tags, search, length(search)));
+% found = any(strncmpi(tags, search, length(search)));
+found = any(strcmpi(tags, search));
 
     function p = parseArguments(tags, search)
         % Parses the input arguments and returns the results

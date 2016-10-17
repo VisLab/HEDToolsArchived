@@ -169,7 +169,8 @@ fprintf('Tagging was canceled\n');
             eegTemp = pop_loadset(fPaths{k});
             studyFields = union(studyFields, fieldnames(eegTemp.event));
             fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
-                p.PreservePrefix, 'ExcludeFields', {}, 'Fields', {});
+                p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, ...
+                'Fields', {});
             fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
         end
     end % findStudyTags
