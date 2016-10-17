@@ -15,8 +15,9 @@
 %   com        A command string that calls the underlying hedepoch
 %              function.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -32,43 +33,33 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [EEG, com] = pop_hedepoch(EEG)
+function [EEG, indices, com] = pop_epochhed(EEG)
 com = '';
 
 % Display help if inappropriate number of arguments
 if nargin < 1
-    help pop_hedepoch;
+    help pop_epochhed;
     return;
 end;
 
 % Find all the unique tags in the events
-uniquetags = finduniquetags(arrayfun(@concatEventTags, EEG.event, ...
+uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
 
 % Get input arguments from GUI
 [canceled, tags, newName, timeLim, valueLim] = ...
-    hedepoch_input(EEG.setname, uniquetags);
+    epochhed_input(EEG.setname, uniquetags);
 
 if canceled
     return;
 end
 
-EEG = hedepoch(EEG, tags, 'timelim', timeLim, ...
+[EEG, indices] = epochhed(EEG, tags, 'timelim', timeLim, ...
     'newname', newName, 'valuelim', valueLim);
 
-com = char(['hedepoch(EEG,' ...
+com = char(['epochhed(EEG,' ...
     '''timelim'', ' vector2str(timeLim) ', ' ...
     '''newname'', ''' newName ''', ' ...
     '''valuelim'', ' vector2str(valueLim) ')']);
 
-    function tags = concatEventTags(event)
-        % Concatenates the event .usertags and .hedtags fields (Anonymous
-        % function)
-        if isfield(event, 'hedtags') && isempty(event.hedtags)
-            tags = event.usertags;
-        else
-            tags = [event.usertags ',' event.hedtags];
-        end
-    end % concatEventTags
-
-end % pop_hedepoch
+end % pop_epochhed

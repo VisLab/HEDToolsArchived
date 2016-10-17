@@ -146,7 +146,7 @@ positionMenu = findobj(fig, 'Label', 'Remove baseline', ...
 position = get(positionMenu, 'Position');
 
 % Processing for 'Extract epochs by tags'
-finalcmd = '[EEG LASTCOM] = pop_hedepoch(EEG);';
+finalcmd = '[EEG, ~, LASTCOM] = pop_epochhed(EEG);';
 ifeegcmd = 'if ~isempty(LASTCOM) && ~isempty(EEG)';
 savecmd = '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET);';
 redrawcmd = 'eeglab redraw;';

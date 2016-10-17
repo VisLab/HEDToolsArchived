@@ -108,8 +108,9 @@ p = parseArguments(hedMaps, events, tagField, generateWarnings);
         try
             for a = 1:numberEvents
                 p.structNumber = a;
-                p.cellTags = hed2cell(p.events(a).(p.tagField), false);
-                p.formattedCellTags = hed2cell(p.events(a).(p.tagField), true);
+                tags = concattags(p.events(a));
+                p.cellTags = hed2cell(tags, false);
+                p.formattedCellTags = hed2cell(tags, true);
                 p = validateStructTags(p);
             end
             issues = p.issues;

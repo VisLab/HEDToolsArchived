@@ -53,7 +53,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [canceled, tags, newName, timeLim, valueLim] = ...
-    hedepoch_input(setname, uniquetags)
+    epochhed_input(setname, uniquetags)
 
     function searchCallback(src, event) %#ok<INUSD>
         [searchCanceled, searchtags] = hedsearch_input(uniquetags); ...
@@ -76,8 +76,8 @@ uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
     { 'style' 'text'       ...
     'string' 'Out-of-bounds EEG limits if any [min max]' } ...
     { 'style' 'edit'       'string' '' } { } };
-result = inputgui( geometry, uilist, 'pophelp(''hedepoch_input'')', ...
-    'Extract data epochs - pop_hedepoch()');
+result = inputgui( geometry, uilist, 'pophelp(''epochhed_input'')', ...
+    'Extract data epochs - pop_epochhed()');
 if isempty(result)
     tags = '';
     timeLim = '';
@@ -100,4 +100,4 @@ else
     valueLim = str2num(result{4});  %#ok<ST2NM>
 end
 
-end % hedepoch_input
+end % epochhed_input

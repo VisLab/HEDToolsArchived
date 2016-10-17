@@ -69,7 +69,7 @@ selectFields = p.SelectFields;
 primaryField = p.PrimaryField;
 fields = intersect(p.Fields, fMap.getFields(), 'stable');
 excluded = setdiff(p.ExcludeFields, fields);
-if isempty(fields) && selectFields
+if selectFields
     [fields, excluded, primaryField, canceled] = ...
         selectFields2Tag(fMap, excluded, primaryField);
 end

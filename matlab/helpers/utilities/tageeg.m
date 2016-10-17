@@ -181,7 +181,7 @@ fprintf('Tagging was canceled\n');
             @(x) (iscellstr(x)));
         parser.addParamValue('ExtensionsAllowed', true, @islogical);
         parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('Fields', {'type'}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))

@@ -4,11 +4,12 @@
 %
 % Usage:
 %
-%   >> EEG = hedepoch(EEG, tags)
+%   >> EEG = epochhed(EEG, tags)
 %
-%   >> EEG = hedepoch(EEG, tags, varargin)
+%   >> EEG = epochhed(EEG, tags, varargin)
 %
 % Inputs:
+%
 %   EEG          Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
 %                The dataset is assumed to be tagged and has a .usertags
@@ -51,8 +52,9 @@
 %
 %   EEG          Output dataset that has extracted data epochs.
 %
-% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
-% Kay Robbins, UTSA, kay.robbins@utsa.edu
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Jeremy Cockfield jeremy.cockfield@gmail.com, and
+% Kay Robbins kay.robbins@utsa.edu
 %
 %
 % This program is free software; you can redistribute it and/or modify
@@ -69,11 +71,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function EEG = hedepoch(EEG, tags, varargin)
+function [EEG, indices] = epochhed(EEG, tags, varargin)
 p = parseArguments();
-positions = findhedevents(EEG, 'tags', tags);
+indices = findhedevents(EEG, 'tags', tags);
 allLatencies = [EEG.event.latency];
-matchedLatencies = allLatencies(positions);
+matchedLatencies = allLatencies(indices);
 [newtimelimts, acceptedEventIndecies, epochevent] = epochData();
 updateFields();
 newevent = duplicateEvents();
@@ -214,4 +216,4 @@ checkBoundaryEvents();
         EEG.setname = p.newname;
     end % updateFields
 
-end % hedepoch
+end % epochhed

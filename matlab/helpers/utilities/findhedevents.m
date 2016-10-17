@@ -67,9 +67,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function positions = findhedevents(data, varargin)
+function indices = findhedevents(data, varargin)
 p = parseArguments(data, varargin{:});
-positions = [];
+indices = [];
 if ischar(p.data)
     p.allTags = getTSVTags(p);
 else
@@ -83,11 +83,11 @@ if isempty(p.tags)
         return;
     end
 end
-positions = findMatches(p);
+indices = findMatches(p);
 
-    function positions = findMatches(p)
+    function indices = findMatches(p)
         % Process the events and look for matches
-        positions = false(1,length(p.allTags));
+        indices = false(length(p.allTags), 1);
         [uniqueHedStrings, ~, ids]= unique(p.allTags);
         for a = 1:length(uniqueHedStrings)
             [eventTags, eventNonGroupTags, eventGroupTags] = ...
@@ -95,9 +95,9 @@ positions = findMatches(p);
             str = createlogexp(length(eventGroupTags), p.tags);
             matchFound = evallogexp(str, eventTags, eventNonGroupTags, ...
                 eventGroupTags);
-            positions(ids == a) = matchFound;
+            indices(ids == a) = matchFound;
         end
-        positions = find(positions);
+        indices = find(indices);
     end % findMatches
 
     function [tags, eventLevelTags, groupTags] = formatTags(tags)

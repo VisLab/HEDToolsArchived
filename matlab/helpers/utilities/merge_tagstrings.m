@@ -62,14 +62,14 @@ if nargin < 3
         'function must have at 3 arguments');
     return;
 end
-parsed1 = vTagList.deStringify(string1);
-parsed2 = vTagList.deStringify(string2);
-merged = merge_taglists(parsed1, parsed2, preservePrefix);
-if isempty(merged)
+list1 = vTagList.deStringify(string1);
+list2 = vTagList.deStringify(string2);
+mergedList = merge_taglists(list1, list2, preservePrefix);
+if isempty(mergedList)
     return;
-elseif ischar(merged)
-    mergedString = strtrim(merged);
+elseif ischar(mergedList)
+    mergedString = strtrim(mergedList);
     return;
 end
-mergedString = vTagList.stringify(merged);
+mergedString = vTagList.stringify(mergedList);
 end % merge_tagstrings
