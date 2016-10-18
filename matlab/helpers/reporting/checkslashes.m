@@ -61,8 +61,8 @@ checkTagSlashes(originalTags, false);
         % Generates tag warnings if the tag ends with a slash
         tagString = originalTags{tagIndex};
         if isGroup
-            tagString = [originalTags{tagIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTags),')'];
+            tagString = [originalTags{tagIndex}, ' in group ' ,...
+                vTagList.stringifyElement(originalTags)];
         end
         warnings = [warnings, generatewarning('slash', '', tagString, '')];
         warningTags{warningsIndex} = originalTags{tagIndex};
@@ -71,6 +71,10 @@ checkTagSlashes(originalTags, false);
 
     function slashesFound = findSlashes(originalTag)
         % Returns true if the tag ends with a slash
+        if isempty(originalTag)
+            slashesFound = false;
+            return;
+        end
         slashesFound = originalTag(1) == '/' || originalTag(end) == '/';
     end % findSlashes
 

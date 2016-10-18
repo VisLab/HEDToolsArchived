@@ -102,8 +102,8 @@ checkValidTags(originalTags, formattedTags, false);
         % Generates errors for tags that are not valid
         tagString = originalTags{tagIndex};
         if isGroup
-            tagString = [originalTags{tagIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTags),')'];
+            tagString = [originalTags{tagIndex}, ' in group ' ,...
+                vTagList.stringifyElement(originalTags)];
         end
         errors = [errors, generateerror('valid', '', tagString, '','')];
         errorTags{errorsIndex} = originalTags{tagIndex};

@@ -82,8 +82,8 @@ checkTags(original, canonical, false);
         % present in the tag list
         tagString = originalTags{tagIndex};
         if isGroup
-            tagString = [originalTags{tagIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTags),')'];
+            tagString = [originalTags{tagIndex}, ' in group ' ,...
+                vTagList.stringifyElement(originalTags)];
         end
         errors = [errors, generateerror('requireChild', '', tagString, ...
             '', '')];

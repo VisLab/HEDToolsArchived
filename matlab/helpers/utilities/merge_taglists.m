@@ -70,17 +70,18 @@ end
 if ~preservePrefix
     myMap = undoPrefix(myMap);
 end
-mergedList = getMergedList(myMap);
+% mergedList = getMergedList(myMap);
+mergedList = myMap.values();
 
-    function mergedList = getMergedList(myMap)
-        % Gets the merged list from the Map container
-        mergedList = myMap.values();
-        if isempty(mergedList)
-            mergedList = '';
-        elseif length(mergedList) == 1 && ischar(mergedList{1})
-            mergedList = mergedList{1};
-        end
-    end % getMergedList
+%     function mergedList = getMergedList(myMap)
+%         % Gets the merged list from the Map container
+%         mergedList = myMap.values();
+%         if isempty(mergedList)
+%             mergedList = '';
+%         elseif length(mergedList) == 1 && ischar(mergedList{1})
+%             mergedList = mergedList{1};
+%         end
+%     end % getMergedList
 
     function [myMap, otherMap] = intersectLists(myMap, otherMap, ...
             tList1, tList2)

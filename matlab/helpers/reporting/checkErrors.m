@@ -57,14 +57,16 @@
 
 function [errors, errorTags] = checkerrors(hedMaps, originalTags, ...
     formattedTags)
-errors = '';
-errors = [errors checkrequired(hedMaps, formattedTags)];
-errors = [errors checkrequirechild(hedMaps, originalTags, ...
-    formattedTags)];
-errors = [errors checktakevalue(hedMaps, originalTags, formattedTags)];
-errors = [errors checktildes(originalTags)];
-errors = [errors checkunique(hedMaps, originalTags, formattedTags)];
-[validationErrors, errorTags] = checkvalid(hedMaps, originalTags, ...
+requireChildErrors = checkrequirechild(hedMaps, originalTags, ...
     formattedTags);
-errors = [errors validationErrors];
+requiredErrors = checkrequired(hedMaps, formattedTags);
+uniqueErrors = checkunique(hedMaps, originalTags, formattedTags);
+[takeValueErrors, takeValueerrorTags] = checktakevalue(hedMaps, ...
+    originalTags, formattedTags);
+[tildeErrors, tildeErrorTags] = checktildes(originalTags);
+[validationErrors, validationErrorTags] = checkvalid(hedMaps, ...
+    originalTags, formattedTags);
+errors = [requireChildErrors requiredErrors uniqueErrors ...
+    takeValueErrors tildeErrors validationErrors];
+errorTags = [takeValueerrorTags tildeErrorTags validationErrorTags];
 end % checkerrors

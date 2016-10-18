@@ -54,11 +54,13 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function warnings = checkwarnings(hedMaps, originalTags, formattedTags)
-warnings = '';
-warnings = [warnings checkcaps(hedMaps, originalTags, formattedTags)];
-warnings = [warnings checkslashes(originalTags)];
-[~, ~, takeValueWarnings] = checktakevalue(hedMaps, originalTags, ...
+function [warnings, warningTags] = checkwarnings(hedMaps, originalTags, ...
+    formattedTags)
+[capWarnings, capWarningTags] = checkcaps(hedMaps, originalTags, ...
     formattedTags);
-warnings = [warnings takeValueWarnings];
+[slashWarnings, slashWarningTags] = checkslashes(originalTags);
+[~, ~, takeValueWarnings, takeValueWarningTags] = ...
+    checktakevalue(hedMaps, originalTags, formattedTags);
+warnings = [capWarnings slashWarnings takeValueWarnings];
+warningTags = [capWarningTags slashWarningTags takeValueWarningTags];
 end % checkwarnings

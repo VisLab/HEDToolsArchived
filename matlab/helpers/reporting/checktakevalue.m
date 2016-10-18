@@ -137,7 +137,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         unitClasses = hedMaps.unitClass(lower(unitClassTag));
         unitClasses = textscan(unitClasses, '%s', 'delimiter', ',', ...
             'multipleDelimsAsOne', 1)';
-        unitClassDefault = hedMaps.default(lower(unitClasses{1}{1}));
+%         unitClassDefault = hedMaps.default(lower(unitClasses{1}{1}));
         unitClassUnits = hedMaps.unitClasses(lower(unitClasses{1}{1}));
         numUnitClasses = size(unitClasses{1}, 1);
         for a = 2:numUnitClasses
@@ -147,7 +147,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         unitsRegexp = buildUnitsRegexp(unitClassUnits);
         if all(ismember(tagName, '<>=.0123456789'))
             generateWarnings(originalTag, unitIndex, isGroup, ...
-                'unitClass', unitClassDefault)
+                'unitClass', unitClassUnits)
         end
         if isempty(regexpi(tagName, unitsRegexp))
             generateErrors(originalTag, unitIndex, isGroup, ...
@@ -160,8 +160,8 @@ checkTakesValueTags(originalTags, formattedTags, false);
         % Generates takes value and unit class tag errors
         tagString = originalTag{valueIndex};
         if isGroup
-            tagString = [originalTag{valueIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTag),')'];
+            tagString = [originalTag{valueIndex}, ' in group ' ,...
+                vTagList.stringifyElement(originalTag)];
         end
         errors = [errors, generateerror(errorType, '', tagString, '', ...
             unitClassUnits)];
@@ -169,15 +169,15 @@ checkTakesValueTags(originalTags, formattedTags, false);
     end % generateErrors
 
     function generateWarnings(originalTag, valueIndex, isGroup, ...
-            warningType, unitClassDefault)
+            warningType, unitClassUnits)
         % Generates takes value and unit class tag errors
         tagString = originalTag{valueIndex};
         if isGroup
-            tagString = [originalTag{valueIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTag),')'];
+            tagString = [originalTag{valueIndex}, ' in group ' ,...
+                vTagList.stringifyElement(originalTag)];
         end
         warnings = [warnings, generatewarning(warningType, '', ...
-            tagString, unitClassDefault)];
+            tagString, unitClassUnits)];
         warningTags{end+1} = originalTag{valueIndex};
     end % generateWarnings
 

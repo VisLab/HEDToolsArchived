@@ -68,7 +68,8 @@ eData = writeSummaryTags(fMap, eData, tFields);
 
     function eData = writeIndividualTags(eData, fMap, eFields, ...
             preservePrefix)
-        % Write tags to individual events in usertags field
+        % Write tags to individual events in usertags field (this needs to
+        % be optimized)
         primaryField = fMap.getPrimaryField();
         eFields = setdiff(eFields, primaryField);
         hasHEDTags = isfield(eData.event, 'hedtags');
@@ -104,6 +105,16 @@ eData = writeSummaryTags(fMap, eData, tFields);
             end
         end
     end % writeIndividualTags
+
+%     function writeUserTags()
+%         primaryField = fMap.getPrimaryField();
+%         tMap = getMap(obj, primaryField);
+%         eCodes = tMap.getCodes();
+%         numCodes = length
+%         for 
+%         tags = getTags(obj, field, value)
+%         
+%     end
 
     function uTagsString = addGroupTags(uTags)
         % Add group tags to event

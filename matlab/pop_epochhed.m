@@ -34,8 +34,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [EEG, indices, com] = pop_epochhed(EEG)
+indices = [];
 com = '';
-
 % Display help if inappropriate number of arguments
 if nargin < 1
     help pop_epochhed;

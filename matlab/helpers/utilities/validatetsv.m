@@ -157,7 +157,7 @@ issues = validate(p);
                 for a = 1:numErrors-1
                     fprintf(fileId, '%s\n', p.issues{a});
                 end
-                fprintf(fileId, '%s', strtrim(p.issues{numErrors}));               
+                fprintf(fileId, '%s', strtrim(p.issues{numErrors}));
             else
                 fprintf(fileId, 'No issues were found.');
             end
@@ -172,26 +172,33 @@ issues = validate(p);
         % Creates a replace file containing all unique tags that generated
         % issues
         if isempty(p.replaceFile)
-            fileId = write2ReplaceFile(p);
+            write2ReplaceFile(p);
         else
-            fileId = append2ReplaceFile(p);
+            append2ReplaceFile(p);
         end
-        fclose(fileId);
+
     end % createReplaceFile
 
     function fileId = write2ReplaceFile(p)
         % Creates and writes to a new replace file
         numReplaceTags = length(p.replaceTags);
-        replaceFile = fullfile(p.outDir, [p.file '_replace' p.replaceExt]);
-        try
-        fileId = fopen(replaceFile,'w');
-        fprintf(fileId, '%s', p.replaceTags{1});
-        for a = 2:numReplaceTags
-            fprintf(fileId, '\n%s', p.replaceTags{a});
-        end
-        catch 
-            throw(MException('validatetsv:cannotWrite', ...
-                'Cannot write to replace file %d', lineNumber));
+        if (numReplaceTags > 0)
+            replaceFile = fullfile(p.outDir, ...
+                [p.file '_replace' p.replaceExt]);
+            try
+                fileId = fopen(replaceFile,'w');
+                fprintf(fileId, '%s', p.replaceTags{1});
+                for a = 2:numReplaceTags
+                    fprintf(fileId, '\n%s', p.replaceTags{a});
+                end
+                fclose(fileId);
+            catch
+                if (fileId ~= 1)
+                    fclose(fileId);
+                end
+                throw(MException('validatetsv:cannotWrite', ...
+                    'Cannot write to replace file'));
+            end
         end
     end % write2ReplaceFile
 
@@ -204,11 +211,20 @@ issues = validate(p);
         if ~strcmp(dir, replaceFileDir)
             copyfile(p.replaceFile, replaceFile);
         end
-        fileId = fopen(replaceFile,'a');
-        for a = 1:numMapTags
-            if ~replaceMap.isKey(lower(p.replaceTags{a}))
-                fprintf(fileId, '\n%s', p.replaceTags{a});
+        try
+            fileId = fopen(replaceFile,'a');
+            for a = 1:numMapTags
+                if ~replaceMap.isKey(lower(p.replaceTags{a}))
+                    fprintf(fileId, '\n%s', p.replaceTags{a});
+                end
             end
+            fclose(fileId);
+        catch
+            if (fileId ~= 1)
+                fclose(fileId);
+            end
+            throw(MException('validatetsv:cannotWrite', ...
+                'Cannot write to replace file'));
         end
     end % append2ReplaceFile
 
