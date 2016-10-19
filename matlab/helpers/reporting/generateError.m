@@ -53,25 +53,20 @@ switch(type)
     case 'event'
         error = sprintf('Errors in event %s:\n', num2str(line));
     case 'isNumeric'
-        error = sprintf(['\t"%s" should have a number, and optionally' ...
-            ' a unit as the leaf string\n'], tag);
+        error = sprintf('\tERROR: Invalid numeric tag - "%s"\n', tag);
     case 'line'
         error = sprintf('Errors on line %s:\n', num2str(line));
     case 'required'
-        error = sprintf(['\tA tag with the prefix "%s" is required in' ...
-            ' every event but was not found in this event\n'], ...
-            tag);
+        error = sprintf('\tERROR: Tag with prefix "%s" is required\n', tag);
     case 'requireChild'
-        error = sprintf('\t"%s" should have a child string\n', tag);
+        error = sprintf('\tERROR: Descendant tag required - "%s"\n', tag);
     case 'valid'
-        error = sprintf('\t"%s" is not a valid HED tag\n', tag);
+        error = sprintf('\tERROR: Invalid HED tag - "%s"\n', tag);
     case 'tilde'
-        error = sprintf('\tgroup "%s" can have at most 2 tildes\n', tag);
+        error = sprintf('\tERROR: Too many tildes - group "%s"\n', tag);
     case 'unique'
-        error = sprintf(['\t"%s" is part of the unique tag set' , ...
-            ' starting with "%s" and has appeared more than once in' , ...
-            ' this tag group\n'], tag, prefix);
+        error = sprintf('\tERROR: Multiple unique tags (prefix "%s") - "%s"\n', prefix, tag);
     case 'unitClass'
-        error = sprintf('\t"%s" should have one of "%s" as a unit', ...
-            tag, units);
+        error = sprintf('\tERROR: Invalid unit (pick one of units "%s") - "%s"\n', ...
+            units, tag);
 end % generateerror

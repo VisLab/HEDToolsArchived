@@ -89,20 +89,22 @@ eData = writeSummaryTags(fMap, eData, tFields);
                         preservePrefix);
                 end
             end
-            if isempty(uTags)
-                eData.event(k).usertags = '';
-            elseif ischar(uTags)
-                eData.event(k).usertags = uTags;
-            else
-                eData.event(k).usertags = addGroupTags(uTags);
-            end
-            if isempty(hTags)
-                eData.event(k).hedtags = '';
-            elseif ischar(hTags)
-                eData.event(k).hedtags = hTags;
-            else
-                eData.event(k).hedtags = addGroupTags(hTags);
-            end
+            eData.event(k).usertags = sorttags(tagList.stringify(uTags));
+            eData.event(k).hedtags = tagList.stringify(hTags);
+%             if isempty(uTags)
+%                 eData.event(k).usertags = '';
+%             elseif ischar(uTags)
+%                 eData.event(k).usertags = uTags;
+%             else
+%                 eData.event(k).usertags = addGroupTags(uTags);
+%             end
+%             if isempty(hTags)
+%                 eData.event(k).hedtags = '';
+%             elseif ischar(hTags)
+%                 eData.event(k).hedtags = hTags;
+%             else
+%                 eData.event(k).hedtags = addGroupTags(hTags);
+%             end
         end
     end % writeIndividualTags
 

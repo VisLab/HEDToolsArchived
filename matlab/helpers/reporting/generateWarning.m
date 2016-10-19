@@ -41,9 +41,8 @@ function warning = generatewarning(type, line, tag, units)
 warning = '';
 switch(type)
     case 'cap'
-        warning = sprintf(['\tEach slash-separated string in "%s"' ...
-            ' should only have the first letter captilized or be camel' ...
-            ' case\n'], tag);
+        warning = sprintf(['\tWARNING: First word not captilized or camel ' ...
+            'case - %s\n'], tag);
     case 'correct'
         warning = sprintf('No warnings were found.');
     case 'event'
@@ -51,8 +50,7 @@ switch(type)
     case 'line'
         warning = sprintf('Warnings on line %s:\n', num2str(line));
     case 'slash'
-        warning = sprintf('\t"%s" should not start or end with a slash\n', tag);
+        warning = sprintf('\tWARNING: Slash at beginning and/or end - "%s"\n', tag);
     case 'unitClass'
-        warning = sprintf(['\t No units were specified for "%s" so the' ...
-            ' unit %s is being used by default\n'], tag, units);
+        warning = sprintf('\tWARNING: No unit specified (pick one of units "%s") - "%s"\n', units, tag);
 end % generatewarning
