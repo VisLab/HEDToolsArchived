@@ -2,8 +2,9 @@ function tMap = extracttags(events, valueField)
 % Extract a tagmap from the usertags in the event structure.
 parseArguments();
 tMap = tagMap();
+positions = arrayfun(@(x) ~isempty(x.(valueField)), events); 
 values = extractfield(events, valueField);
-tags = extractfield(events, 'usertags');
+tags = extractfield(events(positions), 'usertags');
 if iscell(values)
     values = cellfun(@num2str, values, 'UniformOutput', false);
 else

@@ -91,59 +91,9 @@ eData = writeSummaryTags(fMap, eData, tFields);
             end
             eData.event(k).usertags = sorttags(tagList.stringify(uTags));
             eData.event(k).hedtags = tagList.stringify(hTags);
-%             if isempty(uTags)
-%                 eData.event(k).usertags = '';
-%             elseif ischar(uTags)
-%                 eData.event(k).usertags = uTags;
-%             else
-%                 eData.event(k).usertags = addGroupTags(uTags);
-%             end
-%             if isempty(hTags)
-%                 eData.event(k).hedtags = '';
-%             elseif ischar(hTags)
-%                 eData.event(k).hedtags = hTags;
-%             else
-%                 eData.event(k).hedtags = addGroupTags(hTags);
-%             end
         end
     end % writeIndividualTags
 
-%     function writeUserTags()
-%         primaryField = fMap.getPrimaryField();
-%         tMap = getMap(obj, primaryField);
-%         eCodes = tMap.getCodes();
-%         numCodes = length
-%         for 
-%         tags = getTags(obj, field, value)
-%         
-%     end
-
-    function uTagsString = addGroupTags(uTags)
-        % Add group tags to event
-        uTagsString = '';
-        for l = 1:length(uTags)
-            if ischar(uTags{l})
-                uTagsString = [uTagsString ',' uTags{l}];  %#ok<AGROW>
-            else
-                tagGroup = uTags{l};
-                tagGroupString = '';
-                for m = 1:length(tagGroup)
-                    if strcmpi(tagGroup{m}, '~') || ...
-                            ((m-1) > 0 && strcmpi(tagGroup{m-1}, '~'))
-                        tagGroupString = ...
-                            [tagGroupString tagGroup{m}];  %#ok<AGROW>
-                    else
-                        tagGroupString = ...
-                            [tagGroupString ',' tagGroup{m}];  %#ok<AGROW>
-                    end
-                end
-                tagGroupString = regexprep(tagGroupString,',','', 'once');
-                tagGroupString = ['(' tagGroupString ')']; %#ok<AGROW>
-                uTagsString = [uTagsString ',' tagGroupString]; %#ok<AGROW>
-            end
-        end
-        uTagsString = regexprep(uTagsString,',','', 'once');
-    end % addGroupTags
 
     function eData = writeSummaryTags(fMap, eData, tFields)
         % Write summary tags in etc fields
