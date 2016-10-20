@@ -1,4 +1,5 @@
-% Converts a vector to string with colon operators.
+% Converts a vector to string with colon operators used for consecutive 
+% elements.
 %
 %   >> str = vector2str(num)
 %
@@ -29,23 +30,24 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function str = vector2str(num)
-str = '[]';
+str = '';
 if numel(num) > 0
     str = num2str(num(1));
     incrementStart = true;
     for a = 2:length(num)
         if num(a) - num(a-1) == 1
-            incrementStart = handleConsecutive(incrementStart);
+            [str, incrementStart] = handleConsecutive(str, incrementStart);
         else
-            incrementStart = handleNonConsecutive(num(a-1), num(a), ...
-                incrementStart);
+            [str, incrementStart] = handleNonConsecutive(str, ...
+                incrementStart, num(a-1), num(a));
         end
     end
-    handleLastIndex(num(length(num)), incrementStart);
+    str = handleLastIndex(str, incrementStart, num(length(num)));
+    str = ['[' str ']']; 
 end
 
-    function incrementStart = handleNonConsecutive(previous, current, ...
-            incrementStart)
+    function [str, incrementStart] = handleNonConsecutive(str, ...
+            incrementStart, previous, current)
         % Handles a number that is not a consecutive number
         if ~incrementStart
             str = [str num2str(previous)];
@@ -54,14 +56,14 @@ end
         incrementStart = true;
     end % handleNonConsecutive
 
-    function handleLastIndex(last, incrementStart)
+    function str = handleLastIndex(str, incrementStart, last)
         % Handles the last number in the vecor
         if ~incrementStart
             str = [str num2str(last)];
         end
     end % handleLastIndex
 
-    function incrementStart = handleConsecutive(incrementStart)
+    function [str, incrementStart] = handleConsecutive(str, incrementStart)
         % Handles a number that is a consecutive number
         if incrementStart
             str = [str ':'];

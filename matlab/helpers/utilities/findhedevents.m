@@ -67,22 +67,22 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function indices = findhedevents(data, varargin)
+function indices = findhedevents(data, tags, varargin)
 p = parseArguments(data, varargin{:});
-indices = [];
+% indices = [];
 if ischar(p.data)
     p.allTags = getTSVTags(p);
 else
     p.allTags = arrayfun(@concattags, data.event, 'UniformOutput', false);
 end
-if isempty(p.tags)
-    % Find all the unique tags in the events
-    uniqueTags = finduniquetags(p.allTags);
-    [canceled, p.tags] = hedsearch_input(uniqueTags);
-    if canceled
-        return;
-    end
-end
+% if isempty(p.tags)
+%     % Find all the unique tags in the events
+%     uniqueTags = finduniquetags(p.allTags);
+%     [canceled, p.tags] = hedsearch_input(uniqueTags);
+%     if canceled
+%         return;
+%     end
+% end
 indices = findMatches(p);
 
     function indices = findMatches(p)
@@ -173,9 +173,9 @@ indices = findMatches(p);
         p = inputParser();
         p.addRequired('data', @(x) ~isempty(x) && ...
             (ischar(x) ||isstruct(x)));
+        p.addRequired('tags', @ischar);
         p.addParamValue('columns', 2, @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
-        p.addParamValue('tags', '', @ischar);
         p.addParamValue('header', true, @islogical);
         p.parse(data, varargin{:});
         p = p.Results;

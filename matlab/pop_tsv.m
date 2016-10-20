@@ -57,11 +57,11 @@ createTabLayouts(tabs);
         % Creates the tab panels in the figure
         warning off all;
         tabs.tab1 = uitab('Parent', tabGroup, 'title', ...
-            'Validate');
+            'Validate HED Tags');
         tabs.tab2 = uitab('Parent', tabGroup, 'title', ...
-            'Find and Replace');
+            'Find and Replace HED Tags');
         tabs.tab3 = uitab('Parent', tabGroup, 'title', ...
-            'Updates');
+            'Check for Updates');
         warning on all;
     end % createTabs
 

@@ -71,9 +71,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [EEG, indices] = epochhed(EEG, tags, varargin)
-p = parseArguments();
-indices = findhedevents(EEG, 'tags', tags);
+function [EEG, indices] = epochhed(EEG, tags, timelim, varargin)
+p = parseArguments(EEG, tags, timelim, varargin{:});
+indices = intersect(findhedevents(EEG, 'tags', tags), p.eventindices);
 allLatencies = [EEG.event.latency];
 matchedLatencies = allLatencies(indices);
 [newtimelimts, acceptedEventIndecies, epochevent] = epochData();
@@ -169,25 +169,24 @@ checkBoundaryEvents();
         EEG = eeg_checkset(EEG, 'eventconsistency');
     end % modifyEvents
 
-    function p = parseArguments()
+    function p = parseArguments(EEG, tags, timelim, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
         p.addRequired('tags', @(x) ischar(x));
-        p.addParamValue('matchtype', 'Exact', ...
-            @(x) any(strcmpi({'Exact', 'Prefix'}, ...
-            x))); %#ok<NVREPL>
+        p.addRequired('timelim', @(x) isnumeric(x) && ...
+            numel(x) == 2);  
+        p.addParamValue('eventindices', 1:length(EEG.event), ...
+            @isnumeric); %#ok<NVREPL>
         p.addParamValue('newname', [EEG.setname ' epochs'], ...
             @(x) ischar(x)); %#ok<NVREPL>
-        p.addParamValue('timelim', [-1 2], ...
-            @(x) isnumeric(x) && numel(x) == 2);  %#ok<NVREPL>
         p.addParamValue('timeunit', 'points', ...
             @(x) any(strcmpi({'points', 'seconds'}, x))); %#ok<NVREPL>
         p.addParamValue('valuelim', [-inf inf], ...
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.addParamValue('verbose', 'on', ...
             @(x) any(strcmpi({'on', 'off'}, x)));  %#ok<NVREPL>
-        p.parse(EEG, tags, varargin{:});
+        p.parse(EEG, tags, timelim, varargin{:});
         p = p.Results;
     end % parseArguments
 
