@@ -41,11 +41,11 @@
 %
 % Examples:
 %
-%  Store a tab separated file 'BCI Data Specification.txt' with event types
-%  in column '1' and tags in columns '3','4','5','6' in a tagMap as field
-%  'type'.
+%  Store a tab-separated file 'BCI Data Specification.tsv' with event types
+%  in column '1' and HED tags in columns '3','4','5','6' in a tagMap 
+%  'tsvMap' as field 'type'.
 %
-%  s = tagtsv('BCI Data Specification.txt', 'fieldname', 'type' ...
+%  tsvMap = tagtsv('BCI Data Specification.tsv', 'fieldname', 'type' ...
 %  'eventColumn', 1, 'tagColumn', [3,4,5,6])
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
@@ -124,7 +124,7 @@ end
         parser.addRequired('filename', @(x) ~isempty(x) && ...
             ischar(filename));
         parser.addParamValue('fieldname', 'type', @(x) ~isempty(x) && ...
-            ischar(fieldname));
+            ischar(x));
         parser.addParamValue('eventColumn', 1, @(x) ~isempty(x) && ...
             isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
         parser.addParamValue('hasHeader', true, @islogical);
