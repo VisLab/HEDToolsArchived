@@ -90,7 +90,7 @@ for a = 1:numUniqueValues
     matches = positions(strcmpi(uniqueValues{a}, values));
     tList = getValue(tsvMap, uniqueValues{a});
     [EEG.event(matches).usetags] = ...
-        deal(tagList.stringify(tList.getTags()));
+        deal(sorttags(tagList.stringify(tList.getTags())));
 end
 
     function [values, positions] = getValues(p, EEG)
