@@ -3,9 +3,9 @@
 %
 % Usage:
 %
-%   >>  tsvMap = tagtsv(filename)
+%   >>  tsvMap = tsv2map(filename)
 %
-%   >>  tsvMap = tagtsv(filename, 'key1', 'value1', ...)
+%   >>  tsvMap = tsv2map(filename, 'key1', 'value1', ...)
 %
 % Input:
 %
@@ -66,7 +66,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function tsvMap = tagtsv(filename, varargin)
+function tsvMap = tsv2map(filename, varargin)
 p = parseArguments(filename, varargin{:});
 tsvMap = tagMap('Field', p.fieldname);
 lineNumber = 1;
@@ -134,4 +134,4 @@ end
         p = parser.Results;
     end % parseArguments
 
-end % tagtsv
+end % tsv2map
