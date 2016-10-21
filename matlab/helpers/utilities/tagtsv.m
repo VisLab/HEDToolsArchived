@@ -3,41 +3,52 @@
 %
 % Usage:
 %
-%   >>  tsvMap = tagtsv(filename, fieldname, eventColumn, tagColumns)
+%   >>  tsvMap = tagtsv(filename)
+%
+%   >>  tsvMap = tagtsv(filename, 'key1', 'value1', ...)
 %
 % Input:
 %
 %   Required:
 %
 %   filename
-%                    The name or full path to a tab-separated file.
+%                    The name (if added to the workspace) or full path
+%                    (if not added to the workspace) of a tab-separated
+%                    file.
+%
+%   Optional (key/value):
 %
 %   fieldname
 %                    The field name in the tagMap that is associated with
-%                    the values in a tab-separated file.
+%                    the values in a tab-separated file. The default value
+%                    is 'type'. 
 %
 %   eventColumn
 %                    The event column in the tab-separated file. This is a
-%                    scalar value.
+%                    scalar integer. The default value is 1 
+%                    (the first column). 
 %
-%   tagColumns
-%                    The tag columns in the tab-separated file. This can be
-%                    a scalar value or a vector. 
+%   tagColumn
+%                    The tag column(s) in the tab-separated file. This can
+%                    be a scalar integer or an integer vector. The default
+%                    value is 2 (the second column).
 %
 % Output:
 %
-%   tsvMap  
-%                    A cell array containing the field names to exclude.
+%   tsvMap
+%                    A tagMap containing the events and associated tags
+%                    from the tab-separated file.
 %
 % Examples:
 %
-%  s = tagtsv('BCI Data Specification.txt', 'type' 1, [3,4,5,6])
-%
-%  Store a tab separated file 'BCI Data Specification.txt' with events
+%  Store a tab separated file 'BCI Data Specification.txt' with event types
 %  in column '1' and tags in columns '3','4','5','6' in a tagMap as field
 %  'type'.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+%  s = tagtsv('BCI Data Specification.txt', 'fieldname', 'type' ...
+%  'eventColumn', 1, 'tagColumn', [3,4,5,6])
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -55,73 +66,72 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function tsvMap = tagtsv(filename, fieldname, eventColumn, tagColumns)
-p = parseArguments(filename, fieldname, eventColumn, tagColumns);
-s = tdfread(p.filename,'\t');
+function tsvMap = tagtsv(filename, varargin)
+p = parseArguments(filename, varargin{:});
 tsvMap = tagMap('Field', p.fieldname);
-if ~isempty(s)
-    colNames = fieldnames(s);
-    numRows = size(s.(colNames{1}),1);
-    for  rowNum = 1:numRows
-        event = readEvent(s, rowNum, colNames, p.eventColumn);
-        tags = readTags(s, rowNum, colNames, p.tagColumns);
-        if ~isempty(event) && ~strcmpi(event, 'NaN') && ~isempty(tags)
-            addTags2Map(tsvMap, event, tags);
-        end
+lineNumber = 1;
+try
+    fileId = fopen(p.filename);
+    [line, lineNumber] = checkFileHeader(p.hasHeader, fileId);
+    while ischar(line)
+        event = getLineValues(line, p.eventColumn);
+        tags = getLineValues(line, p.tagColumn);
+        addTags2Map(tsvMap, event, tags);
+        lineNumber = lineNumber + 1;
+        line = fgetl(fileId);
     end
+    if fileId ~= -1
+        fclose(fileId);
+    end
+catch ME
+    if fileId ~= -1
+        fclose(fileId);
+    end
+    throw(MException(ME.identifier, ...
+        sprintf('Line %d : %s', lineNumber, ME.message)));
 end
 
-    function addTags2Map(tsvTagMap, event, tags)
+    function addTags2Map(tsvMap, event, tags)
         % Adds tags to a TagMap
         tList = tagList(event);
         tList.addString(tags);
-        tsvTagMap.addValue(tList);
+        tsvMap.addValue(tList);
     end % addTags2Map
 
-    function p = parseArguments(filename, fieldname, eventColumn, ...
-            tagColumns)
+    function [line, lineNumber] = checkFileHeader(hasHeader, fileId)
+        % Checks to see if the file has a header and skips it if it does
+        lineNumber = 1;
+        line = fgetl(fileId);
+        if hasHeader
+            line = fgetl(fileId);
+            lineNumber = 2;
+        end
+    end % checkFileHeader
+
+    function values = getLineValues(line, column)
+        % Reads the column values on a tab-delimited line
+        delimitedLine = textscan(line, '%s', 'delimiter', '\t');
+        delimitedLineCount = 1:length(delimitedLine{1});
+        availableColumns = intersect(delimitedLineCount, column);
+        nonemptyColumns = availableColumns(~cellfun(@isempty, ...
+            delimitedLine{1}(availableColumns)));
+        values = strjoin(delimitedLine{1}(nonemptyColumns), ', ');
+    end % getLineValues
+
+    function p = parseArguments(filename, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
-        parser.addRequired('filename', @(x) (~isempty(x) && ischar(filename)));
-        parser.addRequired('fieldname', @(x) (~isempty(x) && ischar(fieldname)));
-        parser.addRequired('eventColumn', @(x) (~isempty(x) && ...
-            isa(x,'double') && length(x) == 1));
-        parser.addRequired('tagColumns', @(x) (~isempty(x) && ...
-            isa(x,'double') && length(x) >= 1));
-        parser.parse(filename, fieldname, eventColumn, tagColumns);
+        parser.addRequired('filename', @(x) ~isempty(x) && ...
+            ischar(filename));
+        parser.addParamValue('fieldname', 'type', @(x) ~isempty(x) && ...
+            ischar(fieldname));
+        parser.addParamValue('eventColumn', 1, @(x) ~isempty(x) && ...
+            isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
+        parser.addParamValue('hasHeader', true, @islogical);
+        parser.addParamValue('tagColumn', 2, @(x) ~isempty(x) && ...
+            isnumeric(x) && length(x) >= 1 && all(rem(x,1) == 0));
+        parser.parse(filename, varargin{:});
         p = parser.Results;
     end % parseArguments
-
-    function event = readEvent(s, rowNum, colNames, eventColumn)
-        % Reads the event column from a tab separated row
-        numCols = length(eventColumn);
-        for eventColumn = 1:numCols
-            if ~isempty(strtrim(num2str(s.(colNames{eventColumn(...
-                    eventColumn)})(rowNum,:))))
-                event = ...
-                    strtrim(num2str(s.(colNames{eventColumn(...
-                    eventColumn)})(rowNum,:)));
-            end
-        end
-        event = regexprep(event,',','', 'once');
-    end % readEvent
-
-    function tags = readTags(s, rowNum, colNames, tagColumns)
-        % Reads the tag columns from a tab separated row
-        numCols = length(tagColumns);
-        tags = '';
-        for tagColumn = 1:numCols
-            try
-                if ~isempty(strtrim(num2str(s.(colNames{tagColumns(...
-                        tagColumn)})(rowNum,:))))
-                    tags = [tags,',',strtrim(num2str(s.(...
-                        colNames{tagColumns(...
-                        tagColumn)})(rowNum,:)))]; %#ok<AGROW>
-                end
-            catch
-            end
-        end
-        tags = regexprep(tags,',','', 'once');
-    end % readTags
 
 end % tagtsv
