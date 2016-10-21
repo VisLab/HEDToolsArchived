@@ -28,6 +28,11 @@
 %                    scalar integer. The default value is 1 
 %                    (the first column). 
 %
+%   hasHeader
+%                   True (default) if the the tab-separated input file has
+%                   a header. The first row will not be validated otherwise
+%                   it will and this can generate issues.
+%
 %   tagColumn
 %                    The tag column(s) in the tab-separated file. This can
 %                    be a scalar integer or an integer vector. The default
