@@ -21,12 +21,12 @@
 %   fieldname
 %                    The field name in the tagMap that is associated with
 %                    the values in a tab-separated file. The default value
-%                    is 'type'. 
+%                    is 'type'.
 %
 %   eventColumn
 %                    The event column in the tab-separated file. This is a
-%                    scalar integer. The default value is 1 
-%                    (the first column). 
+%                    scalar integer. The default value is 1
+%                    (the first column).
 %
 %   hasHeader
 %                   True (default) if the the tab-separated input file has
@@ -47,7 +47,7 @@
 % Examples:
 %
 %  Store a tab-separated file 'BCI Data Specification.tsv' with event types
-%  in column '1' and HED tags in columns '3','4','5','6' in a tagMap 
+%  in column '1' and HED tags in columns '3','4','5','6' in a tagMap
 %  'tsvMap' as field 'type'.
 %
 %  tsvMap = tagtsv('BCI Data Specification.tsv', 'fieldname', 'type' ...
@@ -81,7 +81,9 @@ try
     while ischar(line)
         event = getLineValues(line, p.eventColumn);
         tags = getLineValues(line, p.tagColumn);
-        addTags2Map(tsvMap, event, tags);
+        if ~isempty(event)
+            addTags2Map(tsvMap, event, tags);
+        end
         lineNumber = lineNumber + 1;
         line = fgetl(fileId);
     end
