@@ -21,12 +21,12 @@
 %   fieldname
 %                    The field name in the tagMap that is associated with
 %                    the values in a tab-separated file. The default value
-%                    is 'type'. 
+%                    is 'type'.
 %
 %   eventColumn
 %                    The event column in the tab-separated file. This is a
-%                    scalar integer. The default value is 1 
-%                    (the first column). 
+%                    scalar integer. The default value is 1
+%                    (the first column).
 %
 %   hasHeader
 %                   True (default) if the the tab-separated input file has
@@ -47,7 +47,7 @@
 % Examples:
 %
 %  Store a tab-separated file 'BCI Data Specification.tsv' with event types
-%  in column '1' and HED tags in columns '3','4','5','6' in a tagMap 
+%  in column '1' and HED tags in columns '3','4','5','6' in a tagMap
 %  'tsvMap' as field 'type'.
 %
 %  tsvMap = tagtsv('BCI Data Specification.tsv', 'fieldname', 'type' ...
@@ -79,9 +79,11 @@ try
     fileId = fopen(p.filename);
     [line, lineNumber] = checkFileHeader(p.hasHeader, fileId);
     while ischar(line)
-        event = getLineValues(line, p.eventColumn);
-        tags = getLineValues(line, p.tagColumn);
-        addTags2Map(tsvMap, event, tags);
+        event = getLineValues(p, line, p.eventColumn, false);
+        tags = getLineValues(p, line, p.tagColumn, true);
+        if ~isempty(event)
+            addTags2Map(tsvMap, event, tags);
+        end
         lineNumber = lineNumber + 1;
         line = fgetl(fileId);
     end
@@ -113,9 +115,13 @@ end
         end
     end % checkFileHeader
 
-    function values = getLineValues(line, column)
+    function values = getLineValues(p, line, column, tag)
         % Reads the column values on a tab-delimited line
         delimitedLine = textscan(line, '%s', 'delimiter', '\t');
+        if tag
+            [delimitedLine{1}, column] = getSpecificColumns(p, ...
+                delimitedLine{1});
+        end
         delimitedLineCount = 1:length(delimitedLine{1});
         availableColumns = intersect(delimitedLineCount, column);
         nonemptyColumns = availableColumns(~cellfun(@isempty, ...
@@ -123,16 +129,76 @@ end
         values = strjoin(delimitedLine{1}(nonemptyColumns), ', ');
     end % getLineValues
 
+    function [delimitedLine, column] = getSpecificColumns(p, delimitedLine)
+        % Gets specific tag columns and appends the appropriate prefix to
+        % it if it's not present 
+        numColumns =  length(delimitedLine);
+        column = p.tagColumn;
+        if ~isempty(p.attributeColumn) && numColumns >= p.attributeColumn
+            delimitedLine{p.attributeColumn} = ...
+                appendPrefix(delimitedLine{p.attributeColumn}, ...
+                'Attribute/');
+            column = union(column, p.attributeColumn);
+        end
+        if ~isempty(p.categoryColumn) && numColumns >= p.categoryColumn
+            delimitedLine{p.categoryColumn} = ...
+                appendPrefix(delimitedLine{p.categoryColumn}, ...
+                'Event/Category/');
+            column = union(column, p.categoryColumn);
+        end
+        if ~isempty(p.descriptionColumn) && numColumns >= ...
+                p.descriptionColumn
+            delimitedLine{p.descriptionColumn} = ...
+                appendPrefix(delimitedLine{p.descriptionColumn}...
+                , 'Event/Description/');
+            column = union(column, p.descriptionColumn);
+        end
+        if ~isempty(p.labelColumn) && numColumns >= p.labelColumn
+            delimitedLine{p.labelColumn} = ...
+                appendPrefix(delimitedLine{p.labelColumn}, ...
+                'Event/Label/');
+            column = union(column, p.labelColumn);
+        end
+        if ~isempty(p.longnameColumn) && numColumns >= p.longnameColumn
+            delimitedLine{p.longnameColumn} = ...
+                appendPrefix(delimitedLine{p.longnameColumn}, ...
+                'Event/Long name/');
+            column = union(column, p.longnameColumn);
+        end
+    end % getSpecificColumns
+
+    function specificLine = appendPrefix(specificLine, specificStr)
+        % Appends a prefix to a tag column if it isn't present
+        if ~isempty(specificLine)
+            specificTags = textscan(specificLine, '%s', 'delimiter', ',');
+            pos = ~strncmpi(specificTags{1}, specificStr, ...
+                length(specificStr));
+            specificTags{1}(pos) = strcat(specificStr, ...
+                specificTags{1}(pos));
+            specificLine = strjoin(specificTags{1}, ', ');
+        end
+    end % appendPrefix
+
     function p = parseArguments(filename, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('filename', @(x) ~isempty(x) && ...
             ischar(filename));
-        parser.addParamValue('fieldname', 'type', @(x) ~isempty(x) && ...
-            ischar(x));
+        parser.addParamValue('attributeColumn', [], @(x) ~isempty(x) ...
+            && isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
+        parser.addParamValue('categoryColumn', [], @(x) ~isempty(x) ...
+            && isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
+        parser.addParamValue('descriptionColumn', [], @(x) ~isempty(x) ...
+            && isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
         parser.addParamValue('eventColumn', 1, @(x) ~isempty(x) && ...
             isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
+        parser.addParamValue('fieldname', 'type', @(x) ~isempty(x) && ...
+            ischar(x));
         parser.addParamValue('hasHeader', true, @islogical);
+        parser.addParamValue('labelColumn', [], @(x) ~isempty(x) && ...
+            isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
+        parser.addParamValue('longnameColumn', [], @(x) ~isempty(x) && ...
+            isnumeric(x) && length(x) == 1 && rem(x,1) == 0);
         parser.addParamValue('tagColumn', 2, @(x) ~isempty(x) && ...
             isnumeric(x) && length(x) >= 1 && all(rem(x,1) == 0));
         parser.parse(filename, varargin{:});
