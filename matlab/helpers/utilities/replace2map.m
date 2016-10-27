@@ -7,7 +7,7 @@
 %
 % Input:
 %
-%   replaceFile     
+%   replaceFile
 %                   The name or the path of the map file containing
 %                   the mappings of old tags to new tags. This
 %                   file is a two column tab-separated file with the old
@@ -15,7 +15,7 @@
 %                   column.
 % Output:
 %
-%   replaceMap  
+%   replaceMap
 %                   A Map object the contains the old to new tag
 %                   mappings from the HED replace file. The old tags will
 %                   be the keys and the new tags will be the values.
@@ -26,7 +26,7 @@
 %
 %                   replaceMap = replace2map('HED1To2Replace.txt')
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -66,15 +66,17 @@ replaceMap = putInMap(p);
                 if ~isempty(tLine)
                     [originalTag, replacementTag] = parseLine(tLine);
                     if ~isempty(originalTag) && ~isempty(replacementTag)
-                        replaceMap(lower(originalTag)) = replacementTag; 
+                        replaceMap(lower(originalTag)) = replacementTag;
                     end
                 end
                 tLine = fgetl(fileId);
             end
             fclose(fileId);
-        catch me
-            fclose(fileId);
-            rethrow(me);
+        catch ME
+            if fileId ~= -1
+                fclose(fileId);
+            end
+            throw(ME);
         end
     end % putInMap
 

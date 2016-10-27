@@ -176,7 +176,6 @@ issues = validate(p);
         else
             append2ReplaceFile(p);
         end
-
     end % createReplaceFile
 
     function fileId = write2ReplaceFile(p)

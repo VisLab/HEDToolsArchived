@@ -4,13 +4,13 @@
 %
 % Usage:
 %
-%   >>  replacetsv(remapFile, tsvFile, tagColumns)
+%   >>  replacetsv(replaceFile, tsvFile, tagColumns)
 %
-%   >>  replacetsv(remapFile, tsvFile, tagColumns, 'key1', 'value1', ...)
+%   >>  replacetsv(replaceFile, tsvFile, tagColumns, 'key1', 'value1', ...)
 %
 % Input:
 %
-%   remapFile
+%   replaceFile
 %                   The name or the path of the remap file containing
 %                   the mappings of old HED tags to new HED tags. This
 %                   file is a two column tab-delimited file with the old
@@ -49,7 +49,7 @@
 %                   replacetsv('HEDRemap.txt', ...
 %                   'Reward Two Back Study.txt', 4)
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -67,23 +67,23 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function replacetsv(remapFile, tsvFile, tagColumns, varargin)
-p = parseArguments(remapFile, tsvFile, tagColumns, varargin{:});
-output = '';
-remapMap = remap2Map(p.remapFile);
-wildCardTags = getWildCardTags();
+function replacetsv(replaceFile, tsvFile, tagColumns, varargin)
+p = parseArguments(replaceFile, tsvFile, tagColumns, varargin{:});
+p.output = '';
+p.replaceMap = replace2map(p.replaceFile);
+p.wildCardTags = getWildCardTags(p);
 try
-    fileId = fopen(p.tsvFile);
-    tLine = checkForHeader(fileId);
-    while ischar(tLine)
-        readTags(tLine, tagColumns);
-        tLine = fgetl(fileId);
+    inputFileId = fopen(p.tsvFile);
+    [p.output, p.tLine] = checkForHeader(p, inputFileId);
+    while ischar(p.tLine)
+        p.output = readTags(p);
+        p.tLine = fgetl(inputFileId);
     end
-    fclose(fileId);
-    writeOutput(output)
-catch me
-    fclose(fileId);
-    rethrow(me);
+    fclose(inputFileId);
+    writeOutput(p)
+catch ME
+    fclose(inputFileId);
+    throw(ME);
 end
 
     function tagStr = cell2str(tags)
@@ -95,10 +95,11 @@ end
         end
     end % cell2str
 
-    function tLine = checkForHeader(fileId)
+    function [output, tLine] = checkForHeader(p, fileId)
         % Checks to see if the file has a header line
         tLine = fgetl(fileId);
         if p.hasHeader
+            output = sprintf('%s\n', tLine);
             tLine = fgetl(fileId);
         end
     end % checkForHeader
@@ -113,17 +114,17 @@ end
         end
     end % convertTag
 
-    function wildCardTags = getWildCardTags()
-        keys = remapMap.keys();
+    function wildCardTags = getWildCardTags(p)
+        keys = p.replaceMap.keys();
         wildCardTags = keys(cellfun(@(x) ~isempty(strfind(x, '*')), keys));
         wildCardTags = cellfun(@(x) x(1:end-1), ...
             wildCardTags, 'UniformOutput', false);
     end % getWildCardTags
 
-    function found = isWildCardTag(tag)
+    function found = isWildCardTag(p, tag)
         % Checks to see if tag is a wildcard tag
         matches = cellfun(@(x) strncmp(x, tag, length(x)), ...
-            wildCardTags);
+            p.wildCardTags);
         found = any(matches);
     end % isWildCardTag
 
@@ -147,78 +148,80 @@ end
         groupStr = [groupStr ')'];
     end % joinTagGroup
 
-    function p = parseArguments(remapFile, tsvFile, tagColumns, varargin)
+    function p = parseArguments(replaceFile, tsvFile, tagColumns, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('remapFile', @(x) ~isempty(x) && ischar(x));
+        p.addRequired('replaceFile', @(x) ~isempty(x) && ischar(x));
         p.addRequired('tsvFile', @(x) ~isempty(x) && ischar(x));
         p.addRequired('tagColumns', @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
         [path, file] = fileparts(tsvFile);
-        p.addParamValue('hasHeader', true, @islogical); 
+        p.addParamValue('hasHeader', true, @islogical);
         p.addParamValue('outputFile', ...
-            fullfile(path, [file '_replace.tsv']), ...
+            fullfile(path, [file '_update.tsv']), ...
             @(x) ~isempty(x) && ischar(x));
-        p.parse(remapFile, tsvFile, tagColumns, varargin{:});
+        p.parse(replaceFile, tsvFile, tagColumns, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function readTags(tLine, tagColumns)
+    function output = readTags(p)
         % Reads the tag columns from a tab-delimited row
-        splitLine = textscan(tLine, '%s', 'delimiter', '\t', ...
+        splitLine = textscan(p.tLine, '%s', 'delimiter', '\t', ...
             'multipleDelimsAsOne', 1)';
         numCols = size(splitLine{1}, 1);
         for a = 1:numCols
-            if ismember(a, tagColumns)
+            if ismember(a, p.tagColumns)
                 splitTags = splitLine{1}{a};
                 splitCellTags = hed2cell(splitTags, true);
-                replacedTags = remapTags(splitCellTags);
+                replacedTags = replaceTags(p, splitCellTags);
                 replacedTags = cell2str(replacedTags);
-                output = sprintf('%s%s\t', output, replacedTags);
+                p.output = sprintf('%s%s\t', p.output, replacedTags);
             else
-                output = sprintf('%s%s\t', output, splitLine{1}{a});
+                p.output = sprintf('%s%s\t', p.output, splitLine{1}{a});
             end
         end
-        output = sprintf('%s\n', output);
+        output = sprintf('%s\n', p.output);
     end % readTags
 
-    function remappedTags = remapTags(tags)
-        % Remaps the old tags with the new tags
-        remappedTags = {};
-        for a = 1:length(tags)
+    function replacedTags = replaceTags(p, tags)
+        % Replaces the old tags with the new tags
+        replacedTags = {};
+        numTags = length(tags);
+        for a = 1:numTags
             if iscellstr(tags{a})
-                remappedTags{end+1} = remapTags(tags{a}); %#ok<AGROW>
+                replacedTags{end+1} = replaceTags(p, tags{a}); %#ok<AGROW>
             else
-                if remapMap.isKey(lower(tags{a}))
-                    remappedTags{end+1} = ...
-                        remapMap(lower(tags{a}));   %#ok<AGROW>
-                elseif isWildCardTag(lower(tags{a}))
-                    remappedTags{end+1} = ...
+                if p.replaceMap.isKey(lower(tags{a}))
+                    replacedTags{end+1} = ...
+                        p.replaceMap(lower(tags{a}));   %#ok<AGROW>
+                elseif isWildCardTag(p, lower(tags{a}))
+                    replacedTags{end+1} = ...
                         replaceWildCardTag(lower(tags{a})); %#ok<AGROW>
                 else
-                    remappedTags{end+1} = tags{a}; %#ok<AGROW>
+                    replacedTags{end+1} = tags{a}; %#ok<AGROW>
                 end
             end
         end
-    end % remapTags
+    end % replaceTags
 
-    function replacementTag = replaceWildCardTag(tag)
+    function replacementTag = replaceWildCardTag(p, tag)
         % Replaces the wildcard tag with new remap tag
-        matchedTag = wildCardTags(cellfun(@(x) strncmp(x, tag, ...
-            length(x)), wildCardTags));
+        matchedTag = p.wildCardTags(cellfun(@(x) strncmp(x, tag, ...
+            length(x)), p.wildCardTags));
         matchedTag = matchedTag{1};
         numCharacters = length(matchedTag);
         restOfTag = tag(numCharacters+1:end);
-        valueTag = remapMap([matchedTag '*']);
+        valueTag = p.replaceMap([matchedTag '*']);
         replacementTag = strrep(valueTag, '*', restOfTag);
     end % replaceWildCardTag
 
-    function writeOutput(output)
+    function writeOutput(p)
         % Writes the output to the file
-        outputFile = p.outputFile;
-        fileId = fopen(outputFile,'w');
-        fprintf(fileId, '%s', output);
-        fclose(fileId);
+        outputFileId = fopen(p.outputFile,'w');
+        fprintf(outputFileId, '%s', p.output);
+        if outputFileId ~= -1
+            fclose(outputFileId);
+        end
     end % writeOutput
 
 end % replacetsv
