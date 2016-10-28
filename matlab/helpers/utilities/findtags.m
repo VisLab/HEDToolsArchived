@@ -23,6 +23,10 @@
 %                    A cell array containing the field names to extract
 %                    tags for.
 %
+%   'HedXML'         
+%                    Full path to a HED XML file. The default is the 
+%                    HED.xml file in the hed directory. 
+%
 %   'PreservePrefix'
 %                    If false (default), tags of the same event type that
 %                    share prefixes are combined and only the most specific
@@ -93,10 +97,11 @@ end
         % Initialized the field maps
         if hasXML(p)
             xml = p.edata.etc.tags.xml;
-            fMap = fieldMap('Xml', xml, 'PreservePrefix', p.PreservePrefix);
         else
-            fMap = fieldMap('PreservePrefix', p.PreservePrefix);
+            xml = fileread(p.HedXML);
         end
+        fMap = fieldMap('Xml', xml, 'PreservePrefix', ...
+            p.PreservePrefix);
     end % intializefMap
 
     function fMap = events2fMap(p)
@@ -171,6 +176,7 @@ end
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('HedXML', which('HED.xml'), @ischar);
         parser.addParamValue('PreservePrefix', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         parser.parse(edata, varargin{:});

@@ -57,6 +57,10 @@
 %                    A one-dimensional cell array of fields to tag. If this
 %                    parameter is non-empty, only these fields are tagged.
 %
+%   'HedXML'         
+%                    Full path to a HED XML file. The default is the 
+%                    HED.xml file in the hed directory. 
+%
 %   'PreservePrefix'
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
@@ -172,7 +176,8 @@ fprintf('Tagging was canceled\n');
             dirFields = union(dirFields, fieldnames(eegTemp.event));
             fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
                 p.PreservePrefix, 'ExcludeFields', ...
-                setdiff(p.ExcludeFields, p.Fields), 'Fields', {});
+                setdiff(p.ExcludeFields, p.Fields), 'Fields', {}, ...
+                'HedXML', p.HedXML);
             fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
         end
     end % findDirTags
@@ -211,6 +216,7 @@ fprintf('Tagging was canceled\n');
         parser.addParamValue('ExtensionsAllowed', true, @islogical);
         parser.addParamValue('ExtensionsAnywhere', false, @islogical);
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('HedXML', which('HED.xml'), @ischar);
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))

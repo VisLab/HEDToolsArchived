@@ -58,9 +58,17 @@
 %
 % Optional inputs:
 %
+%   'epochinfo'
+%                ['yes'|'no'] Propagate event information into the new
+%                epoch structure {default: 'yes'}
+%
 %   'eventindices'
 %                [integer vector] Extract data epochs time locked to the
 %                indexed event numbers.
+%
+%   'newname'
+%                [string] New dataset name {default: "[old_dataset]
+%                epochs"}
 %
 %   'valuelim'
 %                [min max] or [max]. Lower and upper bound latencies for
@@ -71,13 +79,12 @@
 %   'verbose'
 %                ['yes'|'no'] {default: 'yes'}
 %
-%   'newname'
-%                [string] New dataset name {default: "[old_dataset]
-%                epochs"}
+% deprecated
 %
-%   'epochinfo'
-%                ['yes'|'no'] Propagate event information into the new
-%                epoch structure {default: 'yes'}
+%   'timeunit'   Time unit ['seconds'|'points'] If 'seconds,' consider
+%                events times to be in seconds. If 'points,' consider
+%                events as indices into the data array. The default is
+%                'points'.
 %
 % Outputs:
 %

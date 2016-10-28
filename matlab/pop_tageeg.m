@@ -52,7 +52,7 @@ end;
 
 % Get the input parameters
 [baseMap, canceled, extensionsAllowed, extensionsAnywhere, ...
-    preservePrefix, selectFields, useGUI] = tageeg_input();
+    hedXML, preservePrefix, selectFields, useGUI] = tageeg_input();
 if canceled
     return;
 end
@@ -60,8 +60,8 @@ end
 % Tag the EEG structure
 [EEG, fMap, canceled] = tageeg(EEG, 'BaseMap', baseMap, ...
     'ExtensionsAllowed', extensionsAllowed, 'ExtensionsAnywhere', ...
-    extensionsAnywhere, 'PreservePrefix', preservePrefix, ...
-    'SelectFields', selectFields, 'UseGUI', useGUI);
+    extensionsAnywhere, 'HedXML', hedXML, 'PreservePrefix', ...
+    preservePrefix, 'SelectFields', selectFields, 'UseGUI', useGUI);
 if canceled
     return;
 end
@@ -70,7 +70,8 @@ if fMap.getXmlEdited()
 [overwriteHED, saveHED, hedPath] = savehed_input();
 
 if overwriteHED
-   str2file(fMap.getXml(), which('HED.xml')); 
+   dir = fileparts(which('HED.xml'));
+   str2file(fMap.getXml(), fullfile(dir, 'HED_user.xml')); 
 end
 
 if saveHED && ~isempty(hedPath)

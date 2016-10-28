@@ -29,12 +29,13 @@
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]".
 %
+%   timelim    Epoch latency limits [start end] in seconds relative to
+%                the time-locking event. The default is [-1 2].
+%
 % Optional inputs:
 %
 %   'newname'    New dataset name. The default is "[old_dataset] epochs"
 %
-%   'timelim'    Epoch latency limits [start end] in seconds relative to
-%                the time-locking event. The default is [-1 2].
 %   'valuelim'   [min max] data limits. If one positive value is given,
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50] to remove artifactual epoch. The default is

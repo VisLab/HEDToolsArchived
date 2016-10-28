@@ -1,6 +1,6 @@
 function [overwriteHED, saveHED, hedPath] = savehed_input()
-checkText1 = 'Overwrite the original HED with the current';
-checkText2 = 'Save the current HED as a separate XML file';
+checkText1 = 'Create/Overwrite the user HED with the current';
+checkText2 = 'Save the current HED as a separate XML file (outside of HEDTools)';
 overwriteHED = false;
 saveHED = false;
 hedPath = '';
