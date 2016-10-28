@@ -48,22 +48,22 @@
 
 function fMap = findtags(edata, varargin)
 p = parseArguments(edata, varargin{:});
-% if  hasSummaryTags(p)
-%     fMap = etc2fMap(p);
-% else
+if  hasSummaryTags(p)
+    fMap = etc2fMap(p);
+else
     fMap = events2fMap(p);
-% end
+end
 
-%     function summaryFound = hasSummaryTags(p)
-%         % Returns true if there are summary tags found in the .etc field
-%         summaryFound = isfield(p.edata, 'etc') && ...
-%             isstruct(p.edata.etc) && ...
-%             isfield(p.edata.etc, 'tags') && ...
-%             isstruct(p.edata.etc.tags) && ...
-%             isfield(p.edata.etc.tags, 'map') && ...
-%             isstruct(p.edata.etc.tags.map) && ...
-%             isfield(p.edata.etc.tags.map, 'field');
-%     end % hasSummaryTags
+    function summaryFound = hasSummaryTags(p)
+        % Returns true if there are summary tags found in the .etc field
+        summaryFound = isfield(p.edata, 'etc') && ...
+            isstruct(p.edata.etc) && ...
+            isfield(p.edata.etc, 'tags') && ...
+            isstruct(p.edata.etc.tags) && ...
+            isfield(p.edata.etc.tags, 'map') && ...
+            isstruct(p.edata.etc.tags.map) && ...
+            isfield(p.edata.etc.tags.map, 'field');
+    end % hasSummaryTags
 
     function xmlFound = hasXML(p)
         % Returns true if there is a HED XML string found in the .etc field
@@ -75,19 +75,19 @@ p = parseArguments(edata, varargin{:});
             ischar(p.edata.etc.tags.xml);
     end % hasXML
 
-%     function fMap = etc2fMap(p)
-%         % Adds field values to the field maps from the .event and .etc
-%         % field
-%         fMap = intializefMap(p);
-%         etcFields = getEtcFields(p);
-%         eventFields = setdiff(getEventFields(p), etcFields);
-%         for k = 1:length(etcFields)
-%             fMap = addEtcValues(p, fMap, etcFields{k}, k);
-%         end
-%         for k = 1:length(eventFields)
-%             fMap = addEventValues(p, fMap, eventFields{k});
-%         end
-%     end % etc2fMap
+    function fMap = etc2fMap(p)
+        % Adds field values to the field maps from the .event and .etc
+        % field
+        fMap = intializefMap(p);
+        etcFields = getEtcFields(p);
+        eventFields = setdiff(getEventFields(p), etcFields);
+        for k = 1:length(etcFields)
+            fMap = addEtcValues(p, fMap, etcFields{k}, k);
+        end
+        for k = 1:length(eventFields)
+            fMap = addEventValues(p, fMap, eventFields{k});
+        end
+    end % etc2fMap
 
     function fMap = intializefMap(p)
         % Initialized the field maps
@@ -109,14 +109,14 @@ p = parseArguments(edata, varargin{:});
         end
     end % events2fMap
 
-%     function fMap = addEtcValues(p, fMap, eventField, index)
-%         % Adds the field values to the field maps from the .etc field
-%         if isempty(p.edata.etc.tags.map(index).values)
-%             addEventValues(p, index);
-%         else
-%             fMap.addValues(eventField, p.edata.etc.tags.map(index).values);
-%         end
-%     end % addEtcValues
+    function fMap = addEtcValues(p, fMap, eventField, index)
+        % Adds the field values to the field maps from the .etc field
+        if isempty(p.edata.etc.tags.map(index).values)
+            addEventValues(p, index);
+        else
+            fMap.addValues(eventField, p.edata.etc.tags.map(index).values);
+        end
+    end % addEtcValues
 
     function fMap = addEventValues(p, fMap, eventField)
         % Adds the field values to the field maps from the .event field
@@ -154,14 +154,14 @@ p = parseArguments(edata, varargin{:});
         end
     end % getEventFields
 
-%     function etcFields = getEtcFields(p)
-%         % Gets all of the event fields from the .etc field
-%         etcFields = {p.edata.etc.tags.map.field};
-%         etcFields = setdiff(etcFields, p.ExcludeFields);
-%         if ~isempty(p.Fields)
-%             etcFields = intersect(p.Fields, etcFields);
-%         end
-%     end % getEtcFields
+    function etcFields = getEtcFields(p)
+        % Gets all of the event fields from the .etc field
+        etcFields = {p.edata.etc.tags.map.field};
+        etcFields = setdiff(etcFields, p.ExcludeFields);
+        if ~isempty(p.Fields)
+            etcFields = intersect(p.Fields, etcFields);
+        end
+    end % getEtcFields
 
     function p = parseArguments(edata, varargin)
         % Parses the input arguments and returns the results

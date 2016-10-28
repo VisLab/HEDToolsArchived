@@ -117,10 +117,10 @@
 function [EEG, fMap, canceled] = tageeg(EEG, varargin)
 p = parseArguments(EEG, varargin{:});
 fMap = findtags(EEG, 'PreservePrefix', p.PreservePrefix, ...
-    'ExcludeFields', p.ExcludeFields, 'Fields', {});
+    'ExcludeFields', setdiff(p.ExcludeFields, p.Fields), 'Fields', {});
 fMap = mergeBaseTags(fMap, p.BaseMap);
-[fMap, fields, excluded, canceled] = extractSelectedFields(p, EEG, ...
-    fMap);
+
+[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap);
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'ExtensionsAllowed', ...
         p.ExtensionsAllowed, 'ExtensionsAnywhere', ...
@@ -135,16 +135,20 @@ end
 fprintf('Tagging was canceled\n');
 
     function [fMap, fields, excluded, canceled] = ...
-            extractSelectedFields(p, EEG, fMap)
+            extractSelectedFields(p, fMap)
         % Extract the selected fields from the fMap
-        if ~p.UseGui
-            p.SelectFields = false;
+        canceled = false;
+        fields = fMap.getFields();
+        if ~isempty(p.Fields)
+            fields = intersect(p.Fields, fields, 'stable');
         end
-        excluded = intersect(p.ExcludeFields, fieldnames(EEG.event));
-        [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
-            'ExcludeFields', excluded, 'Fields', p.Fields, ...
-            'PrimaryField', p.PrimaryField, 'SelectFields', ...
-            p.SelectFields);
+        excluded = setdiff(p.ExcludeFields, fields);
+        if p.UseGui && isempty(p.Fields) && p.SelectFields
+            [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
+                'ExcludeFields', {}, 'Fields', {}, ...
+                'PrimaryField', p.PrimaryField, 'SelectFields', ...
+                p.SelectFields);
+        end
     end % extractSelectedFields
 
     function EEG = write2EEG(p, EEG, fMap)
@@ -181,7 +185,7 @@ fprintf('Tagging was canceled\n');
             @(x) (iscellstr(x)));
         parser.addParamValue('ExtensionsAllowed', true, @islogical);
         parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {'type'}, @(x) (iscellstr(x)));
+        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))

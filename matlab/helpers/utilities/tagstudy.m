@@ -110,10 +110,9 @@ if isempty(fPaths)
     warning('tagstudy:nofiles', 'No files in study\n');
     return;
 end
-[fMap, studyFields] = findStudyTags(p, fPaths);
+fMap = findStudyTags(p, fPaths);
 fMap = mergeBaseTags(fMap, p.BaseMap);
-[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap, ...
-    studyFields);
+[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap);
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'ExtensionsAllowed', ...
         p.ExtensionsAllowed, 'ExtensionsAnywhere', ...
@@ -149,16 +148,20 @@ fprintf('Tagging was canceled\n');
     end % mergeBaseTags
 
     function [fMap, fields, excluded, canceled] = ...
-            extractSelectedFields(p, fMap, studyFields)
+            extractSelectedFields(p, fMap)
         % Extract the selected fields from the fMap
-        if ~p.UseGui
-            p.SelectFields = false;
+        canceled = false;
+        fields = fMap.getFields();
+        if ~isempty(p.Fields)
+            fields = intersect(p.Fields, fields, 'stable');
         end
-        excluded = intersect(p.ExcludeFields, studyFields);
-        [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
-            'ExcludeFields', excluded, 'Fields', p.Fields, ...
-            'PrimaryField', p.PrimaryField, 'SelectFields', ...
-            p.SelectFields);
+        excluded = setdiff(p.ExcludeFields, fields);
+        if p.UseGui && isempty(p.Fields) && p.SelectFields
+            [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
+                'ExcludeFields', {}, 'Fields', {}, ...
+                'PrimaryField', p.PrimaryField, 'SelectFields', ...
+                p.SelectFields);
+        end
     end % extractSelectedFields
 
     function [fMap, studyFields] = findStudyTags(p, fPaths)

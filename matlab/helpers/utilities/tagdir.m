@@ -129,10 +129,9 @@ if isempty(fPaths)
     warning('tagdir:nofiles', 'No files met tagging criteria\n');
     return;
 end
-[fMap, dirFields] = findDirTags(p, fPaths);
+fMap = findDirTags(p, fPaths);
 fMap = mergeBaseTags(fMap, p.BaseMap);
-[fMap, fields, excluded, canceled] = extractSelectedFields(p, ...
-    fMap, dirFields);
+[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap);
 if p.UseGui && ~canceled
     [fMap, canceled] = editmaps(fMap, 'ExtensionsAllowed', ...
         p.ExtensionsAllowed, 'ExtensionsAnywhere', ...
@@ -147,16 +146,20 @@ end
 fprintf('Tagging was canceled\n');
 
     function [fMap, fields, excluded, canceled] = ...
-            extractSelectedFields(p, fMap, dirFields)
-        % Exclude the appropriate tags from baseTags
-        if ~p.UseGui
-            p.SelectFields = false;
+            extractSelectedFields(p, fMap)
+        % Extract the selected fields from the fMap
+        canceled = false;
+        fields = fMap.getFields();
+        if ~isempty(p.Fields)
+            fields = intersect(p.Fields, fields, 'stable');
         end
-        excluded = intersect(p.ExcludeFields, dirFields);
-        [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
-            'ExcludeFields', excluded, 'Fields', p.Fields, ...
-            'PrimaryField', p.PrimaryField, 'SelectFields', ...
-            p.SelectFields);
+        excluded = setdiff(p.ExcludeFields, fields);
+        if p.UseGui && isempty(p.Fields) && p.SelectFields
+            [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
+                'ExcludeFields', {}, 'Fields', {}, ...
+                'PrimaryField', p.PrimaryField, 'SelectFields', ...
+                p.SelectFields);
+        end
     end % extractSelectedFields
 
     function [fMap, dirFields] = findDirTags(p, fPaths)
@@ -168,8 +171,8 @@ fprintf('Tagging was canceled\n');
             eegTemp = pop_loadset(fPaths{k});
             dirFields = union(dirFields, fieldnames(eegTemp.event));
             fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
-                p.PreservePrefix, 'ExcludeFields', p.ExcludeFields, ...
-                'Fields', {});
+                p.PreservePrefix, 'ExcludeFields', ...
+                setdiff(p.ExcludeFields, p.Fields), 'Fields', {});
             fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
         end
     end % findDirTags
@@ -207,7 +210,7 @@ fprintf('Tagging was canceled\n');
             @(x) (iscellstr(x)));
         parser.addParamValue('ExtensionsAllowed', true, @islogical);
         parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {'type'}, @(x) (iscellstr(x)));
+        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreservePrefix', false, @islogical);
         parser.addParamValue('PrimaryField', 'type', @(x) ...
             (isempty(x) || ischar(x)))

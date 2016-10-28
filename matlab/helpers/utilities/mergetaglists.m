@@ -3,7 +3,7 @@
 %
 % Usage:
 %
-%   >>  mergedList = merge_taglists(tList1, tList2, preservePrefix)
+%   >>  mergedList = mergetaglists(tList1, tList2, preservePrefix)
 %
 % Input:
 %
@@ -55,7 +55,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function mergedList = merge_taglists(tList1, tList2, ...
+function mergedList = mergetaglists(tList1, tList2, ...
     preservePrefix, varargin)
 p = parseArguments(tList1, tList2, preservePrefix, varargin{:});
 myMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
@@ -175,4 +175,4 @@ mergedList = myMap.values();
         end
     end % undoPrefix
 
-end % merge_taglists
+end % mergetaglists

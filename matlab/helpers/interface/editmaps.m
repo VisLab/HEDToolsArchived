@@ -86,7 +86,7 @@ canceled = p.canceled;
         if ~isempty(p.Fields)
             p.Fields = intersect(p.Fields, p.fMap.getFields(), 'stable');
         else
-            p.Fields = setdiff(p.fMap.getFields(), p.ExcludedFields);
+            p.Fields = setdiff(p.fMap.getFields(), p.ExcludeFields);
         end
         p.canceled = false;
         p.k = 1;

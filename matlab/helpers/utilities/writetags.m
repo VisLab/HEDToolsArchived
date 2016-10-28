@@ -59,7 +59,6 @@ if isfield(eData, 'event') && isstruct(eData.event)
         tFields = intersect(fieldnames(eData.event), ...
             setdiff(fMap.getFields(), p.ExcludeFields));
     end
-    %     eFields = intersect(fieldnames(eData.event), tFields);
     eData = writeIndividualTags(eData, fMap, tFields, p.PreservePrefix);
 else
     tFields = intersect(fMap.getFields(), p.Fields);
@@ -70,27 +69,14 @@ eData = writeSummaryTags(fMap, eData, tFields);
             preservePrefix)
         % Write tags to individual events in usertags field (this needs to
         % be optimized)
-        primaryField = fMap.getPrimaryField();
-        eFields = setdiff(eFields, primaryField);
-        hasHEDTags = isfield(eData.event, 'hedtags');
         for k = 1:length(eData.event)
-            uTags = fMap.getTags(primaryField, ...
-                    num2str(eData.event(k).(primaryField)));
-            hTags = {};
+            uTags = {};
             for l = 1:length(eFields)
                 tags = fMap.getTags(eFields{l}, ...
                     num2str(eData.event(k).(eFields{l})));
-                hTags = merge_taglists(hTags, tags, preservePrefix);
-                hTags = merge_taglists(hTags, uTags, preservePrefix, ...
-                    'Diff');
-                if hasHEDTags
-                    oldHTags = hed2cell(eData.event(k).hedtags, false);
-                    hTags = merge_taglists(hTags, oldHTags, ...
-                        preservePrefix);
-                end
+                uTags = mergetaglists(uTags, tags, preservePrefix);
             end
             eData.event(k).usertags = sorttags(tagList.stringify(uTags));
-            eData.event(k).hedtags = tagList.stringify(hTags);
         end
     end % writeIndividualTags
 

@@ -2,7 +2,7 @@
 %
 % Usage:
 %
-%   >>  mergedString = merge_tagstrings(string1, string2, preservePrefix)  
+%   >>  mergedString = mergetagstrings(string1, string2, preservePrefix)  
 %    
 %
 % Input:
@@ -55,16 +55,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function mergedString = merge_tagstrings(string1, string2, preservePrefix)
+function mergedString = mergetagstrings(string1, string2, preservePrefix)
 mergedString = '';
 if nargin < 3
-    warning('merge_tagstrings:NotEnoughArguments', ...
+    warning('mergetagstrings:NotEnoughArguments', ...
         'function must have at 3 arguments');
     return;
 end
 list1 = vTagList.deStringify(string1);
 list2 = vTagList.deStringify(string2);
-mergedList = merge_taglists(list1, list2, preservePrefix);
+mergedList = mergetaglists(list1, list2, preservePrefix);
 if isempty(mergedList)
     return;
 elseif ischar(mergedList)
@@ -72,4 +72,4 @@ elseif ischar(mergedList)
     return;
 end
 mergedString = vTagList.stringify(mergedList);
-end % merge_tagstrings
+end % mergetagstrings

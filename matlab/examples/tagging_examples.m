@@ -1,5 +1,8 @@
 % The file contains examples for tagging a EEG dataset and a directory of 
-% EEG datasets. 
+% EEG datasets. You want to tag datasets so that you can describe your
+% events in a standardized way that other researchers use. This allows
+% collaborators to search and extract events based on HED tags instead of
+% codes which only the person who produced the data knows what they mean.  
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
