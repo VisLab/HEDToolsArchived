@@ -10,6 +10,90 @@
 %
 %   >>  [fMap, fPaths, com] = pop_tagdir()
 %
+%   >>  [fMap, fPaths, com] = pop_tagdir(inDir)
+% 
+%   >>  [fMap, fPaths, com] = pop_tagdir(inDir, 'key1', value1 ...)
+%
+% Input:
+%
+%   Required:
+%
+%   inDir
+%                    A directory that contains similar EEG .set files.
+%
+%   Optional (key/value):
+%
+%   'BaseMap'
+%                    A fieldMap object or the name of a file that contains
+%                    a fieldMap object to be used to initialize tag
+%                    information.
+%
+%   'DoSubDirs'
+%                    If true (default), the entire inDir directory tree is
+%                    searched. If false, only the inDir directory is
+%                    searched.
+%
+%   'ExcludeFields'
+%                    A one-dimensional cell array of field names in the
+%                    .event substructure to ignore during the tagging
+%                    process. By default the following subfields of the
+%                    .event structure are ignored: .latency, .epoch,
+%                    .urevent, .hedtags, and .usertags. The user can
+%                    over-ride these tags using this name-value parameter.
+%
+%   'ExtensionsAllowed'
+%                    If true (default), the HED can be extended. If
+%                    false, the HED can not be extended. The
+%                    'ExtensionAnywhere argument determines where the HED
+%                    can be extended if extension are allowed.
+%
+%
+%   'ExtensionsAnywhere'
+%                    If true, the HED can be extended underneath all tags.
+%                    If false (default), the HED can only be extended where
+%                    allowed. These are tags with the 'extensionAllowed'
+%                    attribute or leaf tags (tags that do not have
+%                    children).
+%
+%   'Fields'
+%                    A one-dimensional cell array of fields to tag. If this
+%                    parameter is non-empty, only these fields are tagged.
+%
+%   'HedXML'         
+%                    Full path to a HED XML file. The default is the 
+%                    HED.xml file in the hed directory. 
+%
+%   'PreservePrefix'
+%                    If false (default), tags for the same field value that
+%                    share prefixes are combined and only the most specific
+%                    is retained (e.g., /a/b/c and /a/b become just
+%                    /a/b/c). If true, then all unique tags are retained.
+%
+%   'PrimaryField'
+%                    The name of the primary field. Only one field can be
+%                    the primary field. A primary field requires a label,
+%                    category, and a description. The default is the type
+%                    field.
+%
+%   'SaveDatasets'
+%                    If true, save the tags to the underlying
+%                    dataset files in the directory. If false (default),
+%                    do not save the tags to the underlying dataset files
+%                    in the directory.
+%
+%   'SaveMapFile'
+%                    A string representing the file name for saving the
+%                    final, consolidated fieldMap object that results from
+%                    the tagging process.
+%
+%   'SelectFields'
+%                    If true (default), the user is presented with a
+%                    GUI that allow users to select which fields to tag.
+%
+%   'UseGui'
+%                    If true (default), the CTAGGER GUI is displayed after
+%                    initialization.
+%
 % Output:
 %
 %   fMap             A fieldMap object that contains the tag map
@@ -39,7 +123,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [fMap, fPaths, com] = pop_tagdir()
+function [fMap, fPaths, com] = pop_tagdir(inDir, varargin)
 fMap = '';
 fPaths = '';
 com = '';
@@ -54,8 +138,9 @@ end
 % Tag the EEG directory
 [fMap, fPaths, canceled] = tagdir(inDir, 'BaseMap', baseMap, ...
     'DoSubDirs', doSubDirs, 'ExtensionsAllowed', extensionsAllowed, ...
-    'ExtensionsAnywhere', extensionsAnywhere, 'PreservePrefix', ...
-    preservePrefix, 'SelectFields', selectFields, 'UseGUI', useGUI);
+    'ExtensionsAnywhere', extensionsAnywhere, 'HedXML', hedXML, ...
+    'PreservePrefix', preservePrefix, 'SelectFields', selectFields, ...
+    'UseGUI', useGUI);
 if canceled
     return;
 end
