@@ -29,10 +29,15 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function version = downloadhed()
+function [hedVersion, wikiPath] = downloadhed()
 wikiURL = ['https://raw.githubusercontent.com/wiki/BigEEGConsortium/' ...
     'HED/HED-Schema.mediawiki'];
-wikiPath = [tempdir 'temp.mediawiki'];
+if exist(tempdir, 'dir')
+    theDir = tempdir;
+else
+    theDir = pwd;
+end
+wikiPath = [theDir 'temp.mediawiki'];
 urlwrite(wikiURL, wikiPath);
-version = getwikiversion(wikiPath);
+hedVersion = getwikiversion(wikiPath);
 end % downloadhed

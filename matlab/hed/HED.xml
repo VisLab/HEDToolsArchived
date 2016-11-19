@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="3.0.3">
+<HED version="4.0.0">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -244,8 +244,16 @@
          </node>
       </node>
       <node predicateType="propertyOf">
-         <name>Sequence group ID</name>
-         <description>A number or string label that uniquely identifies a group of events associated with each other such as an answer to a question that is possibly interleaved by other events.</description>
+         <name>ID</name>
+         <description>A number or string label that uniquely identifies an event instance from all others in the recording (a UUID is strongly preferred).</description>
+         <node takesValue="true">
+            <name>#</name>
+            <description>ID of the event</description>
+         </node>
+      </node>
+      <node predicateType="propertyOf">
+         <name>Group ID</name>
+         <description>A number or string label that uniquely identifies a group of events associated with each other.</description>
          <node takesValue="true">
             <name>#</name>
             <description>ID of the group</description>
@@ -883,6 +891,20 @@
          <node>
             <name>Inappropriate</name>
             <description>A choice that is not allowed such as moving a chess piece to a location it should not go based on game rules</description>
+         </node>
+      </node>
+      <node>
+         <name>Response start delay</name>
+         <description>The time interval between this (stimulus) event and the start of the response event specified, usually by grouping with the event ID of the response start event.</description>
+         <node takesValue="true" unitClass="time">
+            <name>#</name>
+         </node>
+      </node>
+      <node>
+         <name>Response end delay</name>
+         <description>The time interval between this (stimulus) event and the end of the response event specified, usually by grouping with the event ID of the response end event.</description>
+         <node takesValue="true" unitClass="time">
+            <name>#</name>
          </node>
       </node>
       <node>
@@ -2886,7 +2908,7 @@
    </node>
    <node requireChild="true">
       <name>Custom</name>
-      <description>This node can be used to organize events in an alternative (parallel) hierarchy. Uou can define your custom tags and hierarchies without any restriction under this node. These tags will still be matched to each other as for example  /Custom/Dance/Waltz is considered a subtype of /Custom/DanceExample.</description>
+      <description>This node can be used to organize events in an alternative (parallel) hierarchy. You can define your custom tags and hierarchies without any restriction under this node. These tags will still be matched to each other as for example  /Custom/Dance/Waltz is considered a subtype of /Custom/DanceExample.</description>
    </node>
    <node requireChild="true">
       <name>HED</name>
@@ -3236,6 +3258,9 @@
       </node>
       <node>
          <name>Imagined objects-scenes</name>
+      </node>
+      <node>
+         <name>Instructed movement</name>
       </node>
       <node>
          <name>Immediate recall test</name>

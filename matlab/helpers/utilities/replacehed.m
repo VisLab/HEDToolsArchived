@@ -23,14 +23,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function replacehed()
+function replacehed(wikiPath)
 HED = 'HED.xml';
-wikiPath = [tempdir 'temp.mediawiki'];
 hedAttributes = 'HEDMaps.mat';
 hedPath = which(HED);
 hedMapsPath = strrep(hedPath, HED, hedAttributes);
 wiki2xml(wikiPath, hedPath);
-delete(wikiPath);
 hedMaps = mapattributes(hedPath); %#ok<NASGU>
 save(hedMapsPath, 'hedMaps');
 end % replacehed
