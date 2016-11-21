@@ -15,14 +15,16 @@ try
     else
         theDir = tempdir;
     end
-    evalin('base', 'save([theDir ''tmp.mat''], ''-mat'');');
+        saveExp = sprintf('save(%s, ''-mat'');', ['''' theDir 'tmp.mat' '''']);
+    loadExp = sprintf('load(%s, ''-mat'');', ['''' theDir 'tmp.mat' '''']);
+    evalin('base', saveExp);
     tPath = fileparts(which('eegplugin_hedtools.m'));
     jarPath = [tPath filesep 'jars' filesep];  % With jar
     
     javaaddpath([jarPath 'ctagger.jar']);
     javaaddpath([jarPath 'jackson.jar']);
     javaaddpath([jarPath 'hedconversion.jar']);
-    evalin('base', 'load([theDir ''tmp.mat''], ''-mat'');');
+    evalin('base', loadExp);
     delete([theDir 'tmp.mat']);    
 catch mex   
     warning('HEDTools: Could not add supporting Java tools to path');

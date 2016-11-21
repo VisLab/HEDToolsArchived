@@ -46,39 +46,6 @@ end;
 
 % Find the path of the current directory
 addhedpaths();
-% tmp = which('tageeg');
-% if isempty(tmp)
-%     myPath = fileparts(which('pop_tageeg.m'));
-%     addpath(genpath(myPath));
-% end;
-% tPath = fileparts(which('eegplugin_hedtools.m'));
-% %tPath = strrep(tPath, [filesep 'eegplugin_hedtools.m'], '');
-% % 
-% % % Add hedtools folders to path if they aren't already there
-% % if ~exist('eegplugin_hedtools-subfoldertest.m', 'file')  % Dummy file to make sure not added
-% %     addpath(genpath(tPath));  % Add all subfolders to path too
-% % end;
-% 
-% % Add the jar files needed to run this
-% jarPath = [tPath filesep 'jars' filesep];  % With jar
-% % warning off all;
-% % if ~exist(tempdir, 'dir')
-% %     warning('HEDTools: Your system does not have a temporary directory defined');
-% %     theDir = pwd; %#ok<*NASGU>
-% % else
-% %     theDir = tempdir;
-% % end
-% % evalin('base', 'save([theDir ''tmp.mat''], ''-mat'');');
-% try
-%     javaaddpath([jarPath 'ctagger.jar']);
-%     javaaddpath([jarPath 'jackson.jar']);
-%     javaaddpath([jarPath 'hedconversion.jar']);
-% catch mex   %#ok<NASGU>
-%     warning('HEDTools: Could not add supporting Java tools to path');
-% end
-% % evalin('base', 'load([theDir ''tmp.mat''], ''-mat'');');
-% % delete([theDir 'tmp.mat']);
-% warning on all;
 
 % Find 'Edit' in the figure 
 parentMenu = findobj(fig, 'Label', 'Edit');
