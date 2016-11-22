@@ -98,12 +98,13 @@ end
         % particular field
         positions = ...
             find(arrayfun(@(x) ~isempty(x.(p.fieldname)), EEG.event));
-        values = extractfield(EEG.event(positions), p.fieldname);
-        if iscell(values)
-            values = cellfun(@num2str, values, 'UniformOutput', false);
-        else
-            values = arrayfun(@num2str, values, 'UniformOutput', false);
-        end
+        values = {EEG.event(positions).(p.fieldname)};
+        values = cellfun(@num2str, values, 'UniformOutput', false);
+%         if iscell(values)
+%             values = cellfun(@num2str, values, 'UniformOutput', false);
+%         else
+%             values = arrayfun(@num2str, values, 'UniformOutput', false);
+%         end
     end % getValues
 
     function p = parseArguments(EEG, filename, varargin)

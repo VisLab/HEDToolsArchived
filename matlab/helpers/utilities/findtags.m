@@ -23,9 +23,9 @@
 %                    A cell array containing the field names to extract
 %                    tags for.
 %
-%   'HedXML'         
-%                    Full path to a HED XML file. The default is the 
-%                    HED.xml file in the hed directory. 
+%   'HedXML'
+%                    Full path to a HED XML file. The default is the
+%                    HED.xml file in the hed directory.
 %
 %   'PreservePrefix'
 %                    If false (default), tags of the same event type that

@@ -221,7 +221,7 @@ classdef tagList < hgsetget
             try
                 tlist = regexpi(tstring, ',(?![^\(]*\))', 'split');
                 % Remove empty cells
-                tlist = tlist(~cellfun(@isempty, tlist));
+                tlist = tlist(~cellfun('isempty', strtrim(tlist)));
                 for k = 1:length(tlist)
                     if ~isempty(regexpi(tlist{k}, '^\s*\(', 'once'))
                         tlist{k} = regexprep(tlist{k}, '[\(\)]', '');
