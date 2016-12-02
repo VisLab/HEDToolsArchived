@@ -22,15 +22,11 @@
 %                    A cell array containing the field names to extract
 %                    tags for.
 %
-%   'PrimaryField'
+%   'PrimaryEventField'
 %                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
 %                    category, and a description. The default is the type
 %                    field.
-%
-%   'SelectFields'
-%                    If true (default), the user is presented with a
-%                    GUI that allow users to select which fields to tag.
 %
 % Output:
 %
@@ -62,41 +58,34 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [fMap, fields, excluded, canceled] = selectmaps(fMap, varargin)
+function [canceled, ignoredEventFields] = selectmaps(fMap, varargin)
 p = parseArguments(fMap, varargin{:});
-[fields, excluded, primaryField, canceled] = selectFields2Tag(p);
-fMap.setPrimaryMap(primaryField);
+[canceled, ignoredEventFields, primaryEventField] = selectFields2Tag(p);
+fMap.setPrimaryMap(primaryEventField);
 
-    function [taggedUserFields, excludedUserFields, primaryUserField, ...
-            canceled] = selectFields2Tag(p)
-        % Select fields to tag with a menu
-        inputTaggedFields = p.fMap.getFields();
-        if ~isempty(p.Fields)
-        inputTaggedFields = intersect(p.Fields, inputTaggedFields, ...
-            'stable');
-        end
-        inputExcludedFields = setdiff(p.ExcludeFields, inputTaggedFields);
+    function [canceled, ignoredEventFields, primaryEventField] = ...
+            selectFields2Tag(p)
+        % Select fields to ignore/tag with a menu
         canceled = false;
-        [sortedTaggedFields, inputPrimaryField] = ...
-            putPrimaryFirst(p.PrimaryField, inputTaggedFields);
-        [loader, submitted] = showSelectionMenu(inputExcludedFields, ...
-            sortedTaggedFields, inputPrimaryField);
-        taggedUserFields = cell(loader.getTagFields());
-        excludedUserFields = cell(loader.getExcludeFields());
-        primaryUserField = char(loader.getPrimaryField());
+        [loader, submitted] = showSelectionMenu({}, p.fMap.getFields(), ...
+            p.PrimaryEventField);
+        ignoredEventFields = cell(loader.getIgnoredFields());
+        primaryEventField = char(loader.getPrimaryField());
         if ~submitted
             canceled = true;
             return;
         end
     end % selectFields2Tag
 
-    function [loader, submitted] = showSelectionMenu(excluded, fields, ...
-            primaryField)
+    function [loader, submitted] = ...
+            showSelectionMenu(ignoredEventFields, taggedEventFields, ...
+            primaryEventField)
         % Show a java field selection menu
         fprintf('\n---Now select the fields you want to tag---\n');
-        title = 'Please select the fields that you would like to tag';
+        title = ['Please select the event fields that you would like' ...
+            ' to tag'];
         loader = javaObject('edu.utsa.tagger.FieldSelectLoader', title, ...
-            excluded, fields, primaryField);
+            ignoredEventFields, taggedEventFields, primaryEventField);
         [notified, submitted] = checkMenuStatus(loader);
         while (~notified)
             pause(0.5);
@@ -110,29 +99,13 @@ fMap.setPrimaryMap(primaryField);
         submitted = loader.isSubmitted();
     end % checkMenuStatus
 
-    function [fields, primaryField] = putPrimaryFirst(primaryField, fields)
-        % Moves the primary field to the beginning of the list of fields
-        if sum(strcmp(fields, primaryField)) == 0
-            primaryField = '';
-        else
-            pos = find(strcmp(fields, primaryField));
-            temp = fields{pos};
-            fields{pos} = fields{1};
-            fields{1} = temp;
-        end
-    end % putPrimaryFirst
-
     function p = parseArguments(fMap, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('fMap', @(x) (~isempty(x) && ...
             isa(x, 'fieldMap')));
-        parser.addParamValue('ExcludeFields', {}, ...
-            @(x) (iscellstr(x)));
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('PrimaryField', 'type', @(x) ...
+        parser.addParamValue('PrimaryEventField', 'type', @(x) ...
             (isempty(x) || ischar(x)))
-        parser.addParamValue('SelectFields', true, @islogical);
         parser.parse(fMap, varargin{:});
         p = parser.Results;
     end % parseArguments

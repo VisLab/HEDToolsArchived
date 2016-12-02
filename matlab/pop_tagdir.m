@@ -11,15 +11,10 @@
 %   >>  [fMap, fPaths, com] = pop_tagdir()
 %
 %   >>  [fMap, fPaths, com] = pop_tagdir(inDir)
-% 
+%
 %   >>  [fMap, fPaths, com] = pop_tagdir(inDir, 'key1', value1 ...)
 %
 % Input:
-%
-%   Required:
-%
-%   inDir
-%                    A directory that contains similar EEG .set files.
 %
 %   Optional (key/value):
 %
@@ -27,6 +22,14 @@
 %                    A fieldMap object or the name of a file that contains
 %                    a fieldMap object to be used to initialize tag
 %                    information.
+%
+%   'CopyDatasets'
+%                    If true, copy the datasets to the 'CopyDestination'
+%                    directory and write the HED tags to them.
+%
+%   'CopyDestination'
+%                    The full path of a directory to copy the original
+%                    datasets to and write the HED tags to them.
 %
 %   'DoSubDirs'
 %                    If true (default), the entire inDir directory tree is
@@ -59,9 +62,16 @@
 %                    A one-dimensional cell array of fields to tag. If this
 %                    parameter is non-empty, only these fields are tagged.
 %
-%   'HedXML'         
-%                    Full path to a HED XML file. The default is the 
-%                    HED.xml file in the hed directory. 
+%   'HedXML'
+%                    Full path to a HED XML file. The default is the
+%                    HED.xml file in the hed directory.
+%
+%   'InDir'
+%                    A directory that contains similar EEG .set files.
+%
+%   'OverwriteDatasets'
+%                    If true, write the the HED tags to the original
+%                    datasets.
 %
 %   'PreservePrefix'
 %                    If false (default), tags for the same field value that
@@ -123,74 +133,159 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [fMap, fPaths, com] = pop_tagdir(inDir, varargin)
+function [fMap, fPaths, com] = pop_tagdir(varargin)
 fMap = '';
 fPaths = '';
 com = '';
 
-% Get the input parameters
-[baseMap, canceled, doSubDirs, extensionsAllowed, extensionsAnywhere, ...
-    inDir, preservePrefix, selectFields, useGUI] = tagdir_input();
-if canceled
-    return;
-end
+p = parseArguments(varargin{:});
 
-% Tag the EEG directory
-[fMap, fPaths, canceled] = tagdir(inDir, 'BaseMap', baseMap, ...
-    'DoSubDirs', doSubDirs, 'ExtensionsAllowed', extensionsAllowed, ...
-    'ExtensionsAnywhere', extensionsAnywhere, 'HedXML', hedXML, ...
-    'PreservePrefix', preservePrefix, 'SelectFields', selectFields, ...
-    'UseGUI', useGUI);
-if canceled
-    return;
-end
-
-if fMap.getXmlEdited()
-    [overwriteHED, saveHED, hedPath] = savehed_input();
-    
-    if overwriteHED
-        str2file(fMap.getXml(), which('HED.xml'));
+% Call function with menu
+if p.UseGui
+    % Get the menu input parameters
+    menuInputArgs = getkeyvalue({'BaseMap', 'HedExtensionsAllowed', ...
+        'HedExtensionsAnywhere', 'HedXml', 'InDir', ...
+        'PreserveTagPrefixes', 'SelectEventFields', 'UseCTagger'}, ...
+        varargin{:});
+    [canceled, baseMap, doSubDirs, hedExtensionsAllowed, ...
+        hedExtensionsAnywhere, hedXml, inDir, preserveTagPrefixes, ...
+        selectEventFields, useCTagger] = ...
+        pop_tagdir_input(menuInputArgs{:});
+    menuOutputArgs = {'BaseMap', baseMap, 'DoSubDirs', doSubDirs, ...
+        'HedExtensionsAllowed', hedExtensionsAllowed, ...
+        'HedExtensionsAnywhere', hedExtensionsAnywhere, 'HedXml', ...
+        hedXml, 'InDir', inDir, 'PreserveTagPrefixes', ...
+        preserveTagPrefixes, 'SelectEventFields', selectEventFields, ...
+        'UseCTagger', useCTagger};
+    if canceled
+        return;
     end
     
-    if saveHED && ~isempty(hedPath)
-        str2file(fMap.getXml(), hedPath);
+    % Get tagdir input args
+    ignoreEventFields =  getkeyvalue({'EventFieldsToIgnore'}, varargin{:});
+    tagdirInputArgs = [getkeyvalue({'BaseMap', 'DoSubDirs', 'HedXml', ...
+        'PreserveTagPrefixes'}, menuOutputArgs{:}) ignoreEventFields];
+    
+    canceled = false;
+    
+    % Merge base map
+    [fMap, fPaths] = tagdir(inDir, tagdirInputArgs{:});
+    
+    % Get event field selection and tagging arguments
+    taggerMenuArgs = getkeyvalue({'SelectEventFields', 'UseCTagger'}, ...
+        menuOutputArgs{:});
+    selectEventFields = taggerMenuArgs{2};
+    useCTagger = taggerMenuArgs{4};
+    
+    % Select fields to tag
+    ignoredEventFields = {};
+    if useCTagger && selectEventFields
+        selectmapsInputArgs = getkeyvalue({'PrimaryEventField'}, ...
+            varargin{:});
+        [canceled, ignoredEventFields] = selectmaps(fMap, ...
+            selectmapsInputArgs{:});
+    else
+        fMap.setPrimaryMap(p.PrimaryEventField);
     end
+    selectmapsOutputArgs = {'EventFieldsToIgnore', ignoredEventFields};
+    
+    % Use CTagger
+    if useCTagger && ~canceled
+        editmapsInputArgs = [getkeyvalue({'HedExtensionsAllowed', ...
+            'HedExtensionsAnywhere', 'PreserveTagPrefixes'}, ...
+            menuOutputArgs{:}) selectmapsOutputArgs];
+        [fMap, canceled] = editmaps(fMap, editmapsInputArgs{:});
+    end
+    
+    if canceled
+        fprintf('Tagging was canceled\n');
+        return;
+    end
+    fprintf('Tagging complete\n');
+    
+    % Build command string
+    inputArgs = [menuOutputArgs ignoreEventFields];
+    
+    % Save HED if modified
+    if fMap.getXmlEdited()
+        savehedInputArgs = getkeyvalue({'OverwriteUserHed', ...
+            'SeparateUserHedFile', 'WriteSeparateUserHedFile'}, ...
+            varargin{:});
+        [fMap, overwriteUserHed, separateUserHedFile, ...
+            writeSeparateUserHedFile] = pop_savehed(fMap, ...
+            savehedInputArgs{:});
+        savehedOutputArgs = {'OverwriteUserHed', overwriteUserHed, ...
+            'SeparateUserHedFile', separateUserHedFile, ...
+            'WriteSeparateUserHedFile', writeSeparateUserHedFile};
+        inputArgs = [inputArgs savehedOutputArgs];
+    end
+    
+    % Save field map containing tags
+    savefmapInputArgs = getkeyvalue({'FMapDescription', ...
+        'FMapSaveFile', 'WriteFMapToFile'}, varargin{:});
+    [fMap, fMapDescription, fMapSaveFile] = ...
+        pop_savefmap(fMap, savefmapInputArgs{:});
+    savefmapOutputArgs = {'FMapDescription', fMapDescription, ...
+        'FMapSaveFile', fMapSaveFile};
+    
+    % Save datasets
+    saveheddatasetsInputArgs = getkeyvalue({'CopyDatasets', ...
+        'CopyDestination', 'OverwriteDatasets'}, varargin{:});
+    [fMap, copyDatasets, copyDestination, overwriteDatasets] = ...
+        pop_saveheddatasets(fMap, fPaths, saveheddatasetsInputArgs{:});
+    saveheddatasetsOutputArgs = {'CopyDatasets', copyDatasets, ...
+        'CopyDestination', copyDestination, 'OverwriteDatasets', ...
+        overwriteDatasets};
+    
+    % Build command string
+    inputArgs = [inputArgs savefmapOutputArgs saveheddatasetsOutputArgs];
 end
 
-[overwriteDatasets, savefMap, fMapPath, fMapDescription] = ...
-    savetags_input();
-
-if fMapDescription
-    fMap.setDescription(fMapDescription);
+% Call function without menu
+if nargin > 1 && ~p.UseGui
+    inputArgs = getkeyvalue({'BaseMap', 'DoSubDirs', ...
+        'EventFieldsToIgnore', 'HedXml', 'PreserveTagPrefixes'}, ...
+        varargin{:});
+    [fMap, fPaths] = tagdir(p.InDir, inputArgs{:});
 end
 
-if savefMap && ~isempty(fMapPath)
-    savefmap(fMap, fMapPath);
-end
+com = char(['pop_tagdir(' logical2str(p.UseGui) ...
+    ', ' keyvalue2str(inputArgs{:}) ');']);
 
-if overwriteDatasets
-    overwritedataset(fMap, inDir, 'PreservePrefix', preservePrefix);
-end
-
-% Create command string
-com = char(['tagdir(''' inDir ''', ' ...
-    '''BaseMap'', ''' baseMap ''', ' ...
-    '''DoSubDirs'', ' logical2str(doSubDirs) ', ' ...
-    '''ExtensionsAllowed'', ' logical2str(extensionsAllowed) ', ' ...
-    '''ExtensionsAnywhere'', ' logical2str(extensionsAnywhere) ', ' ...
-    '''PreservePrefix'', ' logical2str(preservePrefix) ', ' ...
-    '''SaveDatasets'', ' logical2str(overwriteDatasets) ', ' ...
-    '''SaveMapFile'', ''' fMapPath ''', ' ...
-    '''SelectFields'', ' logical2str(selectFields) ', ' ...
-    '''UseGui'', ' logical2str(useGUI) ')']);
-
-    function s = logical2str(b)
-        % Converts a logical to a string
-        if b
-            s = 'true';
-        else
-            s = 'false';
-        end
-    end % logical2str
+    function p = parseArguments(varargin)
+        % Parses the input arguments and returns the results
+        parser = inputParser;
+        parser.addOptional('UseGui', true, @islogical);
+        parser.addParamValue('BaseMap', '', @(x) isa(x, 'fieldMap') || ...
+            ischar(x));
+        parser.addParamValue('CopyDatasets', false, @islogical);
+        parser.addParamValue('CopyDestination', '', @(x) ...
+            (isempty(x) || (ischar(x))));
+        parser.addParamValue('DoSubDirs', true, @islogical);
+        parser.addParamValue('EventFieldsToIgnore', ...
+            {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
+            @iscellstr);
+        parser.addParamValue('FMapDescription', '', @ischar);
+        parser.addParamValue('FMapSaveFile', '', @(x)(isempty(x) || ...
+            (ischar(x))));
+        parser.addParamValue('HedExtensionsAllowed', true, @islogical);
+        parser.addParamValue('HedExtensionsAnywhere', false, @islogical);
+        parser.addParamValue('HedXml', which('HED.xml'), @ischar);
+        parser.addParamValue('InDir', '', @(x) (~isempty(x) && ischar(x)));
+        parser.addParamValue('OverwriteDatasets', false, @islogical);
+        parser.addParamValue('OverwriteUserHed', '', @islogical);
+        parser.addParamValue('PreserveTagPrefixes', false, @islogical);
+        parser.addParamValue('PrimaryEventField', 'type', @(x) ...
+            (isempty(x) || ischar(x)))
+        parser.addParamValue('SelectEventFields', true, @islogical);
+        parser.addParamValue('SeparateUserHedFile', '', @(x) ...
+            (isempty(x) || (ischar(x))));
+        parser.addParamValue('UseCTagger', true, @islogical);
+        parser.addParamValue('WriteFMapToFile', false, @islogical);
+        parser.addParamValue('WriteSeparateUserHedFile', false, ...
+            @islogical);
+        parser.parse(varargin{:});
+        p = parser.Results;
+    end % parseArguments
 
 end % pop_tagdir

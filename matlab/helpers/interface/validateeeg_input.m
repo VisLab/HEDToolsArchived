@@ -47,7 +47,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, generateWarnings, hedXML, outDir] = validateeeg_input()
+function [canceled, optArgs, generateWarnings, hedXML, outDir] = ...
+    validateeeg_input()
+optArgs = {};
 canceled = true;
 generateWarnings = false;
 hedXML = which('HED.xml');
@@ -209,7 +211,7 @@ uiwait(fig);
         end
     end % browseHedXMLCallback
 
-    function browseOutputDirectoryCallback(~, ~, myTitle) 
+    function browseOutputDirectoryCallback(~, ~, myTitle)
         % Callback for browse button to set the output directory editbox
         startPath = get(findobj('Tag', 'OutputDirEB'), 'String');
         if isempty(startPath) || ~ischar(startPath) || ~isdir(startPath)
@@ -222,7 +224,7 @@ uiwait(fig);
         end
     end % browseOutputDirectoryCallback
 
-    function cancelButtonCallback(~, ~, fig)  
+    function cancelButtonCallback(~, ~, fig)
         % Callback for the cancel button
         canceled = true;
         close(fig);
@@ -243,17 +245,17 @@ uiwait(fig);
             'WindowStyle', 'modal');
     end % createFigure
 
-    function genearteWarningsCallback(src, ~) 
+    function genearteWarningsCallback(src, ~)
         % Callback for generate warnings checkbox
         generateWarnings = get(src, 'Max') == get(src, 'Value');
     end % genearteWarningsCallback
 
-    function hedEditBoxCallback(src, ~) 
+    function hedEditBoxCallback(src, ~)
         % Callback for user directly editing the HED XML editbox
         xml = get(src, 'String');
         if exist(xml, 'file')
             hedXML = xml;
-        else 
+        else
             errordlg(['XML file is invalid. Setting the XML' ...
                 ' file back to the previous file.'], ...
                 'Invalid XML file', 'modal');
@@ -275,7 +277,7 @@ uiwait(fig);
             ' a replace file will be created in addition to the' ...
             ' log file if an optional one isn''t already provided.' ...
             ' The default output directory will be the current' ...
-            ' directory.\n\n***Additional Options***' ... 
+            ' directory.\n\n***Additional Options***' ...
             ' \n\nInclude warnings in log file - Check to include' ...
             ' warnings in the log file in addition to errors. If' ...
             ' unchecked only errors are included in the log file.']), ...
@@ -285,15 +287,23 @@ uiwait(fig);
     function okayButtonCallback(~, ~, fig)
         % Callback for the 'Okay' button
         canceled = false;
+        optArgs = optional2cell();
         close(fig);
     end % okayButtonCallback
+
+    function optArgs = optional2cell()
+        optArgs = {'generateWarnings', generateWarnings, ...
+            'hedXML', hedXML, ...
+            'outDir', outDir, ...
+            'writeOutput', true};
+    end
 
     function outputDirectoryEditBoxCallback(src, ~)
         % Callback for user directly editing the output directory edit box
         directory = get(src, 'String');
         if exist(directory, 'dir')
             outDir = directory;
-        else 
+        else
             errordlg(['Output directory is invalid. Setting the output' ...
                 ' directory back to the previous directory.'], ...
                 'Invalid output directory', 'modal');

@@ -1,10 +1,7 @@
-% Allows a user to tag an entire tree directory of similar EEG .set files.
-% First the events and tags from all data files are extracted and
-% consolidated into a single fieldMap object by merging all of the
-% existing tags. Then the user is presented with a GUI for choosing
-% which fields to tag. The ctagger GUI is displayed so that users can
-% edit/modify the tags. The GUI is launched in asynchronous mode.
-% Finally the tags are rewritten to the data files.
+% Allows a user to create a fieldMap object from an entire tree directory
+% of similar EEG .set files. The events and tags from all data files are
+% extracted and consolidated into a single fieldMap object by merging all
+% of the existing tags.
 %
 % Usage:
 %
@@ -26,12 +23,16 @@
 %                    a fieldMap object to be used to initialize tag
 %                    information.
 %
-%   'DoSubDirs'
-%                    If true (default), the entire inDir directory tree is
-%                    searched. If false, only the inDir directory is
-%                    searched.
+%   'BaseMapFieldsToIgnore'
+%                    A one-dimensional cell array of field names in the
+%                    .event substructure to ignore when merging with a
+%                    fieldMap object 'BaseMap'.
 %
-%   'ExcludeFields'
+%   'HedXml'
+%                    Full path to a HED XML file. The default is the
+%                    HED.xml file in the hed directory.
+%
+%   'EventFieldsToIgnore'
 %                    A one-dimensional cell array of field names in the
 %                    .event substructure to ignore during the tagging
 %                    process. By default the following subfields of the
@@ -39,58 +40,11 @@
 %                    .urevent, .hedtags, and .usertags. The user can
 %                    over-ride these tags using this name-value parameter.
 %
-%   'ExtensionsAllowed'
-%                    If true (default), the HED can be extended. If
-%                    false, the HED can not be extended. The
-%                    'ExtensionAnywhere argument determines where the HED
-%                    can be extended if extension are allowed.
-%
-%
-%   'ExtensionsAnywhere'
-%                    If true, the HED can be extended underneath all tags.
-%                    If false (default), the HED can only be extended where
-%                    allowed. These are tags with the 'extensionAllowed'
-%                    attribute or leaf tags (tags that do not have
-%                    children).
-%
-%   'Fields'
-%                    A one-dimensional cell array of fields to tag. If this
-%                    parameter is non-empty, only these fields are tagged.
-%
-%   'HedXML'         
-%                    Full path to a HED XML file. The default is the 
-%                    HED.xml file in the hed directory. 
-%
-%   'PreservePrefix'
+%   'PreserveTagPrefixes'
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%
-%   'PrimaryField'
-%                    The name of the primary field. Only one field can be
-%                    the primary field. A primary field requires a label,
-%                    category, and a description. The default is the type
-%                    field.
-%
-%   'SaveDatasets'
-%                    If true, save the tags to the underlying
-%                    dataset files in the directory. If false (default),
-%                    do not save the tags to the underlying dataset files
-%                    in the directory.
-%
-%   'SaveMapFile'
-%                    A string representing the file name for saving the
-%                    final, consolidated fieldMap object that results from
-%                    the tagging process.
-%
-%   'SelectFields'
-%                    If true (default), the user is presented with a
-%                    GUI that allow users to select which fields to tag.
-%
-%   'UseGui'
-%                    If true (default), the CTAGGER GUI is displayed after
-%                    initialization.
 %
 % Output:
 %
@@ -101,10 +55,6 @@
 %   fPaths
 %                    A one-dimensional cell array of full file names of the
 %                    datasets to be tagged.
-%
-%   canceled
-%                    True if the user canceled the tagging. False if
-%                    otherwise.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -124,84 +74,44 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [fMap, fPaths, canceled] = tagdir(inDir, varargin)
+function [fMap, fPaths] = tagdir(inDir, varargin)
 p = parseArguments(inDir, varargin{:});
 fPaths = getfilelist(p.InDir, '.set', p.DoSubDirs);
 if isempty(fPaths)
     fMap = '';
-    canceled = '';
     warning('tagdir:nofiles', 'No files met tagging criteria\n');
     return;
 end
 fMap = findDirTags(p, fPaths);
-fMap = mergeBaseTags(fMap, p.BaseMap);
-[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap);
-if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'ExtensionsAllowed', ...
-        p.ExtensionsAllowed, 'ExtensionsAnywhere', ...
-        p.ExtensionsAnywhere, 'PreservePrefix', ...
-        p.PreservePrefix, 'ExcludeField', excluded, 'Fields', fields);
+if ~isempty(p.BaseMap)
+    fMap = mergeBaseTags(p, fMap);
 end
-if ~canceled
-    write2dir(p, fMap);
-    fprintf('Tagging complete\n');
-    return;
-end
-fprintf('Tagging was canceled\n');
-
-    function [fMap, fields, excluded, canceled] = ...
-            extractSelectedFields(p, fMap)
-        % Extract the selected fields from the fMap
-        canceled = false;
-        fields = fMap.getFields();
-        if ~isempty(p.Fields)
-            fields = intersect(p.Fields, fields, 'stable');
-        end
-        excluded = setdiff(p.ExcludeFields, fields);
-        if p.UseGui && isempty(p.Fields) && p.SelectFields
-            [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
-                'ExcludeFields', {}, 'Fields', {}, ...
-                'PrimaryField', p.PrimaryField, 'SelectFields', ...
-                p.SelectFields);
-        end
-    end % extractSelectedFields
 
     function [fMap, dirFields] = findDirTags(p, fPaths)
         % Find the existing tags from the directory datasets
-        fMap = fieldMap('PreservePrefix',  p.PreservePrefix);
+        fMap = fieldMap('PreserveTagPrefixes',  p.PreserveTagPrefixes);
         dirFields = {};
         fprintf('\n---Loading the data files to merge the tags---\n');
         for k = 1:length(fPaths) % Assemble the list
             eegTemp = pop_loadset(fPaths{k});
             dirFields = union(dirFields, fieldnames(eegTemp.event));
-            fMapTemp = findtags(eegTemp, 'PreservePrefix', ...
-                p.PreservePrefix, 'ExcludeFields', ...
-                setdiff(p.ExcludeFields, p.Fields), 'Fields', {}, ...
-                'HedXML', p.HedXML);
-            fMap.merge(fMapTemp, 'Merge', {}, fMapTemp.getFields());
+            fMapTemp = findtags(eegTemp, 'PreserveTagPrefixes', ...
+                p.PreserveTagPrefixes, 'EventFieldsToIgnore', ...
+                p.EventFieldsToIgnore, 'HedXml', p.HedXml);
+            fMap.merge(fMapTemp, 'Merge', p.EventFieldsToIgnore, {});
         end
     end % findDirTags
 
-    function fMap = mergeBaseTags(fMap, baseMap)
+    function fMap = mergeBaseTags(p, fMap)
         % Merge baseMap and fMap tags
-        if isa(baseMap, 'fieldMap')
-            baseTags = baseMap;
+        if isa(p.BaseMap, 'fieldMap')
+            baseTags = p.BaseMap;
         else
-            baseTags = fieldMap.loadFieldMap(baseMap);
+            baseTags = fieldMap.loadFieldMap(p.BaseMap);
         end
-        fMap.merge(baseTags, 'Update', {}, fMap.getFields());
+        fMap.merge(baseTags, 'Update', union(p.BaseMapFieldsToIgnore, ...
+            p.EventFieldsToIgnore), {});
     end % mergeBaseTags
-
-    function write2dir(p, fMap)
-        % Writes the tags to the directory datasets
-        if ~isempty(p.SaveMapFile)
-            savefmap(fMap, p.SaveMapFile);
-        end
-        if p.SaveDatasets
-            overwritedataset(fMap, p.InDir, 'DoSubDirs', p.DoSubDirs, ...
-                'PreservePrefix', p.PreservePrefix);
-        end
-    end % write2dir
 
     function p = parseArguments(inDir, varargin)
         % Parses the input arguments and returns the results
@@ -209,21 +119,13 @@ fprintf('Tagging was canceled\n');
         parser.addRequired('InDir', @(x) (~isempty(x) && ischar(x)));
         parser.addParamValue('BaseMap', '', ...
             @(x) isa(x, 'fieldMap') || ischar(x));
+        parser.addParamValue('BaseMapFieldsToIgnore', {}, @iscellstr);  
         parser.addParamValue('DoSubDirs', true, @islogical);
-        parser.addParamValue('ExcludeFields', ...
+        parser.addParamValue('EventFieldsToIgnore', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
-        parser.addParamValue('ExtensionsAllowed', true, @islogical);
-        parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('HedXML', which('HED.xml'), @ischar);
-        parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('PrimaryField', 'type', @(x) ...
-            (isempty(x) || ischar(x)))
-        parser.addParamValue('SaveDatasets', false, @islogical);
-        parser.addParamValue('SaveMapFile', '', @(x)(ischar(x)));
-        parser.addParamValue('SelectFields', true, @islogical);
-        parser.addParamValue('UseGui', true, @islogical);
+        parser.addParamValue('HedXml', which('HED.xml'), @ischar);
+        parser.addParamValue('PreserveTagPrefixes', false, @islogical);
         parser.parse(inDir, varargin{:});
         p = parser.Results;
     end % parseArguments

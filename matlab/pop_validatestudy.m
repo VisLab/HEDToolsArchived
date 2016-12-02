@@ -3,10 +3,10 @@
 %
 % Usage:
 %
-%   >>  com = pop_validatestudy()
+%   >>  [fPaths, com] = pop_validatestudy()
 %
 %   >>  [fPaths, com] = pop_validatestudy(studyFile)
-%  
+%
 %   >>  [fPaths, com] = pop_validatestudy(studyFile, 'key1', value1 ...)
 %
 % Input:
@@ -30,11 +30,7 @@
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each study
 %                   dataset validated. The default directory will be the
-%                   current directory. 
-%
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
+%                   current directory.
 %
 % Output:
 %
@@ -58,34 +54,25 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function com = pop_validatestudy(studyFile, varargin)
-% Get the input parameters
-[canceled, generateWarnings, hedXML, outDir, studyFile] = ...
-    validatestudy_input();
+function [fPaths, com] = pop_validatestudy(studyFile, varargin)
+canceled = false;
+
+if nargin == 0
+    studyFile = '';
+end
+
+if nargin < 2
+    [canceled, studyFile, varargin] = validatestudy_input(studyFile);
+end
+
 if canceled
+    fPaths = '';
     com = '';
     return;
 end
 
-% Validate the EEG study
-validatestudy(studyFile, ...
-    'generateWarnings', generateWarnings, ...
-    'hedXML', hedXML, ...
-    'outDir', outDir);
-
-% Create command string
-com = char(['tagstudy(''' studyFile ''', ' ...
-    '''generateWarnings'', ' logical2str(generateWarnings) ', ' ...
-    '''hedXML'', ''' hedXML ''', ' ...
-    '''outDir'', ''' outDir ''', '')']);
-
-    function s = logical2str(b)
-        % Converts a logical value to a string
-        if b
-            s = 'true';
-        else
-            s = 'false';
-        end
-    end % logical2str
+fPaths = validatestudy(studyFile, varargin{:});
+com = char(['pop_validatestudy(' '''' studyFile ''', '...
+    keyvalue2str(varargin{:}) ');']);
 
 end % pop_validatestudy

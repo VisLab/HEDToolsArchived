@@ -11,32 +11,39 @@
 %
 %    Optional (key/value):
 %
-%   'Description'      String describing the purpose of this fieldMap.
+%   'Description'      
+%                      String describing the purpose of this fieldMap.
 %
-%   'PreservePrefix'   Logical if false (default) tags with matching
+%   'PreserveTagPrefixes'   
+%                      Logical if false (default) tags with matching
 %                      prefixes are merged to be the longest.
 %
-%   'XML'              XML string specifying tag hierarchy to be used.
+%   'XML'              
+%                      XML string specifying tag hierarchy to be used.
 %
 % Notes:
 %
 %   Merge options:
 %
-%   'Merge'           If an event with that key is not part of this
+%   'Merge'           
+%                     If an event with that key is not part of this
 %                     object, add it as is.
 %
-%   'None'            Don't update anything in the structure
+%   'None'            
+%                     Don't update anything in the structure
 %
-%   'Replace'         If an event with that key is not part of this
+%   'Replace'         
+%                     If an event with that key is not part of this
 %                     object, do nothing. Otherwise, if an event with that
 %                     key is part of this object then completely replace
 %                     that event with the new one.
 %
-%   'Update'          If an event with that key is not part of this
+%   'Update'          
+%                     If an event with that key is not part of this
 %                     object, do nothing. Otherwise, if an event with that
 %                     key is part of this object, then update the tags of
 %                     the matching event with the new ones from this event,
-%                     using the PreservePrefix value to determine how to
+%                     using the PreserveTagPrefixes value to determine how to
 %                     combine the tags. Also update any empty code
 %                     fields by using the values in the
 %                     input event.
@@ -67,7 +74,7 @@ classdef fieldMap < hgsetget
     properties (Access = private)
         Description          % String describing this field map
         GroupMap             % Map for matching event labels
-        PreservePrefix       % If true, don't eliminate duplicate
+        PreserveTagPrefixes       % If true, don't eliminate duplicate
         % prefixes (default false)
         PrimaryField
         Xml                  % Tag hierarchy as an XML string
@@ -81,7 +88,7 @@ classdef fieldMap < hgsetget
             % Constructor parses parameters and sets up initial data
             p = fieldMap.parseArguments(varargin{:});
             obj.Description = p.Description;
-            obj.PreservePrefix = p.PreservePrefix;
+            obj.PreserveTagPrefixes = p.PreserveTagPrefixes;
             obj.Xml = p.Xml;
             obj.XmlSchema = p.XmlSchema;
             obj.GroupMap = containers.Map('KeyType', 'char', ...
@@ -98,7 +105,7 @@ classdef fieldMap < hgsetget
                 @(x) validateattributes(x, {'logical'}, {}));
             p.addParamValue('UpdateType', 'merge', ...
                 @(x) any(validatestring(lower(x), ...
-                {'Update', 'Replace', 'Merge', 'None'})));
+                {'update', 'replace', 'merge', 'none'})));
             p.parse(type, values, varargin{:});
             primary = p.Results.Primary;
             type = p.Results.Type;
@@ -114,13 +121,13 @@ classdef fieldMap < hgsetget
                 for k = 1:length(values)
                     eTag.addValue(values{k}, ...
                         'UpdateType', p.Results.UpdateType, ...
-                        'PreservePrefix', obj.PreservePrefix);
+                        'PreserveTagPrefixes', obj.PreserveTagPrefixes);
                 end
             else
                 for k = 1:length(values)
                     eTag.addValue(values(k), ...
                         'UpdateType', p.Results.UpdateType, ...
-                        'PreservePrefix', obj.PreservePrefix);
+                        'PreserveTagPrefixes', obj.PreserveTagPrefixes);
                 end
             end
             obj.GroupMap(type) = eTag;
@@ -130,7 +137,7 @@ classdef fieldMap < hgsetget
             % Create a copy (newMap) of the fieldMap
             newMap = fieldMap();
             newMap.Description = obj.Description;
-            newMap.PreservePrefix = obj.PreservePrefix;
+            newMap.PreserveTagPrefixes = obj.PreserveTagPrefixes;
             newMap.Xml = obj.Xml;
             newMap.XmlSchema = obj.XmlSchema;
             values = obj.GroupMap.values;
@@ -175,9 +182,9 @@ classdef fieldMap < hgsetget
             tMaps = obj.GroupMap.values;
         end % getMaps
         
-        function pPrefix = getPreservePrefix(obj)
-            % Return the logical PreservePrefix flag of the fieldMap
-            pPrefix = obj.PreservePrefix;
+        function pPrefix = getPreserveTagPrefixes(obj)
+            % Return the logical PreserveTagPrefixes flag of the fieldMap
+            pPrefix = obj.PreserveTagPrefixes;
         end % getPreservePrefix
         
         function primaryField = getPrimaryField(obj)
@@ -256,7 +263,7 @@ classdef fieldMap < hgsetget
                     obj.GroupMap(type) = tagMap('Field', type);
                 end
                 myMap = obj.GroupMap(type);
-                myMap.merge(tMap, updateType, obj.PreservePrefix)
+                myMap.merge(tMap, updateType, obj.PreserveTagPrefixes)
                 obj.GroupMap(type) = myMap;
             end
         end % merge
@@ -330,7 +337,7 @@ classdef fieldMap < hgsetget
             % Parses the input arguments and returns the results
             parser = inputParser;
             parser.addParamValue('Description', '', @ischar);
-            parser.addParamValue('PreservePrefix', false, ...
+            parser.addParamValue('PreserveTagPrefixes', false, ...
                 @(x) validateattributes(x, {'logical'}, {}));
             parser.addParamValue('Xml', fileread(fieldMap.DefaultXml), ...
                 @(x) (ischar(x)));

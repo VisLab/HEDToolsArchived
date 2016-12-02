@@ -8,9 +8,9 @@
 %
 % Usage:
 %
-%   >>  [EEG, fMap, canceled] = tageeg(EEG)
+%   >>  [EEG, fMap] = tageeg(EEG)
 %
-%   >>  [EEG, fMap, canceled] = tageeg(EEG, 'key1', 'value1', ...)
+%   >>  [EEG, fMap] = tageeg(EEG, 'key1', 'value1', ...)
 %
 % Input:
 %
@@ -27,7 +27,16 @@
 %                    a fieldMap object to be used to initialize tag
 %                    information.
 %
-%   'ExcludeFields'
+%   'BaseMapFieldsToIgnore'
+%                    A one-dimensional cell array of field names in the
+%                    .event substructure to ignore when merging with a
+%                    fieldMap object 'BaseMap'. 
+%                    
+%   'HedXml'
+%                    Full path to a HED XML file. The default is the
+%                    HED.xml file in the hed directory.
+%
+%   'EventFieldsToIgnore'
 %                    A one-dimensional cell array of field names in the
 %                    .event substructure to ignore during the tagging
 %                    process. By default the following subfields of the
@@ -35,56 +44,11 @@
 %                    .urevent, .hedtags, and .usertags. The user can
 %                    over-ride these tags using this name-value parameter.
 %
-%   'ExtensionsAllowed'
-%                    If true (default), the HED can be extended. If
-%                    false, the HED can not be extended. The 
-%                    'ExtensionAnywhere argument determines where the HED
-%                    can be extended if extension are allowed.
-%                  
-%   'ExtensionsAnywhere'
-%                    If true, the HED can be extended underneath all tags.
-%                    If false (default), the HED can only be extended where
-%                    allowed. These are tags with the 'extensionAllowed'
-%                    attribute or leaf tags (tags that do not have
-%                    children).
-%
-%   'Fields'
-%                    A one-dimensional cell array of fields to tag. If this
-%                    parameter is non-empty, only these fields are tagged.
-%
-%   'HedXML'         
-%                    Full path to a HED XML file. The default is the 
-%                    HED.xml file in the hed directory. 
-%
-%   'PreservePrefix'
+%   'PreserveTagPrefixes'
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
-%
-%   'PrimaryField'
-%                    The name of the primary field. Only one field can be
-%                    the primary field. A primary field requires a label,
-%                    category, and a description tag. The default is the
-%                    .type field.
-%
-%   'SaveDataset'
-%                    If true, save the tags to the underlying dataset. If
-%                    false (default), do not save the tags to the
-%                    underlying dataset.
-%
-%   'SaveMapFile'
-%                    A string representing the file name for saving the
-%                    final, consolidated fieldMap object that results from
-%                    the tagging process.
-%
-%   'SelectFields'
-%                    If true (default), the user is presented with a
-%                    GUI that allow users to select which fields to tag.
-%
-%   'UseGui'
-%                    If true (default), the CTAGGER GUI is used to edit
-%                    field tags.
 %
 % Output:
 %
@@ -96,11 +60,7 @@
 %   fMap
 %                    A fieldMap object that stores all of the tags.
 %
-%   canceled
-%                    True if the tagging has been canceled, False if
-%                    otherwise.
-%
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -118,65 +78,25 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [EEG, fMap, canceled] = tageeg(EEG, varargin)
+function [EEG, fMap] = tageeg(EEG, varargin)
 p = parseArguments(EEG, varargin{:});
-fMap = findtags(EEG, 'PreservePrefix', p.PreservePrefix, ...
-    'ExcludeFields', setdiff(p.ExcludeFields, p.Fields), 'Fields', {}, ...
-    'HedXML', p.HedXML);
-fMap = mergeBaseTags(fMap, p.BaseMap);
-
-[fMap, fields, excluded, canceled] = extractSelectedFields(p, fMap);
-if p.UseGui && ~canceled
-    [fMap, canceled] = editmaps(fMap, 'ExtensionsAllowed', ...
-        p.ExtensionsAllowed, 'ExtensionsAnywhere', ...
-        p.ExtensionsAnywhere, 'PreservePrefix', p.PreservePrefix, ...
-        'ExcludeFields', excluded, 'Fields', fields);
+fMap = findtags(EEG, 'PreserveTagPrefixes', p.PreserveTagPrefixes, ...
+    'EventFieldsToIgnore', p.EventFieldsToIgnore, 'HedXml', p.HedXml);
+if ~isempty(p.BaseMap)
+    fMap = mergeBaseTags(p, fMap);
+    EEG = writetags(EEG, fMap, 'PreserveTagPrefixes', ...
+        p.PreserveTagPrefixes);
 end
-if ~canceled
-    EEG = write2EEG(p, EEG, fMap);
-    fprintf('Tagging complete\n');
-    return;
-end
-fprintf('Tagging was canceled\n');
 
-    function [fMap, fields, excluded, canceled] = ...
-            extractSelectedFields(p, fMap)
-        % Extract the selected fields from the fMap
-        canceled = false;
-        fields = fMap.getFields();
-        if ~isempty(p.Fields)
-            fields = intersect(p.Fields, fields, 'stable');
-        end
-        excluded = setdiff(p.ExcludeFields, fields);
-        if p.UseGui && isempty(p.Fields) && p.SelectFields
-            [fMap, fields, excluded, canceled] = selectmaps(fMap, ...
-                'ExcludeFields', {}, 'Fields', {}, ...
-                'PrimaryField', p.PrimaryField, 'SelectFields', ...
-                p.SelectFields);
-        end
-    end % extractSelectedFields
-
-    function EEG = write2EEG(p, EEG, fMap)
-        % Writes the tags to the EEG dataset structure  
-        if ~isempty(p.SaveMapFile)
-            savefmap(fMap, p.SaveMapFile);
-        end
-        if p.SaveDataset
-            EEG = overwritedataset(fMap, EEG, 'PreservePrefix', ...
-                p.PreservePrefix);
-        else
-            EEG = writetags(EEG, fMap, 'PreservePrefix', p.PreservePrefix);
-        end
-    end % write2EEG
-
-    function fMap = mergeBaseTags(fMap, baseMap)
+    function fMap = mergeBaseTags(p, fMap)
         % Merge baseMap and fMap tags
-        if isa(baseMap, 'fieldMap')
-            baseTags = baseMap;
+        if isa(p.BaseMap, 'fieldMap')
+            baseTags = p.BaseMap;
         else
-            baseTags = fieldMap.loadFieldMap(baseMap);
+            baseTags = fieldMap.loadFieldMap(p.BaseMap);
         end
-        fMap.merge(baseTags, 'Update', {}, fMap.getFields());
+        fMap.merge(baseTags, 'Update', union(p.BaseMapFieldsToIgnore, ...
+            p.EventFieldsToIgnore), {});
     end % mergeBaseTags
 
     function p = parseArguments(EEG, varargin)
@@ -185,21 +105,12 @@ fprintf('Tagging was canceled\n');
         parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
         parser.addParamValue('BaseMap', '', @(x) isa(x, 'fieldMap') || ...
             ischar(x));
-        parser.addParamValue('ExcludeFields', ...
+        parser.addParamValue('BaseMapFieldsToIgnore', {}, @iscellstr);      
+        parser.addParamValue('HedXml', which('HED.xml'), @ischar);
+        parser.addParamValue('EventFieldsToIgnore', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
-            @(x) (iscellstr(x)));
-        parser.addParamValue('ExtensionsAllowed', true, @islogical);
-        parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('HedXML', which('HED.xml'), @ischar);
-        parser.addParamValue('PreservePrefix', false, @islogical);
-        parser.addParamValue('PrimaryField', 'type', @(x) ...
-            (isempty(x) || ischar(x)))
-        parser.addParamValue('SaveDataset', false, @islogical);
-        parser.addParamValue('SaveMapFile', '', @(x)(isempty(x) || ...
-            (ischar(x))));
-        parser.addParamValue('SelectFields', true, @islogical);
-        parser.addParamValue('UseGui', true, @islogical);
+            @iscellstr);
+        parser.addParamValue('PreserveTagPrefixes', false, @islogical);
         parser.parse(EEG, varargin{:});
         p = parser.Results;
     end % parseArguments

@@ -5,7 +5,7 @@
 %   >>  [fPaths, com] = pop_validatedir()
 %
 %   >>  [fPaths, com] = pop_validatedir(inDir)
-%  
+%
 %   >>  [fPaths, com] = pop_validatedir(inDir, 'key1', value1 ...)
 %
 % Input:
@@ -35,11 +35,7 @@
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each directory
 %                   dataset validated. The default directory will be the
-%                   current directory. 
-%
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
+%                   current directory.
 %
 % Output:
 %
@@ -69,37 +65,24 @@
 
 
 function [fPaths, com] = pop_validatedir(inDir, varargin)
-fPaths = '';
-com = '';
+canceled = false;
 
-% Get the input parameters
-[canceled, doSubDirs, generateWarnings, hedXML, inDir, outDir] ...
-    = validatedir_input();
+if nargin == 0
+    inDir = '';
+end
+
+if nargin < 2
+    [canceled, inDir, varargin] = validatedir_input(inDir);
+end
+
 if canceled
+    fPaths = '';
+    com = '';
     return;
 end
 
-% Validate the EEG directory
-fPaths = validatedir(inDir, ...
-    'doSubDirs', doSubDirs, ...
-    'generateWarnings', generateWarnings, ...
-    'hedXML', hedXML, ...
-    'outDir', outDir);
-
-% Create command string
-com = char(['validatedir(''' inDir ''', ' ...
-    '''doSubDirs'', ' logical2str(doSubDirs) ', ' ...
-    '''generateWarnings'', ' logical2str(generateWarnings) ', ' ...
-    '''hedXML'', ''' hedXML ''', ' ...
-    '''outDir'', ''' outDir ''', '')']);
-
-    function s = logical2str(b)
-        % Converts a logical value to a string
-        if b
-            s = 'true';
-        else
-            s = 'false';
-        end
-    end % logical2str
+fPaths = validatedir(inDir, varargin{:});
+com = char(['pop_validatedir(' '''' inDir ''', '...
+    keyvalue2str(varargin{:}) ');']);
 
 end % pop_validatedir

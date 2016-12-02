@@ -26,7 +26,7 @@
 %                    the entire structure as is. Otherwise, if the
 %                    structure code is a key for this map, then merge the
 %                    tags with those of the existing structure, using the
-%                    PreservePrefix value to determine how to combine the
+%                    PreserveTagPrefixes value to determine how to combine the
 %                    tags.
 %
 %    'None'          
@@ -42,7 +42,7 @@
 %                    If the structure code is not a key of this map,
 %                    do nothing. Otherwise, if the structure code is a
 %                    key for this map, then merge the tags with those
-%                    of the existing structure, using the PreservePrefix
+%                    of the existing structure, using the PreserveTagPrefixes
 %                    value to determine how to combine the tags.
 %
 % Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, 
@@ -93,8 +93,8 @@ classdef tagMap < hgsetget
                 isa(x, 'tagList')));
             parser.addParamValue('UpdateType', 'merge', ...
                 @(x) any(validatestring(lower(x), ...
-                {'Update', 'Replace', 'Merge', 'None'})));
-            parser.addParamValue('PreservePrefix', false, ...
+                {'update', 'replace', 'merge', 'none'})));
+            parser.addParamValue('PreserveTagPrefixes', false, ...
                 @(x) validateattributes(x, {'logical'}, {}));
             parser.parse(tList, varargin{:});
             p = parser.Results;
@@ -114,11 +114,11 @@ classdef tagMap < hgsetget
                 oldTList = obj.TagMap(theKey);
                 oldStruct = oldTList.getStruct();
                 theValue = mergetaglists(newStruct.tags, ...
-                    oldStruct.tags, p.PreservePrefix);
+                    oldStruct.tags, p.PreserveTagPrefixes);
             elseif obj.TagMap.isKey(theKey) && strcmpi('Replace', ...
                     p.UpdateType)
                 theValue = mergetaglists(newStruct.tags, '', ...
-                    p.PreservePrefix);
+                    p.PreserveTagPrefixes);
             else
                 return;
             end
@@ -217,7 +217,7 @@ classdef tagMap < hgsetget
             values = mTags.getValues();
             for k = 1:length(values)
                 obj.addValue(values{k}, 'UpdateType', updateType, ...
-                    'PreservePrefix', preservePrefix);
+                    'PreserveTagPrefixes', preservePrefix);
             end
         end % merge
         

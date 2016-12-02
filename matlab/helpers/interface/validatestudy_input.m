@@ -20,7 +20,7 @@
 %                   A XML file containing every single HED tag and its
 %                   attributes. This by default will be the HED.xml file
 %                   found in the hed directory.
-% 
+%
 %   'outDir'
 %                   The directory where the validation output will be
 %                   written to. There will be log file containing any
@@ -52,14 +52,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, generateWarnings, hedXML, outDir, studyFile] = ...
-    validatestudy_input()
+function [canceled, studyFile, optArgs, generateWarnings, hedXML, ...
+    outDir] = validatestudy_input(varargin)
 % Setup the variables used by the GUI
+p = parseArguments(varargin{:});
+optArgs = {};
 canceled = true;
 generateWarnings = false;
 hedXML = which('HED.xml');
 outDir = pwd;
-studyFile = '';
+studyFile = p.studyFile;
 title = 'Inputs for validating the HED tags in a EEG study';
 fig = createFigure(title);
 addFigureComponents(fig);
@@ -107,7 +109,7 @@ uiwait(fig);
             'BackgroundColor', 'w', ...
             'HorizontalAlignment', 'Left', ...
             'Tag', 'StudyEB', ...
-            'String', '', ...
+            'String', studyFile, ...
             'TooltipString', 'EEG study file name.', ...
             'Units','normalized',...
             'Callback', @studyEditBoxCallback, ...
@@ -309,7 +311,7 @@ uiwait(fig);
             ' directory by default.\n\nOutput directory - The' ...
             ' directory where the validation files are written to.' ...
             ' The default output directory will be the' ...
-            ' current directory.\n\n***Additional Options***' ... 
+            ' current directory.\n\n***Additional Options***' ...
             ' \n\nInclude warnings in log file - Check to include' ...
             ' warnings in the log file in addition to errors. If' ...
             ' unchecked only errors are included in the log file.']), ...
@@ -319,8 +321,16 @@ uiwait(fig);
     function okayButtonCallback(~, ~, fig)
         % Callback for the 'Okay' button
         canceled = false;
+        optArgs = optional2cell();
         close(fig);
     end % okayButtonCallback
+
+    function optArgs = optional2cell()
+        % Puts the optional arguments in a cell array
+        optArgs = {'generateWarnings', generateWarnings, ...
+            'hedXML', hedXML, ...
+            'outDir', outDir};
+    end % optional2cell
 
     function outputDirEditBoxCallback(src, ~)
         % Callback for user directly editing the 'Output directory' editbox
@@ -334,6 +344,14 @@ uiwait(fig);
             set(src, 'String', outDir);
         end
     end % outputDirEditBoxCallback
+
+    function p = parseArguments(varargin)
+        % Parses the arguements passed in and returns the results
+        p = inputParser();
+        p.addOptional('studyFile', '', @ischar);
+        p.parse(varargin{:});
+        p = p.Results;
+    end % parseArguments
 
     function genearteWarningsCallback(src, ~)
         % Callback for generate warnings checkbox

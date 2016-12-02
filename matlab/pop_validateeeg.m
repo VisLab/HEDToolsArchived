@@ -19,18 +19,14 @@
 %                   found in the hed directory.
 %
 %   'outDir'
-%                   The directory where the validation output is written 
+%                   The directory where the validation output is written
 %                   to. There will be a log file generated for each study
 %                   dataset validated.
-%
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   This by default is .usertags.
 %
 %   'writeOutput'
 %                   If true (default), write the validation issues to a
 %                   log file in addition to the workspace. If false only
-%                   write the issues to the workspace. 
+%                   write the issues to the workspace.
 %
 % Output:
 %
@@ -63,6 +59,7 @@
 function [issues, com] = pop_validateeeg(EEG, varargin)
 issues = '';
 com = '';
+canceled = false;
 
 % Display help if inappropriate number of arguments
 if nargin < 1
@@ -70,34 +67,16 @@ if nargin < 1
     return;
 end;
 
-% Get the input parameters
-[canceled, generateWarnings, hedXML, outDir] = ...
-    validateeeg_input();
+if nargin == 1
+    [canceled, varargin] = validateeeg_input();
+end
+
 if canceled
     return;
 end
 
-% Validate the EEG dataset
-issues = validateeeg(EEG, ...
-    'generateWarnings', generateWarnings, ...
-    'hedXML', hedXML, ...
-    'outDir', outDir, ...
-    'writeOutput', true);
-
-% Create command string
-com = char(['validateeeg(EEG, ' ...
-    '''generateWarnings'', ' logical2str(generateWarnings) ', ' ...
-    '''hedXML'', ''' hedXML ''', ' ...
-    '''outDir'', ''' outDir ''', ' ...
-    '''writeOutput'', ' 'true)']);
-
-    function s = logical2str(b)
-        % Converts a logical value to a string
-        if b
-            s = 'true';
-        else
-            s = 'false';
-        end
-    end % logical2str
+issues = validateeeg(EEG, varargin{:});
+com = char(['pop_validateeeg(' inputname(1) ', '...
+    keyvalue2str(varargin{:}) ');']);
 
 end % pop_validateeeg

@@ -23,7 +23,7 @@
 %                    A cell array containing the field names to extract
 %                    tags for.
 %
-%   'HedXML'
+%   'HedXml'
 %                    Full path to a HED XML file. The default is the
 %                    HED.xml file in the hed directory.
 %
@@ -98,10 +98,10 @@ end
         if hasXML(p)
             xml = p.edata.etc.tags.xml;
         else
-            xml = fileread(p.HedXML);
+            xml = fileread(p.HedXml);
         end
-        fMap = fieldMap('Xml', xml, 'PreservePrefix', ...
-            p.PreservePrefix);
+        fMap = fieldMap('Xml', xml, 'PreserveTagPrefixes', ...
+            p.PreserveTagPrefixes);
     end % intializefMap
 
     function fMap = events2fMap(p)
@@ -154,31 +154,24 @@ end
             eventFields = union(eventFields, ...
                 fieldnames(p.edata.urevent));
         end
-        eventFields = setdiff(eventFields, p.ExcludeFields);
-        if ~isempty(p.Fields)
-            eventFields = intersect(p.Fields, eventFields);
-        end
+        eventFields = setdiff(eventFields, p.EventFieldsToIgnore);
     end % getEventFields
 
     function etcFields = getEtcFields(p)
         % Gets all of the event fields from the .etc field
         etcFields = {p.edata.etc.tags.map.field};
-        etcFields = setdiff(etcFields, p.ExcludeFields);
-        if ~isempty(p.Fields)
-            etcFields = intersect(p.Fields, etcFields);
-        end
+        etcFields = setdiff(etcFields, p.EventFieldsToIgnore);
     end % getEtcFields
 
     function p = parseArguments(edata, varargin)
         % Parses the input arguments and returns the results
         parser = inputParser;
         parser.addRequired('edata', @(x) (isempty(x) || isstruct(x)));
-        parser.addParamValue('ExcludeFields', ...
+        parser.addParamValue('EventFieldsToIgnore', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...
             @(x) (iscellstr(x)));
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('HedXML', which('HED.xml'), @ischar);
-        parser.addParamValue('PreservePrefix', false, ...
+        parser.addParamValue('HedXml', which('HED.xml'), @ischar);
+        parser.addParamValue('PreserveTagPrefixes', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         parser.parse(edata, varargin{:});
         p = parser.Results;

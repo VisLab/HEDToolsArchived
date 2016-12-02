@@ -5,11 +5,7 @@ tMap = tagMap();
 positions = arrayfun(@(x) ~isempty(x.(valueField)), events);
 values = {events(positions).(valueField)};
 tags = {events(positions).('usertags')};
-% if iscell(values)
 values = cellfun(@num2str, values, 'UniformOutput', false);
-% else
-%     values = arrayfun(@num2str, values, 'UniformOutput', false);
-% end
 uniqueValues = unique(cellfun(@num2str, values, 'UniformOutput', false));
 for k = 1:length(uniqueValues)
     if ~isempty(uniqueValues{k})

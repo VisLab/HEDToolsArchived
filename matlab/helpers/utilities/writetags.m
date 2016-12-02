@@ -24,7 +24,8 @@
 %   'ExcludeFields'
 %                    A cell array containing the field names to exclude.
 %
-%   'PreservePrefix' If false (default), tags associated with same value
+%   'PreserveTagPrefixes' 
+%                    If false (default), tags associated with same value
 %                    that share prefixes are combined and only the most
 %                    specific is retained (e.g., /a/b/c and /a/b become
 %                    just /a/b/c). If true, then all unique tags are
@@ -59,14 +60,15 @@ if isfield(eData, 'event') && isstruct(eData.event)
         tFields = intersect(fieldnames(eData.event), ...
             setdiff(fMap.getFields(), p.ExcludeFields));
     end
-    eData = writeIndividualTags(eData, fMap, tFields, p.PreservePrefix);
+    eData = writeIndividualTags(eData, fMap, tFields, ...
+        p.PreserveTagPrefixes);
 else
     tFields = intersect(fMap.getFields(), p.Fields);
 end
 eData = writeSummaryTags(fMap, eData, tFields);
 
     function eData = writeIndividualTags(eData, fMap, eFields, ...
-            preservePrefix)
+            preserveTagPrefixes)
         % Write tags to individual events in usertags field (this needs to
         % be optimized)
         for k = 1:length(eData.event)
@@ -74,7 +76,7 @@ eData = writeSummaryTags(fMap, eData, tFields);
             for l = 1:length(eFields)
                 tags = fMap.getTags(eFields{l}, ...
                     num2str(eData.event(k).(eFields{l})));
-                uTags = mergetaglists(uTags, tags, preservePrefix);
+                uTags = mergetaglists(uTags, tags, preserveTagPrefixes);
             end
             eData.event(k).usertags = sorttags(tagList.stringify(uTags));
         end
@@ -124,7 +126,7 @@ eData = writeSummaryTags(fMap, eData, tFields);
             'fieldMap')));
         parser.addParamValue('ExcludeFields', {}, @(x) (iscellstr(x)));
         parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('PreservePrefix', false, @islogical);
+        parser.addParamValue('PreserveTagPrefixes', false, @islogical);
         parser.parse(eData, fMap, varargin{:});
         p = parser.Results;
     end % parseArguments

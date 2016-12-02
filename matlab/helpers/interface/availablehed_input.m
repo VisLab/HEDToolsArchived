@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [okay, success] = availablehed_input(version, wikiPath)
+function [okay, success] = availablehed_input(version)
 title = 'Update Available';
 okay = false;
 success = false;
@@ -143,16 +143,16 @@ uiwait(fig);
 
     function okCallback(src, evnt) %#ok<INUSD>
         % Callback for the okay button
-        wb = waitbar(.5,'Updating HED XML schema ...');
+        wb = waitbar(.5,'Updating...');
         try         
-            replacehed(wikiPath);
+            replacehed();
             close(wb);
             success = true;
-            msgbox('Update HED XML schema complete', 'Success','modal');
-        catch mex
+            msgbox('Update complete', 'Success','modal');
+        catch
             close(wb);
             success = false;
-            msgbox('Update HED XML schema failed', 'Failure','modal');
+            msgbox('Update failed', 'Failure','modal');
         end
         okay = true;
         close(fig);

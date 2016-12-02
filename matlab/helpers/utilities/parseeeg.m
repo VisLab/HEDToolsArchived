@@ -6,7 +6,7 @@
 % Usage:
 %
 %   >>  [issues, replaceTags, success] = parseeeg(hedMaps, events, ...
-%       tagField, generateWarnings)
+%       generateWarnings)
 %
 % Input:
 %
@@ -26,11 +26,6 @@
 %       events
 %                   The EEG event structure containing the HED tags
 %                   associated with a particular study.
-%
-%       tagField
-%                   The field in events structure that contains the HED
-%                   tags. The default field containing the tags is
-%                   .usertags.
 %
 %       generateWarnings
 %                   True to include warnings in the log file in addition
@@ -70,8 +65,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function [issues, replaceTags] = parseeeg(hedMaps, events, ...
-    tagField, generateWarnings)
-p = parseArguments(hedMaps, events, tagField, generateWarnings);
+    generateWarnings)
+p = parseArguments(hedMaps, events, generateWarnings);
 [issues, replaceTags] = readStructTags(p);
 
     function p = findErrors(p)
@@ -87,15 +82,13 @@ p = parseArguments(hedMaps, events, tagField, generateWarnings);
             p.formattedCellTags);
     end % findWarnings
 
-    function p = parseArguments(hedMaps, events, tagField, ...
-            generateWarnings)
+    function p = parseArguments(hedMaps, events, generateWarnings)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
         parser.addRequired('events', @(x) (~isempty(x) && isstruct(x)));
-        parser.addRequired('tagField', @(x) (~isempty(x) && ischar(x)));
         parser.addRequired('generateWarnings', @islogical);
-        parser.parse(hedMaps, events, tagField, generateWarnings);
+        parser.parse(hedMaps, events, generateWarnings);
         p = parser.Results;
     end % parseArguments
 

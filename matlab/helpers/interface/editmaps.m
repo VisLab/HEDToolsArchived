@@ -15,33 +15,24 @@
 %
 %   Optional (key/value):
 %
-%   'ExcludeFields'
+%   'EventFieldsToIgnore'
 %                    A cell array of field names in the .event substructure
-%                    to ignore during the tagging process. By default the
-%                    following subfields of the event structure are
-%                    ignored: .latency, .epoch, .urevent, .hedtags, and
-%                    .usertags. The user can over-ride these tags using
-%                    this name-value parameter.
+%                    to ignore during the tagging process.
 %
-%   'ExtensionsAllowed'
+%   'HedExtensionsAllowed'
 %                    If true (default), the HED can be extended. If
 %                    false, the HED can not be extended. The 
 %                    'ExtensionAnywhere argument determines where the HED
 %                    can be extended if extension are allowed.
 %                  
-%   'ExtensionsAnywhere'
+%   'HedExtensionsAnywhere'
 %                    If true, the HED can be extended underneath all tags.
 %                    If false (default), the HED can only be extended where
 %                    allowed. These are tags with the 'extensionAllowed'
 %                    attribute or leaf tags (tags that do not have
 %                    children).
 %
-%   'Fields'
-%                    A cell array of field names of the fields to include
-%                    in the tagging. If this parameter is non-empty, only
-%                    these fields are tagged.
-%
-%   'PreservePrefix'
+%   'PreserveTagPrefixes'
 %                    If false (default), tags of the same event type that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
@@ -70,9 +61,9 @@ function [fMap, canceled] = editmaps(fMap, varargin)
 % Check the input arguments for validity and initialize
 p = parseArguments(fMap, varargin{:});
 p = setDefaultParameters(p);
-while (~p.canceled && p.k <= length(p.Fields))
-    fprintf('Tagging %s\n', p.Fields{p.k});
-    p.field = p.Fields{p.k};
+while (~p.canceled && p.k <= length(p.fieldsToTag))
+    fprintf('Tagging %s\n', p.fieldsToTag{p.k});
+    p.field = p.fieldsToTag{p.k};
     p = editFieldTags(p);
 end
 canceled = p.canceled;
@@ -83,11 +74,8 @@ canceled = p.canceled;
         p.hedExtended = false;
         p.standAlone = false;
         p.useJSON = true;
-        if ~isempty(p.Fields)
-            p.Fields = intersect(p.Fields, p.fMap.getFields(), 'stable');
-        else
-            p.Fields = setdiff(p.fMap.getFields(), p.ExcludeFields);
-        end
+        p.fieldsToTag = sort(setdiff(p.fMap.getFields(), ...
+            p.EventFieldsToIgnore));
         p.canceled = false;
         p.k = 1;
         p.firstField = true;
@@ -103,7 +91,7 @@ canceled = p.canceled;
         p = executeCTagger(p);
         if p.loaded
             baseTags = fieldMap.loadFieldMap(char(p.loader.getFMapPath));
-            p.fMap.merge(baseTags, 'Update', {}, p.Fields);
+            p.fMap.merge(baseTags, 'Update', {}, p.fieldsToTag);
             if p.loader.isStartOver()
                 p.k = 1;
                 p.firstField = true;
@@ -129,7 +117,7 @@ canceled = p.canceled;
         p = checkCTaggerStatus(p);
         while (~p.notified)
             pause(0.5);
-            p = checkFMapSave(p);
+            p = checkfMapSave(p);
             p = checkCTaggerStatus(p);
         end
         p.taggedList = p.loader.getXMLAndEvents();
@@ -142,7 +130,7 @@ canceled = p.canceled;
         p.notified = p.loader.isNotified();
     end % checkCTaggerStatus
 
-    function p = checkFMapSave(p)
+    function p = checkfMapSave(p)
         % Checks if an fieldMap has been saved
         if p.saved
             p.taggedList = p.loader.getXMLAndEvents();
@@ -164,13 +152,13 @@ canceled = p.canceled;
     function flags = setCTaggerFlags(p)
         % Sets the flags parameter in CTagger
         flags = 1;
-        if p.PreservePrefix
+        if p.PreserveTagPrefixes
             flags = bitor(flags,2);
         end
-        if p.ExtensionsAllowed
+        if p.HedExtensionsAllowed
             flags = bitor(flags,4);
         end
-        if p.ExtensionsAnywhere
+        if p.HedExtensionsAnywhere
             flags = bitor(flags,8);
         end
         if p.standAlone
@@ -195,7 +183,7 @@ canceled = p.canceled;
         tValues = tagMap.json2Values(tValues);
         p.fMap.removeMap(p.field);
         p.fMap.addValues(p.field, tValues, 'Primary', p.tMap.getPrimary());
-        if p.ExtensionsAllowed && p.loader.getHEDExtended()
+        if p.HedExtensionsAllowed && p.loader.getHEDExtended()
             p.hedExtended = true;
             p.fMap.setXmlEdited(true);
             p.fMap.setXml(p.xml);
@@ -207,11 +195,10 @@ canceled = p.canceled;
         parser = inputParser;
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
-        parser.addParamValue('ExcludeFields', {}, @iscellstr);
-        parser.addParamValue('ExtensionsAllowed', true, @islogical);
-        parser.addParamValue('ExtensionsAnywhere', false, @islogical);
-        parser.addParamValue('Fields', {}, @iscellstr);
-        parser.addParamValue('PreservePrefix', false, @islogical);
+        parser.addParamValue('EventFieldsToIgnore', {}, @iscellstr);
+        parser.addParamValue('HedExtensionsAllowed', true, @islogical);
+        parser.addParamValue('HedExtensionsAnywhere', false, @islogical);
+        parser.addParamValue('PreserveTagPrefixes', false, @islogical);
         parser.parse(fMap, varargin{:});
         p = parser.Results;
     end % parseArguments

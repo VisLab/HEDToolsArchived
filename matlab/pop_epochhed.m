@@ -2,11 +2,12 @@
 %
 % Usage:
 %
-%   >>  pop_hedepoch(EEG);
+%   >>  [EEG, indices, com] = pop_hedepoch(EEG);
 %
-%   >>  pop_hedepoch(EEG, events, timelimits);
+%   >>  [EEG, indices, com] = pop_hedepoch(EEG, events, timelimits);
 %
-%   >>  pop_hedepoch(EEG, events, timelimits,'key1', value1 ...);
+%   >>  [EEG, indices, com] = pop_hedepoch(EEG, events, timelimits, ...
+%                             'key1', value1 ...);
 %
 %   Graphic interface:
 %
@@ -147,29 +148,9 @@ if nargin < 3
 end
 
 [EEG, indices] = epochhed(EEG, tags, timelim, varargin{:});
-com = char(['epochhed(EEG, ' ...
+com = char(['pop_epochhed(EEG, ' ...
     '''' tags ''', ', ...
-    vector2str(timelim) ...
-    varargin2str(varargin{:})]);
-
-    function str = varargin2str(varargin)
-        % Converts the optional arguments to a string
-        numArgs = length(varargin);
-        if numArgs < 1
-            str = ')';
-            return;
-        end
-        str = '';
-        for a = 1:2:numArgs
-            name = ['''' varargin{a} ''''];
-            if ischar(varargin{a+1})
-                value = ['''' varargin{a+1} ''''];
-            else
-                value = vector2str(varargin{a+1});
-            end
-            str = [str ', ' name ', ' value]; %#ok<AGROW>
-        end
-        str = [str ')'];
-    end % varargin2str
+    vector2str(timelim) ', '...
+    keyvalue2str(varargin{:})]);
 
 end % pop_hedepoch

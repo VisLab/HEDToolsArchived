@@ -29,10 +29,6 @@
 %                   to. There will be a log file generated for each study
 %                   dataset validated.
 %
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   This by default is .usertags.
-%
 %   'writeOutput'
 %                   If true (default), write the validation issues to a
 %                   log file in addition to the workspace. If false only
@@ -70,18 +66,19 @@ issues = validate(p);
     function issues = validate(p)
         % Validates the eeg structure
         p.hedMaps = getHEDMaps(p);
-        if isfield(p.EEG.event, p.tagField)
+        if isfield(p.EEG.event, 'usertags') || ...
+                isfield(p.EEG.event, 'hedtags')
             [p.issues, p.replaceTags] = parseeeg(p.hedMaps, ...
-                p.EEG.event, p.tagField, p.generateWarnings);
+                p.EEG.event, p.generateWarnings);
             issues = p.issues;
             if p.writeOutput
                 writeOutputFiles(p);
             end
         else
             issues = '';
-            fprintf(['The ''.%s'' field does not exist in' ...
+            fprintf(['The usertag and hedtags fields do not exist in' ...
                 ' the events. Please tag this dataset before' ...
-                ' running the validation.\n'], p.tagField);
+                ' running the validation.\n']);
         end
     end % validate
 
@@ -109,8 +106,6 @@ issues = validate(p);
         p.addRequired('EEG', @(x) (~isempty(x) && isstruct(x)));
         p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('tagField', 'usertags', ...
-            @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('outDir', pwd, ...

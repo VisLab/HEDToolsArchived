@@ -45,13 +45,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, doSubDirs, generateWarnings, hedXML, inDir, outDir] ...
-    = validatedir_input()
+function [canceled, inDir, optionalArgs] = validatedir_input(varargin)
 % Setup the variables used by the GUI
+p = parseArguments(varargin{:});
+optionalArgs = {};
 canceled = true;
 generateWarnings = false;
 hedXML = which('HED.xml');
-inDir = '';
+inDir = p.inDir;
 outDir = pwd;
 doSubDirs = true;
 title = ['Inputs for validating the HED tags in a directory of EEG' ...
@@ -340,8 +341,17 @@ uiwait(fig);
     function okayButtonCallback(~, ~, fig)
         % Callback for the okay button
         canceled = false;
+        optionalArgs = optional2cell();
         close(fig);
     end % okayButtonCallback
+
+    function optArgs = optional2cell()
+        % Puts the optional arguments in a cell array 
+        optArgs = {'doSubDirs', doSubDirs, ...
+            'generateWarnings', generateWarnings, ...
+            'hedXML', hedXML, ...
+            'outDir', outDir};
+    end % optional2cell
 
     function outputDirEditBoxCallback(src, ~)
         % Callback for user directly editing the output directory edit box
@@ -355,6 +365,14 @@ uiwait(fig);
             set(src, 'String', outDir);
         end
     end % outputDirEditBoxCallback
+
+    function p = parseArguments(varargin)
+        % Parses the arguements passed in and returns the results
+        p = inputParser();
+        p.addOptional('inDir', '', @ischar);
+        p.parse(varargin{:});
+        p = p.Results;
+    end % parseArguments
 
     function inputDirEditBoxCallback(src, ~)
         % Callback for user directly editing the study edit box

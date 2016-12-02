@@ -30,10 +30,6 @@
 %                   dataset validated. The default directory will be the
 %                   current directory. 
 %
-%   'tagField'
-%                   The field in .event that contains the HED tags.
-%                   The default field is .usertags.
-%
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
@@ -77,9 +73,10 @@ fPaths = validate(p);
         for a = 1:numFiles
             p.EEG = pop_loadset(fPaths{a});
             p.fPath = fPaths{a};
-            if isfield(p.EEG.event, p.tagField)
+            if isfield(p.EEG.event, 'usertags') || ...
+                isfield(p.EEG.event, 'hedtags')
                 [p.issues, p.replaceTags] = parseeeg(p.hedMaps, ...
-                    p.EEG.event,  p.tagField, p.generateWarnings);
+                    p.EEG.event, p.generateWarnings);
                     writeOutputFiles(p);
             else
                 if ~isempty(p.EEG.filename)
@@ -90,17 +87,16 @@ fPaths = validate(p);
                 nonTagedIndex = nonTagedIndex + 1;
             end
         end
-        printNonTaggedDatasets(p, nonTaggedSets);
+        printNonTaggedDatasets(nonTaggedSets);
     end % validate
 
-    function printNonTaggedDatasets(p, nonTaggedSets)
+    function printNonTaggedDatasets(nonTaggedSets)
         % Prints all datasets in study that are not tagged
         numFiles = length(nonTaggedSets);
         for a = 1:numFiles
-            fprintf(['Dataset %s: The ''.%s'' field does not exist in' ...
-                ' the events. Please tag the dataset before' ...
-                ' running the validation.\n'], nonTaggedSets{a}, ...
-                p.tagField);
+            fprintf(['Dataset %s: The usertag and hedtags fields do' ...
+                ' not exist in the events. Please tag the dataset' ...
+                ' before running the validation.\n'], nonTaggedSets{a});
         end
     end % printNonTaggedDatasets
 
@@ -156,8 +152,6 @@ fPaths = validate(p);
         p.addRequired('studyFile', @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('tagField', 'usertags', ...
-            @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('hedXML', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('outDir', pwd, ...

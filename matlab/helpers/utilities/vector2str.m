@@ -1,4 +1,4 @@
-% Converts a vector to string with colon operators used for consecutive 
+% Converts a vector to string with colon operators used for consecutive
 % elements.
 %
 %   >> str = vector2str(num)
@@ -10,8 +10,8 @@
 % Output:
 %
 %   str          A string representing a vector.
-%                
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+%
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -31,7 +31,9 @@
 
 function str = vector2str(num)
 str = '';
-if numel(num) > 0
+if numel(num) == 1
+    str = num2str(num);
+elseif numel(num) > 1
     str = num2str(num(1));
     incrementStart = true;
     for a = 2:length(num)
@@ -42,8 +44,7 @@ if numel(num) > 0
                 incrementStart, num(a-1), num(a));
         end
     end
-    str = handleLastIndex(str, incrementStart, num(length(num)));
-    str = ['[' str ']']; 
+    str = ['[' handleLastIndex(str, incrementStart, num(length(num))) ']'];
 end
 
     function [str, incrementStart] = handleNonConsecutive(str, ...
