@@ -5,6 +5,8 @@
 %   >>  [baseMap, canceled, editXML, preservePrefix, selectFields, ...
 %       useGUI] = pop_tageeg_input()
 %
+%   >>  [baseMap, canceled, editXML, preservePrefix, selectFields, ...
+%       useGUI] = pop_tageeg_input('key1', 'value1', ...)
 %
 % Output:
 %

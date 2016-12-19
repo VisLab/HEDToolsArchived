@@ -10,28 +10,34 @@
 %
 % Input:
 %
-%   inDir
-%                   A directory containing EEG datasets that will be
-%                   validated.
+%   Optional:
+%
+%   UseGui
+%                    If true (default), use a series of menus to set
+%                    function arguments.
 %
 %   Optional (key/value):
 %
-%   'doSubDirs'
+%   'DoSubDirs'
 %                   If true (default), the entire inDir directory tree is
-%                   searched. If false, only the inDir directory is
-%                   searched.
+%                   searched. If false, only the inDir top-level directory
+%                   is searched.
 %
-%   'generateWarnings'
+%   'GenerateWarnings'
 %                   If true, include warnings in the log file in addition
 %                   to errors. If false (default), only errors are included
 %                   in the log file.
 %
-%   'hedXML'
+%   'HedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'outDir'
+%   'InDir'
+%                   A directory containing tagged EEG datasets that will be
+%                   validated.
+%
+%   'OutputFileDirectory'
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each directory
 %                   dataset validated. The default directory will be the
@@ -64,25 +70,55 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 
-function [fPaths, com] = pop_validatedir(inDir, varargin)
-canceled = false;
+function [fPaths, com] = pop_validatedir(varargin)
+fPaths = '';
+com = '';
 
-if nargin == 0
-    inDir = '';
+p = parseArguments(varargin{:});
+
+% Call function with menu
+if p.UseGui
+    menuInputArgs = getkeyvalue({'DoSubDirs', 'GenerateWarnings', ...
+        'HedXml', 'InDir', 'OutputFileDirectory'}, varargin{:});
+    [canceled, doSubDirs, generateWarnings, hedXML, inDir, outDir] = ...
+        pop_validatedir_input(menuInputArgs{:});
+    if canceled
+        return;
+    end
+    inputArgs = {'DoSubDirs', doSubDirs, 'GenerateWarnings', ...
+        generateWarnings, 'HedXml', hedXML, 'InDir', inDir, ...
+        'OutputFileDirectory', outDir};
+    fPaths = validatedir(inDir, inputArgs{:});
+    com = char(['pop_validatedir(' logical2str(p.UseGui) ', ' ...
+        keyvalue2str(varargin{:}) ');']);
+    
+else
+    inputArgs = getkeyvalue({'DoSubDirs', 'GenerateWarnings', ...
+        'HedXml', 'InDir', 'OutputFileDirectory'}, varargin{:});
+    fPaths = validatedir(p.InDir, inputArgs{:});
+    if nargin == 1
+        com = char(['pop_validatedir(' logical2str(p.UseGui) ');']);        
+    end
+    if nargin > 1    
+        com = char(['pop_validatedir(' logical2str(p.UseGui) ', ' ...
+            keyvalue2str(varargin{2:end}) ');']);
+    end
 end
 
-if nargin < 2
-    [canceled, inDir, varargin] = validatedir_input(inDir);
-end
-
-if canceled
-    fPaths = '';
-    com = '';
-    return;
-end
-
-fPaths = validatedir(inDir, varargin{:});
-com = char(['pop_validatedir(' '''' inDir ''', '...
-    keyvalue2str(varargin{:}) ');']);
+    function p = parseArguments(varargin)
+        % Parses the arguements passed in and returns the results
+        p = inputParser();
+        p.addOptional('UseGui', true, @islogical);
+        p.addParamValue('DoSubDirs', true, @islogical);
+        p.addParamValue('GenerateWarnings', false, ...
+            @(x) validateattributes(x, {'logical'}, {}));
+        p.addParamValue('HedXml', which('HED.xml'), ...
+            @(x) (~isempty(x) && ischar(x)));
+        p.addParamValue('InDir', pwd, @(x) (~isempty(x) && ischar(x)));
+        p.addParamValue('OutputFileDirectory', pwd, ...
+            @(x) ischar(x));
+        p.parse(varargin{:});
+        p = p.Results;
+    end % parseArguments
 
 end % pop_validatedir

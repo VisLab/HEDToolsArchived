@@ -1,8 +1,30 @@
-% GUI for input needed to create inputs for validateeeg.
+% GUI for input needed to create inputs for pop_validateeeg.
 %
 % Usage:
 %
 %   >>  [canceled, generateWarnings, hedXML, outDir] = validateeeg_input()
+%
+%   >>  [canceled, generateWarnings, hedXML, outDir] = ...
+%       validateeeg_input('key1', 'value1', ...)
+%
+% Input:
+%
+%   Optional:
+%
+%   'GenerateWarnings'
+%                   True to include warnings in the log file in addition
+%                   to errors. If false (default) only errors are included
+%                   in the log file.
+%
+%   'HedXml'
+%                   The full path to a HED XML file containing all of the
+%                   tags. This by default will be the HED.xml file
+%                   found in the hed directory.
+%
+%   'OutputFileDirectory'
+%                   The directory where the validation output is written
+%                   to. There will be a log file generated for each study
+%                   dataset validated.
 %
 % Output:
 %
@@ -47,13 +69,15 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, optArgs, generateWarnings, hedXML, outDir] = ...
-    validateeeg_input()
-optArgs = {};
+function [canceled, generateWarnings, hedXML, outDir] = ...
+    pop_validateeeg_input(varargin)
+p = parseArguments(varargin{:});
+hedXMLCtrl = '';
+outDirCtrl = '';
 canceled = true;
-generateWarnings = false;
-hedXML = which('HED.xml');
-outDir = pwd;
+generateWarnings = p.GenerateWarnings;
+hedXML = p.HedXml;
+outDir = p.OutputFileDirectory;
 title = 'Inputs for validating HED tags in a EEG .set dataset';
 fig = createFigure(title);
 addFigureComponents(fig);
@@ -89,7 +113,7 @@ uiwait(fig);
 
     function addBrowserEditBoxes(browserPanel)
         % Adds edit box components to the browser panel
-        uicontrol('Parent', browserPanel, ...
+        hedXMLCtrl = uicontrol('Parent', browserPanel, ...
             'Style', 'edit', ...
             'BackgroundColor', 'w', ...
             'HorizontalAlignment', 'Left', ...
@@ -99,7 +123,7 @@ uiwait(fig);
             'Units','normalized',...
             'Callback', {@hedEditBoxCallback}, ...
             'Position', [0.15 0.8 0.6 0.2]);
-        uicontrol('Parent', browserPanel, ...
+        outDirCtrl = uicontrol('Parent', browserPanel, ...
             'Style', 'edit', ...
             'BackgroundColor', 'w', ...
             'HorizontalAlignment', 'Left', ...
@@ -253,14 +277,7 @@ uiwait(fig);
     function hedEditBoxCallback(src, ~)
         % Callback for user directly editing the HED XML editbox
         xml = get(src, 'String');
-        if exist(xml, 'file')
-            hedXML = xml;
-        else
-            errordlg(['XML file is invalid. Setting the XML' ...
-                ' file back to the previous file.'], ...
-                'Invalid XML file', 'modal');
-        end
-        set(src, 'String', hedXML);
+        hedXML = xml;
     end % hedEditBoxCallback
 
     function helpButtonCallback(~, ~)
@@ -286,17 +303,30 @@ uiwait(fig);
 
     function okayButtonCallback(~, ~, fig)
         % Callback for the 'Okay' button
-        canceled = false;
-        optArgs = optional2cell();
-        close(fig);
+        if ~exist(get(hedXMLCtrl, 'String'), 'file')
+            errordlg('HED file does not exist', 'Invalid Input', 'modal');
+        elseif isempty(get(hedXMLCtrl, 'String'))
+            errordlg('HED file is empty', 'Input required', 'modal');
+        elseif isempty(get(outDirCtrl, 'String'))
+            errordlg('Output directory is empty', 'Input required', ...
+                'modal');
+        else
+            canceled = false;
+            close(fig);
+        end
     end % okayButtonCallback
 
-    function optArgs = optional2cell()
-        optArgs = {'generateWarnings', generateWarnings, ...
-            'hedXML', hedXML, ...
-            'outDir', outDir, ...
-            'writeOutput', true};
-    end
+    function p = parseArguments(varargin)
+        % Parses the input arguments and returns the results
+        parser = inputParser;
+        parser.addParamValue('GenerateWarnings', false, ...
+            @(x) validateattributes(x, {'logical'}, {}));
+        parser.addParamValue('HedXml', which('hed.xml'), ...
+            @(x) (~isempty(x) && ischar(x)));
+        parser.addParamValue('OutputFileDirectory', pwd, @ischar);
+        parser.parse(varargin{:});
+        p = parser.Results;
+    end % parseArguments
 
     function outputDirectoryEditBoxCallback(src, ~)
         % Callback for user directly editing the output directory edit box
@@ -311,4 +341,4 @@ uiwait(fig);
         end
     end % outputDirectoryEditBoxCallback
 
-end % tagstudy_input
+end % pop_validateeeg_input

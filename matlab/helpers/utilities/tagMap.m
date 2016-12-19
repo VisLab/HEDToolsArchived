@@ -86,8 +86,7 @@ classdef tagMap < hgsetget
         end % tagMap constructor
         
         function addValue(obj, tList, varargin)
-            % Add the tagList of tags/tag groups to this object based on
-            % updateType
+            % Add the tagList of tags to this object based on updateType
             parser = inputParser;
             parser.addRequired('TList', @(x) (~isempty(x) || ...
                 isa(x, 'tagList')));
@@ -134,7 +133,7 @@ classdef tagMap < hgsetget
         end % addValue
         
         function newMap = clone(obj)
-            % Clone this tagMap object by making a copy of the map
+            % Create a copy of this object
             newMap = tagMap();
             newMap.Field = obj.Field;
             values = obj.TagMap.values;
@@ -151,27 +150,27 @@ classdef tagMap < hgsetget
         end % getField
         
         function jString = getJson(obj)
-            % Return a JSON string version of the tagMap object
+            % Return a JSON string version of this tagMap object
             jString = savejson('', obj.getStruct());
         end % getJson
         
         function jString = getJsonValues(obj)
-            % Return a JSON string version of the tagList object
+            % Return a JSON string version of this tagMap object
             jString = tagMap.values2Json(obj.TagMap.values);
         end % getJsonValues
         
         function eCodes = getCodes(obj)
-            % Return the unique codes for this map
+            % Return the unique codes for this tagMap object
             eCodes = obj.TagMap.keys();
         end % getLabels
         
         function primary = getPrimary(obj)
-            % Return true if a primary field, false if otherwise
+            % Return true if this tagMap object is a primary field
             primary = obj.Primary;
         end % getPrimary
         
         function thisStruct = getStruct(obj)
-            % Return this object in structure form
+            % Return this tagMap object in structure form
             thisStruct = struct('field', obj.Field, 'values', ...
                 obj.getValueStruct());
         end % getStruct
@@ -186,13 +185,13 @@ classdef tagMap < hgsetget
         end % getValue
         
         function values = getValues(obj)
-            % Return the values of this tagMap as a cell array of
+            % Return the values of this tagMap object as a cell array of
             % structures
             values = obj.TagMap.values;
         end % getValues
         
         function eStruct = getValueStruct(obj)
-            % Return the values of this tagMap as a structure array
+            % Return the values of this tagMap object as a structure array
             values = obj.TagMap.values;
             if isempty(values)
                 eStruct = '';
@@ -222,7 +221,7 @@ classdef tagMap < hgsetget
         end % merge
         
         function setPrimary(obj, primary)
-            % Sets the primary field
+            % Sets this tagMap object to the primary field
             obj.Primary = primary;
         end % setPrimary
         

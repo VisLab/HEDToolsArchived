@@ -27,7 +27,7 @@
 %                    Full path to a HED XML file. The default is the
 %                    HED.xml file in the hed directory.
 %
-%   'PreservePrefix'
+%   'PreserveTagPrefixes'
 %                    If false (default), tags of the same event type that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
@@ -69,15 +69,15 @@ end
             isfield(p.edata.etc.tags.map, 'field');
     end % hasSummaryTags
 
-    function xmlFound = hasXML(p)
-        % Returns true if there is a HED XML string found in the .etc field
-        xmlFound = isfield(p.edata, 'etc') && ...
-            isstruct(p.edata.etc) && ...
-            isfield(p.edata.etc, 'tags') && ...
-            isstruct(p.edata.etc.tags) && ...
-            isfield(p.edata.etc.tags, 'xml') && ...
-            ischar(p.edata.etc.tags.xml);
-    end % hasXML
+%     function xmlFound = hasXML(p)
+%         % Returns true if there is a HED XML string found in the .etc field
+%         xmlFound = isfield(p.edata, 'etc') && ...
+%             isstruct(p.edata.etc) && ...
+%             isfield(p.edata.etc, 'tags') && ...
+%             isstruct(p.edata.etc.tags) && ...
+%             isfield(p.edata.etc.tags, 'xml') && ...
+%             ischar(p.edata.etc.tags.xml);
+%     end % hasXML
 
     function fMap = etc2fMap(p)
         % Adds field values to the field maps from the .event and .etc
@@ -95,11 +95,11 @@ end
 
     function fMap = intializefMap(p)
         % Initialized the field maps
-        if hasXML(p)
-            xml = p.edata.etc.tags.xml;
-        else
-            xml = fileread(p.HedXml);
-        end
+        %         if hasXML(p)
+        %             xml = p.edata.etc.tags.xml;
+        %         else
+        xml = fileread(p.HedXml);
+        %         end
         fMap = fieldMap('Xml', xml, 'PreserveTagPrefixes', ...
             p.PreserveTagPrefixes);
     end % intializefMap

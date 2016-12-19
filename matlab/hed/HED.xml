@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="4.0.0">
+<HED version="4.0.1">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1290,6 +1290,30 @@
             <description>Decreasing in amplitude</description>
          </node>
       </node>
+      <node>
+         <name>Blink</name>
+         <node requireChild="true">
+            <name>Time shut The amount of time the eyelid remains closed</name>
+            <description>in seconds</description>
+            <node isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+            </node>
+         </node>
+         <node requireChild="true">
+            <name>PAVR Amplitude-Velocity ratio</name>
+            <description>in centoseconds</description>
+            <node default="centoseconds" isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+            </node>
+         </node>
+         <node requireChild="true">
+            <name>NAVR Negative Amplitude-Velocity ratio</name>
+            <description>in centoseconds</description>
+            <node default="centoseconds" isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+            </node>
+         </node>
+      </node>
       <node requireChild="true">
          <name>Visual</name>
          <node>
@@ -1866,6 +1890,10 @@
       </node>
       <node>
          <name>Eye blink</name>
+         <node>
+            <name>Max</name>
+            <description>The time at which the eyelid is the most closed.</description>
+         </node>
       </node>
       <node>
          <name>Eye close</name>
@@ -3610,7 +3638,7 @@
       </unitClass>
       <unitClass default="s">
          <name>time</name>
-         <units>s,second,seconds,hour:min,day,days,ms,milliseconds,minute,minutes,hour,hours</units>
+         <units>s,second,seconds,centoseconds,hour:min,day,days,ms,milliseconds,minute,minutes,hour,hours</units>
       </unitClass>
       <unitClass default="cm2">
          <name>area</name>

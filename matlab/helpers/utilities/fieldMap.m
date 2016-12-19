@@ -188,7 +188,7 @@ classdef fieldMap < hgsetget
         end % getPreservePrefix
         
         function primaryField = getPrimaryField(obj)
-            % Return the field names of the fieldMap
+            % Return the primary field of the fieldMap
             primaryField = obj.PrimaryField;
         end % getFields
         
@@ -209,7 +209,7 @@ classdef fieldMap < hgsetget
         end % getStruct
         
         function tags = getTags(obj, field, value)
-            % Return the tag string associated with (field name, value)
+            % Return the tag string associated with value event of field
             tags = '';
             try
                 tMap = obj.GroupMap(field);
@@ -220,7 +220,8 @@ classdef fieldMap < hgsetget
         end % getTags
         
         function value = getValue(obj, type, key)
-            % Return value structure for specified type and key
+            % Return the value structure corresponding to specified field
+            % and key
             value = '';
             if obj.GroupMap.isKey(type)
                 value = obj.GroupMap(type).getValue(key);
@@ -228,7 +229,7 @@ classdef fieldMap < hgsetget
         end % getValue
         
         function values = getValues(obj, type)
-            % Return values for type as a cell array of structures
+            % Return the values for field as a cell array of structures
             if obj.GroupMap.isKey(type)
                 values = obj.GroupMap(type).getValues();
             else
@@ -247,7 +248,8 @@ classdef fieldMap < hgsetget
         end % getXmlEdited
         
         function merge(obj, fMap, updateType, excludeFields, includeFields)
-            % Combine this object with the fMap fieldMap
+            % Combine another fieldMap with this object based on update
+            % type
             if isempty(fMap)
                 return;
             end
@@ -306,7 +308,8 @@ classdef fieldMap < hgsetget
     methods (Static = true)
         
         function baseTags = loadFieldMap(tagsFile)
-            % Load a fieldMap from a file tagsFile
+            % Load a field map from a .mat file that contains a fieldMap
+            % object.
             baseTags = '';
             try
                 t = load(tagsFile);
@@ -324,7 +327,7 @@ classdef fieldMap < hgsetget
         
         function successful = saveFieldMap(tagsFile, ...
                 tagsObject) %#ok<INUSD>
-            % Save the fieldMap tagsObject in a file tagsFile
+            % Save a field map to a .mat file
             successful = true;
             try
                 save(tagsFile, 'tagsObject');

@@ -13,18 +13,18 @@
 %   Required:
 %
 %   eData
-%                    The structure that will be tagged. The
-%                    dataset will need to have a .event field.
+%                    A dataset structure that the tag information is to be
+%                    written to.
 %
 %   fMap
-%                    A fieldMap object that stores all of the tags.
+%                    A fieldMap object with the tag information.
 %
 %   Optional (key/value):
 %
-%   'ExcludeFields'
+%   'EventFieldsToIgnore'
 %                    A cell array containing the field names to exclude.
 %
-%   'PreserveTagPrefixes' 
+%   'PreserveTagPrefixes'
 %                    If false (default), tags associated with same value
 %                    that share prefixes are combined and only the most
 %                    specific is retained (e.g., /a/b/c and /a/b become
@@ -52,18 +52,12 @@
 function eData = writetags(eData, fMap, varargin)
 p = parseArguments(eData, fMap, varargin{:});
 
+tFields = setdiff(fMap.getFields(), p.EventFieldsToIgnore);
+
 if isfield(eData, 'event') && isstruct(eData.event)
-    if ~isempty(p.Fields)
-        tFields = intersect(fieldnames(eData.event), ...
-            intersect(fMap.getFields(), p.Fields));
-    else
-        tFields = intersect(fieldnames(eData.event), ...
-            setdiff(fMap.getFields(), p.ExcludeFields));
-    end
+    tFields = intersect(fieldnames(eData.event), tFields);
     eData = writeIndividualTags(eData, fMap, tFields, ...
         p.PreserveTagPrefixes);
-else
-    tFields = intersect(fMap.getFields(), p.Fields);
 end
 eData = writeSummaryTags(fMap, eData, tFields);
 
@@ -124,8 +118,7 @@ eData = writeSummaryTags(fMap, eData, tFields);
         parser.addRequired('eData', @(x) (isempty(x) || isstruct(x)));
         parser.addRequired('fMap', @(x) (~isempty(x) && isa(x, ...
             'fieldMap')));
-        parser.addParamValue('ExcludeFields', {}, @(x) (iscellstr(x)));
-        parser.addParamValue('Fields', {}, @(x) (iscellstr(x)));
+        parser.addParamValue('EventFieldsToIgnore', {}, @(x) (iscellstr(x)));
         parser.addParamValue('PreserveTagPrefixes', false, @islogical);
         parser.parse(eData, fMap, varargin{:});
         p = parser.Results;

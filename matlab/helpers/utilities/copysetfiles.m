@@ -58,6 +58,7 @@
 function fPaths = copysetfiles(fMap, source, destination, varargin)
 p = parseArguments(fMap, source, destination, varargin{:});
 isStudy = false;
+isDir = false;
 if ~isequal(p.destination(end), '/') && ~isequal(p.destination(end), '\')
     p.destination = [p.destination filesep];
 end
@@ -69,10 +70,11 @@ if iscellstr(p.source)
 elseif ischar(p.source)
     [path,~, ext] = fileparts(p.source);
     if ~isempty(ext) && strcmpi(ext, '.study')
-        [study, fPaths] = loadstudy(p.source); %#ok<ASGLU>
+        [study, fPaths] = loadstudy(p.source);
         isStudy = true;
     elseif ~isempty(path)
         fPaths = getfilelist(p.source, '.set', p.DoSubDirs);
+        isDir = true;
     else
         warning('copysetfiles:invalidPath', ['Invalid path to' ...
             ' source directory or study file']);
@@ -82,21 +84,46 @@ if ~exist(p.destination, 'dir')
     mkdir(p.destination);
 end
 fprintf('\n---Now copying the individual data files---\n');
-for k = 1:length(fPaths)
-    try
-        EEG = pop_loadset(fPaths{k});
-        [~, file, ext] = fileparts(fPaths{k});
-        fPaths{k} = [p.destination file ext];
-        pop_saveset(EEG, 'filepath', fPaths{k});
-    catch
-        warning('File %s does not exist ... ignoring file', fPaths{k});
-        fPaths{k} = '';
+if isDir
+    for k = 1:length(fPaths)
+        try
+            EEG = pop_loadset(fPaths{k});
+            destination = p.destination;
+            [~, file, ext] = fileparts(fPaths{k});
+            fPathLeftOver = strrep(fPaths{k}, p.source, '');
+            leftOverDir = fileparts(fPathLeftOver);
+            if length(leftOverDir) > 1
+                destination = fullfile(destination, leftOverDir); 
+            end
+            fPaths{k} = fullfile(destination, [file ext]);
+            if ~exist(destination, 'dir')
+                mkdir(destination);
+            end
+            pop_saveset(EEG, 'filepath', fPaths{k});
+        catch
+            warning('File %s does not exist ... ignoring file', fPaths{k});
+            fPaths{k} = '';
+        end
+    end
+else
+    for k = 1:length(fPaths)
+        try
+            EEG = pop_loadset(fPaths{k});
+            [~, file, ext] = fileparts(fPaths{k});
+            fPaths{k} = [p.destination file ext];
+            pop_saveset(EEG, 'filepath', fPaths{k});
+        catch
+            warning('File %s does not exist ... ignoring file', fPaths{k});
+            fPaths{k} = '';
+        end
     end
 end
 fPaths = fPaths(~cellfun(@isempty, fPaths));
 if isStudy
     % Copy the study file
     fprintf('\n---Now copying the study file---\n');
+    [study.STUDY.datasetinfo.filepath] = deal(p.destination);
+    
     [~, file, ext] = fileparts(p.source);
     save([p.destination filesep file ext], '-struct', 'study');
 end

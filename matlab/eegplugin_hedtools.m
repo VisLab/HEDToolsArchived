@@ -51,7 +51,7 @@ addhedpaths();
 parentMenu = findobj(fig, 'Label', 'Edit');
 
 % Processing for 'Tag current EEG'
-finalcmd = '[EEG LASTCOM] = pop_tageeg(EEG);';
+finalcmd = '[EEG, ~, LASTCOM] = pop_tageeg(EEG);';
 ifeegcmd = 'if ~isempty(LASTCOM) && ~isempty(EEG)';
 savecmd = '[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET);';
 redrawcmd = ' eeglab redraw;';

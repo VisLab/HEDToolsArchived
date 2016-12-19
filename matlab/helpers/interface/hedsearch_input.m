@@ -1,41 +1,55 @@
-% GUI input for specifying search tags in hedepoch function. Using the
-% Search Bar ("Search for"): The tag search uses boolean operators
-% (AND, OR, NOT) to widen or narrow the search. Two tags separated by a
-% comma use the AND operator by default which will only return events that
-% contain both of the tags. The OR operator looks for events that include
-% either one or both tags being specified. The NOT operator looks for
-% events that contain the first tag but not the second tag. To nest or
-% organize the search statements use square brackets. Nesting will change
-% the order in which the search statements are evaluated. For example,
-% "/attribute/visual/color/green AND [/item/2d shape/rectangle/square OR
-% /item/2d shape/ellipse/circle]" will look for events that have a green
-% square or a green circle. When using the search bar and typing in
-% something there will be a listbox below the search bar containing
-% possible matches. Pressing the "up" and "down" arrows on the keyboard
-% while the cursor is in the search bar will move to the next or previous
-% tag in the listbox. Pressing "Enter" will select the current tag in the
-% listbox and it will be added to the search bar. When done click the
-% "Ok" button and it will take you back to the main epoching menu.
+% GUI input for specifying the "Time-locking HED tag(s) in the pop_epochhed
+% function.
 %
 % Usage:
 %
-%   >>  [canceled, tags] = hedsearch_input(uniquetags)
+%   >>  [canceled, tags] = hedsearch_input(uniquetags, searchtags)
+%
+% Graphic interface:
+%
+%    "Search for"
+%
+%                A search string consisting of tags to extract data epochs.
+%                The tag search uses boolean operators (AND, OR, NOT) to
+%                widen or narrow the search. Two tags separated by a comma
+%                use the AND operator by default which will only return
+%                events that contain both of the tags. The OR operator
+%                looks for events that include either one or both tags
+%                being specified. The NOT operator looks for events that
+%                contain the first tag but not the second tag. To nest or
+%                organize the search statements use square brackets.
+%                Nesting will change the order in which the search
+%                statements are evaluated. For example,
+%                "/attribute/visual/color/green AND 
+%                [/item/2d shape/rectangle/square OR
+%                /item/2d shape/ellipse/circle]" will look for events that
+%                have a green square or a green circle. When using the
+%                search bar and typing in something there will be a listbox
+%                below the search bar containing possible matches. Pressing
+%                the "up" and "down" arrows on the keyboard while the
+%                cursor is in the search bar will move to the next or
+%                previous tag in the listbox. Pressing "Enter" will select
+%                the current tag in the listbox and it will be added to the
+%                search bar. When done click the "Ok" button and it will
+%                take you back to the main epoching menu.
 %
 % Input:
 %
 %   Required:
 %
 %   uniquetags
-%                    The unique HED tags in the EEG dataset loaded.
+%                The unique HED tags in the EEG dataset loaded.
+%
+%   tags         
+%                A search string consisting of tags to extract data epochs.
 %
 % Output:
 %
 %   canceled
-%                    True if the cancel button is pressed. False if
-%                    otherwise.
+%                True if the cancel button is pressed. False if otherwise.
 %
 %   tags
-%                    The search tags that the user specified.
+%                A search string consisting of tags to extract data epochs.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -55,13 +69,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, tags] = hedsearch_input(uniquetags)
+function [canceled, tags] = hedsearch_input(uniquetags, tags)
 canceled = true;
-tags = '';
 matches = '';
-title = 'Set search tag criteria';
+title = 'Set time-locking HED tag(s)';
+criteriaTitle = 'Current time-lock tag string';
 listbox = [];
 editbox = [];
+criteriaLabel = [];
 label = [];
 fig = createFigure(title);
 createPanel(fig);
@@ -73,6 +88,7 @@ if ishandle(fig)
 end
 
     function [matches, sequence] = findMatchingTags(src)
+        % Looks for matching tags 
         sequence = findsequence(char(src.getText()), ...
             src.getCaretPosition());
         indexes = ~cellfun(@isempty, regexpi(uniquetags, sequence));
@@ -80,6 +96,7 @@ end
     end % findMatchingTags
 
     function searchClbk(src, evnt)
+        % The search bar callback 
         if ~isempty(char(src.getText())) && src.getCaretPosition() > 0
             [matches, sequence] = findMatchingTags(src);
             matches = vertcat({sequence}, matches);
@@ -99,9 +116,10 @@ end
             set(label, 'String', '');
             set(listbox, 'Visible', 'off');
         end
-    end
+    end % searchClbk
 
     function isListboxKey = checkForSpecialKeys(evnt, matches)
+        % Checks for special keys associated with the listbox 
         isListboxKey = false;
         if isequal(get(listbox, 'Visible'), 'on') && ...
                 (evnt.getKeyCode() == 10 || evnt.getKeyCode() == 13)
@@ -124,23 +142,26 @@ end
             end
             isListboxKey = true;
         end
-    end
+    end % checkForSpecialKeys
 
-    function OkayCallback(src, eventdata) %#ok<INUSD>
+    function okayCallback(src, eventdata) %#ok<INUSD>
+        % The okay button callback
         canceled = false;
         tags = char(editbox.getText());
         close(fig);
-    end
+    end % okayCallback
 
-    function CancelCallback(src, eventdata) %#ok<INUSD>
+    function cancelCallback(src, eventdata) %#ok<INUSD>
+        % The cancel button callback 
         canceled = true;
         tags = char(editbox.getText());
         close(fig);
-    end
+    end % cancelCallback
 
-    function HelpCallback(src, eventdata) %#ok<INUSD>
+    function helpCallback(src, eventdata) %#ok<INUSD>
+        % The help button callback 
         doc hedsearch_input
-    end
+    end % helpCallback
 
     function MatchClbk(src, evnt) %#ok<INUSD>
         items = get(src, 'String');
@@ -160,6 +181,7 @@ end
         % Creates the edit boxes in the panel
         editbox = javax.swing.JTextField();
         editbox.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        editbox.setText(tags);
         [hcomponent, hContainer] = javacomponent(editbox, [85 360 340 35]);
         set(hContainer, 'Units','norm');
         set(hContainer, 'Position', [0.12 0.85 0.85 0.1]);
@@ -185,6 +207,7 @@ end
     end % createFigure
 
     function scroll(src, evnt) %#ok<INUSL>
+        % Scroll action handler for listbox 
         numTags = length(matches);
         position = get(listbox,'Value');   
         if evnt.VerticalScrollCount == 1 && (position + 1 <= numTags)
@@ -192,7 +215,7 @@ end
         elseif evnt.VerticalScrollCount == -1 && (position - 1 >= 1)
             set(listbox,'Value', position - 1)
         end
-    end
+    end % scroll
 
     function createLabels(panel)
         % Creates the labels in the panel
@@ -202,41 +225,48 @@ end
             'String', 'Search for', ...
             'HorizontalAlignment', 'Left', ...
             'Position', [0.01 0.8 0.12 0.12]);
+        uicontrol('parent', panel, ...
+            'Style', 'Text', ...
+            'Units', 'normalized', ...
+            'FontWeight', 'bold', ...
+            'String', criteriaTitle, ...
+            'HorizontalAlignment', 'Center', ...
+            'Position', [0.01 0.22 0.95 0.22]);
         label = uicontrol('parent', panel, ...
             'Style', 'Text', ...
             'Units', 'normalized', ...
-            'String', '', ...
+            'String', tags, ...
             'HorizontalAlignment', 'Center', ...
-            'Position', [0.01 0.22 0.95 0.22]);
+            'Position', [0.01 0.18 0.95 0.22]);
     end % createLabels
 
     function downCall(src, evnt) %#ok<INUSD>
-    end
+    end % downCall
 
     function createButtons(panel)
-        % Creates the labels in the panel
+        % Creates the buttons in the panel
         uicontrol('parent', panel, ...
             'Style', 'pushbutton', ...
             'Units', 'normalized', ...
             'String', 'Help', ...
             'HorizontalAlignment', 'Left', ...
-            'Callback', @HelpCallback, ...
+            'Callback', @helpCallback, ...
             'Position', [0.01 0.05 0.2 0.1]);
         uicontrol('parent', panel, ...
             'Style', 'pushbutton', ...
             'Units', 'normalized', ...
             'String', 'Cancel', ...
             'HorizontalAlignment', 'Left', ...
-            'Callback', @CancelCallback, ...
+            'Callback', @cancelCallback, ...
             'Position', [0.525 0.05 0.2 0.1]);
         uicontrol('parent', panel, ...
             'Style', 'pushbutton', ...
             'Units', 'normalized', ...
             'String', 'Ok', ...
-            'Callback', @OkayCallback, ...
+            'Callback', @okayCallback, ...
             'HorizontalAlignment', 'Left', ...
             'Position', [0.75 0.05 0.2 0.1]);
-    end
+    end % createButtons
 
     function createListBoxes(panel)
         % Creates the edit boxes in the panel
@@ -250,7 +280,7 @@ end
             'Units','normalized',...
             'Callback',@MatchClbk, ...
             'Position', [0.12 0.45 0.85 0.4]);
-    end % createEditBoxes
+    end % createListBoxes
 
     function createPanel(fig)
         % Creates HED mapping layout

@@ -6,27 +6,42 @@
 %
 %   >>  [issues, com] = pop_validateeeg(EEG, 'key1', value1 ...)
 %
+% Input:
+%
+%   Required:
+%
+%   EEG
+%                    The EEG dataset structure containing HED tags in the
+%                    .event field. The tags need to be present in the
+%                    .usertags and/or .hedtags fields.
+%
 %   Optional:
 %
-%   'generateWarnings'
+%   UseGui
+%                    If true (default), use a series of menus to set
+%                    function arguments.
+%
+%   Optional (key/value):
+%
+%   'GenerateWarnings'
 %                   True to include warnings in the log file in addition
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
-%   'hedXML'
+%   'HedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'outDir'
-%                   The directory where the validation output is written
+%   'OutputFileDirectory'
+%                   The directory where the validation output is written 
 %                   to. There will be a log file generated for each study
 %                   dataset validated.
 %
-%   'writeOutput'
+%   'WriteOutputToFile'
 %                   If true (default), write the validation issues to a
 %                   log file in addition to the workspace. If false only
-%                   write the issues to the workspace.
+%                   write the issues to the workspace. 
 %
 % Output:
 %
@@ -59,7 +74,6 @@
 function [issues, com] = pop_validateeeg(EEG, varargin)
 issues = '';
 com = '';
-canceled = false;
 
 % Display help if inappropriate number of arguments
 if nargin < 1
@@ -67,16 +81,44 @@ if nargin < 1
     return;
 end;
 
-if nargin == 1
-    [canceled, varargin] = validateeeg_input();
+p = parseArguments(EEG, varargin{:});
+
+if p.UseGui
+    menuInputArgs = getkeyvalue({'GenerateWarnings', 'HedXml', ...
+        'OutputFileDirectory'}, varargin{:});
+    [canceled, generateWarnings, hedXML, outDir] = ...
+        pop_validateeeg_input(menuInputArgs{:});
+    if canceled
+        return;
+    end
+    inputArgs = {'GenerateWarnings', generateWarnings, 'HedXml' ...
+        hedXML, 'OutputFileDirectory', outDir};
+    issues = validateeeg(EEG, inputArgs{:});
 end
 
-if canceled
-    return;
+% Call function without menu
+if nargin > 1 && ~p.UseGui
+    inputArgs = getkeyvalue({'GenerateWarnings', 'HedXml', ...
+        'OutputFileDirectory', 'WriteOutputToFile'}, varargin{:});
+    issues = validateeeg(EEG, inputArgs{:});
 end
 
-issues = validateeeg(EEG, varargin{:});
-com = char(['pop_validateeeg(' inputname(1) ', '...
-    keyvalue2str(varargin{:}) ');']);
+com = char(['pop_validateeeg(' inputname(1) ', ' ...
+    logical2str(p.UseGui) ', ' keyvalue2str(inputArgs{:}) ');']);
+
+    function p = parseArguments(EEG, varargin)
+        % Parses the arguements passed in and returns the results
+        p = inputParser();
+        p.addRequired('EEG', @(x) (~isempty(x) && isstruct(x)));
+        p.addOptional('UseGui', true, @islogical);
+        p.addParamValue('GenerateWarnings', false, ...
+            @(x) validateattributes(x, {'logical'}, {}));
+        p.addParamValue('HedXml', 'HED.xml', ...
+            @(x) (~isempty(x) && ischar(x)));
+        p.addParamValue('OutputFileDirectory', pwd, @ischar);
+        p.addParamValue('WriteOutputToFile', true, @islogical);
+        p.parse(EEG, varargin{:});
+        p = p.Results;
+    end % parseArguments
 
 end % pop_validateeeg

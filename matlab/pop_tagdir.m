@@ -10,9 +10,9 @@
 %
 %   >>  [fMap, fPaths, com] = pop_tagdir()
 %
-%   >>  [fMap, fPaths, com] = pop_tagdir(inDir)
+%   >>  [fMap, fPaths, com] = pop_tagdir(UseGui, 'key1', value1 ...)
 %
-%   >>  [fMap, fPaths, com] = pop_tagdir(inDir, 'key1', value1 ...)
+%   >>  [fMap, fPaths, com] = pop_tagdir('key1', value1 ...)
 %
 % Input:
 %
@@ -232,7 +232,7 @@ if p.UseGui
     saveheddatasetsInputArgs = getkeyvalue({'CopyDatasets', ...
         'CopyDestination', 'OverwriteDatasets'}, varargin{:});
     [fMap, copyDatasets, copyDestination, overwriteDatasets] = ...
-        pop_saveheddatasets(fMap, fPaths, saveheddatasetsInputArgs{:});
+        pop_saveheddatasets(fMap, inDir, saveheddatasetsInputArgs{:});
     saveheddatasetsOutputArgs = {'CopyDatasets', copyDatasets, ...
         'CopyDestination', copyDestination, 'OverwriteDatasets', ...
         overwriteDatasets};

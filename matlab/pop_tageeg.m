@@ -10,8 +10,6 @@
 %
 %   >>  [EEG, com] = pop_tageeg(EEG)
 %
-%   >>  [EEG, com] = pop_tageeg(EEG, UseGui)
-%
 %   >>  [EEG, com] = pop_tageeg(EEG, UseGui, 'key1', value1 ...)
 %
 %   >>  [EEG, com] = pop_tageeg(EEG, 'key1', value1 ...)

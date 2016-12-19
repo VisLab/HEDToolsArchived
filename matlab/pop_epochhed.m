@@ -2,11 +2,11 @@
 %
 % Usage:
 %
-%   >>  [EEG, indices, com] = pop_hedepoch(EEG);
+%   >>  [EEG, indices, com] = pop_epochhed(EEG);
 %
-%   >>  [EEG, indices, com] = pop_hedepoch(EEG, events, timelimits);
+%   >>  [EEG, indices, com] = pop_epochhed(EEG, events, timelimits);
 %
-%   >>  [EEG, indices, com] = pop_hedepoch(EEG, events, timelimits, ...
+%   >>  [EEG, indices, com] = pop_epochhed(EEG, events, timelimits, ...
 %                             'key1', value1 ...);
 %
 %   Graphic interface:
@@ -39,7 +39,8 @@
 %                Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
 %
-%   tags         A search string consisting of tags to extract data epochs.
+%   tags         
+%                A search string consisting of tags to extract data epochs.
 %                The tag search uses boolean operators (AND, OR, NOT) to
 %                widen or narrow the search. Two tags separated by a comma
 %                use the AND operator by default which will only return
@@ -128,12 +129,15 @@ end;
 
 
 if nargin < 3
-    % Find all the unique tags in the events
+    % Find all the unique tags in the events    
+    if ~exist('tags','var')
+        tags = '';
+    end
     uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
     % Get input arguments from GUI
     [canceled, tags, newName, timelim, valueLim] = ...
-        epochhed_input(EEG.setname, uniquetags);
+        epochhed_input(EEG.setname, tags, uniquetags);
     if canceled
         return;
     end

@@ -1,12 +1,18 @@
-% Allows a user to tag a EEGLAB study using a GUI.
+% Allows a user to tag a study and its associated datasets using a GUI. 
+% pop_tagstudy first brings up a GUI to allow the user to set parameters
+% for the tagstudy function, and then calls tagstudy to consolidate the
+% tags from all of the data files in the study. Depending on the arguments,
+% tagstudy may bring up a menu to allow the user to choose which fields
+% should be tagged. The tagstudy function may also bring up the CTAGGER GUI
+% to allow users to edit the tags.
 %
 % Usage:
 %
-%   >>  [fMap, com] = pop_tagstudy()
+%   >>  [fMap, fPaths, com] = pop_tagstudy()
 %
-%   >>  [fMap, fPaths, com] = pop_tagstudy(studyFile)
+%   >>  [fMap, fPaths, com] = pop_tagstudy(UseGui, 'key1', value1 ...)
 %
-%   >>  [fMap, fPaths, com] = pop_tagstudy(studyFile, 'key1', value1 ...)
+%   >>  [fMap, fPaths, com] = pop_tagstudy('key1', value1 ...)
 %
 % Input:
 %
@@ -210,7 +216,7 @@ if p.UseGui
     saveheddatasetsInputArgs = getkeyvalue({'CopyDatasets', ...
         'CopyDestination', 'OverwriteDatasets'}, varargin{:});
     [fMap, copyDatasets, copyDestination, overwriteDatasets] = ...
-        pop_saveheddatasets(fMap, fPaths, saveheddatasetsInputArgs{:});
+        pop_saveheddatasets(fMap, studyFile, saveheddatasetsInputArgs{:});
     saveheddatasetsOutputArgs = {'CopyDatasets', copyDatasets, ...
         'CopyDestination', copyDestination, 'OverwriteDatasets', ...
         overwriteDatasets};
@@ -257,7 +263,7 @@ com = char(['pop_tagstudy(' logical2str(p.UseGui) ...
         parser.addParamValue('SelectEventFields', true, @islogical);
         parser.addParamValue('SeparateUserHedFile', '', @(x) ...
             (isempty(x) || (ischar(x))));
-        parser.addParamValue('StudyFile', ...
+        parser.addParamValue('StudyFile', '', ...
             @(x) (~isempty(x) && exist(x, 'file')));
         parser.addParamValue('UseCTagger', true, @islogical);
         parser.addParamValue('WriteFMapToFile', false, @islogical);

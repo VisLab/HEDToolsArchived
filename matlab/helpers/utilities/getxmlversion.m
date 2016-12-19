@@ -42,6 +42,17 @@ try
     xRoot = xDoc.getDocumentElement;
     version =  strtrim(char(xRoot.getAttribute('version')));
 catch
-    warning('No version was found');
+    hedMaps = loadHEDMap();
+    mapVersion = hedMaps.version;
+    warning(['No version number was found in the HED file ... using' ...
+        ' default version %s'], mapVersion);
 end
+
+    function hedMaps = loadHEDMap()
+        % Loads a structure that contains Maps associated with the HED XML
+        % tags
+        Maps = load('hedMaps.mat');
+        hedMaps = Maps.hedMaps;
+    end % loadHEDMap
+
 end % getxmlversion

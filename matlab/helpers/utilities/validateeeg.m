@@ -12,24 +12,24 @@
 %   EEG         
 %                   A EEG dataset structure containing HED tags.
 %
-%   Optional:
+%   Optional (key/value):
 %
-%   'generateWarnings'
+%   'GenerateWarnings'
 %                   True to include warnings in the log file in addition
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
-%   'hedXML'
+%   'HedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'outDir'
+%   'OutputFileDirectory'
 %                   The directory where the validation output is written 
 %                   to. There will be a log file generated for each study
 %                   dataset validated.
 %
-%   'writeOutput'
+%   'WriteOutputToFile'
 %                   If true (default), write the validation issues to a
 %                   log file in addition to the workspace. If false only
 %                   write the issues to the workspace. 
@@ -69,14 +69,14 @@ issues = validate(p);
         if isfield(p.EEG.event, 'usertags') || ...
                 isfield(p.EEG.event, 'hedtags')
             [p.issues, p.replaceTags] = parseeeg(p.hedMaps, ...
-                p.EEG.event, p.generateWarnings);
+                p.EEG.event, p.GenerateWarnings);
             issues = p.issues;
-            if p.writeOutput
+            if p.WriteOutputToFile
                 writeOutputFiles(p);
             end
         else
             issues = '';
-            fprintf(['The usertag and hedtags fields do not exist in' ...
+            fprintf(['The usertags and hedtags fields do not exist in' ...
                 ' the events. Please tag this dataset before' ...
                 ' running the validation.\n']);
         end
@@ -87,9 +87,9 @@ issues = validate(p);
         % tags
         hedMaps = loadHEDMap();
         mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.hedXML);
-        if ~strcmp(mapVersion, xmlVersion);
-            hedMaps = mapHEDAttributes(p.hedXML);
+        xmlVersion = getxmlversion(p.HedXml);
+        if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion)
+            hedMaps = mapHEDAttributes(p.HedXml);
         end
     end % getHEDMaps
 
@@ -104,20 +104,19 @@ issues = validate(p);
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) (~isempty(x) && isstruct(x)));
-        p.addParamValue('generateWarnings', false, ...
+        p.addParamValue('GenerateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('hedXML', 'HED.xml', ...
+        p.addParamValue('HedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('outDir', pwd, ...
-            @(x) ischar(x) && 7 == exist(x, 'dir'));
-        p.addParamValue('writeOutput', true, @islogical);
+        p.addParamValue('OutputFileDirectory', pwd, @ischar);
+        p.addParamValue('WriteOutputToFile', true, @islogical);
         p.parse(EEG, varargin{:});
         p = p.Results;
     end % parseArguments
 
     function writeOutputFiles(p)
         % Writes the issues to the log file
-        p.dir = p.outDir;
+        p.dir = p.OutputFileDirectory;
         if ~isempty(p.EEG.filename)
         [~, p.file] = fileparts(p.EEG.filename);
         else

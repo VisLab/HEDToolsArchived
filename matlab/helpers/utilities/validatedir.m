@@ -15,28 +15,28 @@
 %
 %   Optional (key/value):
 %
-%   'doSubDirs'
+%   'DoSubDirs'
 %                   If true (default), the entire inDir directory tree is
 %                   searched. If false, only the inDir directory is
 %                   searched.
 %
-%   'generateWarnings'
+%   'GenerateWarnings'
 %                   If true, include warnings in the log file in addition
 %                   to errors. If false (default), only errors are included
 %                   in the log file.
 %
-%   'hedXML'
+%   'HedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'outDir'
+%   'OutputFileDirectory'
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each directory
 %                   dataset validated. The default directory will be the
-%                   current directory. 
+%                   current directory.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -63,16 +63,16 @@ fPaths = validate(p);
         % tags
         hedMaps = loadHEDMaps();
         mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.hedXML);
-        if ~strcmp(mapVersion, xmlVersion);
-            hedMaps = mapHEDAttributes(p.hedXML);
+        xmlVersion = getxmlversion(p.HedXml);
+        if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion);
+            hedMaps = mapHEDAttributes(p.HedXml);
         end
     end % getHEDMaps
 
     function fPaths = validate(p)
         % Validates all .set files in the input directory
         p.hedMaps = getHEDMaps(p);
-        fPaths = getfilelist(p.inDir, '.set', p.doSubDirs);
+        fPaths = getfilelist(p.inDir, '.set', p.DoSubDirs);
         numFiles = length(fPaths);
         nonTaggedSets = {};
         nonTagedIndex = 1;
@@ -80,32 +80,34 @@ fPaths = validate(p);
             p.EEG = pop_loadset(fPaths{a});
             p.fPath = fPaths{a};
             if isfield(p.EEG.event, 'usertags') || ...
-                isfield(p.EEG.event, 'hedtags')
+                    isfield(p.EEG.event, 'hedtags')
                 [p.issues, p.replaceTags] = ...
-                    parseeeg(p.hedMaps, p.EEG.event, p.generateWarnings);
-                    writeOutputFiles(p);
+                    parseeeg(p.hedMaps, p.EEG.event, p.GenerateWarnings);
+                writeOutputFiles(p);
             else
                 if ~isempty(p.EEG.filename)
                     nonTaggedSets{nonTagedIndex} = ...
-                        p.EEG.filename; %#ok<AGROW>
+                        [p.EEG.filepath p.EEG.filename]; %#ok<AGROW>
                 else
                     nonTaggedSets{nonTagedIndex} = ...
-                        p.EEG.setname; %#ok<AGROW>
+                        [p.EEG.filepath p.EEG.setname]; %#ok<AGROW>
                 end
                 nonTagedIndex = nonTagedIndex + 1;
             end
         end
-        printNonTaggedDatasets(nonTaggedSets);
+        if ~isempty(nonTaggedSets)
+            printNonTaggedDatasets(nonTaggedSets);
+        end
     end % validate
 
     function printNonTaggedDatasets(nonTaggedSets)
         % Prints all datasets in directory that are not tagged
         numFiles = length(nonTaggedSets);
-        for a = 1:numFiles
-            fprintf(['Dataset %s: The usertag and hedtags fields do' ...
-                ' not exist in the events. Please tag the dataset' ...
-                ' before running the validation.\n'], nonTaggedSets{a});
+        datasets = nonTaggedSets{1};
+        for a = 2:numFiles
+            datasets = [datasets sprintf('\n%s' , nonTaggedSets{a})];             %#ok<AGROW>
         end
+        warning('Please tag the following dataset(s):\n%s', datasets);
     end % printNonTaggedDatasets
 
     function hedMaps = loadHEDMaps()
@@ -119,12 +121,12 @@ fPaths = validate(p);
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('inDir', @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('doSubDirs', true, @islogical);
-        p.addParamValue('generateWarnings', false, ...
+        p.addParamValue('DoSubDirs', true, @islogical);
+        p.addParamValue('GenerateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('hedXML', 'HED.xml', ...
+        p.addParamValue('HedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('outDir', pwd, ...
+        p.addParamValue('OutputFileDirectory', pwd, ...
             @(x) ischar(x));
         p.parse(inDir, varargin{:});
         p = p.Results;
@@ -132,7 +134,12 @@ fPaths = validate(p);
 
     function writeOutputFiles(p)
         % Writes the issues found to a log file
-        p.dir = p.outDir;
+        p.dir = p.OutputFileDirectory;
+        fPathLeftOver = strrep(p.fPath, p.inDir, '');
+        leftOverDir = fileparts(fPathLeftOver);
+        if length(leftOverDir) > 1
+            p.dir = fullfile(p.dir, leftOverDir);
+        end
         if ~isempty(p.EEG.filename)
             [~, p.file] = fileparts(p.EEG.filename);
         else
@@ -143,11 +150,10 @@ fPaths = validate(p);
         try
             if ~isempty(p.issues)
                 createLogFile(p, false);
-                createReplaceFile(p);
             else
                 createLogFile(p, true);
             end
-        catch
+        catch ME
             throw(MException('validatedir:cannotWrite', ...
                 'Could not write output file'));
         end
@@ -158,6 +164,9 @@ fPaths = validate(p);
         % validation
         numErrors = length(p.issues);
         errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
+        if ~exist(p.dir, 'dir')
+            mkdir(p.dir);
+        end
         fileId = fopen(errorFile,'w');
         if ~empty
             fprintf(fileId, '%s', p.issues{1});

@@ -114,7 +114,7 @@ classdef tagList < hgsetget
         end % getJsonValues
         
         function keys = getKeys(obj)
-            % Returns the tag map keys for this tagList
+            % Returns the keys for this tagList
             keys = obj.Tags.keys;
         end % getCount
         
@@ -131,8 +131,8 @@ classdef tagList < hgsetget
         end % getTags
         
         function keysRemoved = intersect(obj, newList)
-            % Keep only the tag map keys that are in this tagList and in
-            % tagList newList
+            % Keep only the keys that are in this tagList and in the other
+            % tagList 
             keys1 = newList.Tags.keys;
             keys2 = obj.Tags.keys;
             keysBoth = intersect(keys1, keys2);
@@ -156,8 +156,8 @@ classdef tagList < hgsetget
         
         
         function remove(obj, value)
-            % Remove the tag or tag group in the tag map of this tagList
-            % corresponding to value
+            % Remove the tag or tag group in this tagList corresponding to
+            % value
             key = tagList.stringify({tagList.getCanonical(value)});
             if ~isempty(key)  && obj.Tags.isKey(key)
                 obj.Tags.remove(key);
@@ -186,12 +186,12 @@ classdef tagList < hgsetget
         end  % remove
         
         function setCode(obj, code)
-            % Returns the code associated with this tagList
+            % Sets the code associated with this tagList
             obj.Code = code;
         end % setCode
         
         function keysAdded = union(obj, newList)
-            % Adds the tags given in tagList newList to those of this
+            % Adds the tags given in another tagList to those of this
             % tagList
             keysNew = newList.Tags.keys;
             keysOld = obj.Tags.keys;
@@ -352,7 +352,7 @@ classdef tagList < hgsetget
         end   % removeGroupDuplicates
         
         function [keep, duplicates] = separateDuplicates(tlist, prefix)
-            % Returns a list of tags without duplicates from cellstr tlist
+            % Returns a list of tags without duplicates from cellstr
             duplicates = {};
             keep = {};
             if isempty(tlist)
