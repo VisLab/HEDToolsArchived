@@ -87,10 +87,10 @@ fPaths = validate(p);
             else
                 if ~isempty(p.EEG.filename)
                     nonTaggedSets{nonTagedIndex} = ...
-                        [p.EEG.filepath p.EEG.filename]; %#ok<AGROW>
+                        fullfile(p.EEG.filepath, p.EEG.filename); %#ok<AGROW>
                 else
                     nonTaggedSets{nonTagedIndex} = ...
-                        [p.EEG.filepath p.EEG.setname]; %#ok<AGROW>
+                        fullfile(p.EEG.filepath, p.EEG.setname); %#ok<AGROW>
                 end
                 nonTagedIndex = nonTagedIndex + 1;
             end

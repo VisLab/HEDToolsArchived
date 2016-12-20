@@ -89,7 +89,7 @@ uimenu(dirMenu, 'Label', 'Validate directory', 'Callback', finalcmd, ...
     'Separator', 'on', 'userdata', 'startup:on;study:on');
 
 % Processing for 'Tag EEG study'
-finalcmd = 'LASTCOM = pop_validatestudy();';
+finalcmd = '[~, LASTCOM] = pop_validatestudy();';
 finalcmd =  [trystrs.no_check finalcmd catchstrs.add_to_hist];
 
 % Add 'Validate EEG study' to 'Tag files'  
