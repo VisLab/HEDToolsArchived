@@ -1,3 +1,0 @@
-1123	Event/Label/some event 1, Event/Long name/ Environmental | MissionBoundary | DataCollection | Onset	Event/Description/some event 1's description, Item/Object/Animal, (Item/Object/Person/Man, Item/Object/Plant/cactus, Item/Object/Food), Sensory presentation/Taste	(Item/3D shape/Box/Cube, Item/2D shape/Star)
-1111	Event/Label/some event 2	Event/Long name/Vehicle | Perturbation | Left | Offset	Event/Description/some event 2's description
-a	Event/Label/some event 3	Event/Description/some event 3's description, Item/Object/Building	Event/Category/Participant response
