@@ -132,7 +132,7 @@ classdef tagList < hgsetget
         
         function keysRemoved = intersect(obj, newList)
             % Keep only the keys that are in this tagList and in the other
-            % tagList 
+            % tagList
             keys1 = newList.Tags.keys;
             keys2 = obj.Tags.keys;
             keysBoth = intersect(keys1, keys2);
@@ -204,7 +204,7 @@ classdef tagList < hgsetget
             end
             keysAdded = keysOld(addedMask);
         end % union
-                
+        
     end % public methods
     
     methods(Static = true)
@@ -251,9 +251,12 @@ classdef tagList < hgsetget
             elseif ischar(tgroup)
                 tsorted = strrep(tgroup, '"','');
                 tsorted = strtrim(tsorted);
-%                 if ~strcmp(tsorted(1), '/')
-%                     tsorted = ['/', tsorted];
-%                 end
+                %                 if ~strcmp(tsorted(1), '/')
+                %                     tsorted = ['/', tsorted];
+                %                 end
+                if strcmp(tsorted(1), '/')
+                    tsorted = tsorted(2:end);
+                end
                 if strcmp(tsorted(end), '/')
                     tsorted = tsorted(1:end-1);
                 end
@@ -266,9 +269,12 @@ classdef tagList < hgsetget
             empties = cellfun(@isempty, tgroup);
             tgroup(empties) = [];   % remove empties
             for k = 1:length(tgroup)
-%                 if ~strcmp(tgroup{k}, '~') && ~strcmp(tgroup{k}(1), '/')
-%                     tgroup{k} = ['/', tgroup{k}];
-%                 end
+                %                 if ~strcmp(tgroup{k}, '~') && ~strcmp(tgroup{k}(1), '/')
+                %                     tgroup{k} = ['/', tgroup{k}];
+                %                 end
+                if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(1), '/')
+                    tgroup{k} = tgroup{k}(2:end);
+                end
                 if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(end), '/')
                     tgroup{k} = tgroup{k}(1:end - 1);
                 end
@@ -288,48 +294,54 @@ classdef tagList < hgsetget
         end % getCanonical
         
         function tCanonical = getUnsortedCanonical(tgroup)
-        % Returns a unsorted version of a valid tag or tag group
-        tCanonical = {};
-        if isempty(tgroup)
-            return;
-        elseif ischar(tgroup)
-            tCanonical = strrep(tgroup, '"','');
-            tCanonical = strtrim(tCanonical);
-%             if ~strcmp(tCanonical(1), '/')
-%                 tCanonical = ['/', tCanonical];
-%             end
-            if strcmp(tCanonical(end), '/')
-                tCanonical = tCanonical(1:end-1);
+            % Returns a unsorted version of a valid tag or tag group
+            tCanonical = {};
+            if isempty(tgroup)
+                return;
+            elseif ischar(tgroup)
+                tCanonical = strrep(tgroup, '"','');
+                tCanonical = strtrim(tCanonical);
+                if strcmp(tCanonical(1), '/')
+                    tCanonical = tCanonical(2:end);
+                end
+                %             if ~strcmp(tCanonical(1), '/')
+                %                 tCanonical = ['/', tCanonical];
+                %             end
+                if strcmp(tCanonical(end), '/')
+                    tCanonical = tCanonical(1:end-1);
+                end
+                return
+            elseif ~iscellstr(tgroup)
+                return;
             end
-            return
-        elseif ~iscellstr(tgroup)
-            return;
-        end
-        tgroup = strrep(tgroup, '"','');
-        tgroup = strtrim(tgroup(:))';   % make sure a row
-        empties = cellfun(@isempty, tgroup);
-        tgroup(empties) = [];   % remove empties
-        for k = 1:length(tgroup)
-%             if ~strcmp(tgroup{k}, '~') && ~strcmp(tgroup{k}(1), '/')
-%                 tgroup{k} = ['/', tgroup{k}];
-%             end
-            if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(end), '/')
-                tgroup{k} = tgroup{k}(1:end - 1);
+            tgroup = strrep(tgroup, '"','');
+            tgroup = strtrim(tgroup(:))';   % make sure a row
+            empties = cellfun(@isempty, tgroup);
+            tgroup(empties) = [];   % remove empties
+            for k = 1:length(tgroup)
+                %             if ~strcmp(tgroup{k}, '~') && ~strcmp(tgroup{k}(1), '/')
+                %                 tgroup{k} = ['/', tgroup{k}];
+                %             end
+                if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(1), '/')
+                    tgroup{k} = tgroup{k}(2:end);
+                end
+                if ~strcmp(tgroup{k}, '~') && strcmp(tgroup{k}(end), '/')
+                    tgroup{k} = tgroup{k}(1:end - 1);
+                end
             end
-        end
-        empties = cellfun(@isempty, tgroup);
-        tgroup(empties) = [];   % remove empties
-        tildepos = find(strcmpi('~', tgroup));
-        tCanonical = cell(1, length(tgroup));
-        tindex = [0 tildepos length(tgroup) + 1];
-        for k = 1:length(tildepos) + 1
-            theind = (tindex(k) + 1):(tindex(k+1) - 1);
-            tCanonical(theind) = tgroup(theind);
-            if tindex(k+1) <= length(tgroup)
-                tCanonical{tindex(k+1)} = '~';
+            empties = cellfun(@isempty, tgroup);
+            tgroup(empties) = [];   % remove empties
+            tildepos = find(strcmpi('~', tgroup));
+            tCanonical = cell(1, length(tgroup));
+            tindex = [0 tildepos length(tgroup) + 1];
+            for k = 1:length(tildepos) + 1
+                theind = (tindex(k) + 1):(tindex(k+1) - 1);
+                tCanonical(theind) = tgroup(theind);
+                if tindex(k+1) <= length(tgroup)
+                    tCanonical{tindex(k+1)} = '~';
+                end
             end
-        end
-    end % getUnsortedCanonical
+        end % getUnsortedCanonical
         
         function tremoved = removeGroupDuplicates(tgroup, prefix)
             % Removes duplicates from a tag group based on prefix

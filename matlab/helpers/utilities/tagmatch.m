@@ -34,13 +34,17 @@
 
 function found = tagmatch(tags, search)
 parseArguments(tags, search);
+if search(1) == '/'
+   search = search(2:end); 
+end
 offsetTag = 'Attribute/Offset';
 if any(strncmpi(tags, offsetTag, length(offsetTag)))
     onsetTag = 'Attribute/Onset';
     tags{end+1} = onsetTag;
 end
-% found = any(strncmpi(tags, search, length(search)));
-found = any(strcmpi(tags, search));
+prefixSearch = [search '/'];
+found = any(strcmpi(tags, search)) || ...
+    any(strncmpi(tags, prefixSearch, length(prefixSearch)));
 
     function p = parseArguments(tags, search)
         % Parses the input arguments and returns the results

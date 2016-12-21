@@ -1,5 +1,5 @@
-% This function looks through the events of a EEG structure and finds
-% the events that contain a list of HED tags.
+% This function looks through the events of a EEG structure or a 
+% tab-delimited file and finds the events that contain a list of HED tags.
 %
 % Usage:
 %
@@ -18,9 +18,19 @@
 %                contains HED tags. The default tag column will be the
 %                second column.
 %
-%   Optional (key/value):
+% Optional (key/value):
 %
-%   tags         A comma separated list of tags or a tag search string
+%  'columns'
+%                The columns in the tab-separated file that contains the
+%                HED tags. The columns are either a scalar value or a
+%                vector (e.g. 2 or [2,3,4]).
+%
+%  'header'
+%                True (the default), if the tab-separated file has a
+%                header. False, if the tab-separated file doesn't have a
+%                header.
+%
+%   'tags'       A comma separated list of tags or a tag search string
 %                used to extract event positions that found a match. If no
 %                tags are passed in then a pop-up menu will appear allowing
 %                you to specify the tags. The tag search uses boolean
@@ -36,11 +46,6 @@
 %                "/attribute/visual/color/green AND
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]".
-%
-%  header
-%                True (the default), if the tab-separated file has a
-%                header. False, if the tab-separated file doesn't have a
-%                header.
 %
 % Outputs:
 %
@@ -67,7 +72,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function indices = findhedevents(data, tags, varargin)
+function indices = findhedevents(data, varargin)
 p = parseArguments(data, varargin{:});
 % indices = [];
 if ischar(p.data)
@@ -75,14 +80,6 @@ if ischar(p.data)
 else
     p.allTags = arrayfun(@concattags, data.event, 'UniformOutput', false);
 end
-% if isempty(p.tags)
-%     % Find all the unique tags in the events
-%     uniqueTags = finduniquetags(p.allTags);
-%     [canceled, p.tags] = hedsearch_input(uniqueTags);
-%     if canceled
-%         return;
-%     end
-% end
 indices = findMatches(p);
 
     function indices = findMatches(p)
@@ -173,7 +170,7 @@ indices = findMatches(p);
         p = inputParser();
         p.addRequired('data', @(x) ~isempty(x) && ...
             (ischar(x) ||isstruct(x)));
-        p.addRequired('tags', @ischar);
+        p.addParamValue('tags', @ischar);
         p.addParamValue('columns', 2, @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
         p.addParamValue('header', true, @islogical);
