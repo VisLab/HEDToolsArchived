@@ -16,6 +16,12 @@
 %
 % Input:
 %
+%   Optional:
+%
+%   UseGui
+%                    If true (default), use a series of menus to set
+%                    function arguments.
+%
 %   Optional (key/value):
 %
 %   'BaseMap'
@@ -36,7 +42,7 @@
 %                    searched. If false, only the inDir directory is
 %                    searched.
 %
-%   'ExcludeFields'
+%   'EventFieldsToIgnore'
 %                    A one-dimensional cell array of field names in the
 %                    .event substructure to ignore during the tagging
 %                    process. By default the following subfields of the
@@ -44,23 +50,28 @@
 %                    .urevent, .hedtags, and .usertags. The user can
 %                    over-ride these tags using this name-value parameter.
 %
-%   'ExtensionsAllowed'
+%   'FMapDescription'
+%                    The description of the fieldMap object. The
+%                    description will show up in the .etc.tags.description
+%                    field of any datasets tagged by this fieldMap.
+%
+%   'FMapSaveFile'
+%                    A string representing the file name for saving the
+%                    final, consolidated fieldMap object that results from
+%                    the tagging process.
+%
+%   'HEDExtensionsAllowed'
 %                    If true (default), the HED can be extended. If
-%                    false, the HED can not be extended. The
+%                    false, the HED cannot be extended. The
 %                    'ExtensionAnywhere argument determines where the HED
 %                    can be extended if extension are allowed.
 %
-%
-%   'ExtensionsAnywhere'
+%   'HEDExtensionsAnywhere'
 %                    If true, the HED can be extended underneath all tags.
 %                    If false (default), the HED can only be extended where
-%                    allowed. These are tags with the 'extensionAllowed'
+%                    allowed. These are tags with the 'ExtensionAllowed'
 %                    attribute or leaf tags (tags that do not have
 %                    children).
-%
-%   'Fields'
-%                    A one-dimensional cell array of fields to tag. If this
-%                    parameter is non-empty, only these fields are tagged.
 %
 %   'HedXML'
 %                    Full path to a HED XML file. The default is the
@@ -73,36 +84,45 @@
 %                    If true, write the the HED tags to the original
 %                    datasets.
 %
-%   'PreservePrefix'
+%   'OverwriteUserHed'
+%                    If true, overwrite/create the 'HED_USER.xml' file with
+%                    the HED from the fieldMap object. The
+%                    'HED_USER.xml' file is made specifically for modifying
+%                    the original 'HED.xml' file. This file will be written
+%                    under the 'hed' directory.
+%
+%   'PreserveTagPrefixes'
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
 %                    is retained (e.g., /a/b/c and /a/b become just
 %                    /a/b/c). If true, then all unique tags are retained.
 %
-%   'PrimaryField'
+%   'PrimaryEventField'
 %                    The name of the primary field. Only one field can be
 %                    the primary field. A primary field requires a label,
-%                    category, and a description. The default is the type
-%                    field.
+%                    category, and a description tag. The default is the
+%                    .type field.
 %
-%   'SaveDatasets'
-%                    If true, save the tags to the underlying
-%                    dataset files in the directory. If false (default),
-%                    do not save the tags to the underlying dataset files
-%                    in the directory.
-%
-%   'SaveMapFile'
-%                    A string representing the file name for saving the
-%                    final, consolidated fieldMap object that results from
-%                    the tagging process.
-%
-%   'SelectFields'
+%   'SelectEventFields'
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %
-%   'UseGui'
-%                    If true (default), the CTAGGER GUI is displayed after
-%                    initialization.
+%   'SeparateUserHedFile'
+%                    The full path and file name to write the HED from the
+%                    fieldMap object to. This file is meant to be
+%                    stored outside of the HEDTools.
+%
+%   'UseCTagger'
+%                    If true (default), the CTAGGER GUI is used to edit
+%                    field tags.
+%
+%   'WriteFMapToFile'
+%                    If true, write the fieldMap object to the
+%                    specified 'FMapSaveFile' file.
+%
+%   'WriteSeparateUserHedFile'
+%                    If true, write the fieldMap object to the file
+%                    specified by the 'SeparateUserHedFile' argument.
 %
 % Output:
 %

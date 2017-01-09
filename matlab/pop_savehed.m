@@ -61,7 +61,7 @@
 %                    stored outside of the HEDTools.
 %
 %   'WriteSeparateUserHedFile'
-%                    If true, write the the fieldMap object to the file
+%                    If true, write the fieldMap object to the file
 %                    specified by the 'SeparateUserHedFile' argument.
 %
 % Output:

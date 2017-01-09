@@ -44,6 +44,16 @@
 %                    .urevent, .hedtags, and .usertags. The user can
 %                    over-ride these tags using this name-value parameter.
 %
+%   'FMapDescription'
+%                    The description of the fieldMap object. The
+%                    description will show up in the .etc.tags.description
+%                    field of any datasets tagged by this fieldMap.
+%
+%   'FMapSaveFile'
+%                    A string representing the file name for saving the
+%                    final, consolidated fieldMap object that results from
+%                    the tagging process.
+%
 %   'HEDExtensionsAllowed'
 %                    If true (default), the HED can be extended. If
 %                    false, the HED can not be extended. The
@@ -65,6 +75,13 @@
 %                    If true, write the the HED tags to the original
 %                    datasets.
 %
+%   'OverwriteUserHed'
+%                    If true, overwrite/create the 'HED_USER.xml' file with
+%                    the HED from the fieldMap object. The
+%                    'HED_USER.xml' file is made specifically for modifying
+%                    the original 'HED.xml' file. This file will be written
+%                    under the 'hed' directory.
+%
 %   'PreserveTagPrefixes'
 %                    If false (default), tags for the same field value that
 %                    share prefixes are combined and only the most specific
@@ -77,18 +94,29 @@
 %                    category, and a description tag. The default is the
 %                    .type field.
 %
-%   'SaveBaseMapFile'
-%                    A string representing the file name for saving the
-%                    final, consolidated fieldMap object that results from
-%                    the tagging process.
-%
 %   'SelectEventFields'
 %                    If true (default), the user is presented with a
 %                    GUI that allow users to select which fields to tag.
 %
+%   'SeparateUserHedFile'
+%                    The full path and file name to write the HED from the
+%                    fieldMap object to. This file is meant to be
+%                    stored outside of the HEDTools.
+%
+%   'StudyFile'
+%                    The path to an EEG study.
+%
 %   'UseCTagger'
 %                    If true (default), the CTAGGER GUI is used to edit
 %                    field tags.
+%
+%   'WriteFMapToFile'
+%                    If true, write the fieldMap object to the
+%                    specified 'FMapSaveFile' file.
+%
+%   'WriteSeparateUserHedFile'
+%                    If true, write the fieldMap object to the file
+%                    specified by the 'SeparateUserHedFile' argument.
 %
 % Output:
 %
