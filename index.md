@@ -429,16 +429,26 @@ tag them. When finished press the *Ok* button.
 **Name**|**Type**|**Description**
 UseGui|Optional|If true (default), use a series of menus to set function arguments.
 'BaseMap'|Name-Value|A *fieldMap* object or the name of a file that contains a *fieldMap* object to be used to initialize tag information.
+'CopyDatasets'|Name-Value|If true, copy the datasets to the 'CopyDestination' directory and write the HED tags to them.
+'CopyDestination'|Name-Value|The full path of a directory to copy the original datasets to and write the HED tags to them.
+'DoSubDirs'|Name-Value|If true (default), the entire inDir directory tree is searched. If false, only the inDir directory is searched.
 'EventFieldsToIgnore'|Name-Value|A one-dimensional cell array of field names in the *.event* substructure to ignore during the tagging process. By default the following subfields of the .event structure are ignored: *.latency*, *.epoch*, *.urevent*, *.hedtags*, and *.usertags*. The user can over-ride these tags using this name-value parameter.
+'FMapDescription'|Name-Value|The description of the *fieldMap* object. The description will show up in the .etc.tags.description field of any datasets tagged by this *fieldMap*.
+'FMapSaveFile'|Name-Value|A string representing the file name for saving the final, consolidated *fieldMap* object that results from the tagging process.
 'HEDExtensionsAllowed'|Name-Value|If true (default), HED can be extended. If false, HED cannot be extended. The 'ExtensionAnywhere' argument determines where HED can be extended if extension are allowed.
 'HEDExtensionsAnywhere'|Name-Value|If true, the HED can be extended underneath all tags. If false (default), the HED can only be extended where allowed: tags with 'ExtensionAllowed' attribute or leaf tags (tags that do not have children).
 'HedXML'|Name-Value|Full path to a HED XML file. The default is the HED.xml file in the *hed* directory of *HEDTools*.
 'InDir'|Name-Value|A directory that contains similar EEG .set files.
+'OverwriteDatasets'|Name-Value|If true, write the the HED tags to the original datasets.
+'OverwriteUserHed'|Name-Value|If true, overwrite/create the 'HED_USER.xml' file with the HED from the fieldMap object. The 'HED_USER.xml' file is made specifically for modifying the original 'HED.xml' file. This file will be written under the 'hed' directory.
 'PreserveTagPrefixes'|Name-Value|If false (default), tags for the same field value that share prefixes are combined and only the most specific is retained (e.g., /a/b/c and /a/b become just /a/b/c). If true, then all unique tags are retained.
 'PrimaryEventField'|Name-Value|The name of the primary field. Only one field can be the primary field. A primary field requires a label, category, and a description tag. The default is the .type field.
-'SaveBaseMapFile'|Name-Value|A string representing the file name for saving the final, consolidated *fieldMap* object that results from the tagging process.
 'SelectEventFields'|Name-Value|If true (default), the user is presented with a GUI that allow users to select which fields to tag.
+'SeparateUserHedFile'|Name-Value|The full path and file name to write the HED from the fieldMap object to. This file is meant to be stored outside of the HEDTools.
 'UseCTagger'|Name-Value|If true (default), the *CTagger* GUI is used to edit field tags.
+'WriteFMapToFile'|Name-Value|If true, write the fieldMap object to the specified 'FMapSaveFile' file.
+'WriteSeparateUserHedFile'|Name-Value|If true, write the fieldMap object to the file specified by the 'SeparateUserHedFile' argument.
+
 
 2.3 Tagging an EEGLAB study
 ---------------------------
