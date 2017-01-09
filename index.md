@@ -335,8 +335,8 @@ UseGui|Optional|If true (default), use a series of menus to set function argumen
 'SelectEventFields'|Name-Value|If true (default), the user is presented with a GUI that allow users to select which fields to tag.
 'SeparateUserHedFile'|Name-Value|The full path and file name to write the HED from the fieldMap object to. This file is meant to be stored outside of the HEDTools.
 'UseCTagger'|Name-Value|If true (default), the CTagger GUI is used to edit field tags.
-'WriteFMapToFile'|If true, write the fieldMap object to the specified 'FMapSaveFile' file.
-'WriteSeparateUserHedFile'|If true, write the fieldMap object to the file specified by the 'SeparateUserHedFile' argument.
+'WriteFMapToFile'|Name-Value|If true, write the fieldMap object to the specified 'FMapSaveFile' file.
+'WriteSeparateUserHedFile'|Name-Value|If true, write the fieldMap object to the file specified by the 'SeparateUserHedFile' argument.
 
 ## 2.2 Tagging a directory of datasets
 
