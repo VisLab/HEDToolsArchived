@@ -751,7 +751,6 @@ UseGui|Optional|If true (default), use a series of menus to set function argumen
 'HedXml'|Name-Value|The full path to a HED XML file containing all of the tags. This by default will be the *HED.xml* file found in the *hed* subdirectory of the *HEDTools*.
 'InDir'|Name-Value|A directory containing tagged EEG datasets to be validated.
 'OutputFileDirectory'|Name-Value|The directory where the validation output is written. There will be a log file generated for each study dataset validated.
-'WriteOutputToFile'|Name-Value|If true (default), write the validation issues to a log file in addition to the workspace. If false, only write the issues to the workspace.
 
 ## 3.4 Validating an EEGLAB study
 
