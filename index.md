@@ -679,8 +679,8 @@ using a menu.
 **Table 4. A summary of arguments for pop\_validateeeg.**
 
 **Name**|**Type**|**Description**
-UseGui|Optional|If true (default), use a series of menus to set function arguments.
 EEG|Required|The EEG dataset structure containing HED tags in the *EEG.event* structure. The tags need to be present in the *.usertags* and/or *.hedtags* fields of *EEG.event*.
+UseGui|Optional|If true (default), use a series of menus to set function arguments.
 'GenerateWarnings'|Name-Value|If true, include warnings in the log file in addition to errors. If false (default), only include errors in the log file.
 'HedXml'|Name-Value|The full path to a HED XML file containing all of the tags. This by default will be the *HED.xml* file found in the *hed* directory of *HEDTools*.
 'OutputFileDirectory'|Name-Value|The directory where the validation output is written.
