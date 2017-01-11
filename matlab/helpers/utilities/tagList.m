@@ -393,7 +393,8 @@ classdef tagList < hgsetget
             for groupTagNum = 1:numGroupTags
                 if strfind(TagGroup{groupTagNum}, '~')
                     tildeTags = strtrim(strsplit(...
-                        TagGroup{groupTagNum}, '~'));
+                        TagGroup{groupTagNum}, '~', ...
+                        'CollapseDelimiters', false));
                     numTildeGroupTags = length(tildeTags);
                     for numTildeGroupTag = 1:numTildeGroupTags-1
                         tildeTagGroup{tagGroupCount} = ...

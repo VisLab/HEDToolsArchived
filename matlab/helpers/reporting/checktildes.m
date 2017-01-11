@@ -75,7 +75,7 @@ checkTildeTags(originalTags);
         % Generates errors when there are more than 2 tildes in a group
         tagString = vTagList.stringifyElement(original{groupIndex});
         errors = [errors, generateerror('tilde', '', tagString, '', '')];
-        errorTags{end+1} = original{groupIndex};
+        errorTags{end+1} = tagString;
     end % generateErrors
 
 end % checktildes
