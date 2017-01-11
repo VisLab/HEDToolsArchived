@@ -87,15 +87,15 @@ eData = writeSummaryTags(fMap, eData, tFields);
             map = '';
         else
             map(length(tFields)) = struct('field', '', 'values', '');
-            if isfield(eData, 'event') && isstruct(eData.event)
-                for k = 1:length(tFields)
-                    map(k) = removeMapValues(fMap, eData, tFields{k});
-                end
-            else
+%             if isfield(eData, 'event') && isstruct(eData.event)
+%                 for k = 1:length(tFields)
+%                     map(k) = removeMapValues(fMap, eData, tFields{k});
+%                 end
+%             else
                 for k = 1:length(tFields)
                     map(k) = fMap.getMap(tFields{k}).getStruct();
                 end
-            end
+%             end
         end
         eData.etc.tags = struct('description', fMap.getDescription(), ...
             'xml', fMap.getXml(), 'map', map);
