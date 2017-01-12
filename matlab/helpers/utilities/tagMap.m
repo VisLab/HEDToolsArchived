@@ -1,5 +1,5 @@
 % Object encapsulating a field to tag mapping. This class is called by the
-% fieldMap class to store tags associated with each and every field. 
+% fieldMap class to store tags associated with each and every field.
 %
 % Usage:
 %
@@ -15,13 +15,13 @@
 %
 %        'Primary'              True if the field is a primary field, False
 %                               if otherwise. Primary fields require
-%                               description, category, and label tags. 
+%                               description, category, and label tags.
 %
 % Notes:
 %
 % Merge options:
 %
-%    'Merge'         
+%    'Merge'
 %                    If the structure code is not a key of this map, add
 %                    the entire structure as is. Otherwise, if the
 %                    structure code is a key for this map, then merge the
@@ -29,23 +29,23 @@
 %                    PreserveTagPrefixes value to determine how to combine the
 %                    tags.
 %
-%    'None'          
+%    'None'
 %                    Don't do any updating
 %
-%    'Replace'       
+%    'Replace'
 %                    If the structure code is not a key of this map,
 %                    do nothing. Otherwise, if the structure code is a
 %                    key for this map, then completely replace the map
 %                    value structure with this structure.
 %
-%    'Update'        
+%    'Update'
 %                    If the structure code is not a key of this map,
 %                    do nothing. Otherwise, if the structure code is a
 %                    key for this map, then merge the tags with those
 %                    of the existing structure, using the PreserveTagPrefixes
 %                    value to determine how to combine the tags.
 %
-% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013, 
+% Copyright (C) Kay Robbins and Thomas Rognon, UTSA, 2011-2013,
 % krobbins@cs.utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -106,7 +106,11 @@ classdef tagMap < hgsetget
             
             % Does this value exist in this object?
             if ~obj.TagMap.isKey(theKey) && strcmpi('Merge', p.UpdateType)
+                
                 theValue = newStruct.tags;
+                if ~p.PreserveTagPrefixes
+                    theValue = undoprefix(theValue);
+                end
             elseif obj.TagMap.isKey(theKey) && ...
                     (strcmpi('Merge', p.UpdateType) || ...
                     strcmpi('Update', p.UpdateType))
