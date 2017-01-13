@@ -30,8 +30,8 @@
 %   'BaseMapFieldsToIgnore'
 %                    A one-dimensional cell array of field names in the
 %                    .event substructure to ignore when merging with a
-%                    fieldMap object 'BaseMap'. 
-%                    
+%                    fieldMap object 'BaseMap'.
+%
 %   'HedXml'
 %                    Full path to a HED XML file. The default is the
 %                    HED.xml file in the hed directory.
@@ -84,9 +84,9 @@ fMap = findtags(EEG, 'PreserveTagPrefixes', p.PreserveTagPrefixes, ...
     'EventFieldsToIgnore', p.EventFieldsToIgnore, 'HedXml', p.HedXml);
 if ~isempty(p.BaseMap)
     fMap = mergeBaseTags(p, fMap);
-    EEG = writetags(EEG, fMap, 'PreserveTagPrefixes', ...
-        p.PreserveTagPrefixes);
 end
+EEG = writetags(EEG, fMap, 'PreserveTagPrefixes', ...
+    p.PreserveTagPrefixes);
 
     function fMap = mergeBaseTags(p, fMap)
         % Merge baseMap and fMap tags
@@ -105,7 +105,7 @@ end
         parser.addRequired('EEG', @(x) (isempty(x) || isstruct(EEG)));
         parser.addParamValue('BaseMap', '', @(x) isa(x, 'fieldMap') || ...
             ischar(x));
-        parser.addParamValue('BaseMapFieldsToIgnore', {}, @iscellstr);      
+        parser.addParamValue('BaseMapFieldsToIgnore', {}, @iscellstr);
         parser.addParamValue('HedXml', which('HED.xml'), @ischar);
         parser.addParamValue('EventFieldsToIgnore', ...
             {'latency', 'epoch', 'urevent', 'hedtags', 'usertags'}, ...

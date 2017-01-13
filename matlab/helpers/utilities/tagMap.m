@@ -105,8 +105,7 @@ classdef tagMap < hgsetget
             theKey = newStruct.code;
             
             % Does this value exist in this object?
-            if ~obj.TagMap.isKey(theKey) && strcmpi('Merge', p.UpdateType)
-                
+            if ~obj.TagMap.isKey(theKey) && strcmpi('Merge', p.UpdateType)                
                 theValue = newStruct.tags;
                 if ~p.PreserveTagPrefixes
                     theValue = undoprefix(theValue);
