@@ -98,8 +98,23 @@ end
         % Callback for field map 'Edit description' button
         description = get(findobj('Tag', 'fMapDescription'), 'String');
         description = pop_comments(description, 'Field map description');
+        if size(description, 1) > 1 
+            description = catMultiStr(description);
+        end
         set(findobj('Tag', 'fMapDescription'), 'String', description);
     end % fMapdescriptionCallback
+
+    function concatStr = catMultiStr(str)
+        % Concatenates a multi-lined string into a single line string
+        concatStr = '';
+        if ~isempty(str)
+            concatStr = strtrim(str(1,:));
+            numLines = size(str, 1);
+            for a = 2:numLines
+                concatStr = [concatStr ' ' strtrim(str(a,:))]; %#ok<AGROW>
+            end
+        end
+    end % catMultiStr
 
     function savefMapCallback(src, ~)
         % Callback for save field map checkbox
