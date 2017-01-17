@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="4.0.1">
+<HED version="4.0.2">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1550,14 +1550,14 @@
                </node>
                <node takesValue="true">
                   <name>#</name>
-                  <description>Actual sentences</description>
+                  <description>Actual sentence</description>
                </node>
             </node>
             <node>
                <name>Paragraph</name>
                <node takesValue="true">
                   <name>#</name>
-                  <description>Actual sentence</description>
+                  <description>Actual paragraph</description>
                </node>
             </node>
             <node>
