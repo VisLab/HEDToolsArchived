@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="4.0.5">
+<HED version="5.0.0">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -836,7 +836,7 @@
          </node>
       </node>
    </node>
-   <node requireChild="true">
+   <node extensionAllowed="true" requireChild="true">
       <name>Attribute</name>
       <node>
          <name>Onset</name>
@@ -1287,7 +1287,7 @@
             <description>Number of items  more than or equal to #</description>
          </node>
       </node>
-      <node requireChild="true">
+      <node>
          <name>Auditory</name>
          <node requireChild="true">
             <name>Frequency</name>
@@ -1336,7 +1336,7 @@
             </node>
          </node>
       </node>
-      <node requireChild="true">
+      <node>
          <name>Visual</name>
          <node>
             <name>Bistable</name>
@@ -1696,10 +1696,22 @@
          </node>
       </node>
       <node requireChild="true">
-         <name>Presentation fraction</name>
-         <description>the fraction of presentation of an Oddball or Expected stimuli to the total number of same-class presentations, e.g. 10% of images in an RSVP being targets</description>
-         <node isNumeric="true" takesValue="true">
-            <name>#</name>
+         <name>Presentation</name>
+         <description>Attributes associated with visual, auditory, tactile, etc. presentation of an stimulus</description>
+         <node requireChild="true">
+            <name>Fraction</name>
+            <description>the fraction of presentation of an Oddball or Expected stimuli to the total number of same-class presentations, e.g. 10% of images in an RSVP being targets</description>
+            <node isNumeric="true" takesValue="true">
+               <name>#</name>
+            </node>
+         </node>
+         <node>
+            <name>Cued</name>
+            <description>what is presented is cued to the presentation of something else</description>
+         </node>
+         <node>
+            <name>Background</name>
+            <description>presented in the background such as background music, background image, etc.</description>
          </node>
       </node>
       <node>
@@ -1807,6 +1819,19 @@
       <node>
          <name>Extraneous</name>
          <description>Button presses that are not meaningful for example due to intrinsic mechanical causes after a meaningful press</description>
+      </node>
+      <node extensionAllowed="true" requireChild="true">
+         <name>Role</name>
+         <description>The role of the agent (participant, character, AI..)</description>
+         <node>
+            <name>Leader</name>
+         </node>
+         <node>
+            <name>Follower</name>
+         </node>
+         <node takesValue="true">
+            <name>#</name>
+         </node>
       </node>
    </node>
    <node>
@@ -2165,19 +2190,6 @@
          <node isNumeric="true" takesValue="true">
             <name>#</name>
             <description>Numeric value of an ID</description>
-         </node>
-      </node>
-      <node extensionAllowed="true" requireChild="true">
-         <name>Role</name>
-         <description>The role of the participant associated with the event such as leader is placed at a lower level for example Participant/Role/Leader</description>
-         <node>
-            <name>Leader</name>
-         </node>
-         <node>
-            <name>Follower</name>
-         </node>
-         <node takesValue="true">
-            <name>#</name>
          </node>
       </node>
       <node>

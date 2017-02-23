@@ -10,18 +10,18 @@
 %   numgroups    The number of tag groups in the event.
 %
 %   search       A search string consisting of tags to extract data epochs.
-%                The tag search uses boolean operators (AND, OR, NOT) to
-%                widen or narrow the search. Two tags separated by a comma
-%                use the AND operator by default which will only return
-%                events that contain both of the tags. The OR operator
-%                looks for events that include either one or both tags
-%                being specified. The NOT operator looks for events that
-%                contain the first tag but not the second tag. Groups can
-%                also be searched for by enclosing the tags in parentheses.
-%                The operators explained above also apply to tags in
-%                groups. To nest or organize the search statements use
-%                square brackets. Nesting will change the order in which
-%                the search statements are evaluated. For example,
+%                The tag search uses boolean operators (AND, OR, AND NOT)
+%                to widen or narrow the search. Two tags separated by a
+%                comma use the AND operator by default which will only
+%                return events that contain both of the tags. The OR
+%                operator looks for events that include either one or both
+%                tags being specified. The AND NOT operator looks for
+%                events that contain the first tag but not the second tag.
+%                Groups can also be searched for by enclosing the tags in
+%                parentheses. The operators explained above also apply to
+%                tags in groups. To nest or organize the search statements
+%                use square brackets. Nesting will change the order in
+%                which the search statements are evaluated. For example,
 %                "/attribute/visual/color/green AND
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]".
@@ -48,16 +48,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function exp = createlogexp(numgroups, search)
+search = strtrim(search);
 inGroup = false;
 groupIndex = 1;
 exp = '';
-if ~isempty(strtrim(search))
-    commaIndexes = strfind(search, ',');
-    %     if ~isempty(commaIndexes)
-    %         tagsAndDelimiters = splitCommaSearch(search);
-    %     else
+if ~isempty(search)
     tagsAndDelimiters = splitBooleanSearch(search);
-    %     end
     exp = translateSearchExpression(tagsAndDelimiters);
 end
 
@@ -97,23 +93,6 @@ end
         end
         tagsAndDelimiters = putGroupsInCells(tagsAndDelimiters);
     end % splitTagsAndDelimiters
-
-    function tagsAndDelimiters = splitCommaSearch(search)
-        % Splits the comma search string into a cell array containing all
-        % tags, operators, and delimiters
-        splitStr = textscan(search, '%s', 'delimiter', ',', ...
-            'multipleDelimsAsOne', 1);
-        numTags = size(splitStr{1}, 1);
-        tagsAndDelimiters = cell(1, numTags + numTags-1);
-        tagsAndDelimiters{1} = splitStr{1}{1};
-        index = 2;
-        for a = 2:numTags
-            tagsAndDelimiters{index} = ',';
-            index = index+1;
-            tagsAndDelimiters{index} = splitStr{1}{a};
-            index = index+1;
-        end
-    end
 
     function groupTagsAndDelimiters = putGroupsInCells(tagsAndDelimiters)
         % Puts tag groups in cellstrs
@@ -159,7 +138,7 @@ end
             case 'OR'
                 translatedOperator = '||';
             case'NOT'
-                translatedOperator = '&& ~';
+                translatedOperator = '~';
             case ','
                 translatedOperator = '&&';
             otherwise
