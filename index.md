@@ -11,7 +11,7 @@ study using the hierarchical event description language (HED) as the
 vocabulary.
 
 Although HEDTools can be used in very general annotation settings, the
-most common application is for users to users annotate the events that
+most common application is for users to annotate the events that
 occur during an EEG study using the hierarchical event description
 language (HED) as the vocabulary. Many of the tools are designed to
 assist in annotation of events as represented in EEGLAB *EEG.event*
@@ -54,7 +54,7 @@ EEGLAB. In both cases, you should install EEGLAB unless you plan to use
 
 ### 1.3.1 Running as a standalone application
 If your data files are *.mat* files, you can simply unzip the
-*EEGLABPlugin/HEDTools1.0.2.zip* anywhere you choose. Execute the
+*EEGLABPlugin/HEDTools1.0.3.zip* anywhere you choose. Execute the
 *setup* script to set the paths each time you run MATLAB. Alternatively,
 you can add the code contained in *setup* to your *startup* script. If
 you are not using EEGLAB, you can comment out the last section of the
@@ -65,7 +65,7 @@ If you wish to use EEGLAB, you should follow the directions above
 without commenting out the last section of the setup script.
 
 ### 1.3.3 Running as a plugin to EEGLAB
-To install *HEDTools* unzip the *HEDTools1.0.2.zip* file inside the
+To install *HEDTools* unzip the *HEDTools1.0.3.zip* file inside the
 *EEGLAB plugin* directory. If you don’t install *HEDTools* via the
 EEGLAB menu, you can find this file at:
 
@@ -75,7 +75,7 @@ When you start EEGLAB again, *HEDTools* should be ready to use. Note:
 EEGLAB requires that each EEGLAB plugin be in its own subdirectory in
 the plugins directory of EEGLAB. Thus, if you have unzipped *HEDTools*
 correctly, you should see
-*…/eeglab/plugins/HEDTools1.0.2*/*eegplugin\_hedtools.m*.
+*…/eeglab/plugins/HEDTools1.0.3*/*eegplugin\_hedtools.m*.
 
 # 2. Annotating Data
 The EEGLAB plugin version of *HEDTools* adds several additional menu
@@ -842,11 +842,11 @@ a new menu used for inputting HED tags as shown below in Figure 24.
 
 **Figure 24. pop\_epochhed search bar.**
 
-The advanced tag search uses Boolean operators (AND, OR, NOT) to widen
+The advanced tag search uses Boolean operators (AND, OR, AND NOT) to widen
 or narrow the search. Two tags separated by a comma use the AND operator
 by default, meaning that it will only return events that contain both
 the tags. The OR operator looks for events that include either one or
-both tags being specified. The NOT operator looks for events that
+both tags being specified. The AND NOT operator looks for events that
 contain the first tag but not the second tag. To nest or organize the
 search statements use square brackets. Nesting changes the order of
 evaluation of the search statements. For example,
@@ -874,7 +874,7 @@ button to return to the main epoching menu.
 
 **Name**|**Type**|**Description**
 EEG|Required|Input dataset. Data may already be epoched; in this case, extract (shorter) subepochs time locked to epoch events.
-tagstring|Required if no GUI|A search string consisting of tags to use for extracting data epochs. The tag search uses the Boolean operators (AND, OR, NOT) to widen or narrow the search. Two tags separated by a comma use the AND operator by default, and the search only returns events that contain both of the tags. The OR operator looks for events that include either one or both tags being specified. The NOT operator looks for events that contain the first tag but not the second tag. To nest or organize the search statements use square brackets. Nesting will change the order in which the search statements are evaluated. For example, "/Attribute/Visual/Color/Green AND \[/Item/2d shape/Rectangle/Square OR /Item/2d shape/Ellipse/Circle\]" find events with green squares or circles.
+tagstring|Required if no GUI|A search string consisting of tags to use for extracting data epochs. The tag search uses the Boolean operators (AND, OR, AND NOT) to widen or narrow the search. Two tags separated by a comma use the AND operator by default, and the search only returns events that contain both of the tags. The OR operator looks for events that include either one or both tags being specified. The AND NOT operator looks for events that contain the first tag but not the second tag. To nest or organize the search statements use square brackets. Nesting will change the order in which the search statements are evaluated. For example, "/Attribute/Visual/Color/Green AND \[/Item/2d shape/Rectangle/Square OR /Item/2d shape/Ellipse/Circle\]" find events with green squares or circles.
 timelimits|Required if no GUI|Epoch latency limits \[start end\] in seconds relative to the time-locking event {default: \[-1 2\]}
 'epochinfo'|Name-Value|Propagate event information into the new epoch structure {default: 'yes'}.
 'eventindices'|Name-Value|Extract data epochs time locked to the specified event numbers (either an integer or a vector of integers.
