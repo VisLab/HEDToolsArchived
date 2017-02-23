@@ -34,15 +34,16 @@
 %                used to extract event positions that found a match. If no
 %                tags are passed in then a pop-up menu will appear allowing
 %                you to specify the tags. The tag search uses boolean
-%                operators (AND, OR, NOT) to widen or narrow the search.
-%                Two tags separated by a comma use the AND operator by
-%                default which will only return events that contain both of
-%                the tags. The OR operator looks for events that include
-%                either one or both tags being specified. The NOT operator
-%                looks for events that contain the first tag but not the
-%                second tag. To nest or organize the search statements use
-%                square brackets. Nesting will change the order in which
-%                the search statements are evaluated. For example,
+%                operators (AND, OR, AND NOT) to widen or narrow the
+%                search. Two tags separated by a comma use the AND operator
+%                by default which will only return events that contain both
+%                of the tags. The OR operator looks for events that include
+%                either one or both tags being specified. The AND NOT 
+%                operator looks for events that contain the first tag but
+%                not the second tag. To nest or organize the search
+%                statements use square brackets. Nesting will change the
+%                order in which the search statements are evaluated. 
+%                For example,
 %                "/attribute/visual/color/green AND
 %                [/item/2d shape/rectangle/square OR
 %                /item/2d shape/ellipse/circle]".
@@ -170,7 +171,7 @@ indices = findMatches(p);
         p = inputParser();
         p.addRequired('data', @(x) ~isempty(x) && ...
             (ischar(x) ||isstruct(x)));
-        p.addParamValue('tags', @ischar);
+        p.addParamValue('tags', '', @ischar);
         p.addParamValue('columns', 2, @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
         p.addParamValue('header', true, @islogical);
