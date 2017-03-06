@@ -1,7 +1,7 @@
 # 1. Getting Started with HEDTools
 
 ## 1.1 Overview
-*HEDTools* is a MATLAB/Java Toolbox and an
+*HEDToolss* is a MATLAB/Java Toolbox and an
 EEGLAB plugin designed to help users annotate and validate events or
 other data elements using a predefined, but extensible, hierarchically
 structured annotation language. The input to the system consists of two
