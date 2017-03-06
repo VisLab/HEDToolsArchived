@@ -1,3 +1,5 @@
+{% feed_meta %}
+
 # 1. Getting Started with HEDTools
 
 ## 1.1 Overview
