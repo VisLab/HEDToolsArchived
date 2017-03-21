@@ -4,8 +4,7 @@
 %
 % Usage:
 %
-%   >>  [errors, warnings, extensions] = parseCellTags(hedMaps, ...
-%       extensionAllowed);
+%   >>  issues = parseCellTags(hedMaps, extensionAllowed);
 %
 % Input:
 %
@@ -37,14 +36,6 @@
 %                   the validation. Each cell corresponds to the issues
 %                   found in a particular cell.
 %
-%       replaceTags
-%                   A cell array containing all of the tags that generated
-%                   issues. These tags will be written to a replace file.
-%
-%       success
-%                   True if the validation finishes without throwing any
-%                   exceptions, false if otherwise.
-%
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
@@ -62,57 +53,45 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [issues, replaceTags, success] = parsecell(hedMaps, cell, ...
-    generateWarnings)
+function issues = parsecell(hedMaps, cell, generateWarnings)
 p = parseArguments(hedMaps, cell, generateWarnings);
-[issues, replaceTags, success] = readCell(p);
+issues = readCell(p);
 
     function p = findErrors(p)
         % Errors will be generated for the cell if found
-        [p.cellErrors, cellReplaceTags] = ...
-            checkForValidationErrors(p.hedMaps, p.cellTags, ...
+        p.cellErrors = checkerrors(p.hedMaps, p.cellTags, ...
             p.formattedCellTags);
-        p.replaceTags = union(p.replaceTags, cellReplaceTags);
     end % findErrors
 
     function p = findWarnings(p)
         % Warnings will be generated for the cell if found
-        p.cellWarnings = checkForValidationWarnings(p.hedMaps, ...
-            p.cellTags, p.formattedCellTags);
+        p.cellWarnings = checkwarnings(p.hedMaps, p.cellTags, ...
+            p.formattedCellTags);
     end % findWarnings
 
     function p = parseArguments(hedMaps, cell, extensionAllowed)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
-        parser.addRequired('cell', @(x) (~isempty(x) && iscellstr(x)));
+        parser.addRequired('cell', @(x) (~isempty(x) && iscell(x)));
         parser.addRequired('generateWarnings', @islogical);
         parser.parse(hedMaps, cell, extensionAllowed);
         p = parser.Results;
     end % parseArguments
 
-    function [issues, replaceTags, success] = readCell(p)
+    function issues = readCell(p)
         % Read the tags in a cell array and validates them
         p.issues = {};
         p.replaceTags = {};
-        p.issueCount = 1;
-        numCells = length(p.cell);
         try
-            for a = 1:numCells
-                p.cellTags = hed2cell(p.cell{a}, false);
-                p.formattedCellTags = hed2cell(p.cell{a}, true);
-                p.cellNumber = a;
-                p = validateCellTags(p);
-            end
-            issues = p.issues;
-            replaceTags = p.replaceTags;
-            success = true;
+            p.cellTags = hed2cell(p.cell, false);
+            p.formattedCellTags = hed2cell(p.cell, true);
+            p = validateCellTags(p);
+            issues = p.issues(1,:);
         catch
-            warning(['Unable to parse tags in cell %d. Please check' ...
-                ' tags'], a);
+            warning(['Unable to parse tags in cell array. Please check' ...
+                ' the format of it.']);
             issues = '';
-            replaceTags = {};
-            success = false;
         end
     end % readCell
 
@@ -126,8 +105,7 @@ p = parseArguments(hedMaps, cell, generateWarnings);
                 p.cellIssues = [p.cellErrors p.cellWarnings];
             end
             if ~isempty(p.cellIssues)
-                p.issues{p.issueCount} = sprintf(['\n' p.cellIssues]);
-                p.issueCount = p.issueCount + 1;
+                p.issues = sprintf(['\n' p.cellIssues]);
             end
         end
     end % validateCellTags

@@ -4,7 +4,7 @@
 %
 %   >>  tList = vTagList(code)
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -232,11 +232,11 @@ classdef vTagList < hgsetget
                             tlist{k} = ...
                                 vTagList.splitTildesInGroup(tlist{k});
                         end
-                        tlist{k} = strtrim(tlist{k});  
+                        tlist{k} = strtrim(tlist{k});
                         tlist{k} = tlist{k}(~cellfun(@isempty, tlist{k}));
                     else
                         tlist{k} = strtrim(tlist{k});
-                    end                                   
+                    end
                     msg = vTagList.validate(tlist{k});
                     if ~isempty(msg)
                         errormsg = [errormsg '[' msg ']']; %#ok<AGROW>
@@ -414,17 +414,24 @@ classdef vTagList < hgsetget
             elseif ~iscell(tlist)
                 errormsg = 'input is not cell array';
             else
-                [tstring, errormsg] = vTagList.stringifyElement(tlist{1});
+                [tstring, errormsg] = ...
+                    vTagList.stringifyElement(tlist{1});
+                tlast = tstring;
                 if ~isempty(errormsg)
                     return;
                 end
                 for k = 2:length(tlist)
-                    [tnext, errormsg] = vTagList.stringifyElement(tlist{k});
+                    [tnext, errormsg] = ...
+                        vTagList.stringifyElement(tlist{k});
                     if ~isempty( errormsg)
                         return;
-                        
                     end
-                    tstring = [tstring ', ' tnext]; %#ok<AGROW>
+                    if strcmp(tlast, '~') || strcmp(tnext, '~')
+                        tstring = [tstring ' ' tnext]; %#ok<AGROW>
+                    else
+                        tstring = [tstring ', ' tnext]; %#ok<AGROW>
+                    end
+                    tlast = tnext;
                 end
             end
         end  % stringify
@@ -449,6 +456,14 @@ classdef vTagList < hgsetget
                         tstring = [tstring ', ' ...
                             strtrim(telement{k})]; %#ok<AGROW>
                     end
+                end
+                tstring = [tstring ')'];
+            elseif iscell(telement)
+                tstring = ['(' vTagList.stringifyElement(telement{1})];
+                telementLength = length(telement);
+                for k = 2:telementLength
+                    tstring = [tstring ' ' ...
+                        vTagList.stringifyElement(telement{k})]; %#ok<AGROW>
                 end
                 tstring = [tstring ')'];
             else

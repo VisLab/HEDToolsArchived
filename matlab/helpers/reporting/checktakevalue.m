@@ -161,7 +161,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         tagString = originalTag{valueIndex};
         if isGroup
             tagString = [originalTag{valueIndex}, ' in group ' ,...
-                vTagList.stringifyElement(originalTag)];
+                vTagList.stringify({originalTag})];
         end
         errors = [errors, generateerror(errorType, '', tagString, '', ...
             unitClassUnits)];
@@ -174,7 +174,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         tagString = originalTag{valueIndex};
         if isGroup
             tagString = [originalTag{valueIndex}, ' in group ' ,...
-                vTagList.stringifyElement(originalTag)];
+                vTagList.stringify(originalTag)];
         end
         warnings = [warnings, generatewarning(warningType, '', ...
             tagString, unitClassUnits)];

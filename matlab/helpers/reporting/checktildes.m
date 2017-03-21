@@ -23,7 +23,7 @@
 %
 %   originalTags
 %                   A cell array of HED tags. These tags are used to report
-%                   the errors found. 
+%                   the errors found.
 %
 %   formattedTags
 %                   A cell array of HED tags. These tags are used to do the
@@ -35,7 +35,7 @@
 %                   A string containing the validation errors.
 %
 %   errorTags
-%                   A cell array containing validation error tags. 
+%                   A cell array containing validation error tags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -62,18 +62,20 @@ checkTildeTags(originalTags);
 
     function checkTildeTags(originalTags)
         % Checks if the tags in the group have no more than 2 tildes
+        if sum(strncmp('~', originalTags, 1)) > 2
+            generateErrors({originalTags});
+        end
         numTags = length(originalTags);
         for a = 1:numTags
-            if ~ischar(originalTags{a}) && ...
-                    sum(strncmp('~',originalTags{a}, 1)) > 2
-                generateErrors(originalTags, a);
+            if ~ischar(originalTags{a})
+                checkTildeTags(originalTags{a})
             end
         end
     end % checkTags
 
-    function generateErrors(original, groupIndex)
+    function generateErrors(original)
         % Generates errors when there are more than 2 tildes in a group
-        tagString = vTagList.stringifyElement(original{groupIndex});
+        tagString = vTagList.stringify(original);
         errors = [errors, generateerror('tilde', '', tagString, '', '')];
         errorTags{end+1} = tagString;
     end % generateErrors

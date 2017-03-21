@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="5.0.0">
+<HED version="5.2.1">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1315,23 +1315,30 @@
       <node>
          <name>Blink</name>
          <node requireChild="true">
-            <name>Time shut The amount of time the eyelid remains closed</name>
-            <description>in seconds</description>
-            <node isNumeric="true" takesValue="true" unitClass="time">
+            <name>Time shut</name>
+            <description>The amount of time the eyelid remains closed (typically measured as 90% of the blink amplitude), in seconds.</description>
+            <node default="s" isNumeric="true" takesValue="true" unitClass="time">
                <name>#</name>
             </node>
          </node>
          <node requireChild="true">
-            <name>PAVR Amplitude-Velocity ratio</name>
-            <description>in centoseconds</description>
-            <node default="centoseconds" isNumeric="true" takesValue="true" unitClass="time">
+            <name>Duration</name>
+            <description>Duration of blink, usually the half-height blink duration in seconds taken either from base or zero of EEG signal. For eye-trackers, usually denotes interval when pupil covered by eyelid.</description>
+            <node default="s" isNumeric="true" takesValue="true" unitClass="time">
                <name>#</name>
             </node>
          </node>
          <node requireChild="true">
-            <name>NAVR Negative Amplitude-Velocity ratio</name>
-            <description>in centoseconds</description>
-            <node default="centoseconds" isNumeric="true" takesValue="true" unitClass="time">
+            <name>PAVR</name>
+            <description>Amplitude-Velocity ratio, in centiseconds</description>
+            <node default="centiseconds" isNumeric="true" takesValue="true" unitClass="time">
+               <name>#</name>
+            </node>
+         </node>
+         <node requireChild="true">
+            <name>NAVR</name>
+            <description>Negative Amplitude-Velocity ratio, in centiseconds</description>
+            <node default="centiseconds" isNumeric="true" takesValue="true" unitClass="time">
                <name>#</name>
             </node>
          </node>
@@ -1938,8 +1945,32 @@
       <node>
          <name>Eye blink</name>
          <node>
+            <name>Left base</name>
+            <description>The time of the first detectable eyelid movement on closing.</description>
+         </node>
+         <node>
+            <name>Left zero</name>
+            <description>The last time at which the EEG/EOG signal crosses zero during eyelid closing.</description>
+         </node>
+         <node>
+            <name>Left half height</name>
+            <description>The time at which the EEG/EOG signal reaches half maximum height during eyelid closing.</description>
+         </node>
+         <node>
             <name>Max</name>
             <description>The time at which the eyelid is the most closed.</description>
+         </node>
+         <node>
+            <name>Right half height</name>
+            <description>The time at which the EEG/EOG signal reaches half maximum height during eyelid opening.</description>
+         </node>
+         <node>
+            <name>Right zero</name>
+            <description>The first time at which the EEG/EOG signal crosses zero during eyelid opening.</description>
+         </node>
+         <node>
+            <name>Right base</name>
+            <description>The time of the last detectable eyelid movement on opening.</description>
          </node>
       </node>
       <node>
@@ -2007,6 +2038,15 @@
       <node>
          <name>Course correction</name>
          <description>Change the direction of a reach in the middle to adjust for a moving target.</description>
+      </node>
+      <node>
+         <name>Interact</name>
+         <node>
+            <name>With human</name>
+         </node>
+      </node>
+      <node>
+         <name>Take survey</name>
       </node>
       <node>
          <name>Stretch</name>
@@ -3666,7 +3706,7 @@
       </unitClass>
       <unitClass default="s">
          <name>time</name>
-         <units>s,second,seconds,centoseconds,hour:min,day,days,ms,milliseconds,minute,minutes,hour,hours</units>
+         <units>s,second,seconds,centiseconds,cs,hour:min,day,days,ms,milliseconds,minute,minutes,hour,hours</units>
       </unitClass>
       <unitClass default="cm2">
          <name>area</name>

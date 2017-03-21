@@ -2,7 +2,7 @@
 % if specified. Cells that are strings represent individual tags while
 % cells that are cellstrs represent tag groups. Canonical tags have forward
 % slashes and double quotes removed from the beginning and end of the tags.
-% Canonical tags are used for validation. 
+% Canonical tags are used for validation.
 %
 % Usage:
 %
@@ -13,19 +13,19 @@
 %   Required:
 %
 %   tags
-%                    A cell array containing HED tags. 
+%                    A cell array containing HED tags.
 %
 %   canonicalFormat
 %                    True if the tags are to be converted into canonical
-%                    format. False if otherwise.   
+%                    format. False if otherwise.
 %
 % Output:
 %
 %   fTags
-%                    The formatted tags 
+%                    The formatted tags
 %                    dataset will need to have a .event field.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -44,11 +44,24 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function fTags = hed2cell(tags, canonicalFormat)
-fTags = vTagList.deStringify(tags);
-if canonicalFormat
-    numTags = length(fTags);
-    for c = 1:numTags
-        fTags{c} = vTagList.getUnsortedCanonical(fTags{c});
-    end
+fTags = tags;
+if ischar(tags)
+    fTags = hedstring2cell(tags, 'keepTildes', true);
 end
+if canonicalFormat
+    fTags = putInCanonicalForm(fTags);
+end
+
+    function fTags = putInCanonicalForm(fTags)
+        % Removes slashes and double quotes
+        numTags = length(fTags);
+        for a = 1:numTags
+            if iscell(fTags{a})
+                fTags{a} = putInCanonicalForm(fTags{a});
+            else
+                fTags{a} = vTagList.getUnsortedCanonical(fTags{a});
+            end
+        end
+    end % putInCanonicalForm
+
 end % hed2cell

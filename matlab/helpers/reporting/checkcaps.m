@@ -71,7 +71,9 @@ checkTagCaps(originalTags, formattedTags, false);
         for a = 1:numTags
             if ~ischar(formattedTags{a})
                 checkTagCaps(originalTags{a}, formattedTags{a}, true);
-            elseif findCaps(formattedTags{a})
+                continue;
+            end
+            if findCaps(formattedTags{a})
                 generateWarnings(originalTags, a, isGroup);
             end
         end
@@ -84,7 +86,7 @@ checkTagCaps(originalTags, formattedTags, false);
         tagString = originalTags{tagIndex};
         if isGroup
             tagString = [originalTags{tagIndex}, ' in group (' ,...
-                vTagList.stringifyElement(originalTags),')'];
+                vTagList.stringify(originalTags),')'];
         end
         warnings = [warnings, generatewarning('cap', '', tagString, '')];
         warningTags{warningsIndex} = originalTags{tagIndex};

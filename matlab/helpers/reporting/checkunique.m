@@ -63,15 +63,7 @@ function [errors, errorTags] = checkunique(hedMaps, originalTags, ...
 errors = '';
 errorTags = {};
 uniqueTags = hedMaps.unique.values();
-[originalEventTags, canonicalEventTags] = ...
-    getEventTags(originalTags, formattedTags);
-[originalGroupTags, canonicalGroupTags] = ...
-    getGroupTags(originalTags, formattedTags);
-checkUniqueTags(originalEventTags, canonicalEventTags, false);
-originalGroupTagsLength = length(originalGroupTags);
-for a = 1:originalGroupTagsLength
-    checkUniqueTags(originalGroupTags{a}, canonicalGroupTags{a}, true);
-end
+checkUniqueTags(originalTags, formattedTags, false);
 
     function checkUniqueTags(originalTags, formattedTags, isGroup)
         % Looks for two or more tags that are descendants of a unique tag
@@ -86,6 +78,12 @@ end
                     originalTags, isGroup);
             end
         end
+        numTags = length(originalTags);
+        for a = 1:numTags
+            if ~ischar(originalTags{a})
+                checkUniqueTags(originalTags{a}, formattedTags{a}, true)
+            end
+        end
     end % checkUniqueTags
 
     function generateErrors(uniqueTagsIndex, foundIndexes, ...
@@ -98,28 +96,12 @@ end
             if isGroup
                 tagString = [originalTags{foundIndexes(foundIndex)}, ...
                     ' in group ' ,...
-                    vTagList.stringifyElement(originalTags)];
+                    vTagList.stringify({originalTags})];
             end
             errors = [errors, generateerror('unique', '', tagString, ...
                 uniqueTags{uniqueTagsIndex}, '')];     %#ok<AGROW>
             errorTags{end+1} = uniqueTags{uniqueTagsIndex}; %#ok<AGROW>
         end
     end % generateErrors
-
-    function [originalEventTags, formattedEventTags] = ...
-            getEventTags(originalTags, formattedTags)
-        % Retrieves the event level tags for the original and canonical
-        % tags
-        originalEventTags = originalTags(cellfun(@isstr, originalTags));
-        formattedEventTags = formattedTags(cellfun(@isstr, formattedTags));
-    end % getEventTags
-
-    function [originalGroupTags, canonicalGroupTags] = ...
-            getGroupTags(originalTags, formattedTags)
-        % Retrieves the tag groups for the original and canonical tags
-        originalGroupTags = originalTags(~cellfun(@isstr, originalTags));
-        canonicalGroupTags = formattedTags(~cellfun(@isstr, ...
-            formattedTags));
-    end % getGroupTags
 
 end % checkunique

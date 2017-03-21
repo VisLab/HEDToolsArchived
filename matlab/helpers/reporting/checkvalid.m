@@ -70,7 +70,7 @@ checkValidTags(originalTags, formattedTags, false);
         for a = 1:numTags
             if ~ischar(formattedTags{a})
                 checkValidTags(originalTags{a}, formattedTags{a}, true);
-                return;
+                continue;
             end
             if isTilde(formattedTags{a}) || ...
                     tagTakesValue(formattedTags{a}) || ...
@@ -103,7 +103,7 @@ checkValidTags(originalTags, formattedTags, false);
         tagString = originalTags{tagIndex};
         if isGroup
             tagString = [originalTags{tagIndex}, ' in group ' ,...
-                vTagList.stringifyElement(originalTags)];
+                vTagList.stringify({originalTags})];
         end
         errors = [errors, generateerror('valid', '', tagString, '','')];
         errorTags{errorsIndex} = originalTags{tagIndex};
