@@ -64,6 +64,7 @@ warnings = '';
 warningTags = cell(1, numElements);
 warningsIndex = 1;
 checkTagCaps(originalTags, formattedTags, false);
+warningTags(cellfun('isempty', warningTags)) = [];
 
     function checkTagCaps(originalTags, formattedTags, isGroup)
         % Checks if the tags are capitalized correctly
@@ -77,7 +78,6 @@ checkTagCaps(originalTags, formattedTags, false);
                 generateWarnings(originalTags, a, isGroup);
             end
         end
-        warningTags(cellfun('isempty', warningTags)) = [];
     end % checkTagCaps
 
     function generateWarnings(originalTags, tagIndex, isGroup)
@@ -85,8 +85,8 @@ checkTagCaps(originalTags, formattedTags, false);
         % capitalized
         tagString = originalTags{tagIndex};
         if isGroup
-            tagString = [originalTags{tagIndex}, ' in group (' ,...
-                vTagList.stringify(originalTags),')'];
+            tagString = [originalTags{tagIndex}, ' in group ' ,...
+                vTagList.stringify({originalTags})];
         end
         warnings = [warnings, generatewarning('cap', '', tagString, '')];
         warningTags{warningsIndex} = originalTags{tagIndex};

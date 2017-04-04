@@ -17,7 +17,7 @@
 %
 %   Optional (key/value):
 %
-%   'outputFile'   
+%   'outputFile'
 %                   The name or the path to the HED XML output file
 %                   that the HED tags in the 'wiki' text file are written
 %                   to. If not specified then the output file path will be
@@ -26,13 +26,13 @@
 %
 % Output:
 %
-%   xmlDoc     
+%   xmlDoc
 %                   Returns a handle to the newly created XML document
 %                   object. This XML document object can be converted to
 %                   a string, saved to another file, and traversed through
 %                   to access each element (tags in this case).
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -66,7 +66,9 @@ try
     writeDocumentObjectModel();
     fclose(fid);
 catch me
-    fclose(fid);
+    if fid > -1
+        fclose(fid);
+    end
     rethrow(me);
 end
 
@@ -150,7 +152,7 @@ end
 
     function nameElement = createNodeNameElement()
         % Creates a new node name element in the XML document
-        nameExpression = '(\w+\s*-?\s*)*(\s*\((\w+\s*-?\s*)*\))?(\#)?';
+        nameExpression = '([<>=#\-a-zA-Z0-9$:]+\s*)+';
         name = strtrim(regexpi(tLine, nameExpression, 'match'));
         nameElement = xmlDoc.createElement('name');
         nameElement.appendChild(xmlDoc.createTextNode(name{1}));
@@ -209,14 +211,10 @@ end
     end % createUnitClassUnitsElement
 
     function formatLine()
-        % Formats the current line by removing white space, wiki, and
-        % comment portions of the line
-        wikiexpression = '</?nowiki>';
-        commentexpression = '\[\w+\d+\]';
+        % Formats the current line by removing white space and wiki
+        % portions of the line
         tLine = strtrim(tLine);
-        tLine = strrep(tLine,'''','');
-        tLine = regexprep(tLine,wikiexpression,'');
-        tLine = regexprep(tLine,commentexpression,'');
+        tLine = regexprep(tLine,'</?nowiki>','');
     end % formatLine
 
     function attributes = getAttributes()
@@ -315,7 +313,7 @@ end
     function readLines()
         % Read each line and parse it to be added to a document object
         % model
-        fid = fopen(wikiFile);
+        fid = fopen(wikiFile, 'r', 'n', 'UTF-8');
         tLine = fgetl(fid);
         while ischar(tLine)
             parseLine();

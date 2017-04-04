@@ -37,7 +37,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function warning = generatewarning(type, line, tag, units)
+function warning = generatewarning(type, line, tag, units) 
 warning = '';
 switch(type)
     case 'cap'
@@ -52,5 +52,5 @@ switch(type)
     case 'slash'
         warning = sprintf('\tWARNING: Slash at beginning and/or end - "%s"\n', tag);
     case 'unitClass'
-        warning = sprintf('\tWARNING: No unit specified (pick one of units "%s") - "%s"\n', units, tag);
+        warning = sprintf('\tWARNING: No unit specified. Using "%s" as the default - "%s"', units, tag);
 end % generatewarning

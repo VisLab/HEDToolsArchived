@@ -87,10 +87,10 @@ issues = readStr(p);
         p.formattedCellTags = hed2cell(p.str, true);
         issues = validateStrTags(p);
         %         catch
-        %             warning(['Unable to parse tags in cell array. Please check' ...
+        %             warning(['Unable to parse string. Please check' ...
         %                 ' the format of it.']);
         %             issues = '';
-        %         end
+        %     end
     end % readStr
 
     function issues = validateStrTags(p)
@@ -100,7 +100,7 @@ issues = readStr(p);
             issues = p.strErrors;
             if(p.generateWarnings)
                 p = findWarnings(p);
-                p.strIssues = [issues p.strWarnings];
+                issues = [issues p.strWarnings];
             end
             
         end

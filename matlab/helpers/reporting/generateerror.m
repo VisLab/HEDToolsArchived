@@ -67,6 +67,6 @@ switch(type)
     case 'unique'
         error = sprintf('\tERROR: Multiple unique tags (prefix "%s") - "%s"\n', prefix, tag);
     case 'unitClass'
-        error = sprintf('\tERROR: Invalid unit (pick one of units "%s") - "%s"\n', ...
-            units, tag);
+        error = sprintf('\tERROR: Invalid unit - "%s" (valid units are "%s")\n', ...
+            tag, units);
 end % generateerror

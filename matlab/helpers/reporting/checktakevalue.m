@@ -27,7 +27,7 @@
 %
 %   originalTags
 %                   A cell array of HED tags. These tags are used to report
-%                   the errors found. 
+%                   the errors found.
 %
 %   formattedTags
 %                   A cell array of HED tags. These tags are used to do the
@@ -39,13 +39,13 @@
 %                   A string containing the validation errors.
 %
 %   errorTags
-%                   A cell array containing validation error tags. 
+%                   A cell array containing validation error tags.
 %
 %   warnings
 %                   A string containing the validation warnings.
 %
 %   warningTags
-%                   A cell array containing validation warning tags. 
+%                   A cell array containing validation warning tags.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -94,8 +94,11 @@ checkTakesValueTags(originalTags, formattedTags, false);
 
     function isNumeric = isNumericTag(tag)
         % Returns true if the tag is a numeric tag
-        valueTag = convertToValueTag(tag);
-        isNumeric = hedMaps.isNumeric.isKey(lower(valueTag));
+        isNumeric = false;
+        if ~hedMaps.tags.isKey(lower(tag))
+            valueTag = convertToValueTag(tag);
+            isNumeric = hedMaps.isNumeric.isKey(lower(valueTag));
+        end
     end % isNumericTag
 
     function unitsRegexp = buildUnitsRegexp(units)
@@ -137,7 +140,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         unitClasses = hedMaps.unitClass(lower(unitClassTag));
         unitClasses = textscan(unitClasses, '%s', 'delimiter', ',', ...
             'multipleDelimsAsOne', 1)';
-%         unitClassDefault = hedMaps.default(lower(unitClasses{1}{1}));
+        unitClassDefault = hedMaps.default(lower(unitClasses{1}{1}));
         unitClassUnits = hedMaps.unitClasses(lower(unitClasses{1}{1}));
         numUnitClasses = size(unitClasses{1}, 1);
         for a = 2:numUnitClasses
@@ -147,7 +150,7 @@ checkTakesValueTags(originalTags, formattedTags, false);
         unitsRegexp = buildUnitsRegexp(unitClassUnits);
         if all(ismember(tagName, '<>=.0123456789'))
             generateWarnings(originalTag, unitIndex, isGroup, ...
-                'unitClass', unitClassUnits)
+                'unitClass', unitClassDefault)
         end
         if isempty(regexpi(tagName, unitsRegexp))
             generateErrors(originalTag, unitIndex, isGroup, ...
@@ -192,8 +195,12 @@ checkTakesValueTags(originalTags, formattedTags, false);
 
     function [isUnitClass, unitClassTag] = isUnitClassTag(tag)
         % Returns true if the tag requires a unit class
-        unitClassTag = convertToValueTag(tag);
-        isUnitClass = hedMaps.unitClass.isKey(lower(unitClassTag));
+        isUnitClass = false;
+        unitClassTag = '';
+        if ~hedMaps.tags.isKey(lower(tag))
+            unitClassTag = convertToValueTag(tag);
+            isUnitClass = hedMaps.unitClass.isKey(lower(unitClassTag));
+        end
     end % isUnitClassTag
 
     function tagName = getTagName(tag)

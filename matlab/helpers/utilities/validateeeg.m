@@ -89,7 +89,7 @@ issues = validate(p);
         mapVersion = hedMaps.version;
         xmlVersion = getxmlversion(p.HedXml);
         if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion)
-            hedMaps = mapHEDAttributes(p.HedXml);
+            hedMaps = mapattributes(p.HedXml);
         end
     end % getHEDMaps
 

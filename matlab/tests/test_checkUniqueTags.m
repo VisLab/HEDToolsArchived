@@ -4,7 +4,7 @@ initTestSuite;
 function values = setup %#ok<DEFNU>
 % Read in the HED schema
 latestHed = 'HED.xml';
-values.Maps = mapHEDAttributes(latestHed);
+values.Maps = mapattributes(latestHed);
 values.Tags1 = {};
 values.Tags2 = {'Event/Description/Description 1', ...
     'Event/Description/Description 2'};

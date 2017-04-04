@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="5.2.1">
+<HED version="5.2.2">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -846,7 +846,8 @@
          <name>Offset</name>
       </node>
       <node>
-         <name>Imagined This is used to identity that the (sub)</name>
+         <name>Imagined</name>
+         <description>This is used to identity that the (sub)event only happened in participant's imagination, e.g.  imagined movements in motor imagery paradigms.</description>
       </node>
       <node requireChild="true">
          <name>State ID</name>
@@ -1051,7 +1052,7 @@
          <name>Location</name>
          <description>Spot or center of an area. Use Area were you are referring to something with significant extent and emphasizing its boundaries, like a city</description>
          <node takesValue="true">
-            <name>#</name>
+            <name>:</name>
             <description>location label</description>
          </node>
          <node>
@@ -1279,11 +1280,11 @@
             <description>Numeric value of number of items #</description>
          </node>
          <node isNumeric="true" takesValue="true">
-            <name>#</name>
+            <name>&lt;=#</name>
             <description>Number of items less than or equal to #</description>
          </node>
          <node isNumeric="true" takesValue="true">
-            <name>#</name>
+            <name>&gt;=#</name>
             <description>Number of items  more than or equal to #</description>
          </node>
       </node>
@@ -1686,7 +1687,7 @@
       </node>
       <node>
          <name>Probability</name>
-         <description>Use to specify the level of certainty about the occurrence of the event. Use either numerical values as the child node or low, high, etc.</description>
+         <description>Use to specify the level of certainty about the occurrence of the event. Use either numerical values as the child node or 'low', 'high', etc.</description>
       </node>
       <node requireChild="true">
          <name>Temporal uncertainty</name>
@@ -1881,7 +1882,7 @@
          </node>
          <node>
             <name>Drop</name>
-            <description>For example something  drops from subjectâ€™s hand</description>
+            <description>For example something  drops from subject's hand</description>
          </node>
       </node>
       <node>
@@ -2652,7 +2653,7 @@
                   <name>Stage</name>
                   <node takesValue="true">
                      <name>#</name>
-                     <description>a number between 1 to 4, or REM</description>
+                     <description>a number between 1 to 4, or 'REM'</description>
                   </node>
                </node>
             </node>
@@ -2913,7 +2914,7 @@
          <description>Default</description>
          <node>
             <name>Clinic</name>
-            <description>Recording in a clinical setting such as in a hospital or doctorâ€™s office</description>
+            <description>Recording in a clinical setting such as in a hospital or doctor's office</description>
          </node>
          <node>
             <name>Dim Room</name>
@@ -3055,10 +3056,10 @@
          <name>Backward masking</name>
       </node>
       <node>
-         <name>Balloon analogue risk task (BART)</name>
+         <name>Balloon analogue risk task</name>
       </node>
       <node>
-         <name>Behavioral investment allocation strategy (BIAS)</name>
+         <name>Behavioral investment allocation strategy</name>
       </node>
       <node>
          <name>Behavioral rating inventory of executive function</name>
@@ -3235,7 +3236,7 @@
          <name>Dot pattern expectancy task</name>
       </node>
       <node>
-         <name>Drawing (Cognitive Atlas Term)</name>
+         <name>Drawing</name>
       </node>
       <node>
          <name>Drawing paradigm</name>
@@ -3292,7 +3293,7 @@
          <name>Face n-back task</name>
       </node>
       <node>
-         <name>Fagerstrom test for nicotine dependence (Cognitive Atlas Term)</name>
+         <name>Fagerstrom test for nicotine dependence</name>
       </node>
       <node>
          <name>Film viewing</name>
@@ -3431,7 +3432,7 @@
          <name>Micturition task</name>
       </node>
       <node>
-         <name>Mini mental state examination (Cognitive Atlas Term)</name>
+         <name>Mini mental state examination</name>
       </node>
       <node>
          <name>Mirror tracing test</name>
@@ -3599,10 +3600,10 @@
          <name>Rapid serial object transformation</name>
       </node>
       <node>
-         <name>Reading (Covert)</name>
+         <name>Reading</name>
       </node>
       <node>
-         <name>Reading (Overt)</name>
+         <name>Reading</name>
       </node>
       <node>
          <name>Reading paradigm</name>
@@ -3617,10 +3618,10 @@
          <name>Reading span task</name>
       </node>
       <node>
-         <name>Recitation-repetition (Covert)</name>
+         <name>Recitation-repetition</name>
       </node>
       <node>
-         <name>Recitation-repetition (Overt)</name>
+         <name>Recitation-repetition</name>
       </node>
       <node>
          <name>Remember-know task</name>
