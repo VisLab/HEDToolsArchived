@@ -20,7 +20,8 @@
 %
 % See also: eeglab
 %
-% Copyright (C) 2012-2013 Thomas Rognon tcrognon@gmail.com and
+% Copyright (C) 2012-2013 
+% Jeremy Cockfield, UTSA, jeremy.cockfield@gmail.com
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,7 +39,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 function vers = eegplugin_hedtools(fig, trystrs, catchstrs)
-vers = 'hedtools1.0.4';
+vers = 'HEDTools1.0.4';
 % Check the number of input arguments
 if nargin < 3
     error('eegplugin_hedtools requires 3 arguments');
