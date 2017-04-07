@@ -87,12 +87,12 @@ end
         index = 1;
         while ~isempty(remain)
             index = index + 1;
-            newBody{index} = '~'; 
+            newBody{index} = '~';
             index = index + 1;
             [token, remain] = strtok(remain, '~'); %#ok<STTOK>
             newBody{index} = hedstring2cell(token, 'keepTildes', ...
                 true);
-            newBody = unnestCell(newBody, index);     
+            newBody = unnestCell(newBody, index);
         end
     end % splitWithTildes
 
@@ -108,6 +108,9 @@ end
             if pos < numElements
                 unnestedCellArray = [unnestedCellArray ...
                     cellArray(pos+1:end)];
+            end
+            if ischar(unnestedCellArray)
+                unnestedCellArray = {unnestedCellArray};
             end
         end
     end

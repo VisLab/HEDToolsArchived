@@ -46,7 +46,7 @@ if nargin < 3
 end;
 
 % Find the path of the current directory
-addhedpaths();
+addhedpaths(true);
 
 % Find 'Edit' in the figure 
 parentMenu = findobj(fig, 'Label', 'Edit');

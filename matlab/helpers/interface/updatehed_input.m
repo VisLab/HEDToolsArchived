@@ -6,7 +6,7 @@
 %
 % Input:
 %
-%   tab              
+%   tab
 %                    The 'Updates' tab object in pop_tsv.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
@@ -27,10 +27,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function updatehed_input(tab)
+function updatehed_input(varargin)
+p = parseArguments(varargin{:});
 versionCtrl = '';
 currentVersion = getxmlversion('HED.xml');
-createPanel(tab);
+title = 'Check for updates';
+parent = p.Parent;
+if isempty(parent)
+parent = createFigure();    
+end
+createPanel(parent);
 
     function createButtons(panel)
         % Creates the buttons in the tab panel
@@ -42,6 +48,21 @@ createPanel(tab);
             'Callback', {@checkUpdateCallback}, ...
             'Position', [0.775 0.025 0.2 0.1]);
     end % createButtons
+
+    function inputFig = createFigure()
+        % Creates a modal figure
+        inputFig = figure( ...
+            'Color', [.94 .94 .94], ...
+            'MenuBar', 'none', ...
+            'Name', title, ...
+            'NextPlot', 'add', ...
+            'NumberTitle','off', ...
+            'Resize', 'on', ...
+            'Tag', title, ...
+            'Toolbar', 'none', ...
+            'Visible', 'on', ...
+            'WindowStyle', 'modal');        
+    end % createFigure 
 
     function createLabels(panel)
         % Creates the labels in the tab panel
@@ -56,12 +77,12 @@ createPanel(tab);
             'Units', 'normalized', ...
             'String', ['Current HED version: ' currentVersion], ...
             'HorizontalAlignment', 'Left', ...
-            'Position', [0 0 0.5 0.05]); 
+            'Position', [0 0 0.5 0.05]);
     end % createLabels
 
-    function createPanel(tab)
-        % Creates the tab panel 
-        panel = uipanel('Parent', tab, ...
+    function createPanel(parent)
+        % Creates the tab panel
+        panel = uipanel('Parent', parent, ...
             'BorderType', 'none', ...
             'BackgroundColor', [.94 .94 .94], ...
             'FontSize', 12, ...
@@ -70,7 +91,7 @@ createPanel(tab);
         createButtons(panel);
     end % createPanel
 
-    function checkUpdateCallback(~, ~) 
+    function checkUpdateCallback(~, ~)
         % Callback for 'Check' button
         latestVersion = downloadhed();
         if ~strcmp(currentVersion, latestVersion)
@@ -84,5 +105,13 @@ createPanel(tab);
             msgbox('The current version is up to date');
         end
     end % checkUpdateCallback
+
+    function p = parseArguments(varargin)
+        % Parses the input arguments and returns the results
+        parser = inputParser;
+        parser.addOptional('Parent', [], @(x) ~isempty(x));
+        parser.parse(varargin{:});
+        p = parser.Results;
+    end
 
 end % updatehed_input

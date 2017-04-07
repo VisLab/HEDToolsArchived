@@ -1052,7 +1052,7 @@
          <name>Location</name>
          <description>Spot or center of an area. Use Area were you are referring to something with significant extent and emphasizing its boundaries, like a city</description>
          <node takesValue="true">
-            <name>:</name>
+            <name>#</name>
             <description>location label</description>
          </node>
          <node>
@@ -1882,7 +1882,7 @@
          </node>
          <node>
             <name>Drop</name>
-            <description>For example something  drops from subject's hand</description>
+            <description>For example something  drops from subject’s hand</description>
          </node>
       </node>
       <node>
@@ -2914,7 +2914,7 @@
          <description>Default</description>
          <node>
             <name>Clinic</name>
-            <description>Recording in a clinical setting such as in a hospital or doctor's office</description>
+            <description>Recording in a clinical setting such as in a hospital or doctor’s office</description>
          </node>
          <node>
             <name>Dim Room</name>
