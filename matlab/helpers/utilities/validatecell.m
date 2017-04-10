@@ -4,22 +4,22 @@
 %
 % Usage:
 %
-%   >>  issues = validateCellTags(cell);
+%   >>  issues = validatecell(cell);
 %
-%   >>  issues = validateCellTags(cell, varargin);
+%   >>  issues = validatecell(cell, varargin);
 %
 % Input:
 %
 %   cell
-%                   A cellstr containing HED tags that are validated.
+%                   A cell containing HED tags that are validated.
 %
 %
 %   Optional:
 %
-%   'extensionAllowed'
-%                   True(default) if descendants of extension allowed tags
-%                   are accepted which will generate warnings, False if
-%                   they are not accepted which will generate errors.
+%   'generateWarnings'
+%                   True to include warnings in the issues output variable 
+%                   in addition to errors. If false (default) only errors
+%                   are included in the issues output variable.
 %
 %   'hedXML'
 %                   The name or the path of the XML file containing
@@ -54,12 +54,9 @@ p = parseArguments(cell, varargin{:});
 issues = validate(p);
 
     function issues = validate(p)
-        % Validates a cellstr
+        % Validates a cell
         p.hedMaps = getHEDMaps(p);
-        if ~all(cellfun(@isempty, strtrim(p.cell)))
-            p.issues = parsecell(p.hedMaps, p.cell, p.generateWarnings);
-            issues = p.issues;
-        end
+        issues = parsecell(p.hedMaps, p.cell, p.generateWarnings);
     end % validate
 
     function hedMaps = getHEDMaps(p)

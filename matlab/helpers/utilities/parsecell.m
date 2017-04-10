@@ -57,15 +57,15 @@ function issues = parsecell(hedMaps, cell, generateWarnings)
 p = parseArguments(hedMaps, cell, generateWarnings);
 issues = readCell(p);
 
-    function p = findErrors(p)
+    function errors = findErrors(p)
         % Errors will be generated for the cell if found
-        p.cellErrors = checkerrors(p.hedMaps, p.cellTags, ...
+        errors = checkerrors(p.hedMaps, p.cellTags, ...
             p.formattedCellTags);
     end % findErrors
 
-    function p = findWarnings(p)
+    function warnings = findWarnings(p)
         % Warnings will be generated for the cell if found
-        p.cellWarnings = checkwarnings(p.hedMaps, p.cellTags, ...
+        warnings = checkwarnings(p.hedMaps, p.cellTags, ...
             p.formattedCellTags);
     end % findWarnings
 
@@ -81,13 +81,10 @@ issues = readCell(p);
 
     function issues = readCell(p)
         % Read the tags in a cell array and validates them
-        p.issues = {};
-        p.replaceTags = {};
         try
             p.cellTags = hed2cell(p.cell, false);
             p.formattedCellTags = hed2cell(p.cell, true);
-            p = validateCellTags(p);
-            issues = p.issues(1,:);
+            issues = validateCellTags(p);
         catch
             warning(['Unable to parse tags in cell array. Please check' ...
                 ' the format of it.']);
@@ -95,18 +92,14 @@ issues = readCell(p);
         end
     end % readCell
 
-    function p = validateCellTags(p)
+    function issues = validateCellTags(p)
         % Validates the tags in a cell array
         if ~isempty(p.cellTags)
-            p = findErrors(p);
-            p.cellIssues = p.cellErrors;
+            issues = findErrors(p);
             if(p.generateWarnings)
-                p = findWarnings(p);
-                p.cellIssues = [p.cellErrors p.cellWarnings];
-            end
-            if ~isempty(p.cellIssues)
-                p.issues = sprintf(['\n' p.cellIssues]);
-            end
+                warnings = findWarnings(p);
+                issues = [issues warnings];
+            end  
         end
     end % validateCellTags
 

@@ -62,8 +62,8 @@ checkRequiredTags();
         % Checks the tags that are required
         numTags = length(requiredTags);
         for a = 1:numTags
-            requiredIndexes = strncmpi(eventLevelTags, requiredTags{a}, ...
-                length(requiredTags{a}));
+            requiredIndexes = strncmpi(eventLevelTags, ...
+                [requiredTags{a} '/'], length(requiredTags{a}) + 1);
             if sum(requiredIndexes) == 0
                 generateErrors(a);
             end

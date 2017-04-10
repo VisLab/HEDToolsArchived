@@ -16,10 +16,10 @@
 %
 %   Optional:
 %
-%   'extensionAllowed'
-%                   True(default) if descendants of extension allowed tags
-%                   are accepted which will generate warnings, False if
-%                   they are not accepted which will generate errors.
+%   'generateWarnings'
+%                   True to include warnings in the issues output variable 
+%                   in addition to errors. If false (default) only errors
+%                   are included in the issues output variable.
 %
 %   'hedXML'
 %                   The name or the path of the XML file containing

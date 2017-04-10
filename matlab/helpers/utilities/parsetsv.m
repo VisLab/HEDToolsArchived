@@ -5,7 +5,7 @@
 %
 % Usage:
 %
-%   >>  [issues, replaceTags, success] = parsetsv(hedMaps, tsvFile, ...
+%   >>  [issues, replaceTags] = parsetsv(hedMaps, tsvFile, ...
 %       tagColumns, hasHeader, generateWarnings)
 %
 % Input:

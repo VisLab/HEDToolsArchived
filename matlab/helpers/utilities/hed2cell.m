@@ -43,27 +43,26 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function cTags = hed2cell(tags, canonicalFormat)
-cTags = {};
+function tags = hed2cell(tags, canonicalFormat)
 if ischar(tags)
     if isempty(regexp(tags, '[,~]', 'ONCE'))
-        cTags = {strtrim(tags)};
+        tags = {strtrim(tags)};
     else
-        cTags = hedstring2cell(tags, 'keepTildes', true);
-    end
-    if canonicalFormat
-        cTags = putInCanonicalForm(cTags);
+        tags = hedstring2cell(tags, 'keepTildes', true);
     end
 end
+if canonicalFormat
+    tags = putInCanonicalForm(tags);
+end
 
-    function cTags = putInCanonicalForm(cTags)
+    function tags = putInCanonicalForm(tags)
         % Removes slashes and double quotes
-        numTags = length(cTags);
+        numTags = length(tags);
         for a = 1:numTags
-            if iscell(cTags{a})
-                cTags{a} = putInCanonicalForm(cTags{a});
+            if iscell(tags{a})
+                tags{a} = putInCanonicalForm(tags{a});
             else
-                cTags{a} = vTagList.getUnsortedCanonical(cTags{a});
+                tags{a} = vTagList.getUnsortedCanonical(tags{a});
             end
         end
     end % putInCanonicalForm

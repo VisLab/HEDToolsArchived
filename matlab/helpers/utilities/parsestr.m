@@ -57,15 +57,15 @@ function issues = parsestr(hedMaps, str, generateWarnings)
 p = parseArguments(hedMaps, str, generateWarnings);
 issues = readStr(p);
 
-    function p = findErrors(p)
+    function errors = findErrors(p)
         % Errors will be generated for the cell if found
-        p.strErrors = checkerrors(p.hedMaps, p.strTags, ...
+        errors = checkerrors(p.hedMaps, p.cellTags, ...
             p.formattedCellTags);
     end % findErrors
 
-    function p = findWarnings(p)
+    function warnings = findWarnings(p)
         % Warnings will be generated for the cell if found
-        p.strWarnings = checkwarnings(p.hedMaps, p.strTags, ...
+        warnings = checkwarnings(p.hedMaps, p.cellTags, ...
             p.formattedCellTags);
     end % findWarnings
 
@@ -81,9 +81,8 @@ issues = readStr(p);
 
     function issues = readStr(p)
         % Read the tags in a string and validates them
-        p.issues = {};
         try
-            p.strTags = hed2cell(p.str, false);
+            p.cellTags = hed2cell(p.str, false);
             p.formattedCellTags = hed2cell(p.str, true);
             issues = validateStrTags(p);
         catch
@@ -95,14 +94,12 @@ issues = readStr(p);
 
     function issues = validateStrTags(p)
         % Validates the tags in a cell array from a string
-        if ~isempty(p.strTags)
-            p = findErrors(p);
-            issues = p.strErrors;
+        if ~isempty(p.cellTags)
+            issues = findErrors(p);
             if(p.generateWarnings)
-                p = findWarnings(p);
-                issues = [issues p.strWarnings];
+                warnings = findWarnings(p);
+                issues = [issues warnings];
             end
-            
         end
     end % validateStrTags
 
