@@ -79,7 +79,7 @@ issues = validate(p);
     function p = parseArguments(str, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('str', @(x) ~isempty(x) && ischar(x));
+        p.addRequired('str', @ischar);
         p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('hedXML', 'HED.xml', ...

@@ -73,7 +73,7 @@ issues = readStr(p);
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
-        parser.addRequired('str', @(x) (~isempty(x) && ischar(x)));
+        parser.addRequired('str', @ischar);
         parser.addRequired('generateWarnings', @islogical);
         parser.parse(hedMaps, str, extensionAllowed);
         p = parser.Results;
@@ -82,15 +82,15 @@ issues = readStr(p);
     function issues = readStr(p)
         % Read the tags in a string and validates them
         p.issues = {};
-        %         try
-        p.strTags = hed2cell(p.str, false);
-        p.formattedCellTags = hed2cell(p.str, true);
-        issues = validateStrTags(p);
-        %         catch
-        %             warning(['Unable to parse string. Please check' ...
-        %                 ' the format of it.']);
-        %             issues = '';
-        %     end
+        try
+            p.strTags = hed2cell(p.str, false);
+            p.formattedCellTags = hed2cell(p.str, true);
+            issues = validateStrTags(p);
+        catch
+            warning(['Unable to parse string. Please check' ...
+                ' the format of it.']);
+            issues = '';
+        end
     end % readStr
 
     function issues = validateStrTags(p)

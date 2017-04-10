@@ -79,7 +79,7 @@
 %  in column '1' and HED tags in columns '3','4','5','6' in a tagMap
 %  'tsvMap' as field 'type'.
 %
-%  tsvMap = tagtsv('BCI Data Specification.tsv', 'EventsTsvTagField', 
+%  tsvMap = tagtsv('BCI Data Specification.tsv', 'EventsTsvTagField',
 %  'type', 'TsvEventColumn', 1, 'TsvTagColumns', [3,4,5,6])
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
@@ -116,9 +116,7 @@ try
         lineNumber = lineNumber + 1;
         line = fgetl(fileId);
     end
-    if fileId ~= -1
-        fclose(fileId);
-    end
+    fclose(fileId);
 catch ME
     if fileId ~= -1
         fclose(fileId);

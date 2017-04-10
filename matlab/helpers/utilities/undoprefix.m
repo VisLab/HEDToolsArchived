@@ -1,5 +1,5 @@
 % This function combines tags that share the same prefix and only the most
-% specific is retained (e.g., /a/b/c and /a/b become just /a/b/c). 
+% specific is retained (e.g., /a/b/c and /a/b become just /a/b/c).
 %
 % Usage:
 %
@@ -14,9 +14,9 @@
 %
 % Output:
 %
-%   nonPrefixTags
+%   tags
 %                    A cell array of tags whose shared prefixes are
-%                    combined.  
+%                    combined.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -36,13 +36,17 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function nonPrefixTags = undoprefix(tags)
-nonPrefixTags = sort(tags);
-for k = 1:length(nonPrefixTags) - 1
-    if ~isempty(regexp(nonPrefixTags{k+1}, ['^' nonPrefixTags{k}], ...
+function tags = undoprefix(tags)
+% nonPrefixTags = sort(tags);
+for k = 1:length(tags) - 1
+    if ~ischar(tags{k})
+        tags{k} = undoprefix(tags{k});
+        continue;
+    end
+    if ~isempty(regexp(tags{k+1}, ['^' tags{k}], ...
             'match'))
-        nonPrefixTags{k} = [];
+        tags{k} = [];
     end
 end
- nonPrefixTags = nonPrefixTags(~cellfun('isempty',nonPrefixTags));  
+tags = tags(~cellfun('isempty',tags));
 end % undoprefix

@@ -120,32 +120,31 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         p.issues = {};
         p.replaceTags = {};
         p.issueCount = 1;
-        %         try
-        fileId = fopen(p.tsvFile);
-        [line, p.lineNumber] = checkFileHeader(p.hasHeader, fileId);
-        while ischar(line)
-            [p.cellTags, p.formattedCellTags] = getLineTags(line, ...
-                p.tagColumns);
-            p = validateLineTags(p);
-            line = fgetl(fileId);
-            p.lineNumber = p.lineNumber + 1;
+        try
+            fileId = fopen(p.tsvFile);
+            [line, p.lineNumber] = checkFileHeader(p.hasHeader, fileId);
+            while ischar(line)
+                [p.cellTags, p.formattedCellTags] = getLineTags(line, ...
+                    p.tagColumns);
+                p = validateLineTags(p);
+                line = fgetl(fileId);
+                p.lineNumber = p.lineNumber + 1;
+            end
+            fclose(fileId);
+            issues = p.issues;
+            replaceTags = p.replaceTags;
+        catch
+            fclose(fileId);
+            throw(MException('parsetsv:cannotRead', ...
+                'Unable to read TSV file on line %d', p.lineNumber));
         end
-        fclose(fileId);
-        issues = p.issues;
-        replaceTags = p.replaceTags;
-        %         catch
-        %             fclose(fileId);
-        %             throw(MException('parsetsv:cannotRead', ...
-        %                 'Unable to read TSV file on line %d', p.lineNumber));
-        %         end
     end % readLines
 
     function [cellTags, formattedCellTags] = getLineTags(line, tagColumns)
         % Reads the tag columns in a tab-delimited file and formats them
         cellTags = {};
         formattedCellTags = {};
-        delimitedLine = textscan(line, '%s', 'delimiter', '\t', ...
-            'multipleDelimsAsOne', 1)';
+        delimitedLine = textscan(line, '%q', 'delimiter', '\t')';
         numLineCols = size(delimitedLine{1},1);
         numCols = size(tagColumns, 2);
         % clean this up later
@@ -158,17 +157,11 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
                         delimitedLine{1}{tagColumns(a)}]; %#ok<AGROW>
                 end
             end
-            splitTags = cleanupTags(splitTags);
             cellTags = hed2cell(splitTags, false);
             formattedCellTags = hed2cell(splitTags, true);
         end
     end % getLineTags
 
-    function tags = cleanupTags(tags)
-        % Clean up the tags in the spreadsheet
-        tags = strrep(tags, '"', '');
-    end % cleanupTags
-        
     function p = validateLineTags(p)
         % This function validates the tags on a line in a tab-delimited
         % file
