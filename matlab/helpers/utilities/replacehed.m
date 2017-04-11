@@ -5,7 +5,7 @@
 %
 %   >>  replacehed()
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -25,12 +25,19 @@
 
 function replacehed()
 HED = 'HED.xml';
-wikiPath = [tempdir 'temp.mediawiki'];
 hedAttributes = 'HEDMaps.mat';
+if ~exist(tempdir, 'dir')
+    tempDirectory = pwd;
+else
+    tempDirectory = tempdir;
+end
+wikiPath = [tempDirectory 'temp.mediawiki'];
 hedPath = which(HED);
 hedMapsPath = strrep(hedPath, HED, hedAttributes);
 wiki2xml(wikiPath, hedPath);
-delete(wikiPath);
+if exist(wikiPath, 'dir')
+    delete(wikiPath);
+end
 hedMaps = mapattributes(hedPath); %#ok<NASGU>
 save(hedMapsPath, 'hedMaps');
 end % replacehed
