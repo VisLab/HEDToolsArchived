@@ -86,18 +86,10 @@ catch ME
     throw(ME);
 end
 
-    function tagStr = cell2str(tags)
-        % Converts the tags from a cell array to a string
-        numTags = size(tags, 2);
-        tagStr = convertTag(tags{1});
-        for a = 2:numTags
-            tagStr = [tagStr ', ' convertTag(tags{a})]; %#ok<AGROW>
-        end
-    end % cell2str
-
     function [output, tLine] = checkForHeader(p, fileId)
         % Checks to see if the file has a header line
         tLine = fgetl(fileId);
+        output = p.output;
         if p.hasHeader
             output = sprintf('%s\n', tLine);
             tLine = fgetl(fileId);
@@ -174,7 +166,7 @@ end
                 splitTags = splitLine{1}{a};
                 splitCellTags = hed2cell(splitTags, true);
                 replacedTags = replaceTags(p, splitCellTags);
-                replacedTags = cell2str(replacedTags);
+                replacedTags = vTagList.stringify(replacedTags);
                 p.output = sprintf('%s%s\t', p.output, replacedTags);
             else
                 p.output = sprintf('%s%s\t', p.output, splitLine{1}{a});
@@ -183,23 +175,18 @@ end
         output = sprintf('%s\n', p.output);
     end % readTags
 
-    function replacedTags = replaceTags(p, tags)
+    function tags = replaceTags(p, tags)
         % Replaces the old tags with the new tags
-        replacedTags = {};
         numTags = length(tags);
         for a = 1:numTags
-            if iscellstr(tags{a})
-                replacedTags{end+1} = replaceTags(p, tags{a}); %#ok<AGROW>
-            else
-                if p.replaceMap.isKey(lower(tags{a}))
-                    replacedTags{end+1} = ...
-                        p.replaceMap(lower(tags{a}));   %#ok<AGROW>
-                elseif isWildCardTag(p, lower(tags{a}))
-                    replacedTags{end+1} = ...
-                        replaceWildCardTag(lower(tags{a})); %#ok<AGROW>
-                else
-                    replacedTags{end+1} = tags{a}; %#ok<AGROW>
-                end
+            if iscell(tags{a})
+                tags{a} = replaceTags(p, tags{a});
+                continue;
+            elseif p.replaceMap.isKey(lower(tags{a}))
+                tags{a} = p.replaceMap(lower(tags{a}));
+            elseif isWildCardTag(p, lower(tags{a}))
+                tags{a} = ...
+                    replaceWildCardTag(lower(tags{a}));
             end
         end
     end % replaceTags
@@ -218,6 +205,7 @@ end
     function writeOutput(p)
         % Writes the output to the file
         outputFileId = fopen(p.outputFile,'w');
+        p.output = regexprep(p.output,'\n$', '');
         fprintf(outputFileId, '%s', p.output);
         if outputFileId ~= -1
             fclose(outputFileId);

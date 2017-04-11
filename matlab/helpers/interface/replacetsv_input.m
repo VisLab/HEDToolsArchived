@@ -38,6 +38,7 @@ columns = '2';
 replaceCtrl = '';
 tsvCtrl = '';
 outputCtrl = '';
+hasHeader = true;
 createPanel(tab);
 
     function browseOutputCallback(~, ~, replaceOutputCtrl, myTitle) 
@@ -129,6 +130,25 @@ createPanel(tab);
             'Position', [0.775 0.025 0.2 0.1]);
     end % createButtons
 
+    function createCheckboxes()
+        % Creates the checkboxes in the panel
+        panel = uipanel('Parent', tab, ...
+            'BackgroundColor', [.94 .94 .94], ...
+            'FontSize', 12, ...
+            'Position', [0.15 0.02 0.6 0.2], ...
+            'Title', 'Additional options');
+        uicontrol('Parent', panel, ...
+            'Style', 'checkbox', ...
+            'HorizontalAlignment', 'Left', ...
+            'String', 'Tab-separated input file has a header', ...
+            'Value', hasHeader, ...
+            'TooltipString', ['Check if the tab-separated input file' ...
+            ' has a header, uncheck if it does not have a header.'], ...
+            'Units','normalized',...
+            'Callback', {@hasHeaderCallback}, ...
+            'Position', [0.04 0.6 .9 0.4]);
+    end % createCheckboxes
+
     function createEditBoxes(panel)
         % Creates the edit boxes in the panel
         tsvCtrl = uicontrol('Parent', panel, ...
@@ -212,6 +232,7 @@ createPanel(tab);
             'Position', [0 0 1 1]);
         createLabels(panel);
         createEditBoxes(panel);
+        createCheckboxes();
         createButtons(panel);
     end % createPanel
 
@@ -234,7 +255,7 @@ createPanel(tab);
             wb = waitbar(.5,'Please wait...');
             try
                 replacetsv(replaceFile, tsvFile, columns, ...
-                    'OutputFile', outputFile);
+                    'hasHeader', hasHeader, 'OutputFile', outputFile);
                 msgbox('Complete!');
             catch
                 errordlg('Failed!');
@@ -242,6 +263,12 @@ createPanel(tab);
             close(wb);
         end
     end % replaceCallback
+
+    function hasHeaderCallback(src, ~) 
+        % Callback for user directly editing the 'Tab-separated input file
+        % has a header' checkbox
+        hasHeader = get(src, 'Max') == get(src, 'Value');
+    end % hasHeaderCallback
 
     function helpCallback(~, ~) 
         % Callback for the 'Help' button

@@ -84,15 +84,15 @@ end
         end
         newBody{1} = hedstring2cell(token, 'keepTildes', true);
         newBody = unnestCell(newBody, 1);
-        index = 1;
+        index = 2;
         while ~isempty(remain)
-            index = index + 1;
             newBody{index} = '~';
             index = index + 1;
             [token, remain] = strtok(remain, '~'); %#ok<STTOK>
             newBody{index} = hedstring2cell(token, 'keepTildes', ...
                 true);
             newBody = unnestCell(newBody, index);
+            index = length(newBody) +1;
         end
     end % splitWithTildes
 
