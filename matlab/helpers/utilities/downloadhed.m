@@ -11,7 +11,7 @@
 %                   The version of the wiki file. Will return an empty
 %                   string if there is no version number in the file.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com, 
+% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -32,7 +32,12 @@
 function version = downloadhed()
 wikiURL = ['https://raw.githubusercontent.com/wiki/BigEEGConsortium/' ...
     'HED/HED-Schema.mediawiki'];
-wikiPath = [tempdir 'temp.mediawiki'];
+if ~exist(tempdir, 'dir')
+    tempDirectory = pwd;
+else
+    tempDirectory = tempdir;
+end
+wikiPath = [tempDirectory 'temp.mediawiki'];
 urlwrite(wikiURL, wikiPath);
 version = getwikiversion(wikiPath);
 end % downloadhed
