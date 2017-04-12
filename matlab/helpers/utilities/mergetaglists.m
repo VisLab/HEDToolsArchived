@@ -62,26 +62,18 @@ myMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
 if strcmpi('Merge', p.UpdateType)
     myMap = addList2Map(tList1, myMap);
     myMap = addList2Map(tList2, myMap);
-elseif strcmpi('Diff', p.UpdateType) 
-    myMap = diffLists(myMap, tList1, tList2);    
+elseif strcmpi('Diff', p.UpdateType)
+    myMap = diffLists(myMap, tList1, tList2);
 else
     myMap = intersectLists(myMap, tList1, tList2);
 end
 if ~preservePrefix
     myMap = undoPrefix(myMap);
 end
-% mergedList = getMergedList(myMap);
 mergedList = myMap.values();
-
-%     function mergedList = getMergedList(myMap)
-%         % Gets the merged list from the Map container
-%         mergedList = myMap.values();
-%         if isempty(mergedList)
-%             mergedList = '';
-%         elseif length(mergedList) == 1 && ischar(mergedList{1})
-%             mergedList = mergedList{1};
-%         end
-%     end % getMergedList
+if length(mergedList) == 1 && ischar(mergedList{1})
+    mergedList = mergedList{1};
+end
 
     function [myMap, otherMap] = intersectLists(myMap, otherMap, ...
             tList1, tList2)

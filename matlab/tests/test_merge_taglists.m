@@ -13,34 +13,34 @@ function teardown(values) %#ok<INUSD,DEFNU>
 
 function testMergeTagListsArgumentsValid(values) %#ok<DEFNU>
 % Unit test for mergeTagLists
-fprintf('\nUnit tests for merge_taglists with valid lists\n');
+fprintf('\nUnit tests for mergetaglists with valid lists\n');
 
 fprintf('It should merge correctly when lists are independent\n');
-mergedList1 = merge_taglists(values.tList1, values.tList2, false);
+mergedList1 = mergetaglists(values.tList1, values.tList2, false);
 assertEqual(length(mergedList1), 5);
-mergedList2 = merge_taglists(values.tList1, values.tList3, false);
+mergedList2 = mergetaglists(values.tList1, values.tList3, false);
 assertEqual(length(mergedList2), 5);
 
 fprintf('It should ignore case differences\n')
-mergedList3 = merge_taglists(values.tList2, values.tList3, false);
+mergedList3 = mergetaglists(values.tList2, values.tList3, false);
 assertEqual(length(mergedList3), 3);
 
 fprintf('It should remove prefixes by default\n');
-mergedList4 = merge_taglists(values.tList1, values.tList4, false);
+mergedList4 = mergetaglists(values.tList1, values.tList4, false);
 assertEqual(length(mergedList4), 2);
 
 fprintf('It should not remove prefixes when preservePrefix is true\n');
-mergedList5 = merge_taglists(values.tList4, values.tList5, true);
+mergedList5 = mergetaglists(values.tList4, values.tList5, true);
 assertEqual(length(mergedList5), 6);
 
 fprintf('It should still work when one of the lists is empty\n');
-mergedList6 = merge_taglists(values.tList1, '', true);
+mergedList6 = mergetaglists(values.tList1, '', true);
 assertElementsAlmostEqual(sum(~strcmpi(values.tList1, mergedList6)), 0);
-mergedList7 = merge_taglists('', values.tList1, true);
+mergedList7 = mergetaglists('', values.tList1, true);
 assertElementsAlmostEqual(sum(~strcmpi(values.tList1, mergedList7)), 0);
 
 fprintf('It should still work when both lists are empty\n');
-mergedList8 = merge_taglists('', '', true);
+mergedList8 = mergetaglists('', '', true);
 assertTrue(isempty(mergedList8));
 
 fprintf('It should return either an empty string or a cellstr\n');
@@ -59,16 +59,16 @@ function testMergeTagArguments(values) %#ok<DEFNU>
 fprintf('\nUnit tests for mergetaglists with invalid arguments\n');
 fprintf(['It should correctly reduce each list when either argument' ...
     ' is empty\n']);
-mergedList1 = merge_taglists(values.tList4, '', true);
+mergedList1 = mergetaglists(values.tList4, '', true);
 assertEqual(length(mergedList1), 3);
-mergedList2 = merge_taglists(values.tList4, '', false);
+mergedList2 = mergetaglists(values.tList4, '', false);
 assertEqual(length(mergedList2), 2);
-mergedList3 = merge_taglists('', values.tList4, true);
+mergedList3 = mergetaglists('', values.tList4, true);
 assertEqual(length(mergedList3), 3);
-mergedList4 = merge_taglists('', values.tList4, false);
+mergedList4 = mergetaglists('', values.tList4, false);
 assertEqual(length(mergedList4), 2);
 fprintf('It should return a string when there is only one tag\n');
-mergedList5 = merge_taglists('a/b/c', '', true);
+mergedList5 = mergetaglists('a/b/c', '', true);
 assertTrue(ischar(mergedList5));
-mergedList6 = merge_taglists('', 'a/b/c', true);
+mergedList6 = mergetaglists('', 'a/b/c', true);
 assertTrue(ischar(mergedList6));
