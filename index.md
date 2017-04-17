@@ -59,8 +59,7 @@ If your data files are *.mat* files, you can simply unzip the
 you can add the code contained in *setup* to your *startup* script.
 
 ### 1.3.2 Running with .set data file types 
-If you wish to use EEGLAB, you should follow the directions above
-without commenting out the last section of the setup script.
+If you wish to use EEGLAB, you should follow the directions above also.
 
 ### 1.3.3 Running as a plugin to EEGLAB
 To install *HEDTools* unzip the *HEDTools1.0.4.zip* file inside the
