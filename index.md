@@ -210,7 +210,7 @@ Once the tag has been added to the HED then you will be prompted to
 specify the version (Figure 6). Setting this will change the version
 number that appears at the top of the CTagger. To modify the version
 number again, click on the HED/\# tag and specify the value. Note: HED
-uses a standard *x*.*y*.*z* versioning convention (e.g., 4.0.1). Changes
+uses a standard *x*.*y*.*z* versioning convention (e.g., 5.2.3). Changes
 in *x* denote major releases with significant changes. Changes in *y*
 denote changes that may result in minor incompatibilities with the
 previous version. Changes in *z* denote minor additions, modifications
@@ -897,7 +897,7 @@ represented as an XML string.
 
 > &lt;?xml version="1.0" encoding="utf-8"?&gt;
 >
-> &lt;HED version="4.0.1"&gt;
+> &lt;HED version="5.2.2"&gt;
 >
 > &lt;node&gt;
 >
