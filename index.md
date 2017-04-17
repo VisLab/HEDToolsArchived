@@ -54,18 +54,16 @@ EEGLAB. In both cases, you should install EEGLAB unless you plan to use
 
 ### 1.3.1 Running as a standalone application
 If your data files are *.mat* files, you can simply unzip the
-*EEGLABPlugin/HEDTools1.0.3.zip* anywhere you choose. Execute the
+*EEGLABPlugin/HEDTools1.0.4.zip* anywhere you choose. Execute the
 *setup* script to set the paths each time you run MATLAB. Alternatively,
-you can add the code contained in *setup* to your *startup* script. If
-you are not using EEGLAB, you can comment out the last section of the
-*setup* script.
+you can add the code contained in *setup* to your *startup* script.
 
 ### 1.3.2 Running with .set data file types 
 If you wish to use EEGLAB, you should follow the directions above
 without commenting out the last section of the setup script.
 
 ### 1.3.3 Running as a plugin to EEGLAB
-To install *HEDTools* unzip the *HEDTools1.0.3.zip* file inside the
+To install *HEDTools* unzip the *HEDTools1.0.4.zip* file inside the
 *EEGLAB plugin* directory. If you don’t install *HEDTools* via the
 EEGLAB menu, you can find this file at:
 
@@ -75,7 +73,7 @@ When you start EEGLAB again, *HEDTools* should be ready to use. Note:
 EEGLAB requires that each EEGLAB plugin be in its own subdirectory in
 the plugins directory of EEGLAB. Thus, if you have unzipped *HEDTools*
 correctly, you should see
-*…/eeglab/plugins/HEDTools1.0.3*/*eegplugin\_hedtools.m*.
+*…/eeglab/plugins/HEDTools1.0.4*/*eegplugin\_hedtools.m*.
 
 # 2. Annotating Data
 The EEGLAB plugin version of *HEDTools* adds several additional menu
