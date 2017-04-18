@@ -1,10 +1,10 @@
-function test_suite = test_remapTSVTags%#ok<STOUT>
+function test_suite = test_replacetsv%#ok<STOUT>
 initTestSuite;
 
 function values = setup %#ok<DEFNU>
 % Read in the HED schema
 setup_tests;
-values.remapFile = [values.testroot filesep values.Otherdir filesep ...
+values.replaceFile = [values.testroot filesep values.Otherdir filesep ...
     'Remap1.txt']; %#ok<NODEF>
 values.tagFile1 = [values.testroot filesep values.Otherdir filesep ...
     'Tags1.txt'];
@@ -24,14 +24,14 @@ delete(values.outputFile2);
 
 function testOptions(values)  %#ok<DEFNU>
 % Unit test for editmaps
-fprintf('\nUnit tests for remapTSVTags\n');
+fprintf('\nUnit tests for replacetsv\n');
 
 fprintf(['\nIt should should create a new file when there is no header' ...
     ' in the tag file\n']);
-remapTSVTags(values.remapFile, values.tagFile1, values.tagColumns1, ...
+replacetsv(values.replaceFile, values.tagFile1, values.tagColumns1, ...
     'OutputFile', values.outputFile1, 'HasHeader', false);
 
 fprintf(['\nIt should should create a new file but should not replace' ...
     ' any of the tags because they are not valid.\n']);
-remapTSVTags(values.remapFile, values.tagFile2, values.tagColumns2, ...
+replacetsv(values.replaceFile, values.tagFile2, values.tagColumns2, ...
     'OutputFile', values.outputFile2);
