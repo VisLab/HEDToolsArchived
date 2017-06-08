@@ -34,38 +34,52 @@
 
 function found = findhedtags(hedString, query)
 p = parseArguments(hedString, query);
-% No exclusive tags, find matches amongst all tags
-if ~any(ismember(p.exclusiveTags, p.allTags))
-    found = all(ismember(p.queryTags, p.allTags)) || all(cellfun(@(x) ...
-        any(strncmp(p.allTags, x, length(x))), p.prefixQueryTags));
+
+if isempty(p.queryTags)
+    found = false;
     return;
 end
 
-% Exclusive tags, no groups, look into top-level tags
-if isempty(p.groupTags)
-    found = foundInAndB(p.topLevelTags, p.queryTags, p.exclusiveTags) && ...
-        (all(ismember(p.queryTags, p.topLevelTags)) || all(cellfun(@(x) ...
-        any(strncmp(p.allTags, x, length(x))), p.prefixQueryTags)));
+% query contains only attribute tags and there are no attributes on
+% top-level
+if ~isempty(p.topLevelTags) && all(strncmp(p.attributePrefix, p.queryTags, length(p.attributePrefix))) ...
+        && ~any(strncmp(p.attributePrefix, p.topLevelTags, length(p.attributePrefix)))
+    found = false;
     return;
-else
-    % Exclusive tags, with groups, none found at top-level, look into top-level
-    if ~any(ismember(p.exclusiveTags, p.topLevelTags)) && ...
-            all(ismember(p.queryTags, p.topLevelTags)) || all(cellfun(@(x) ...
-            any(strncmp(p.topLevelTags, x, length(x))), p.prefixQueryTags));
-        found = true;
-        return;
-        % Exclusive tags, no matches at top-level, look into groups
-    else
-        numGroups = length(p.groupTags);
-        matchesFound = zeros(1,numGroups);
-        for a = 1:numGroups
-            matchesFound(a) = foundInAndB(p.groupTags{a}, p.queryTags, p.exclusiveTags) && ...
-                (all(ismember(p.queryTags, p.groupTags{a})) || all(cellfun(@(x) ...
-                any(strncmp(p.groupTags{a}, x, length(x))), p.prefixQueryTags)));
-        end
-        found = any(matchesFound);
-    end
 end
+
+% Look in all tags if there are no attributes/exclusive tags
+if ~any(ismember(p.exclusiveTags, p.allTags)) && ...
+        ~any(strncmp(p.attributePrefix, p.allTags, length(p.attributePrefix))) ...
+        && all(ismember(p.queryTags, p.allTags)) || all(cellfun(@(x) ...
+        any(strncmp(p.allTags, x, length(x))), p.prefixQueryTags));
+    found = true;
+    return;
+end
+
+% Look in top-level tags, attributes/exclusive tags present
+if foundInAndB(p.topLevelTags, p.queryTags, p.exclusiveTags) && ...
+        (all(ismember(p.queryTags, p.topLevelTags)) || all(cellfun(@(x) ...
+        any(strncmp(p.topLevelTags, x, length(x))), p.prefixQueryTags)))
+    found = true;
+    return;
+end
+
+
+% if ~isempty(p.groupTags)
+%     found = all(matchesFound);
+%     return;
+% end
+
+numGroups = length(p.groupTags);
+matchesFound = zeros(1,numGroups);
+for a = 1:numGroups
+    matchesFound(a) = foundInAndB(p.groupTags{a}, p.queryTags, p.exclusiveTags) && ...
+        (all(ismember(p.queryTags, p.groupTags{a})) || all(cellfun(@(x) ...
+        any(strncmp(p.groupTags{a}, x, length(x))), p.prefixQueryTags)));
+end
+found = any(matchesFound);
+
 
     function found = foundInAndB(a, b, c)
         % Checks to see if all c elements found in a are also found b
@@ -82,6 +96,7 @@ end
         p.parse(hedString, query);
         p = p.Results;
         p = parseHedAndQueryStrings(p, hedString, query);
+        p.attributePrefix = 'attribute';
     end % parseArguments
 
     function p = parseHedAndQueryStrings(p, hedString, query)
