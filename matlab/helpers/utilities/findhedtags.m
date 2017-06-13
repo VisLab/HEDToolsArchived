@@ -34,57 +34,106 @@
 
 function found = findhedtags(hedString, query)
 p = parseArguments(hedString, query);
+found = false;
 
-if isempty(p.queryTags)
-    found = false;
+% hed string or query string is empty or query contains only attribute tags
+% and there are no attributes on top-level
+if hedOrQueryIsEmpty(p) || (queryContainsAllAttributes(p) && ...
+        noTopLevelAttributesFound(p))
     return;
 end
 
-% query contains only attribute tags and there are no attributes on
-% top-level
-if ~isempty(p.topLevelTags) && all(strncmp(p.attributePrefix, p.queryTags, length(p.attributePrefix))) ...
-        && ~any(strncmp(p.attributePrefix, p.topLevelTags, length(p.attributePrefix)))
-    found = false;
-    return;
-end
-
-% Look in all tags if there are no attributes/exclusive tags
-if ~any(ismember(p.exclusiveTags, p.allTags)) && ...
-        ~any(strncmp(p.attributePrefix, p.allTags, length(p.attributePrefix))) ...
-        && all(ismember(p.queryTags, p.allTags)) || all(cellfun(@(x) ...
-        any(strncmp(p.allTags, x, length(x))), p.prefixQueryTags));
+% Match found at top-level or all levels if there are no
+% attribute/exclusive tags
+if topLevelMatchFound(p) || (noAttributeOrExlcusiveTagsFound(p) && ...
+        matchAnywhereFound(p))
     found = true;
     return;
 end
 
-% Look in top-level tags, attributes/exclusive tags present
-if foundInAndB(p.topLevelTags, p.queryTags, p.exclusiveTags) && ...
-        (all(ismember(p.queryTags, p.topLevelTags)) || all(cellfun(@(x) ...
-        any(strncmp(p.topLevelTags, x, length(x))), p.prefixQueryTags)))
-    found = true;
-    return;
+% Finally look in groups, attribute/exclusive tags present
+if ~isempty(p.groupTags)
+    numGroups = length(p.groupTags);
+    matchesFound = zeros(1,numGroups);
+    for a = 1:numGroups
+        if exclusiveTagsFoundInGroupNotQuery(p, a)
+            break;
+        elseif entireGroupMatchFound(p, a)
+            found = true;
+            return;
+        else
+            matchesFound(a) = partialGroupMatchFound(p, a);
+        end
+    end
+    found = all(matchesFound);
 end
 
+    function found = exclusiveTagsFoundInGroupNotQuery(p, indx)
+        % Returns true if there are exclusive tags in hed string group but
+        % not the query string
+        found = ~foundInAndB(p.groupTags{indx}, p.queryTags, ...
+            p.exclusiveTags);
+    end % exclusiveInGroupNotQuery
 
-% if ~isempty(p.groupTags)
-%     found = all(matchesFound);
-%     return;
-% end
+    function found = entireGroupMatchFound(p, indx)
+        % Returns true if the query string matches the entire group
+        found = length(p.groupTags{indx}) == length(p.queryTags) && ...
+            all(ismember(p.groupTags{indx}, p.queryTags));
+    end % entireGroupMatchFound
 
-numGroups = length(p.groupTags);
-matchesFound = zeros(1,numGroups);
-for a = 1:numGroups
-    matchesFound(a) = foundInAndB(p.groupTags{a}, p.queryTags, p.exclusiveTags) && ...
-        (all(ismember(p.queryTags, p.groupTags{a})) || all(cellfun(@(x) ...
-        any(strncmp(p.groupTags{a}, x, length(x))), p.prefixQueryTags)));
-end
-found = any(matchesFound);
-
+    function found = partialGroupMatchFound(p, indx)
+        % Returns true if the query string matches part of the group
+        found = all(ismember(p.queryTags, p.groupTags{indx}) | ...
+            cellfun(@(x) any(strncmp(p.groupTags{indx}, x, length(x))), ...
+            p.prefixQueryTags));
+    end % partialGroupMatchFound
 
     function found = foundInAndB(a, b, c)
-        % Checks to see if all c elements found in a are also found b
-        found = all(ismember(c(ismember(c, a)), b));
-    end % foundInAButNotB
+        % Checks to see if any c elements found in a are also found b
+        found = true;
+        cElementsFoundInA = c(ismember(c, a));
+        if ~isempty(cElementsFoundInA)
+            found = any(ismember(cElementsFoundInA, b));
+        end
+    end % foundInAndB
+
+    function isEmpty = hedOrQueryIsEmpty(p)
+        % Returns true if the hed or query string is empty
+        isEmpty = isempty(p.queryTags) || isempty(p.allTags);
+    end % emptyHedOrQueryString
+
+    function notFound = noTopLevelAttributesFound(p)
+        % Returns true if no attribute tags are found at the top level of
+        % the hed string
+        notFound = ~isempty(p.topLevelTags) && ...
+            ~any(strncmp(p.attributePrefix, p.topLevelTags, ...
+            length(p.attributePrefix)));
+    end % noTopLevelAttributesFound
+
+    function notFound = noAttributeOrExlcusiveTagsFound(p)
+        % Returns true if no attribute or exclusive tags are found in
+        % hed string
+        notFound = ~any(ismember(p.exclusiveTags, ...
+            p.allTags)) && ~any(strncmp(p.attributePrefix, p.allTags, ...
+            length(p.attributePrefix)));
+    end % noAttributeOrExlcusiveTagsFound
+
+    function found = matchAnywhereFound(p)
+        % Returns true if a match was found in any tags of the hed string
+        found = all(ismember(p.queryTags, p.allTags) | ...
+            cellfun(@(x) any(strncmp(p.allTags, x, length(x))), ...
+            p.prefixQueryTags));
+    end % matchAnywhereFound
+
+    function found = topLevelMatchFound(p)
+        % Returns true if a match was found in top-level tags of the hed
+        % string
+        found = foundInAndB(p.topLevelTags, p.queryTags, ...
+            p.exclusiveTags) && ...
+            (all(ismember(p.queryTags, p.topLevelTags) | ...
+            cellfun(@(x) any(strncmp(p.topLevelTags, x, length(x))), ...
+            p.prefixQueryTags)));
+    end % topLevelMatchFound
 
     function p = parseArguments(hedString, query)
         % Parses the input arguments and returns the results
@@ -112,4 +161,10 @@ found = any(matchesFound);
         p.prefixQueryTags = strcat(p.queryTags, '/');
     end % parseHedAndQueryTags
 
-end % tagmatch
+    function attributeOnly = queryContainsAllAttributes(p)
+        % Returns true if the query string only contains attribute tags
+        attributeOnly = all(strncmp(p.attributePrefix, ...
+            p.queryTags, length(p.attributePrefix)));
+    end % queryContainsAllAttributes
+
+end % findhedtags

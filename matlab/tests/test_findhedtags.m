@@ -94,7 +94,7 @@ found = findhedtags(hedString, query);
 assertTrue(found);
 
 fprintf('\n''Attribute/Intended effect'' should match ''(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)''\n');
-hedString = ' (a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)';
+hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)';
 query = 'Attribute/Intended effect';
 found = findhedtags(hedString, query);
 assertTrue(found);
@@ -128,15 +128,15 @@ hedString = '(a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X)';
 query = 'a/b, Attribute/X';
 found = findhedtags(hedString, query);
 assertTrue(found);
-% 
-% fprintf('\n''a/b, Attribute/X'' (a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X, Attribute/Intended effect)''\n');
-% hedString = ' (a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X, Attribute/Intended effect)';
-% query = 'a/b, Attribute/X';
-% found = findhedtags(hedString, query);
-% assertFalse(found);
 
-% fprintf('\n''a/b, Attribute/Intended effect, Attribute/Offset'' ''(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)''\n');
-% hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)';
-% query = 'a/b, Attribute/Intended effect, Attribute/Offset';
-% found = findhedtags(hedString, query);
-% assertFalse(found);
+fprintf('\n''a/b, Attribute/X'' (a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X, Attribute/Intended effect)''\n');
+hedString = ' (a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X, Attribute/Intended effect)';
+query = 'a/b, Attribute/X';
+found = findhedtags(hedString, query);
+assertFalse(found);
+
+fprintf('\n''a/b, Attribute/Intended effect, Attribute/Offset'' ''(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)''\n');
+hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)';
+query = 'a/b, Attribute/Intended effect, Attribute/Offset';
+found = findhedtags(hedString, query);
+assertTrue(found);
