@@ -1,39 +1,148 @@
 function test_suite = test_findhedevents %#ok<STOUT>
 initTestSuite;
 
-function values = setup %#ok<DEFNU>
-% Function executed before each test
-values.event(1).usertags = 'a/b, b/c/d';
-values.event(2).usertags = 'a/b';
-values.event(3).usertags = 'b/c';
-values.event(4).usertags = 'a/b, b/c';
-values.event(5).usertags = 'e/a/b';
+function testvalidsearches() %#ok<DEFNU>
+% Unit test for fieldMap adding structure events
+fprintf('\n''a/b'' should match ''a/b/c''\n');
+hedString = 'a/b/c';
+queryString = 'a/b'; 
+found = findhedevents(hedString, queryString);
+assertTrue(found);
 
-function teardown(values) %#ok<INUSD,DEFNU>
-% Function executed after each test
+fprintf('\n''a/b'' should not match ''a/b, Attribute/Intended effect''\n');
+hedString = 'a/b, Attribute/Intended effect';
+queryString = 'a/b';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
 
-function testFindHedEvents(values) %#ok<DEFNU>
-fprintf(['\nIt should return no matches when the tag search string is' ...
-    ' empty\n']);
-numMatches = 0;
-tags = '';
-positions = findhedevents(values, 'tags', tags);
-assertEqual(length(positions), numMatches);
+fprintf('\n''a/b, Attribute/Intended effect'' should match ''a/b, Attribute/Intended effect''\n');
+hedString = 'a/b, Attribute/Intended effect';
+queryString = 'a/b, Attribute/Intended effect';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
 
-fprintf('\nIt should return 2 matches\n');
-numMatches = 2;
-tags = 'a/b, b/c';
-positions = findhedevents(values, 'tags', tags);
-assertEqual(length(positions), numMatches);
+fprintf('\n''c/d'' should match ''(a/b, Attribute/Intended effect), c/d''\n');
+hedString = '(a/b, Attribute/Intended effect), c/d';
+queryString = 'c/d';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
 
-fprintf('\nIt should return 1 matches\n');
-numMatches = 1;
-tags = 'e/a/b';
-positions = findhedevents(values, 'tags', tags);
-assertEqual(length(positions), numMatches);
+fprintf('\n''a/b, c/d'' should match ''(a/b, e/f), c/d''\n');
+hedString = '(a/b, e/f), c/d';
+queryString = 'a/b, c/d';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
 
-fprintf('\nIt should return 3 matches\n');
-numMatches = 3;
-tags = 'b/c';
-positions = findhedevents(values, 'tags', tags);
-assertEqual(length(positions), numMatches);
+fprintf('\n''e/f, c/d'' should match ''(a/b, e/f), c/d''\n');
+hedString = '(a/b, e/f), c/d';
+queryString = 'e/f, c/d';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''c/d, Attribute/Intended effect'' should not match ''(a/b, Attribute/Intended effect), c/d''\n');
+hedString = '(a/b, Attribute/Intended effect), c/d';
+queryString = 'c/d, Attribute/Intended effect';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
+
+fprintf('\n''c/d, Attribute/Intended effect'' should match ''a/b, Attribute/Intended effect, c/d''\n');
+hedString = 'a/b, Attribute/Intended effect, c/d';
+queryString = 'c/d, Attribute/Intended effect';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b, Attribute/X'' should match ''(a/b, Attribute/X), c/d''\n');
+hedString = '(a/b, Attribute/X), c/d';
+queryString = 'a/b, Attribute/X';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''c/d, Attribute/X'' should not match ''(a/b, Attribute/X), c/d''\n');
+hedString = '(a/b, Attribute/X), c/d';
+queryString = 'c/d, Attribute/X';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
+
+fprintf('\n''Attribute/X'' should not match ''(a/b, Attribute/X), c/d''\n');
+hedString = '(a/b, Attribute/X), c/d';
+queryString = 'Attribute/X';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
+
+fprintf('\n''Attribute/X'' should not match ''(a/b, Attribute/X), c/d''\n');
+hedString = '(a/b, Attribute/X), c/d';
+queryString = 'Attribute/X';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
+
+fprintf('\n''Attribute/Offset'' should match ''a/b, Attribute/Offset, c/d''\n');
+hedString = 'a/b, Attribute/Offset, c/d';
+queryString = 'Attribute/Offset';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''Attribute/X, Attribute/Y'' should not match ''(a/b, Attribute/X, Attribute/Y), c/d''\n');
+hedString = '(a/b, Attribute/X, Attribute/Y), c/d';
+queryString = 'Attribute/X, Attribute/Y';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
+
+fprintf('\n''Attribute/Y'' should match ''(a/b, Attribute/X, Attribute/Y), (c/d, Attribute/Y)''\n');
+hedString = '(a/b, Attribute/X, Attribute/Y), (c/d, Attribute/Y)';
+queryString = 'Attribute/Y';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''Attribute/Intended effect'' should match ''(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)''\n');
+hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)';
+queryString = 'Attribute/Intended effect';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''Attribute/Intended effect, Attribute/Offset'' should match ''(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect, Attribute/Offset)''\n');
+hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect, Attribute/Offset)';
+queryString = 'Attribute/Intended effect, Attribute/Offset';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b, Attribute/Intended effect, Attribute/Offset'' should match ''(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)''\n');
+hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (c/d,  Attribute/Intended effect)';
+queryString = 'a/b, Attribute/Intended effect, Attribute/Offset';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b, Attribute/X, Attribute/Y'' should match ''(a/b, Attribute/X, Attribute/Y), (c/d,  Attribute/X)''\n');
+hedString = '(a/b, Attribute/X, Attribute/Y), (c/d,  Attribute/X)';
+queryString = 'a/b, Attribute/X, Attribute/Y';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b, Attribute/X, Attribute/Y'' should match ''(a/b, Attribute/X, Attribute/Y), (c/d,  Attribute/X)''\n');
+hedString = '(a/b, Attribute/X, Attribute/Y), (c/d,  Attribute/X)';
+queryString = 'a/b, Attribute/X, Attribute/Y';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b, Attribute/X'' should match ''(a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X)''\n');
+hedString = '(a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X)';
+queryString = 'a/b, Attribute/X';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b, Attribute/X'' should not match (a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X, Attribute/Intended effect)''\n');
+hedString = ' (a/b, Attribute/X, Attribute/Y), (a/b/q, c/d,  Attribute/X, Attribute/Intended effect)';
+queryString = 'a/b, Attribute/X';
+found = findhedevents(hedString, queryString);
+assertFalse(found);
+
+fprintf('\n''a/b, Attribute/Intended effect, Attribute/Offset'' ''(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)''\n');
+hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)';
+queryString = 'a/b, Attribute/Intended effect, Attribute/Offset';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''a/b'' should not match ''(a/b, b/c), c/d'' when ''b/c is an exclusive tag\n');
+hedString = '(a/b, b/c), c/d';
+queryString = 'a/b';
+found = findhedevents(hedString, queryString, {'b/c'});
+assertFalse(found);

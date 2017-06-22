@@ -1,57 +1,54 @@
 % This function will extract data epochs time locked to events that contain
-% specified HED tags. The event tags are assumed to be stored in the
-% .event.usertags field of EEG structure passed in.
+% specified HED tags. The HED tags are assumed to be stored in the
+% .event.usertags and/or .event.hedtags field of EEG structure passed in.
 %
 % Usage:
 %
-%   >> EEG = epochhed(EEG, tags)
+%   >> EEG = epochhed(EEG, queryString)
 %
-%   >> EEG = epochhed(EEG, tags, varargin)
+%   >> EEG = epochhed(EEG, queryString, varargin)
 %
 % Inputs:
 %
-%   EEG          Input dataset. Data may already be epoched; in this case,
+%   EEG
+%                Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
 %                The dataset is assumed to be tagged and has a .usertags
-%                field in the .event structure.
-%   tags         A search string consisting of tags to extract data epochs.
-%                The tag search uses boolean operators (AND, OR, AND NOT) 
-%                to widen or narrow the search. Two tags separated by a
-%                comma use the AND operator by default which will only
-%                return events that contain both of the tags. The OR
-%                operator looks for events that include either one or both
-%                tags being specified. The AND NOT operator looks for
-%                events that contain the first tag but not the second tag.
-%                To nest or organize the search statements use square
-%                brackets. Nesting will change the order in which the
-%                search statements are evaluated. For example,
-%                "/attribute/visual/color/green AND
-%                [/item/2d shape/rectangle/square OR
-%                /item/2d shape/ellipse/circle]".
+%                and/or .hedtags fields in the .event structure.
 %
-%   timelim    Epoch latency limits [start end] in seconds relative to
+%   queryString
+%                A query string containing tags that you want to search
+%                for.
+%
+%   timelim
+%                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event. The default is [-1 2].
 %
-% Optional inputs:
+% Optional inputs (key/value):
 %
-%   'newname'    New dataset name. The default is "[old_dataset] epochs"
+%   'newname'
+%                New dataset name. The default is "[old_dataset] epochs"
 %
-%   'valuelim'   [min max] data limits. If one positive value is given,
+%   'valuelim'
+%                [min max] data limits. If one positive value is given,
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50] to remove artifactual epoch. The default is
 %                [-Inf Inf].
 %
-%   'verbose'    ['on'|'off']. The default is 'on'.
+%   'verbose'
+%                ['on'|'off']. The default is 'on'.
 %
 % deprecated
 %
-%   'timeunit'   Time unit ['seconds'|'points'] If 'seconds,' consider
+%   'timeunit'
+%                Time unit ['seconds'|'points'] If 'seconds,' consider
 %                events times to be in seconds. If 'points,' consider
 %                events as indices into the data array. The default is
 %                'points'.
 % Outputs:
 %
-%   EEG          Output dataset that has extracted data epochs.
+%   EEG
+%                Output dataset that has extracted data epochs.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -72,22 +69,26 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [EEG, indices] = epochhed(EEG, tags, timelim, varargin)
-p = parseArguments(EEG, tags, timelim, varargin{:});
-indices = intersect(findhedevents(EEG, 'tags', tags), p.eventindices);
-allLatencies = [EEG.event.latency];
-matchedLatencies = allLatencies(indices);
-[newtimelimts, acceptedEventIndecies, epochevent] = epochData();
-updateFields();
-newevent = duplicateEvents();
-modifyEvents();
-checkBoundaryEvents();
+function [EEG, indices] = epochhed(EEG, queryString, timelim, varargin)
+parsedArguments = parseArguments(EEG, queryString, timelim, varargin{:});
+hedStringsArray = arrayfun(@concattags, parsedArguments.EEG.event, ...
+    'UniformOutput', false);
+indices = cellfun(@(x) findhedevents(x, queryString), hedStringsArray);
+parsedArguments.allLatencies = [parsedArguments.EEG.event.latency];
+parsedArguments.matchedLatencies = parsedArguments.allLatencies(indices);
+parsedArguments = epochData(parsedArguments);
+parsedArguments = updateFields(parsedArguments);
+parsedArguments = duplicateEvents(parsedArguments);
+parsedArguments = modifyEvents(parsedArguments);
+parsedArguments = checkBoundaryEvents(parsedArguments);
+EEG = parsedArguments.EEG;
 
-    function checkBoundaryEvents()
+    function parsedArguments = checkBoundaryEvents(parsedArguments)
         % Check for boundary events
         disp('hed_epoch(): checking epochs for data discontinuity');
-        if ~isempty(EEG.event) && ischar(EEG.event(1).type)
-            tmpevent = EEG.event;
+        if ~isempty(parsedArguments.EEG.event) && ...
+                ischar(parsedArguments.EEG.event(1).type)
+            tmpevent = parsedArguments.EEG.event;
             boundaryindex = strmatch('boundary', ...
                 { tmpevent.type }); %#ok<MATCH2>
             if ~isempty(boundaryindex)
@@ -100,83 +101,109 @@ checkBoundaryEvents();
                         indexepoch = 1; % only one epoch
                     end
                 end
-                EEG = pop_select(EEG, 'notrial', indexepoch);
-                acceptedEventIndecies = acceptedEventIndecies(setdiff(...
-                    1:length(acceptedEventIndecies),indexepoch));
+                parsedArguments.EEG = pop_select(parsedArguments.EEG, ...
+                    'notrial', indexepoch);
+                parsedArguments.acceptedEventIndecies = ...
+                    parsedArguments.acceptedEventIndecies(setdiff(...
+                    1:length(parsedArguments.acceptedEventIndecies), ...
+                    indexepoch));
             end
         end
     end % checkBoundaryEvents
 
-    function newevent = duplicateEvents()
+    function parsedArguments = duplicateEvents(parsedArguments)
         % Count the number of events to duplicate and duplicate them
         totlen = 0;
-        for index=1:EEG.trials, ...
-                totlen = totlen + length(epochevent{index}); end
-        EEG.event(1).epoch = 0;
+        for index=1:parsedArguments.EEG.trials, ...
+                totlen = totlen + ...
+                length(parsedArguments.epochevent{index});
+        end
+        parsedArguments.EEG.event(1).epoch = 0;
         if totlen ~= 0
-            newevent(totlen) = EEG.event(1);
+            parsedArguments.newevent(totlen) = ...
+                parsedArguments.EEG.event(1);
         else
-            newevent = [];
+            parsedArguments.newevent = [];
         end
     end % duplicateEvents
 
-    function [newtimelimts, acceptedEventIndecies, epochevent] = ...
-            epochData()
+    function parsedArguments = epochData(parsedArguments)
         % Epoch the data based on the event latencies
-        if isempty(matchedLatencies)
-%             error('pop_epoch(): empty epoch range (no epochs were found).');
-            fprintf('pop_epoch(): empty epoch range (no epochs were found).\n');
+        if isempty(parsedArguments.matchedLatencies)
+            fprintf(['pop_epoch(): empty epoch range (no epochs were' ...
+                ' found).\n']);
         end;
         fprintf('hed_epoch():%d epochs selected\n', ...
-            length(matchedLatencies));
-        switch lower(p.timeunit)
+            length(parsedArguments.matchedLatencies));
+        switch lower(parsedArguments.timeunit)
             case 'points',
-                [EEG.data, newtimelimts, acceptedEventIndecies, ...
-                    epochevent] = epoch(EEG.data, matchedLatencies, ...
-                    [p.timelim(1) p.timelim(2)]*EEG.srate, ...
-                    'valuelim', p.valuelim, 'allevents', allLatencies, ...
-                    'verbose', p.verbose);
-                newtimelimts = newtimelimts/EEG.srate;
+                [parsedArguments.EEG.data, ...
+                    parsedArguments.newtimelimts, ...
+                    parsedArguments.acceptedEventIndecies, ...
+                    parsedArguments.epochevent] = ...
+                    epoch(parsedArguments.EEG.data, ...
+                    parsedArguments.matchedLatencies, ...
+                    [parsedArguments.timelim(1) ...
+                    parsedArguments.timelim(2)]*...
+                    parsedArguments.EEG.srate, ...
+                    'valuelim', parsedArguments.valuelim, 'allevents', ...
+                    parsedArguments.allLatencies, ...
+                    'verbose', parsedArguments.verbose);
+                parsedArguments.newtimelimts = ...
+                    parsedArguments.newtimelimts/parsedArguments.EEG.srate;
             case 'seconds',
-                [EEG.data, newtimelimts, acceptedEventIndecies, ...
-                    epochevent] = ...
-                    epoch(EEG.data, matchedLatencies, p.timelim, ...
-                    'valuelim', p.valuelim, 'srate', EEG.srate, ...
-                    'allevents', allLatencies, 'verbose', p.verbose);
+                [parsedArguments.EEG.data, ...
+                    parsedArguments.newtimelimts, ...
+                    parsedArguments.acceptedEventIndecies, ...
+                    parsedArguments.epochevent] = ...
+                    epoch(parsedArguments.EEG.data, ...
+                    parsedArguments.matchedLatencies, ...
+                    parsedArguments.timelim, ...
+                    'valuelim', parsedArguments.valuelim, 'srate', ...
+                    parsedArguments.EEG.srate, ...
+                    'allevents', parsedArguments.allLatencies, ...
+                    'verbose', parsedArguments.verbose);
             otherwise, disp('hed_epoch(): invalid event time format'); ...
                     beep; return;
         end
-        matchedLatencies = matchedLatencies(acceptedEventIndecies);
+        parsedArguments.matchedLatencies = ...
+            parsedArguments.matchedLatencies(...
+            parsedArguments.acceptedEventIndecies);
         fprintf('hed_epoch():%d epochs generated\n', ...
-            length(acceptedEventIndecies));
+            length(parsedArguments.acceptedEventIndecies));
     end % epochData
 
-    function modifyEvents()
+    function parsedArguments = modifyEvents(parsedArguments)
         % Modify the event structure accordingly (latencies and add epoch
         % field)
         count = 1;
-        for index=1:EEG.trials
-            for indexevent = epochevent{index}
-                newevent(count) = EEG.event(indexevent);
-                newevent(count).epoch = index;
-                newevent(count).latency = newevent(count).latency ...
-                    - matchedLatencies(index) - ...
-                    newtimelimts(1)*EEG.srate + 1 + EEG.pnts*(index-1);
+        for index=1:parsedArguments.EEG.trials
+            for indexevent = parsedArguments.epochevent{index}
+                parsedArguments.newevent(count) = ...
+                    parsedArguments.EEG.event(indexevent);
+                parsedArguments.newevent(count).epoch = index;
+                parsedArguments.newevent(count).latency = ...
+                    parsedArguments.newevent(count).latency ...
+                    - parsedArguments.matchedLatencies(index) - ...
+                    parsedArguments.newtimelimts(1)*...
+                    parsedArguments.EEG.srate + 1 + ...
+                    parsedArguments.EEG.pnts*(index-1);
                 count = count + 1;
             end
         end
-        EEG.event = newevent;
-        EEG.epoch = [];
-        EEG = eeg_checkset(EEG, 'eventconsistency');
+        parsedArguments.EEG.event = parsedArguments.newevent;
+        parsedArguments.EEG.epoch = [];
+        parsedArguments.EEG = eeg_checkset(parsedArguments.EEG, ...
+            'eventconsistency');
     end % modifyEvents
 
-    function p = parseArguments(EEG, tags, timelim, varargin)
+    function p = parseArguments(EEG, queryString, timelim, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
-        p.addRequired('tags', @(x) ischar(x));
+        p.addRequired('queryString', @(x) ischar(x));
         p.addRequired('timelim', @(x) isnumeric(x) && ...
-            numel(x) == 2);  
+            numel(x) == 2);
         p.addParamValue('eventindices', 1:length(EEG.event), ...
             @isnumeric); %#ok<NVREPL>
         p.addParamValue('newname', [EEG.setname ' epochs'], ...
@@ -187,33 +214,39 @@ checkBoundaryEvents();
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.addParamValue('verbose', 'on', ...
             @(x) any(strcmpi({'on', 'off'}, x)));  %#ok<NVREPL>
-        p.parse(EEG, tags, timelim, varargin{:});
+        p.parse(EEG, queryString, timelim, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function updateFields()
+    function parsedArguments = updateFields(parsedArguments)
         % Update other fields
-        if p.timelim(1) ~= newtimelimts(1) && ...
-                p.timelim(2)-1/EEG.srate ~= newtimelimts(2)
+        if parsedArguments.timelim(1) ~= ...
+                parsedArguments.newtimelimts(1) && ...
+                parsedArguments.timelim(2)-1/parsedArguments.EEG.srate ...
+                ~= parsedArguments.newtimelimts(2)
             fprintf(['hed_epoch(): time limits have been adjusted to' ...
                 ' [%3.3f %3.3f] to fit data points limits\n'], ...
-                newtimelimts(1), newtimelimts(2)+1/EEG.srate);
+                parsedArguments.newtimelimts(1), ...
+                parsedArguments.newtimelimts(2)+1/...
+                parsedArguments.EEG.srate);
         end
-        EEG.xmin = newtimelimts(1);
-        EEG.xmax = newtimelimts(2);
-        EEG.pnts = size(EEG.data,2);
-        EEG.trials = size(EEG.data,3);
-        EEG.icaact = [];
-        if ~isempty(EEG.setname)
-            if ~isempty(EEG.comments)
-                EEG.comments = strvcat(['Parent dataset "' ...
-                    EEG.setname '": ----------'], ...
-                    EEG.comments); %#ok<DSTRVCT>
+        parsedArguments.EEG.xmin = parsedArguments.newtimelimts(1);
+        parsedArguments.EEG.xmax = parsedArguments.newtimelimts(2);
+        parsedArguments.EEG.pnts = size(parsedArguments.EEG.data,2);
+        parsedArguments.EEG.trials = size(parsedArguments.EEG.data,3);
+        parsedArguments.EEG.icaact = [];
+        if ~isempty(parsedArguments.EEG.setname)
+            if ~isempty(parsedArguments.EEG.comments)
+                parsedArguments.EEG.comments = ...
+                    strvcat(['Parent dataset "' ...
+                    parsedArguments.EEG.setname '": ----------'], ...
+                    parsedArguments.EEG.comments); %#ok<DSTRVCT>
             end
-            EEG.comments = strvcat(['Parent dataset: ' ...
-                EEG.setname ], ' ', EEG.comments); %#ok<DSTRVCT>
+            parsedArguments.EEG.comments = strvcat(['Parent dataset: ' ...
+                parsedArguments.EEG.setname ], ' ', ...
+                parsedArguments.EEG.comments); %#ok<DSTRVCT>
         end
-        EEG.setname = p.newname;
+        parsedArguments.EEG.setname = parsedArguments.newname;
     end % updateFields
 
 end % epochhed
