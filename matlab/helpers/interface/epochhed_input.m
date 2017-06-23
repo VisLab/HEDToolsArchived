@@ -1,40 +1,67 @@
-% GUI for input needed to create inputs for hedepoch.
+% GUI for input needed to create inputs for epochhed.
 %
 % Menu Options:
 %
-%   Time-locking 
-%   HED tag(s)   
-%                A comma separated list of tags or a tag search string                 
-%                consisting of tags to extract data epochs.
-%                The tag search uses boolean operators (AND, OR, NOT) to
-%                widen or narrow the search. Two tags separated by a comma
-%                use the AND operator by default which will only return
-%                events that contain both of the tags. The OR operator
-%                looks for events that include either one or both tags
-%                being specified. The NOT operator looks for events that
-%                contain the first tag but not the second tag. To nest or
-%                organize the search statements use square brackets.
-%                Nesting will change the order in which the search
-%                statements are evaluated. For example,
-%                "/attribute/visual/color/green AND
-%                [/item/2d shape/rectangle/square OR
-%                /item/2d shape/ellipse/circle]".
+%   Time-locking HED tag(s)   
+%                A comma separated list of HED tags that you want to search
+%                for. All tags in the list must be present in the HED
+%                string.
+%
+%   ...
+%                Brings up search bar for specifiying Time-locking HED
+%                tag(s).
+%
+%   Exclusive HED tag(s)
+%                A comma-separated list of tags that nullify matches to
+%                other tags. If these tags are present in both the EEG
+%                dataset event tags and the tag string then a match will be
+%                returned. The default is 
+%                'Attribute/Intended effect', 'Attribute/Offset'.
 %
 %   Epoch limits 
 %                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event. The default is [-1 2].
 %
-%   New dataset  
-%                New dataset name. The default is "[old_dataset] epochs".
+%   Name for the new dataset
+%                The new dataset name. The default is "[old_dataset]
+%                epochs".
 %
-%   Out-of-      
-%   bounds EEG   
-%   limits       
+%   Out-of-bounds EEG limits if any       
 %                [min max] data limits. If one positive value is given,            
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50].
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Outputs:
+%
+%   canceled
+%                True if cancel was pressed in the menu. 
+%
+%   tags
+%                A comma separated list of HED tags that you want to search
+%                for. All tags in the list must be present in the HED
+%                string.
+%
+%   exclusiveTags
+%                A comma-separated list of tags that nullify matches to
+%                other tags. If these tags are present in both the EEG
+%                dataset event tags and the tag string then a match will be
+%                returned. The default is 
+%                'Attribute/Intended effect', 'Attribute/Offset'.
+%
+%   newName
+%                The new dataset name. 
+%
+%   timeLim
+%                Epoch latency limits [start end] in seconds relative to
+%                the time-locking event {default: [-1 2]}
+%
+%   valueLim
+%                Lower and upper bound latencies for trial data. Else if
+%                one positive value is given, use its negative as the lower
+%                bound. The given values are also considered outliers
+%               (min max).
+%
+% Copyright (C) 2012-2017 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -52,7 +79,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, tags, newName, timeLim, valueLim] = ...
+function [canceled, tags, exclusiveTags, newName, timeLim, valueLim] = ...
     epochhed_input(newName, tags, uniquetags)
 
     function searchCallback(src, event) %#ok<INUSD>
@@ -69,11 +96,16 @@ function [canceled, tags, newName, timeLim, valueLim] = ...
         tags = get(src, 'String');
     end % hedEditBoxCallback
 
-geometry = { [2 5 0.5] [5 2 0.5] [4 3 0.5] [5 2 0.5] };
+geometry = { [2 5 0.5] [2 5 0.5] [5 2 0.5] [4 3 0.5] [5 2 0.5] };
 uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
     { 'style' 'edit'       'string' tags 'tag' 'tags' 'callback', ...
     @tagsEditBoxCallback} ...
     { 'style' 'pushbutton' 'string' '...' 'callback' @searchCallback } ...
+    { 'style' 'text'       ...
+    'string' 'Exclusive HED tag(s)' } ...
+    { 'style' 'edit'       'string' ...
+    'Attribute/Intended effect, Attribute/Offset' } ...
+    { } ...  
     { 'style' 'text'       ...
     'string' 'Epoch limits [start, end] in seconds' } ...
     { 'style' 'edit'       'string' '-1 2' } ...
@@ -97,16 +129,17 @@ if isempty(result)
 end
 canceled = false;
 tags = result{1};
-if isempty(result{2})
+exclusiveTags = strsplit(result{2}, ',');
+if isempty(result{3})
     timeLim = [-1 2];
 else
-    timeLim = str2num(result{2});  %#ok<ST2NM>
+    timeLim = str2num(result{3});  %#ok<ST2NM>
 end
-newName = result{3};
-if isempty(result{4})
+newName = result{4};
+if isempty(result{5})
     valueLim = [-Inf Inf];
 else
-    valueLim = str2num(result{4});  %#ok<ST2NM>
+    valueLim = str2num(result{5});  %#ok<ST2NM>
 end
 
 end % epochhed_input

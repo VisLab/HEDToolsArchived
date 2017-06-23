@@ -13,8 +13,9 @@
 %                A string containing HED tags.
 %
 %   queryString
-%                A query string containing tags that you want to search
-%                for.
+%                A comma separated list of HED tags that you want to search
+%                for. All tags in the list must be present in the HED
+%                string.
 %
 % Optional
 %
@@ -22,14 +23,14 @@
 %                A cell array of tags that nullify matches to other tags.
 %                If these tags are present in both the query string and the
 %                HED string then a match will be returned.
-%                By default, this parameter is set to
+%                By default, this argument is set to
 %                {'Attribute/Intended effect', 'Attribute/Offset'}.
 %
 % Output:
 %
 %   matchFound
-%                True, if the query string matched the HED string. False,
-%                if there was no match found.
+%                True, if the query string tags were found in the HED
+%                string. False, if there was no match found.
 %
 % Examples:
 %

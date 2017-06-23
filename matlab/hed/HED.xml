@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="5.2.2">
+<HED version="5.2.3">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1719,7 +1719,7 @@
          </node>
          <node>
             <name>Background</name>
-            <description>presented in the background such as background music, background image, etc.</description>
+            <description>presented in the background such as background music, background image, etc. The main factor here is that background presentations are to be ignored, e.g. ignore math question auditory stimuli.</description>
          </node>
       </node>
       <node>
