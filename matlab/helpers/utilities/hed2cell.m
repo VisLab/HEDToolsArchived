@@ -45,8 +45,11 @@
 
 function tags = hed2cell(tags, canonicalFormat)
 if ischar(tags)
-    if isempty(regexp(tags, '[,~]', 'ONCE'))
-        tags = {strtrim(tags)};
+    tags = strtrim(tags);
+    if isempty(tags)
+        tags = {};
+    elseif isempty(regexp(tags, '[,~]', 'ONCE'))
+        tags = {tags};
     else
         tags = hedstring2cell(tags, 'keepTildes', true);
     end

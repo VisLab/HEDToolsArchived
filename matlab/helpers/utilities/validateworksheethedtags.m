@@ -36,8 +36,8 @@
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
-%   'hasHeader'
-%                   True (default) if the workbook worksheet has a header.
+%   'hasHeaders'
+%                   True (default) if the workbook worksheet has headers.
 %                   The first row will not be validated otherwise it will
 %                   and this can generate errors.
 %
@@ -109,7 +109,7 @@ issues = reportValidationIssues(inputArguments);
         % Gets the first row number for validation based on the file having
         % a header or not
         rowNumber = 1;
-        if inputArguments.hasHeader
+        if inputArguments.hasHeaders
             rowNumber = 2;
         end
     end % getFirstRowNumberForValidation
@@ -128,7 +128,7 @@ issues = reportValidationIssues(inputArguments);
 
     function needToBeAppended = tagPrefixesNeedToBeAdded(inputArguments)
         % Returns true if tag prefixes need to be added to tag columns
-        needToBeAppended = inputArguments.hasHeader && ...
+        needToBeAppended = inputArguments.hasHeaders && ...
             inputArguments.addPrefixes;
     end % tagPrefixesNeedToBeAdded
 
@@ -277,7 +277,7 @@ issues = reportValidationIssues(inputArguments);
         parser.addRequired('workbook', @ischar);
         parser.addParamValue('addPrefixes', true, @islogical);
         parser.addParamValue('generateWarnings', false, @islogical);
-        parser.addParamValue('hasHeader', true, @islogical);
+        parser.addParamValue('hasHeaders', true, @islogical);
         parser.addParamValue('tagColumns', [], @isnumeric);
         parser.addParamValue('worksheet', '', @ischar);
         parser.parse(hedtags, varargin{:});
