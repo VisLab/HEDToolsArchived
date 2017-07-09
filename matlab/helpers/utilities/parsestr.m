@@ -94,6 +94,7 @@ issues = readStr(p);
 
     function issues = validateStrTags(p)
         % Validates the tags in a cell array from a string
+        issues = '';
         if ~isempty(p.cellTags)
             issues = findErrors(p);
             if(p.generateWarnings)
