@@ -94,7 +94,7 @@ issues = reportValidationIssues(inputArguments);
             issue = parsestr(hedMaps, worksheetTags{a}, ...
                 inputArguments.generateWarnings);
             if ~isempty(issue)
-                issues{a} = sprintf('Issues on line %d:\n%s', a, issue);
+                issues{a} = sprintf('Issues in row %d:\n%s', a, issue);
             end
         end
         issues = removeEmptyCellsInIssuesArray(issues);
