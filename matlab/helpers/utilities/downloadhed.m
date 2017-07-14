@@ -31,7 +31,7 @@
 
 function version = downloadhed()
 wikiURL = ['https://raw.githubusercontent.com/wiki/BigEEGConsortium/' ...
-    'HED/HED-Schema.mediawiki'];
+    'HED-Schema/HED-Schema.mediawiki'];
 if ~exist(tempdir, 'dir')
     tempDirectory = pwd;
 else
