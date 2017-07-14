@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="6.0.0">
+<HED version="6.0.1">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -481,7 +481,7 @@
       <node>
          <name>Natural scene</name>
          <node>
-            <name>Arial</name>
+            <name>Aerial</name>
             <node>
                <name>Satellite</name>
             </node>
