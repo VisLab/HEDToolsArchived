@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="6.0.1">
+<HED version="6.0.2">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -1731,6 +1731,12 @@
          <node>
             <name>Pass by</name>
             <description>Passing by another object or the participant</description>
+         </node>
+         <node>
+            <name>Accelerate</name>
+         </node>
+         <node>
+            <name>Decelerate</name>
          </node>
       </node>
       <node requireChild="true">
