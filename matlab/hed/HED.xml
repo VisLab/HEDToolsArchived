@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="6.0.2">
+<HED version="6.0.3">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -3003,9 +3003,6 @@
          <name>Action imitation task</name>
       </node>
       <node>
-         <name>Action observation paradigm</name>
-      </node>
-      <node>
          <name>Action observation task</name>
       </node>
       <node>
@@ -3538,6 +3535,9 @@
          <name>Pattern comparison</name>
       </node>
       <node>
+         <name>Perturbed driving</name>
+      </node>
+      <node>
          <name>Phonological discrimination</name>
       </node>
       <node>
@@ -3581,9 +3581,6 @@
       </node>
       <node>
          <name>Pyramids and palm trees task</name>
-      </node>
-      <node>
-         <name>Perturbed driving</name>
       </node>
       <node>
          <name>Rapid automatized naming test</name>
