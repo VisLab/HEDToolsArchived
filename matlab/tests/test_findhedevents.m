@@ -135,9 +135,21 @@ queryString = 'a/b, Attribute/X';
 found = findhedevents(hedString, queryString);
 assertFalse(found);
 
-fprintf('\n''a/b, Attribute/Intended effect, Attribute/Offset'' ''(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)''\n');
+fprintf('\n''a/b, Attribute/Intended effect, Attribute/Offset'' should match ''(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)''\n');
 hedString = '(a/b, Attribute/Intended effect, Attribute/Offset), (a/b,  Attribute/Intended effect)';
 queryString = 'a/b, Attribute/Intended effect, Attribute/Offset';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''b'' should match ''(a, b, c), (e, Attribute/p)''\n');
+hedString = '(a, b, c), (e, Attribute/p)';
+queryString = 'b';
+found = findhedevents(hedString, queryString);
+assertTrue(found);
+
+fprintf('\n''c'' should match ''a, (b~c,d), (e~f,g), Attribute/Onset''\n');
+hedString = 'a, (b~c,d), (e~f,g), Attribute/Onset';
+queryString = 'c';
 found = findhedevents(hedString, queryString);
 assertTrue(found);
 
