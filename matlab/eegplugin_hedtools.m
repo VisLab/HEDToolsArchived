@@ -39,7 +39,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 function vers = eegplugin_hedtools(fig, trystrs, catchstrs)
-vers = 'HEDTools1.0.4';
+vers = 'HEDTools2.0.2';
 % Check the number of input arguments
 if nargin < 3
     error('eegplugin_hedtools requires 3 arguments');
