@@ -259,7 +259,7 @@ issues = reportValidationIssues(inputArguments);
     function hedMaps = loadHedTagMaps()
         % Loads a structure full of Maps containings all of the HED tags
         % and their attributes
-        Maps = load('hedMaps.mat');
+        Maps = load('HEDMaps.mat');
         hedMaps = Maps.hedMaps;
     end % loadHedTagMaps
 
