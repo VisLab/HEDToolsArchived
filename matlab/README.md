@@ -1,6 +1,29 @@
 # HEDTools
 Tools to support event annotation using hierarchical event descriptor (HED) tags. The user manual can be found online at:  [http://vislab.github.io/HEDTools/](http://vislab.github.io/HEDTools/).
 
+
+### Installation
+
+You can run HEDTools as a standalone toolbox or as a plugin for EEGLAB. In both cases, you should install EEGLAB unless you plan to use HEDTools only to validate tags from spreadsheets.
+
+#### Running as a standalone application
+
+If your data files are .mat files, you can simply unzip the EEGLABPlugin/HEDTools1.0.4.zip anywhere you choose. Execute the *setup* script to set the paths each time you run MATLAB. Alternatively, you can add the code contained in *setup* to your startup script.
+
+#### Running with .set data file types
+
+If you wish to use EEGLAB, you should follow the directions above also.
+
+#### Running as a plugin to EEGLAB
+
+To install HEDTools unzip the HEDTools1.0.4.zip file inside the EEGLAB plugin directory. If you don’t install HEDTools via the EEGLAB menu, you can find this file at:
+
+https://github.com/VisLab/HEDTools/tree/master/EEGLABPlugin
+
+When you start EEGLAB again, HEDTools should be ready to use. Note: EEGLAB requires that each EEGLAB plugin be in its own subdirectory in the plugins directory of EEGLAB. Thus, if you have unzipped HEDTools correctly, you should see …/eeglab/plugins/HEDTools1.0.4/eegplugin_hedtools.m.
+
+### Notes
+
 **Note:** For convenience, EEGLABPlugin directory contains the latest released version of the
 HEDTools that can be unzipped into your EEGLAB plugins directory. 
 
@@ -15,7 +38,18 @@ N. Bigdely-Shamlo, S. Makeig, and K. Robbins (2016). Preparing laboratory and re
 
 ### Releases
 
-Version 1.0.4 Not Released 
+Version 2.0.2 Released 9/11/2017
+* HEDTools is distributed with HED schema 6.0.4
+* findhedevents function is more robust
+
+Version 2.0.1 Released 7/22/2017
+* HEDTools is distributed with HED schema 6.0.3
+
+Version 2.0.0 Released 7/16/2017
+* epochhed and findhedtags search functionality has been re-implemented. Added exclusive tags feature and removed boolean search functionality. 
+* implemented validateworksheethedtags function for validating the HED tags in an Excel spreadsheet.
+
+Version 1.0.4 Released 4/17/2017 
 
 * Nested groups are validated 
 * Added pop_updatehed function

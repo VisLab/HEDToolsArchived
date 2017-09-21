@@ -99,6 +99,8 @@ end
         % Looks for a match, first at the top-level and then in the groups
         if topLevelMatchFound(tags)
             matchFound = true;
+        elseif noAttributeOrExclusiveTagsFound(tags)         
+            matchFound = matchFoundAnywhere(tags);
         elseif ~isempty(tags.groupTags)
             matchFound = findMatchInGroup(tags);
         else
@@ -122,12 +124,30 @@ end
 
     function matchFound = findMatchInGroup(tags)
         % Finds a match in the HED string groups
-        if ~attributeTagsFound(tags) && ~exclusiveTagsFound(tags)
-            matchFound = matchFoundInAnyGroup(tags);
-        else
-            matchFound = matchFoundInAllGroups(tags);
-        end
+        matchFound = matchFoundInAllGroups(tags);
     end % findMatchInGroup
+    
+    function matchFound = noQueryAttributesAndExclusiveTagsFound(tags)
+        % Returns true if no attributes tags are found in the query string
+        % and no exclusive tags are found in the HED string
+        matchFound = queryContainsNoAttributes(tags) && ...
+            ~exclusiveTagsFound(tags);
+    end % noQueryAttributesOrExclusiveTagsFound
+
+    function matchFound = noNonOnsetAttributesAndExclusiveTagsFound(tags)
+        % Returns true if no non-onset attributes tags are found in the
+        % HED string and no exclusive tags are found in the HED string
+        matchFound = ~nonOnsetAttributeTagsFound(tags) && ...
+                ~exclusiveTagsFound(tags);       
+    end % noNonOnsetAttributesOrExclusiveTagsFound
+
+    function noAttributesFound = noAttributeOrExclusiveTagsFound(tags)
+        % Returns true if no attributes are found in query string and no
+        % attributes or exclusive tags are found in HED string 
+         noAttributesFound = ...
+             noQueryAttributesAndExclusiveTagsFound(tags) || ...
+                noNonOnsetAttributesAndExclusiveTagsFound(tags);
+    end % noAttributeOrExclusiveTagsFound
 
     function matchFound = matchFoundInAllGroups(tags)
         % Find a match that is in all groups
@@ -174,18 +194,21 @@ end
         isEmpty =  isempty(tags.allTags) || isempty(tags.queryTags);
     end % hedOrQueryStringIsEmpty
 
-    function matchFound = matchFoundInAnyGroup(tags)
-        % Returns true if a match is found in any group
+    function matchFound = matchFoundAnywhere(tags)
+        % Returns true if a match is found anywhere. Top-level or groups
         matchFound = all(ismember(tags.queryTags, tags.allTags) | ...
             cellfun(@(x) any(strncmp(tags.allTags, x, length(x))), ...
             tags.prefixQueryTags));
-    end % matchFoundInAnyGroup
+    end % matchFoundAnywhere
 
-    function attributesFound = attributeTagsFound(tags)
-        % Returns true if attribute tags are found in the Hed string
+    function attributesFound = nonOnsetAttributeTagsFound(tags)
+        % Returns true if attribute tags that are not attribute/onset
+        % are found in the HED string
         attributesFound = any(strncmp(tags.attributePrefix, ...
-            tags.allTags, length(tags.attributePrefix)));
-    end % attributeTagsFound
+            tags.allTags, length(tags.attributePrefix)) & ...
+            ~strncmp(tags.onsetTag, tags.allTags, ...
+            length(tags.onsetTag)));
+    end % nonOnsetAttributeTagsFound
 
     function matchFound = exclusiveTagsFound(tags)
         % Returns true if exlcusive tags are found in the HED string
@@ -209,12 +232,34 @@ end
     function matchFound = topLevelMatchFound(tags)
         % Returns true if a match was found in top-level tags of the HED
         % string
-        matchFound = anyFoundInAndB(tags.topLevelTags, tags.queryTags, ...
-            tags.exclusiveTags) && ...
-            (all(ismember(tags.queryTags, tags.topLevelTags) | ...
-            cellfun(@(x) any(strncmp(tags.topLevelTags, x, length(x))), ...
-            tags.prefixQueryTags)));
+        matchFound = sameExclusiveTagsFoundInTopLevelAndQuery(tags) && ...
+            topLevelExactOrPrefixMatchFound(tags);
     end % topLevelMatchFound
+
+    function matchFound = topLevelExactOrPrefixMatchFound(tags)
+        % Returns true if there is an exact or prefix match found in
+        % top-level tags 
+        matchFound = all(exactTopLevelMatchIndices(tags) | ...
+            prefixTopLevelMatchIndices(tags));
+    end % topLevelExactOrPartialMatchFound
+
+    function matchFound = sameExclusiveTagsFoundInTopLevelAndQuery(tags)
+       % Returns true if all exclusive tags found at the top-level are also
+       % found in the query tags 
+        matchFound = anyFoundInAndB(tags.topLevelTags, tags.queryTags, ...
+            tags.exclusiveTags);
+    end % topLevelExclusiveTagsFoundInQuery
+
+    function matchIndices = exactTopLevelMatchIndices(tags)
+        % Returns indices of exact top level matches found
+        matchIndices = ismember(tags.queryTags, tags.topLevelTags);
+    end % exactTopLevelMatchIndices
+
+    function matchIndices = prefixTopLevelMatchIndices(tags)
+        % Returns indices of prefix top level matches found
+        matchIndices = cellfun(@(x) any(strncmp(tags.topLevelTags, x, ...
+            length(x))), tags.prefixQueryTags);
+    end % prefixTopLevelMatchIndices
 
     function inputArguments = parseInputArguments(hedString, ...
             queryString, varargin)
@@ -233,6 +278,7 @@ end
         % structure
         tags = struct();
         tags.attributePrefix = 'attribute';
+        tags.onsetTag = 'attribute/onset';
         tags.exclusiveTags = lower(inputArguments.exclusiveTags);
         tags = splitHedTagsIntoCellArraysByLevel(tags, ...
             inputArguments.hedString);
@@ -264,5 +310,11 @@ end
         containsAllAttributes = all(strncmp(p.attributePrefix, ...
             p.queryTags, length(p.attributePrefix)));
     end % queryContainsAllAttributes
+
+    function containsNoAttributes = queryContainsNoAttributes(tags)
+        % Returns true if the query string contains no attributes
+        containsNoAttributes = ~any(strncmp(tags.attributePrefix, ...
+            tags.queryTags, length(tags.attributePrefix)));
+    end % queryContainsNoAttributes
 
 end % findhedevents
