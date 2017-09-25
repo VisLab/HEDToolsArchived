@@ -10,8 +10,8 @@ Created on Sept 21, 2017
 
 from defusedxml.lxml import parse;
 
-
 extension_allowed_tags = {};
+
 
 def get_hed_root_element(hed_xml_file_path):
     """Parses a xml file and returns the root element.
@@ -30,8 +30,10 @@ def get_hed_root_element(hed_xml_file_path):
     hed_tree = parse(hed_xml_file_path);
     return hed_tree.getroot();
 
+
 def get_all_ancestor_tags(tag_element):
     pass;
+
 
 def get_parent_tag_name(tag_element):
     """Gets the name of the tag parent element.
@@ -47,8 +49,11 @@ def get_parent_tag_name(tag_element):
         The name of the tag element's parent.
 
     """
-    parent_tag_element = tag_element.getparent();
-    return parent_tag_element.find('name').text;
+    try:
+        parent_tag_element = tag_element.getparent();
+        return parent_tag_element.find('name').text;
+    except:
+        return '';
 
 
 # def test_get_all_extension_allowed_tags():
@@ -63,13 +68,6 @@ def get_parent_tag_name(tag_element):
 #             print("Parent Node name: " + parent_node.find('name').text)
 
 if __name__ == '__main__':
-   a = parse("../tests/data/HED.xml");
-   all_nodes = a.xpath('.//node');
-   element = all_nodes[24];
-   parent_element = element.getparent();
-   print(parent_element.find('name').text)
-
-
-
-
-
+    hed_root_element = get_hed_root_element("../tests/data/HED.xml");
+    parent = hed_root_element.getparent();
+    print(parent)
