@@ -2,6 +2,11 @@ import unittest;
 import defusedxml;
 from defusedxml.lxml import parse;
 from validation import attribute_dictionary;
+import random;
+
+
+def generate_random_integer(min, max):
+    return random.randint(min, max);
 
 
 class Test(unittest.TestCase):
@@ -16,7 +21,8 @@ class Test(unittest.TestCase):
     def test_get_parent_tag_name(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
         all_nodes = hed_root_element.xpath('.//node');
-        tag_element = all_nodes[24];
+        random_node = generate_random_integer(1, len(all_nodes));
+        tag_element = all_nodes[random_node];
         parent_tag_name = attribute_dictionary.get_parent_tag_name(tag_element);
         self.assertIsInstance(parent_tag_name, basestring);
         self.assertTrue(parent_tag_name);
@@ -24,7 +30,8 @@ class Test(unittest.TestCase):
     def test_get_parent_tag_name(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
         all_nodes = hed_root_element.xpath('.//node');
-        tag_element = all_nodes[24];
+        random_node = generate_random_integer(1, len(all_nodes));
+        tag_element = all_nodes[random_node];
         parent_tag_name = attribute_dictionary.get_parent_tag_name(tag_element);
         self.assertIsInstance(parent_tag_name, basestring);
         self.assertTrue(parent_tag_name);
@@ -32,7 +39,8 @@ class Test(unittest.TestCase):
     def test_get_all_ancestor_tags(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
         all_nodes = hed_root_element.xpath('.//node');
-        tag_element = all_nodes[24];
+        random_node = generate_random_integer(1, len(all_nodes));
+        tag_element = all_nodes[random_node];
         all_ancestor_tags = attribute_dictionary.get_all_ancestor_tags(tag_element);
         self.assertIsInstance(all_ancestor_tags, list);
         self.assertTrue(all_ancestor_tags);
