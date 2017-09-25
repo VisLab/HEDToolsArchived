@@ -9,6 +9,7 @@ Created on Sept 21, 2017
 '''
 
 from defusedxml.lxml import parse;
+import random;
 
 extension_allowed_tags = {};
 
@@ -31,8 +32,8 @@ def get_hed_root_element(hed_xml_file_path):
     return hed_tree.getroot();
 
 
-def get_all_ancestor_tags(tag_element):
-    """Gets all the ancestor tags of a tag element.
+def get_all_ancestor_tag_names(tag_element):
+    """Gets all the ancestor tag names of a tag element.
 
     Parameters
     ----------
@@ -42,7 +43,7 @@ def get_all_ancestor_tags(tag_element):
     Returns
     -------
     list
-        A list containing all of the ancestor tags of a given tag.
+        A list containing all of the ancestor tag names of a given tag.
 
     """
     ancestor_tags = [];
@@ -89,9 +90,9 @@ def get_parent_tag_name(tag_element):
 #             parent_node = hed_node_element.getparent();
 #             print("Parent Node name: " + parent_node.find('name').text)
 
+def generate_random_integer(min, max):
+    return random.randint(min, max);
+
 if __name__ == '__main__':
-    a = parse("../tests/data/HED.xml");
-    all_nodes = a.xpath('.//node');
-    tag_element = all_nodes[24];
-    all_ancestor_tags = get_all_ancestor_tags(tag_element)
-    print(all_ancestor_tags);
+    print(generate_random_integer(0, 10));
+
