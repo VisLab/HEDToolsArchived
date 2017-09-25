@@ -97,6 +97,28 @@ def get_parent_tag_name(tag_element):
     except:
         return '';
 
+def get_tag_path(tag_element):
+    """Gets the path of the given tag.
+
+    Parameters
+    ----------
+    tag_element: Element
+        A tag element in the HED XML file.
+
+    Returns
+    -------
+    string
+        The path of the tag. The tag and it's ancestor tags will be separated by /'s.
+
+    """
+    try:
+        all_tag_names = get_all_ancestor_tag_names(tag_element);
+        all_tag_names.insert(0, get_tag_name(tag_element));
+        all_tag_names.reverse();
+        return '/'.join(all_tag_names);
+    except:
+        return '';
+
 
 # def test_get_all_extension_allowed_tags():
 #     hed_tree = parse(self.HED_XML);
@@ -114,6 +136,9 @@ def generate_random_integer(min, max):
 
 if __name__ == '__main__':
     hed_root_element = get_hed_root_element('../tests/data/HED.xml');
-    extension_allowed_tags = hed_root_element.xpath('.//node[@required]');
-    print extension_allowed_tags
+    all_nodes = hed_root_element.xpath('.//node');
+    tag_element = all_nodes[0];
+    print(get_tag_path(tag_element));
+
+
 
