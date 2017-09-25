@@ -58,6 +58,25 @@ def get_all_ancestor_tag_names(tag_element):
         pass;
     return ancestor_tags;
 
+def get_tag_name(tag_element):
+    """Gets the name of the tag element.
+
+    Parameters
+    ----------
+    tag_element: Element
+        A tag element in the HED XML file.
+
+    Returns
+    -------
+    string
+        The name of the tag element. If there is no name then an empty string is returned.
+
+    """
+    try:
+        return tag_element.find('name').text;
+    except:
+        return '';
+
 def get_parent_tag_name(tag_element):
     """Gets the name of the tag parent element.
 
@@ -94,5 +113,7 @@ def generate_random_integer(min, max):
     return random.randint(min, max);
 
 if __name__ == '__main__':
-    print(generate_random_integer(0, 10));
+    hed_root_element = get_hed_root_element('../tests/data/HED.xml');
+    extension_allowed_tags = hed_root_element.xpath('.//node[@required]');
+    print extension_allowed_tags
 
