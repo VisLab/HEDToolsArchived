@@ -46,7 +46,7 @@ def get_parent_tag_name(tag_element):
     Returns
     -------
     string
-        The name of the tag element's parent.
+        The name of the tag element's parent. If there is no parent tag then an empty string is returned. 
 
     """
     try:
