@@ -32,8 +32,30 @@ def get_hed_root_element(hed_xml_file_path):
 
 
 def get_all_ancestor_tags(tag_element):
-    pass;
+    """Gets all the ancestor tags of a tag element.
 
+    Parameters
+    ----------
+    tag_element: Element
+        A tag element in the HED XML file.
+
+    Returns
+    -------
+    list
+        A list containing all of the ancestor tags of a given tag.
+
+    """
+    ancestor_tags = [];
+    try:
+        parent_tag_name = get_parent_tag_name(tag_element);
+        parent_element = tag_element.getparent();
+        while parent_tag_name:
+            ancestor_tags.append(parent_tag_name);
+            parent_tag_name = get_parent_tag_name(parent_element);
+            parent_element = parent_element.getparent();
+    except:
+        pass;
+    return ancestor_tags;
 
 def get_parent_tag_name(tag_element):
     """Gets the name of the tag parent element.
@@ -46,7 +68,7 @@ def get_parent_tag_name(tag_element):
     Returns
     -------
     string
-        The name of the tag element's parent. If there is no parent tag then an empty string is returned. 
+        The name of the tag element's parent. If there is no parent tag then an empty string is returned.
 
     """
     try:
@@ -68,6 +90,8 @@ def get_parent_tag_name(tag_element):
 #             print("Parent Node name: " + parent_node.find('name').text)
 
 if __name__ == '__main__':
-    hed_root_element = get_hed_root_element("../tests/data/HED.xml");
-    parent = hed_root_element.getparent();
-    print(parent)
+    a = parse("../tests/data/HED.xml");
+    all_nodes = a.xpath('.//node');
+    tag_element = all_nodes[24];
+    all_ancestor_tags = get_all_ancestor_tags(tag_element)
+    print(all_ancestor_tags);
