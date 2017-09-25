@@ -9,8 +9,6 @@ Created on Sept 21, 2017
 '''
 
 from defusedxml.lxml import parse;
-import random;
-
 extension_allowed_tags = {};
 
 
@@ -32,7 +30,7 @@ def get_hed_root_element(hed_xml_file_path):
     return hed_tree.getroot();
 
 
-def get_all_ancestor_tag_names(tag_element):
+def get_ancestor_tag_names(tag_element):
     """Gets all the ancestor tag names of a tag element.
 
     Parameters
@@ -112,12 +110,37 @@ def get_tag_path(tag_element):
 
     """
     try:
-        all_tag_names = get_all_ancestor_tag_names(tag_element);
+        all_tag_names = get_ancestor_tag_names(tag_element);
         all_tag_names.insert(0, get_tag_name(tag_element));
         all_tag_names.reverse();
         return '/'.join(all_tag_names);
     except:
         return '';
+
+def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
+    """Gets the tag paths that have a specific attribute.
+
+    Parameters
+    ----------
+    hed_root_element: Element
+        The root element of the HED XML file.
+    tag_attribute_name: string
+        The name of the attribute associated with the tag paths.
+
+    Returns
+    -------
+    list
+        A list containing tag paths that have a specified attribute.
+
+    """
+    attribute_tag_paths = [];
+    try:
+        attribute_tags = hed_root_element.xpath('.//node[@%s]' % tag_attribute_name );
+        for attribute_tag in attribute_tags:
+            attribute_tag_paths.append(get_tag_path(attribute_tag));
+    except:
+        pass;
+    return attribute_tag_paths;
 
 
 # def test_get_all_extension_allowed_tags():
@@ -131,14 +154,10 @@ def get_tag_path(tag_element):
 #             parent_node = hed_node_element.getparent();
 #             print("Parent Node name: " + parent_node.find('name').text)
 
-def generate_random_integer(min, max):
-    return random.randint(min, max);
-
 if __name__ == '__main__':
     hed_root_element = get_hed_root_element('../tests/data/HED.xml');
-    all_nodes = hed_root_element.xpath('.//node');
-    tag_element = all_nodes[0];
-    print(get_tag_path(tag_element));
+    tag_paths = get_tag_paths_by_attribute(hed_root_element, 'predicateType');
+    print(tag_paths);
 
 
 
