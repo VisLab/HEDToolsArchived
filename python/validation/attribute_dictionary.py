@@ -30,6 +30,13 @@ def get_hed_root_element(hed_xml_file_path):
     hed_tree = parse(hed_xml_file_path);
     return hed_tree.getroot();
 
+def get_all_ancestor_tags(tag_element):
+    pass;
+
+def get_parent_tag_name(tag_element):
+    parent_tag_element = tag_element.getparent();
+    return parent_tag_element.find('name').text;
+
 
 # def test_get_all_extension_allowed_tags():
 #     hed_tree = parse(self.HED_XML);
@@ -42,6 +49,14 @@ def get_hed_root_element(hed_xml_file_path):
 #             parent_node = hed_node_element.getparent();
 #             print("Parent Node name: " + parent_node.find('name').text)
 
-# def test_get_all_ancestor_tags(self):
+if __name__ == '__main__':
+   a = parse("../tests/data/HED.xml");
+   all_nodes = a.xpath('.//node');
+   element = all_nodes[24];
+   parent_element = element.getparent();
+   print(parent_element.find('name').text)
+
+
+
 
 
