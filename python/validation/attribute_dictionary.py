@@ -34,6 +34,19 @@ def get_all_ancestor_tags(tag_element):
     pass;
 
 def get_parent_tag_name(tag_element):
+    """Gets the name of the tag parent element.
+
+    Parameters
+    ----------
+    tag_element: Element
+        A tag element in the HED XML file.
+
+    Returns
+    -------
+    string
+        The name of the tag element's parent.
+
+    """
     parent_tag_element = tag_element.getparent();
     return parent_tag_element.find('name').text;
 
