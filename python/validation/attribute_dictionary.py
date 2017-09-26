@@ -10,7 +10,7 @@ Created on Sept 21, 2017
 
 from defusedxml.lxml import parse;
 TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
-                               'position', 'unique', 'predicateType'];
+                               'position', 'unique', 'predicateType', 'default'];
 UNIT_ATTRIBUTES = ['default'];
 
 attribute_dictionaries = {};
@@ -53,7 +53,10 @@ def populate_tag_attribute_dictionaries(hed_xml_file_path):
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
         attribute_tag_paths = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
-        tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
+        if 'default' == TAG_ATTRIBUTES:
+            tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
+        else:
+            tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
         attribute_dictionaries[TAG_ATTRIBUTE] = tag_attribute_dictionary;
     return attribute_dictionaries;
 
@@ -133,7 +136,7 @@ def get_element_name(element):
     Returns
     -------
     string
-        The name of the tag element. If there is no name then an empty string is returned.
+        The name of the element. If there is no name then an empty string is returned.
 
     """
     try:
@@ -208,6 +211,31 @@ def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
         pass;
     return attribute_tag_paths;
 
+def get_elements_by_attribute(hed_root_element, attribute_name, element_name='node'):
+    """Gets the elements that have a specific attribute.
+
+    Parameters
+    ----------
+    hed_root_element: Element
+        The root element of the HED XML file.
+    attribute_name: string
+        The name of the attribute associated with the element.
+
+    Returns
+    -------
+    list
+        A list containing elements that have a specified attribute.
+
+    """
+    attribute_elements = [];
+    try:
+        attribute_elements = hed_root_element.xpath('.//%s[@%s]' % (element_name, attribute_name));
+    except:
+        pass;
+    return attribute_elements;
+
 if __name__ == '__main__':
-    attribute_dictionary = populate_tag_attribute_dictionaries('../tests/data/HED.xml');
-    print(attribute_dictionary);
+    hed_root_element = get_hed_root_element('../tests/data/HED.xml')
+    elements = get_elements_by_attribute(hed_root_element, 'default');
+    # paths = get_tag_paths_by_attribute(hed_root_element, 'default');
+    print(elements);
