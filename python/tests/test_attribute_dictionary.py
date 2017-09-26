@@ -74,5 +74,11 @@ class Test(unittest.TestCase):
         self.assertIsInstance(lowercase_dictionary, dict);
         self.assertTrue(lowercase_dictionary);
 
+    def test_populate_tag_attribute_dictionaries(self):
+        attribute_dictionaries = attribute_dictionary.populate_tag_attribute_dictionaries(self.HED_XML);
+        self.assertIsInstance(attribute_dictionaries, dict);
+        for attribute_dictionary_key in attribute_dictionaries:
+            self.assertIsInstance(attribute_dictionaries[attribute_dictionary_key], dict);
+
 if __name__ == '__main__':
     unittest.main();
