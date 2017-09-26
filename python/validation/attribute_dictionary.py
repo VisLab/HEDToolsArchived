@@ -11,7 +11,30 @@ Created on Sept 21, 2017
 from defusedxml.lxml import parse;
 TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
                                'position', 'unique', 'predicateType'];
+UNIT_ATTRIBUTES = ['default'];
+
 attribute_dictionaries = {};
+
+def populate_unit_attribute_dictionaries(hed_xml_file_path):
+    """Populates the dictionaries associated with units in the attribute dictionary.
+
+    Parameters
+    ----------
+    hed_xml_file_path: string
+        The path to a HED XML file.
+
+    Returns
+    -------
+    dictionary
+        The attribute dictionary that has been populated with dictionaries associated with units.
+
+    """
+    hed_root_element = get_hed_root_element(hed_xml_file_path);
+    for UNIT_ATTRIBUTE in UNIT_ATTRIBUTES:
+        attribute_tag_paths = get_tag_paths_by_attribute(hed_root_element, UNIT_ATTRIBUTE);
+        tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
+        attribute_dictionaries[UNIT_ATTRIBUTE] = tag_attribute_dictionary;
+    return attribute_dictionaries;
 
 def populate_tag_attribute_dictionaries(hed_xml_file_path):
     """Populates the dictionaries associated with tags in the attribute dictionary.
@@ -99,13 +122,13 @@ def get_ancestor_tag_names(tag_element):
         pass;
     return ancestor_tags;
 
-def get_tag_name(tag_element):
-    """Gets the name of the tag element.
+def get_element_name(element):
+    """Gets the name of the element.
 
     Parameters
     ----------
-    tag_element: Element
-        A tag element in the HED XML file.
+    element: Element
+        A element in the HED XML file.
 
     Returns
     -------
@@ -114,7 +137,7 @@ def get_tag_name(tag_element):
 
     """
     try:
-        return tag_element.find('name').text;
+        return element.find('name').text;
     except:
         return '';
 
@@ -154,7 +177,7 @@ def get_tag_path(tag_element):
     """
     try:
         all_tag_names = get_ancestor_tag_names(tag_element);
-        all_tag_names.insert(0, get_tag_name(tag_element));
+        all_tag_names.insert(0, get_element_name(tag_element));
         all_tag_names.reverse();
         return '/'.join(all_tag_names);
     except:
