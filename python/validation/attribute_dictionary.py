@@ -9,7 +9,48 @@ Created on Sept 21, 2017
 '''
 
 from defusedxml.lxml import parse;
-extension_allowed_tags = {};
+TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
+                               'position', 'unique', 'predicateType'];
+attribute_dictionary = {};
+
+def populate_tag_attribute_dictionaries(hed_xml_file_path):
+    """Populates the dictionaries associated with tags in the attribute dictionary.
+
+    Parameters
+    ----------
+    hed_xml_file_path: string
+        The path to a HED XML file.
+
+    Returns
+    -------
+    dictionary
+        The attribute dictionary that has been populated with dictionaries associated with tags.
+
+    """
+    hed_root_element = get_hed_root_element(hed_xml_file_path);
+    for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
+        attribute_dictionary[TAG_ATTRIBUTE] = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
+    return attribute_dictionary;
+
+def string_list_2_lowercase_dictionary(string_list):
+    """Converts a string list into a dictionary. The keys in the dictionary will be the lowercase values of the strings
+     in the list.
+
+    Parameters
+    ----------
+    string_list: list
+        A list containing string elements.
+
+    Returns
+    -------
+    dictionary
+        A dictionary containing the strings in the list.
+
+    """
+    lowercase_dictionary = {};
+    for string_element in string_list:
+        lowercase_dictionary[string_element.lower()] = string_element;
+    return lowercase_dictionary;
 
 
 def get_hed_root_element(hed_xml_file_path):
@@ -142,22 +183,9 @@ def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
         pass;
     return attribute_tag_paths;
 
-
-# def test_get_all_extension_allowed_tags():
-#     hed_tree = parse(self.HED_XML);
-#     hed_root_element = hed_tree.getroot();
-#     hed_node_elements = hed_root_element.findall('.//node');
-#     print(len(hed_node_elements))
-#     for hed_node_element in hed_node_elements:
-#         if 'extensionAllowed' in hed_node_element.attrib:
-#             print("Node name: " + hed_node_element.find('name').text);
-#             parent_node = hed_node_element.getparent();
-#             print("Parent Node name: " + parent_node.find('name').text)
-
 if __name__ == '__main__':
     hed_root_element = get_hed_root_element('../tests/data/HED.xml');
-    tag_paths = get_tag_paths_by_attribute(hed_root_element, 'predicateType');
-    print(tag_paths);
-
-
-
+    tag_paths = get_tag_paths_by_attribute(hed_root_element, 'required');
+    tag_path_dictionary = string_list_2_lowercase_dictionary(tag_paths);
+    lower_keys = tag_path_dictionary.keys();
+    print(lower_keys[0]);
