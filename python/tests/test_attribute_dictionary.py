@@ -10,7 +10,7 @@ class Test(unittest.TestCase):
     def setUpClass(self):
         self.HED_XML = 'data/HED.xml';
         self.tag_attributes = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', \
-                               'position', 'unique', 'predicateType'];
+                               'position', 'unique', 'predicateType', 'default'];
         self.string_list = ['This/Is/A/Tag', 'This/Is/Another/Tag'];
 
     def test_get_hed_root_element(self):
@@ -79,6 +79,13 @@ class Test(unittest.TestCase):
         self.assertIsInstance(attribute_dictionaries, dict);
         for attribute_dictionary_key in attribute_dictionaries:
             self.assertIsInstance(attribute_dictionaries[attribute_dictionary_key], dict);
+
+    def test_get_elements_by_attribute(self):
+        hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
+        for tag_attribute in self.tag_attributes:
+            tag_paths = attribute_dictionary.get_elements_by_attribute(hed_root_element, tag_attribute);
+            self.assertIsInstance(tag_paths, list);
+            self.assertTrue(tag_paths);
 
 if __name__ == '__main__':
     unittest.main();
