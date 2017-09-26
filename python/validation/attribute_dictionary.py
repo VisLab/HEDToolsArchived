@@ -11,7 +11,7 @@ Created on Sept 21, 2017
 from defusedxml.lxml import parse;
 TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
                                'position', 'unique', 'predicateType'];
-attribute_dictionary = {};
+attribute_dictionaries = {};
 
 def populate_tag_attribute_dictionaries(hed_xml_file_path):
     """Populates the dictionaries associated with tags in the attribute dictionary.
@@ -29,8 +29,10 @@ def populate_tag_attribute_dictionaries(hed_xml_file_path):
     """
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
-        attribute_dictionary[TAG_ATTRIBUTE] = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
-    return attribute_dictionary;
+        attribute_tag_paths = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
+        tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
+        attribute_dictionaries[TAG_ATTRIBUTE] = tag_attribute_dictionary;
+    return attribute_dictionaries;
 
 def string_list_2_lowercase_dictionary(string_list):
     """Converts a string list into a dictionary. The keys in the dictionary will be the lowercase values of the strings
@@ -184,8 +186,5 @@ def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
     return attribute_tag_paths;
 
 if __name__ == '__main__':
-    hed_root_element = get_hed_root_element('../tests/data/HED.xml');
-    tag_paths = get_tag_paths_by_attribute(hed_root_element, 'required');
-    tag_path_dictionary = string_list_2_lowercase_dictionary(tag_paths);
-    lower_keys = tag_path_dictionary.keys();
-    print(lower_keys[0]);
+    attribute_dictionary = populate_tag_attribute_dictionaries('../tests/data/HED.xml');
+    print(attribute_dictionary);
