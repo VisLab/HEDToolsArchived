@@ -11,6 +11,7 @@ class Test(unittest.TestCase):
         self.HED_XML = 'data/HED.xml';
         self.tag_attributes = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', \
                                'position', 'unique', 'predicateType', 'default'];
+        self.default_tag_attribute = 'default';
         self.string_list = ['This/Is/A/Tag', 'This/Is/Another/Tag'];
 
     def test_get_hed_root_element(self):
@@ -65,9 +66,9 @@ class Test(unittest.TestCase):
     def test_get_tag_paths_by_attribute(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
         for tag_attribute in self.tag_attributes:
-            tag_paths = attribute_dictionary.get_tag_paths_by_attribute(hed_root_element, tag_attribute);
-            self.assertIsInstance(tag_paths, list);
-            self.assertTrue(tag_paths);
+            attribute_tag_paths, attribute_tag_elements = attribute_dictionary.get_tag_paths_by_attribute(hed_root_element, tag_attribute);
+            self.assertIsInstance(attribute_tag_paths, list);
+            self.assertTrue(attribute_tag_paths);
 
     def test_string_list_2_lowercase_dictionary(self):
         lowercase_dictionary = attribute_dictionary.string_list_2_lowercase_dictionary(self.string_list);
@@ -83,9 +84,19 @@ class Test(unittest.TestCase):
     def test_get_elements_by_attribute(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
         for tag_attribute in self.tag_attributes:
-            tag_paths = attribute_dictionary.get_elements_by_attribute(hed_root_element, tag_attribute);
-            self.assertIsInstance(tag_paths, list);
-            self.assertTrue(tag_paths);
+            attribute_elements = attribute_dictionary.get_elements_by_attribute(hed_root_element, tag_attribute);
+            self.assertIsInstance(attribute_elements, list);
+            self.assertTrue(attribute_elements);
+
+    def test_populate_default_unit_tag_dictionary(self):
+        hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
+        [attribute_tag_paths, attribute_tag_elements] = attribute_dictionary.get_tag_paths_by_attribute( \
+            hed_root_element, self.default_tag_attribute);
+        default_unit_tag_dictionary = attribute_dictionary.populate_default_unit_tag_dictionary(attribute_tag_paths, \
+                                                                                             attribute_tag_elements, \
+                                                                                             self.default_tag_attribute);
+        self.assertIsInstance(default_unit_tag_dictionary, dict);
+
 
 if __name__ == '__main__':
     unittest.main();
