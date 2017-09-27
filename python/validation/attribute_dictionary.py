@@ -11,7 +11,10 @@ Created on Sept 21, 2017
 from defusedxml.lxml import parse;
 TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
                                'position', 'unique', 'predicateType', 'default'];
+DEFAULT_UNIT_ATTRIBUTE = 'default';
 UNIT_ATTRIBUTES = ['default'];
+UNIT_CLASS_TAG = 'unitClass';
+
 
 attribute_dictionaries = {};
 
@@ -31,9 +34,10 @@ def populate_unit_attribute_dictionaries(hed_xml_file_path):
     """
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     for UNIT_ATTRIBUTE in UNIT_ATTRIBUTES:
-        attribute_tag_paths = get_tag_paths_by_attribute(hed_root_element, UNIT_ATTRIBUTE);
-        tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
-        attribute_dictionaries[UNIT_ATTRIBUTE] = tag_attribute_dictionary;
+        unit_elements = get_elements_by_attribute(hed_root_element, UNIT_ATTRIBUTE, UNIT_CLASS_TAG);
+        for unit_element in unit_elements:
+            unit_element_name = get_element_tag_value(unit_element);
+
     return attribute_dictionaries;
 
 def populate_tag_attribute_dictionaries(hed_xml_file_path):
@@ -53,7 +57,7 @@ def populate_tag_attribute_dictionaries(hed_xml_file_path):
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
         attribute_tag_paths, attribute_tag_elements = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
-        if 'default' == TAG_ATTRIBUTE:
+        if DEFAULT_UNIT_ATTRIBUTE == TAG_ATTRIBUTE:
             tag_attribute_dictionary = populate_default_unit_tag_dictionary(attribute_tag_paths, \
                                                                             attribute_tag_elements, TAG_ATTRIBUTE);
         else:
@@ -149,22 +153,24 @@ def get_ancestor_tag_names(tag_element):
         pass;
     return ancestor_tags;
 
-def get_element_name(element):
-    """Gets the name of the element.
+def get_element_tag_value(element, tag_name='name'):
+    """Gets the value of the element's tag.
 
     Parameters
     ----------
     element: Element
         A element in the HED XML file.
+    tag_name: string
+        The name of the element's tag.
 
     Returns
     -------
     string
-        The name of the element. If there is no name then an empty string is returned.
+        The value of the element's tag. If the element doesn't have the tag then it will return an empty string.
 
     """
     try:
-        return element.find('name').text;
+        return element.find(tag_name).text;
     except:
         return '';
 
@@ -204,7 +210,7 @@ def get_tag_path(tag_element):
     """
     try:
         all_tag_names = get_ancestor_tag_names(tag_element);
-        all_tag_names.insert(0, get_element_name(tag_element));
+        all_tag_names.insert(0, get_element_tag_value(tag_element));
         all_tag_names.reverse();
         return '/'.join(all_tag_names);
     except:
