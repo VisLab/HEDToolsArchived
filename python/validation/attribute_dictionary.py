@@ -14,6 +14,7 @@ TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric',
 DEFAULT_UNIT_ATTRIBUTE = 'default';
 UNIT_ATTRIBUTES = ['default'];
 UNIT_CLASS_TAG = 'unitClass';
+UNIT_CLASS_UNITS_TAG = 'units';
 
 
 attribute_dictionaries = {};
@@ -35,10 +36,28 @@ def populate_unit_attribute_dictionaries(hed_xml_file_path):
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     for UNIT_ATTRIBUTE in UNIT_ATTRIBUTES:
         unit_elements = get_elements_by_attribute(hed_root_element, UNIT_ATTRIBUTE, UNIT_CLASS_TAG);
-        for unit_element in unit_elements:
-            unit_element_name = get_element_tag_value(unit_element);
-
     return attribute_dictionaries;
+
+def populate_unit_class_units_dictionary(unit_class_elements):
+    """Populates a dictionary that contains unit class units.
+
+    Parameters
+    ----------
+    unit_class_elements: list
+        A list of unit class elements.
+
+    Returns
+    -------
+    dictionary
+        A dictionary that contains all the unit class units.
+
+    """
+    unit_class_units_dictionary = {};
+    for unit_class_element in unit_class_elements:
+        unit_class_element_name = get_element_tag_value(unit_class_element);
+        unit_class_element_units = get_element_tag_value(unit_class_element, UNIT_CLASS_UNITS_TAG);
+        unit_class_units_dictionary[unit_class_element_name] = unit_class_element_units.split(',');
+    return unit_class_units_dictionary;
 
 def populate_tag_attribute_dictionaries(hed_xml_file_path):
     """Populates the dictionaries associated with tags in the attribute dictionary.
@@ -51,7 +70,7 @@ def populate_tag_attribute_dictionaries(hed_xml_file_path):
     Returns
     -------
     dictionary
-        The attribute dictionary that has been populated with dictionaries associated with tags.
+        A dictionary that has been populated with dictionaries associated with tag attributes.
 
     """
     hed_root_element = get_hed_root_element(hed_xml_file_path);
@@ -264,6 +283,31 @@ def get_elements_by_attribute(hed_root_element, attribute_name, element_name='no
         pass;
     return attribute_elements;
 
+def get_elements_by_tag_name(hed_root_element, tag_name):
+    """Gets the elements that have a specific element name.
+
+    Parameters
+    ----------
+    hed_root_element: Element
+        The root element of the HED XML file.
+    tag_name: string
+        The name of the element.
+
+    Returns
+    -------
+    list
+        A list containing elements that have a specific element name.
+
+    """
+    elements = [];
+    try:
+        elements = hed_root_element.xpath('.//%s' % tag_name);
+    except:
+        pass;
+    return elements;
+
 if __name__ == '__main__':
-    attribute_dictionaries = populate_tag_attribute_dictionaries('../tests/data/HED.xml')
-    print(attribute_dictionaries['default']);
+    hed_root_element = get_hed_root_element('../tests/data/HED.xml');
+    unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG)
+    unit_class_units_dictionary = populate_unit_class_units_dictionary(unit_class_elements);
+    print(unit_class_units_dictionary);
