@@ -27,12 +27,12 @@ class Test(unittest.TestCase):
         self.assertIsInstance(parent_tag_name, basestring);
         self.assertTrue(parent_tag_name);
 
-    def test_get_element_name(self):
+    def test_get_element_tag_value(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.HED_XML);
         all_nodes = hed_root_element.xpath('.//node');
         random_node = random.randint(1, len(all_nodes));
         tag_element = all_nodes[random_node];
-        tag_name = attribute_dictionary.get_element_name(tag_element);
+        tag_name = attribute_dictionary.get_element_tag_value(tag_element);
         self.assertIsInstance(tag_name, basestring);
         self.assertTrue(tag_name);
 
