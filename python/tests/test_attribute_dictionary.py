@@ -101,6 +101,11 @@ class Test(unittest.TestCase):
     def test_get_elements_by_tag_name(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.hed_xml);
         unit_class_elements = attribute_dictionary.get_elements_by_tag_name(hed_root_element, self.unit_class_tag);
+        self.assertIsInstance(unit_class_elements, list);
+
+    def test_populate_unit_class_units_dictionary(self):
+        hed_root_element = attribute_dictionary.get_hed_root_element(self.hed_xml);
+        unit_class_elements = attribute_dictionary.get_elements_by_tag_name(hed_root_element, self.unit_class_tag);
         unit_class_units_dictionary = attribute_dictionary.populate_unit_class_units_dictionary(unit_class_elements);
         self.assertIsInstance(unit_class_units_dictionary, dict);
 
