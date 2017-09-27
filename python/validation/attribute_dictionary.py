@@ -52,13 +52,37 @@ def populate_tag_attribute_dictionaries(hed_xml_file_path):
     """
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
-        attribute_tag_paths = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
-        if 'default' == TAG_ATTRIBUTES:
-            tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
+        attribute_tag_paths, attribute_tag_elements = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
+        if 'default' == TAG_ATTRIBUTE:
+            tag_attribute_dictionary = populate_default_unit_tag_dictionary(attribute_tag_paths, \
+                                                                            attribute_tag_elements, TAG_ATTRIBUTE);
         else:
             tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
         attribute_dictionaries[TAG_ATTRIBUTE] = tag_attribute_dictionary;
     return attribute_dictionaries;
+
+def populate_default_unit_tag_dictionary(attribute_tag_paths, attribute_tag_elements, tag_attribute_name):
+    """Populates the dictionaries associated with default unit tags in the attribute dictionary.
+
+    Parameters
+    ----------
+    attribute_tag_paths: string
+        A list containing tag paths that have a specified attribute.
+    attribute_tag_elements: Element
+        The Element that contains the attribute.
+    tag_attribute_name: string
+        The name of the attribute associated with the tag paths.
+
+    Returns
+    -------
+    dictionary
+        The attribute dictionary that has been populated with dictionaries associated with tags.
+
+    """
+    default_unit_tag_dictionary = {};
+    for index, attribute_tag_path in enumerate(attribute_tag_paths):
+        default_unit_tag_dictionary[attribute_tag_path.lower()] = attribute_tag_elements[index].attrib[tag_attribute_name];
+    return default_unit_tag_dictionary;
 
 def string_list_2_lowercase_dictionary(string_list):
     """Converts a string list into a dictionary. The keys in the dictionary will be the lowercase values of the strings
@@ -204,12 +228,12 @@ def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
     """
     attribute_tag_paths = [];
     try:
-        attribute_tags = hed_root_element.xpath('.//node[@%s]' % tag_attribute_name );
-        for attribute_tag in attribute_tags:
-            attribute_tag_paths.append(get_tag_path(attribute_tag));
+        attribute_tag_elements = hed_root_element.xpath('.//node[@%s]' % tag_attribute_name );
+        for attribute_tag_element in attribute_tag_elements:
+            attribute_tag_paths.append(get_tag_path(attribute_tag_element));
     except:
         pass;
-    return attribute_tag_paths;
+    return attribute_tag_paths, attribute_tag_elements;
 
 def get_elements_by_attribute(hed_root_element, attribute_name, element_name='node'):
     """Gets the elements that have a specific attribute.
@@ -235,7 +259,5 @@ def get_elements_by_attribute(hed_root_element, attribute_name, element_name='no
     return attribute_elements;
 
 if __name__ == '__main__':
-    hed_root_element = get_hed_root_element('../tests/data/HED.xml')
-    elements = get_elements_by_attribute(hed_root_element, 'default');
-    # paths = get_tag_paths_by_attribute(hed_root_element, 'default');
-    print(elements);
+    attribute_dictionaries = populate_tag_attribute_dictionaries('../tests/data/HED.xml')
+    print(attribute_dictionaries['default']);
