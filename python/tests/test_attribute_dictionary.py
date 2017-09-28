@@ -92,7 +92,7 @@ class Test(unittest.TestCase):
 
     def test_populate_default_unit_tag_dictionary(self):
         hed_root_element = attribute_dictionary.get_hed_root_element(self.hed_xml);
-        [attribute_tag_paths, attribute_tag_elements] = attribute_dictionary.get_tag_paths_by_attribute( \
+        attribute_tag_paths, attribute_tag_elements = attribute_dictionary.get_tag_paths_by_attribute( \
             hed_root_element, self.default_tag_attribute);
         default_unit_tag_dictionary = attribute_dictionary.populate_default_unit_tag_dictionary(attribute_tag_paths, \
                                                                                              attribute_tag_elements, \
@@ -109,6 +109,18 @@ class Test(unittest.TestCase):
         unit_class_elements = attribute_dictionary.get_elements_by_tag_name(hed_root_element, self.unit_class_tag);
         unit_class_units_dictionary = attribute_dictionary.populate_unit_class_units_dictionary(unit_class_elements);
         self.assertIsInstance(unit_class_units_dictionary, dict);
+
+    def test_populate_unit_class_units_dictionary(self):
+        hed_root_element = attribute_dictionary.get_hed_root_element(self.hed_xml);
+        unit_class_elements = attribute_dictionary.get_elements_by_tag_name(hed_root_element, self.unit_class_tag);
+        unit_class_units_dictionary = attribute_dictionary.populate_unit_class_units_dictionary(unit_class_elements);
+        self.assertIsInstance(unit_class_units_dictionary, dict);
+
+    def test_get_all_tag_paths(self):
+        hed_root_element = attribute_dictionary.get_hed_root_element(self.hed_xml);
+        tag_paths, tag_elements = attribute_dictionary.get_all_tag_paths(hed_root_element);
+        self.assertIsInstance(tag_paths, list);
+        self.assertIsInstance(tag_elements, list);
 
 if __name__ == '__main__':
     unittest.main();
