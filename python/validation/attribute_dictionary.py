@@ -39,6 +39,8 @@ def populate_unit_class_units_dictionary(unit_class_elements):
         unit_class_units_dictionary[unit_class_element_name] = unit_class_element_units.split(',');
     return unit_class_units_dictionary;
 
+# populate_tag_dictionary
+
 def populate_unit_class_default_unit_dictionary(unit_class_elements):
     """Populates a dictionary that contains unit class default units.
 
@@ -247,8 +249,8 @@ def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
 
     Returns
     -------
-    list
-        A list containing tag paths that have a specified attribute.
+    tuple
+        A tuple containing tag paths and tag elements that have a specified attribute.
 
     """
     attribute_tag_paths = [];
@@ -259,6 +261,32 @@ def get_tag_paths_by_attribute(hed_root_element, tag_attribute_name):
     except:
         pass;
     return attribute_tag_paths, attribute_tag_elements;
+
+
+def get_all_tag_paths(hed_root_element, tag_element_name='node'):
+    """Gets the tag paths that have a specific attribute.
+
+    Parameters
+    ----------
+    hed_root_element: Element
+        The root element of the HED XML file.
+    tag_element_name: string
+        The name of the tag elements.
+
+    Returns
+    -------
+    tuple
+        A tuple containing all the tag paths and tag elements in the XML file.
+
+    """
+    tag_paths = [];
+    try:
+        tag_elements = hed_root_element.xpath('.//%s' % tag_element_name);
+        for tag_element in tag_elements:
+            tag_paths.append(get_tag_path(tag_element));
+    except:
+        pass;
+    return tag_paths, tag_elements;
 
 def get_elements_by_attribute(hed_root_element, attribute_name, element_name='node'):
     """Gets the elements that have a specific attribute.
@@ -308,6 +336,7 @@ def get_elements_by_tag_name(hed_root_element, tag_name):
 
 if __name__ == '__main__':
     hed_root_element = get_hed_root_element('../tests/data/HED.xml');
-    unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG)
-    unit_class_units_dictionary = populate_unit_class_default_unit_dictionary(unit_class_elements);
-    print(unit_class_units_dictionary);
+    tag_paths, tag_elements = get_all_tag_paths(hed_root_element);
+    # unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG)
+    # unit_class_units_dictionary = populate_unit_class_default_unit_dictionary(unit_class_elements);
+    print(len(tag_paths));
