@@ -12,31 +12,11 @@ from defusedxml.lxml import parse;
 TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
                                'position', 'unique', 'predicateType', 'default'];
 DEFAULT_UNIT_ATTRIBUTE = 'default';
-UNIT_ATTRIBUTES = ['default'];
 UNIT_CLASS_TAG = 'unitClass';
 UNIT_CLASS_UNITS_TAG = 'units';
 
 
 attribute_dictionaries = {};
-
-def populate_unit_attribute_dictionaries(hed_xml_file_path):
-    """Populates the dictionaries associated with units in the attribute dictionary.
-
-    Parameters
-    ----------
-    hed_xml_file_path: string
-        The path to a HED XML file.
-
-    Returns
-    -------
-    dictionary
-        The attribute dictionary that has been populated with dictionaries associated with units.
-
-    """
-    hed_root_element = get_hed_root_element(hed_xml_file_path);
-    for UNIT_ATTRIBUTE in UNIT_ATTRIBUTES:
-        unit_elements = get_elements_by_attribute(hed_root_element, UNIT_ATTRIBUTE, UNIT_CLASS_TAG);
-    return attribute_dictionaries;
 
 def populate_unit_class_units_dictionary(unit_class_elements):
     """Populates a dictionary that contains unit class units.
@@ -59,13 +39,34 @@ def populate_unit_class_units_dictionary(unit_class_elements):
         unit_class_units_dictionary[unit_class_element_name] = unit_class_element_units.split(',');
     return unit_class_units_dictionary;
 
-def populate_tag_attribute_dictionaries(hed_xml_file_path):
+def populate_unit_class_default_unit_dictionary(unit_class_elements):
+    """Populates a dictionary that contains unit class default units.
+
+    Parameters
+    ----------
+    unit_class_elements: list
+        A list of unit class elements.
+
+    Returns
+    -------
+    dictionary
+        A dictionary that contains all the unit class default units.
+
+    """
+    unit_class_default_unit_dictionary = {};
+    for unit_class_element in unit_class_elements:
+        unit_class_element_name = get_element_tag_value(unit_class_element);
+        unit_class_default_unit_dictionary[unit_class_element_name] = unit_class_element.attrib[DEFAULT_UNIT_ATTRIBUTE];
+    return unit_class_default_unit_dictionary;
+
+
+def populate_tag_attribute_dictionaries(hed_root_element):
     """Populates the dictionaries associated with tags in the attribute dictionary.
 
     Parameters
     ----------
-    hed_xml_file_path: string
-        The path to a HED XML file.
+    hed_root_element: Element
+        The root element of the HED XML file.
 
     Returns
     -------
@@ -73,7 +74,6 @@ def populate_tag_attribute_dictionaries(hed_xml_file_path):
         A dictionary that has been populated with dictionaries associated with tag attributes.
 
     """
-    hed_root_element = get_hed_root_element(hed_xml_file_path);
     for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
         attribute_tag_paths, attribute_tag_elements = get_tag_paths_by_attribute(hed_root_element, TAG_ATTRIBUTE);
         if DEFAULT_UNIT_ATTRIBUTE == TAG_ATTRIBUTE:
@@ -309,5 +309,5 @@ def get_elements_by_tag_name(hed_root_element, tag_name):
 if __name__ == '__main__':
     hed_root_element = get_hed_root_element('../tests/data/HED.xml');
     unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG)
-    unit_class_units_dictionary = populate_unit_class_units_dictionary(unit_class_elements);
+    unit_class_units_dictionary = populate_unit_class_default_unit_dictionary(unit_class_elements);
     print(unit_class_units_dictionary);
