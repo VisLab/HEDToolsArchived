@@ -77,7 +77,8 @@ class Test(unittest.TestCase):
         self.assertTrue(lowercase_dictionary);
 
     def test_populate_tag_attribute_dictionaries(self):
-        attribute_dictionaries = attribute_dictionary.populate_tag_attribute_dictionaries(self.hed_xml);
+        hed_root_element = attribute_dictionary.get_hed_root_element(self.hed_xml)
+        attribute_dictionaries = attribute_dictionary.populate_tag_attribute_dictionaries(hed_root_element);
         self.assertIsInstance(attribute_dictionaries, dict);
         for attribute_dictionary_key in attribute_dictionaries:
             self.assertIsInstance(attribute_dictionaries[attribute_dictionary_key], dict);
