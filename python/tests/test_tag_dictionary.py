@@ -126,5 +126,10 @@ class Test(unittest.TestCase):
         tag_path_dictionary = tag_dictionary.populate_tag_path_dictionary(hed_root_element);
         self.assertIsInstance(tag_path_dictionary, dict);
 
+    def test_populate_tag_dictionaries(self):
+        tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
+        for tag_dictionary_key in tag_dictionaries:
+            self.assertIsInstance(tag_dictionaries[tag_dictionary_key], dict);
+
 if __name__ == '__main__':
     unittest.main();
