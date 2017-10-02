@@ -7,6 +7,26 @@ Created on Oct 2, 2017
 
 '''
 def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_class_units=''):
+    """Reports the validation error based on the type of error.
+
+    Parameters
+    ----------
+    error_type: string
+        The type of validation error.
+    error_line: int
+        The line number that the error occurred on.
+    tag: string
+        The tag that generated the error. The original tag not the formatted one.
+    tag_prefix: string
+        The tag prefix that generated the error.
+    unit_class_units: string
+        The unit class units that are associated with the error.
+    Returns
+    -------
+    dictionary
+        A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
+
+    """
     error_types = {
         'isNumeric': '\tERROR: Invalid numeric tag - \"%s\"\n' % tag,
         'line': 'Issues on line %s:\n' % str(error_line),
