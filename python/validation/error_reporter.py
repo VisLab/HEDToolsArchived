@@ -9,7 +9,7 @@ Created on Oct 2, 2017
 def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_class_units=''):
     error_types = {
         'isNumeric': '\tERROR: Invalid numeric tag - \"%s\"\n' % tag,
-        'line': 'Errors on line %s:\n' % str(error_line),
+        'line': 'Issues on line %s:\n' % str(error_line),
         'required': '\tERROR: Tag with prefix \"%s\" is required\n' % tag,
         'requireChild':'\tERROR: Descendant tag required - \"%s\"\n' % tag,
         'tilde': '\tERROR: Too many tildes - group \"%s\"\n' % tag,
