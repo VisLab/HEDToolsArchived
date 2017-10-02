@@ -23,8 +23,8 @@ def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_clas
         The unit class units that are associated with the error.
     Returns
     -------
-    dictionary
-        A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
+    string
+        A error message related to a particular type of error. 
 
     """
     error_types = {
