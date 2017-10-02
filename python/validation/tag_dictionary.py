@@ -1,6 +1,6 @@
 '''
-This module is used to store all HED tag attributes in a dictionary. The dictionary is a dictionary of dictionaries.
-Each dictionary pertains to a specific attribute associated with the HED tags.
+This module is used to store all HED tags, tag attributes, unit classes, and unit class attributes in a dictionary.
+The dictionary is a dictionary of dictionaries.
 
 Created on Sept 21, 2017
 
@@ -16,8 +16,33 @@ DEFAULT_UNIT_ATTRIBUTE = 'default';
 UNIT_CLASS_TAG = 'unitClass';
 UNIT_CLASS_UNITS_TAG = 'units';
 
-def populate_attribute_dictionary():
-    attribute_dictionaries = {};
+def populate_tag_dictionaries(hed_xml_file_path):
+    """Populates a dictionary containing all of the tags, tag attributes, unit class units, and unit class attributes.
+
+    Parameters
+    ----------
+    hed_xml_file_path: string
+        The path to a HED XML file.
+
+    Returns
+    -------
+    dictionary
+        A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
+
+    """
+    tag_dictionaries = {};
+    hed_root_element = get_hed_root_element(hed_xml_file_path);
+    unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG);
+    tag_paths, tag_elements = get_tag_paths_by_attribute(hed_root_element, \
+                                                                                            DEFAULT_UNIT_ATTRIBUTE);
+    tag_dictionaries['tags'] = populate_tag_path_dictionary(hed_root_element);
+    tag_dictionaries['unitClassUnits'] = populate_unit_class_units_dictionary(unit_class_elements);
+    tag_dictionaries['unitClassDefaultUnits'] = populate_unit_class_default_unit_dictionary(unit_class_elements);
+    tag_dictionaries['tagDefaultUnits'] = populate_default_unit_tag_dictionary(tag_paths, tag_elements, \
+                                                                                 DEFAULT_UNIT_ATTRIBUTE);
+    tag_dictionaries.update(populate_tag_attribute_dictionaries(hed_root_element));
+    return tag_dictionaries;
+
 
 def populate_unit_class_units_dictionary(unit_class_elements):
     """Populates a dictionary that contains unit class units.
@@ -123,7 +148,8 @@ def populate_default_unit_tag_dictionary(attribute_tag_paths, attribute_tag_elem
     """
     default_unit_tag_dictionary = {};
     for index, attribute_tag_path in enumerate(attribute_tag_paths):
-        default_unit_tag_dictionary[attribute_tag_path.lower()] = attribute_tag_elements[index].attrib[tag_attribute_name];
+        default_unit_tag_dictionary[attribute_tag_path.lower()] = \
+            attribute_tag_elements[index].attrib[tag_attribute_name];
     return default_unit_tag_dictionary;
 
 def string_list_2_lowercase_dictionary(string_list):
@@ -352,8 +378,6 @@ def get_elements_by_tag_name(hed_root_element, tag_name):
     return elements;
 
 if __name__ == '__main__':
-    hed_root_element = get_hed_root_element('../tests/data/HED.xml');
-    tag_paths, tag_elements = get_all_tag_paths(hed_root_element);
-    tag_dictionary = populate_tag_path_dictionary(hed_root_element);
-    print(collections.Counter(tag_paths));
-    # print(list(set(tag_dictionary.values()) - set(tag_paths)));
+    # hed_root_element = get_hed_root_element('../tests/data/HED.xml');
+    tag_dictionaries = populate_tag_dictionaries('../tests/data/HED.xml');
+    print(tag_dictionaries.keys());
