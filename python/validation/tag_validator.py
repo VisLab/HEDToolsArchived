@@ -8,6 +8,9 @@ Created on Oct 2, 2017
 '''
 
 import random;
+VALID_ERROR_TYPE = 'valid';
+REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
+TILDE_ERROR_TYPE = 'tilde';
 
 from validation import error_reporter, tag_dictionary;
 
@@ -29,10 +32,28 @@ def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
 
     """
     validation_error = '';
-    error_type = 'valid';
     if not tag_dictionaries['tags'].get(formatted_tag):
-        validation_error = error_reporter.report_error_type(error_type, tag=original_tag);
+        validation_error = error_reporter.report_error_type(VALID_ERROR_TYPE, tag=original_tag);
     return validation_error;
+
+def check_number_of_group_tildes(group_tag_string):
+    """Reports a validation error if the tag group has too many tildes.
+
+    Parameters
+    ----------
+    group_tag_string: string
+        A group tag string.
+    Returns
+    -------
+    string
+        A validation error string. If no errors are found then an empty string is returned.
+
+    """
+    validation_error = '';
+    if group_tag_string.count('~') > 2:
+        validation_error = error_reporter.report_error_type(TILDE_ERROR_TYPE, group_tag_string);
+    return validation_error;
+
 
 def check_if_tag_requires_child(tag_dictionaries, original_tag, formatted_tag):
     """Reports a validation error if the tag provided has the 'requireChild' attribute.
