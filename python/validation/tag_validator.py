@@ -7,11 +7,11 @@ Created on Oct 2, 2017
 
 '''
 
-import random;
 from validation import error_reporter, tag_dictionary;
 from itertools import compress;
 
 REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
+REQUIRED_ERROR_TYPE = 'required';
 TAG_DICTIONARY_KEY = 'tags';
 TILDE_ERROR_TYPE = 'tilde';
 UNIQUE_ERROR_TYPE = 'unique';
@@ -80,6 +80,32 @@ def check_if_tag_requires_child(tag_dictionaries, original_tag, formatted_tag):
         validation_error = error_reporter.report_error_type(REQUIRE_CHILD_ERROR_TYPE, tag=original_tag);
     return validation_error;
 
+
+def check_for_required_tags(tag_dictionaries, formatted_tag_list):
+    """Reports a validation error if the required tags aren't present.
+
+    Parameters
+    ----------
+    tag_dictionaries: dictionary
+        A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
+    original_tag: string
+        The original tag that is used to report the error.
+    formatted_tag: string
+        The tag that is used to do the validation.
+    Returns
+    -------
+    string
+        A validation error string. If no errors are found then an empty string is returned.
+
+    """
+    validation_error = '';
+    required_tag_prefixes = tag_dictionaries[REQUIRED_ERROR_TYPE];
+    for required_tag_prefix in required_tag_prefixes:
+        if sum([x.startswith(required_tag_prefix) for x in formatted_tag_list]) < 1:
+            validation_error += error_reporter.report_error_type(REQUIRED_ERROR_TYPE,
+                                                                 tag_prefix=required_tag_prefix);
+    return validation_error;
+
 def check_if_multiple_unique_tags_exist(tag_dictionaries, original_tag_list, formatted_tag_list):
     """Reports a validation error if two or more tags start with a tag prefix that has the 'unique' attribute.
 
@@ -104,7 +130,7 @@ def check_if_multiple_unique_tags_exist(tag_dictionaries, original_tag_list, for
         if sum(unique_tag_prefix_boolean_mask) > 1:
             unique_original_tag_list = list(compress(original_tag_list, unique_tag_prefix_boolean_mask));
             for unique_original_tag in unique_original_tag_list:
-                validation_error += error_reporter.report_error_type(UNIQUE_ERROR_TYPE, tag=unique_original_tag, \
+                validation_error += error_reporter.report_error_type(UNIQUE_ERROR_TYPE, tag=unique_original_tag,
                                                                     tag_prefix=unique_tag_prefix);
     return validation_error;
 
