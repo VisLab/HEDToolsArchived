@@ -136,5 +136,10 @@ class Test(unittest.TestCase):
         for tag_dictionary_key in tag_dictionaries:
             self.assertIsInstance(tag_dictionaries[tag_dictionary_key], dict);
 
+    def test_get_all_leaf_tags(self):
+        tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
+        leaf_tags = tag_dictionary.get_all_leaf_tags(tag_dictionaries);
+        self.assertIsInstance(leaf_tags, dict);
+
 if __name__ == '__main__':
     unittest.main();
