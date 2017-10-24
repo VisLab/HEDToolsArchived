@@ -73,11 +73,11 @@ class Test(unittest.TestCase):
 
     def test_check_for_required_tags(self):
         tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
-        validation_error = tag_validator.check_for_required_tags(tag_dictionaries, \
+        validation_error = tag_validator.check_for_required_tags(tag_dictionaries, 
                                                                              self.valid_formatted_required_tag_list);
         self.assertIsInstance(validation_error, basestring);
         self.assertFalse(validation_error);
-        validation_error = tag_validator.check_for_required_tags(tag_dictionaries, \
+        validation_error = tag_validator.check_for_required_tags(tag_dictionaries, 
                                                                              self.invalid_formatted_required_tag_list);
         self.assertIsInstance(validation_error, basestring);
         self.assertTrue(validation_error);
