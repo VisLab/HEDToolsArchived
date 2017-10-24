@@ -9,6 +9,7 @@ Created on Oct 2, 2017
 
 from validation import error_reporter, tag_dictionary;
 from itertools import compress;
+import re;
 
 REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
 REQUIRED_ERROR_TYPE = 'required';
@@ -134,10 +135,25 @@ def check_if_multiple_unique_tags_exist(tag_dictionaries, original_tag_list, for
                                                                     tag_prefix=unique_tag_prefix);
     return validation_error;
 
+def get_tag_path_slash_indices(tag_path, slash='/'):
+    """Gets all of the indices in a tag path that are slashes.
+
+    Parameters
+    ----------
+    tag_path: string
+        A tag path.
+    slash: string
+        The slash character. By default it is a forward slash.
+    Returns
+    -------
+    list
+        A list containing the indices of the tag path slashes.
+
+    """
+    return [s.start() for s in re.finditer(slash, tag_path)];
+
 if __name__ == '__main__':
-    hed_xml = '../tests/data/HED.xml';
-    tag_dictionaries = tag_dictionary.populate_tag_dictionaries(hed_xml);
-    a = ['Event/Label/This is a label', 'Event/Label/This is another label', 'Event/Description/This is a description'];
-    b = ['event/label/this is a label', 'event/label/this is another label', 'event/description/this is a description'];
-    validation_error = check_if_multiple_unique_tags_exist(tag_dictionaries, a, b);
-    print(validation_error);
+    # hed_xml = '../tests/data/HED.xml';
+    # tag_dictionaries = tag_dictionary.populate_tag_dictionaries(hed_xml);
+    a = "This";
+    print(get_tag_slash_positions(a));
