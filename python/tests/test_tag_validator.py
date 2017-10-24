@@ -82,6 +82,10 @@ class Test(unittest.TestCase):
         self.assertIsInstance(validation_error, basestring);
         self.assertTrue(validation_error);
 
+    def test_get_tag_path_slash_indices(self):
+        tag_path_slash_indices = tag_validator.get_tag_path_slash_indices(self.valid_formatted_tag);
+        self.assertIsInstance(tag_path_slash_indices, list);
+
 
 if __name__ == '__main__':
     unittest.main();
