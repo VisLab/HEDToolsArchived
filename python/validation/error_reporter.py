@@ -30,7 +30,7 @@ def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_clas
     error_types = {
         'isNumeric': '\tERROR: Invalid numeric tag - \"%s\"\n' % tag,
         'line': 'Issues on line %s:\n' % str(error_line),
-        'required': '\tERROR: Tag with prefix \"%s\" is required\n' % tag,
+        'required': '\tERROR: Tag with prefix \"%s\" is required\n' % tag_prefix,
         'requireChild':'tERROR: Descendant tag required - \"%s\"\n' % tag,
         'tilde': '\tERROR: Too many tildes - group \"%s\"\n' % tag,
         'unique': '\tERROR: Multiple unique tags (prefix \"%s\") - \"%s\"\n' % (tag_prefix, tag),
