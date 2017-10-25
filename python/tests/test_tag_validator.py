@@ -86,6 +86,13 @@ class Test(unittest.TestCase):
         tag_path_slash_indices = tag_validator.get_tag_path_slash_indices(self.valid_formatted_tag);
         self.assertIsInstance(tag_path_slash_indices, list);
 
+    def test_get_tag_path_by_slash_indicie(self):
+        tag_path_slash_indices = tag_validator.get_tag_path_slash_indices(self.valid_formatted_tag);
+        tag_path = tag_validator.get_tag_path_substring_by_end_index(self.valid_formatted_tag,
+                                                                             tag_path_slash_indices[0]);
+        self.assertIsInstance(tag_path, basestring);
+        self.assertNotEqual(self.valid_formatted_tag, tag_path);
+
 
 if __name__ == '__main__':
     unittest.main();
