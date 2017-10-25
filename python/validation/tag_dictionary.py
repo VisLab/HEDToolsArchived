@@ -405,6 +405,27 @@ def get_all_leaf_tags(root_element, tag_element_name='node'):
             leaf_tags[tag_path.lower()] = tag_path;
     return leaf_tags;
 
+def tag_path_has_attribute(tag_dictionaries, tag_path, tag_attribute):
+    """Checks to see if the tag path has a specific attribute.
+
+    Parameters
+    ----------
+    tag_dictionaries
+        A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
+    tag_path: string
+        A tag path.
+    tag_attribute: string
+        A tag attribute.
+    Returns
+    -------
+    boolean
+        True if the tag path has the specified attribute. False, if otherwise.
+
+    """
+    if tag_path.lower() in tag_dictionaries[tag_attribute]:
+            return True;
+    return False;
+
 if __name__ == '__main__':
     root_element = get_hed_root_element('../tests/data/HED.xml');
     # leaf_tags = get_all_leaf_tags(root_element, tag_element_name='node');
