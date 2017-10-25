@@ -92,7 +92,8 @@ class Test(unittest.TestCase):
                                                                              tag_path_slash_indices[0]);
         self.assertIsInstance(tag_path, basestring);
         self.assertNotEqual(self.valid_formatted_tag, tag_path);
-
+        tag_path = tag_validator.get_tag_path_substring_by_end_index(self.valid_formatted_tag, 0);
+        self.assertEqual(self.valid_formatted_tag, tag_path);
 
 if __name__ == '__main__':
     unittest.main();
