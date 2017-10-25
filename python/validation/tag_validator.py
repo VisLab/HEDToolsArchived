@@ -152,8 +152,30 @@ def get_tag_path_slash_indices(tag_path, slash='/'):
     """
     return [s.start() for s in re.finditer(slash, tag_path)];
 
+def get_tag_path_substring_by_end_index(tag_path, end_index):
+    """Gets a tag path substring from the start until the end index.
+
+    Parameters
+    ----------
+    tag_path: string
+        A tag path.
+    end_index: int
+        A index for the tag path substring to end.
+    Returns
+    -------
+    string
+        A tag path substring.
+
+    """
+    if end_index != 0:
+        return tag_path[:end_index]
+    return tag_path;
+
 if __name__ == '__main__':
     # hed_xml = '../tests/data/HED.xml';
     # tag_dictionaries = tag_dictionary.populate_tag_dictionaries(hed_xml);
-    a = "This";
-    print(get_tag_slash_positions(a));
+    # a = "This/Is/A/String";
+    # indices = get_tag_path_slash_indices(a);
+    # print(get_tag_path_by_slash_indicie(a, indices[1]));
+    a = "THe This This This This"
+    print(a.find("This"))
