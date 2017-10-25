@@ -141,5 +141,14 @@ class Test(unittest.TestCase):
         leaf_tags = tag_dictionary.get_all_leaf_tags(tag_dictionaries);
         self.assertIsInstance(leaf_tags, dict);
 
+    def test_tag_path_has_attribute(self):
+        tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
+        for tag_attribute in self.tag_attributes:
+            tag_attribute_keys = tag_dictionaries[tag_attribute].keys();
+            tag_path = tag_attribute_keys[0];
+            print(tag_path);
+            tag_path_has_attribute = tag_dictionary.tag_path_has_attribute(tag_dictionaries, tag_path, tag_attribute);
+            self.assertTrue(tag_path_has_attribute);
+
 if __name__ == '__main__':
     unittest.main();
