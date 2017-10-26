@@ -44,7 +44,8 @@ def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
     return validation_error;
 
 def is_extension_allowed_tag(tag_dictionaries, tag):
-    """Checks to see if the tag has the 'extensionAllowed' attribute.
+    """Checks to see if the tag has the 'extensionAllowed' attribute. It will strip the tag until there are no more
+    slashes to check if its ancestors have the attribute.
 
     Parameters
     ----------
@@ -61,7 +62,7 @@ def is_extension_allowed_tag(tag_dictionaries, tag):
     tag_slash_indices = get_tag_slash_indices(tag);
     for tag_slash_index in tag_slash_indices:
         tag_substring = get_tag_substring_by_end_index(tag, tag_slash_index);
-        if tag_dictionary.tag_has_attribute(tag_dictionaries, tag, EXTENSION_ALLOWED_ATTRIBUTE):
+        if tag_dictionary.tag_has_attribute(tag_dictionaries, tag_substring, EXTENSION_ALLOWED_ATTRIBUTE):
             return True;
     return False;
 
