@@ -30,6 +30,7 @@ class Test(unittest.TestCase):
              'event/description/this is a description'];
         self.invalid_formatted_required_tag_list = ['event/label/this is a label',
              'event/description/this is a description'];
+        self.extension_allowed_descendant_tag = 'Item/Object/Tool/Hammer';
 
     def test_check_if_tag_is_valid(self):
         tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
@@ -94,6 +95,14 @@ class Test(unittest.TestCase):
         self.assertNotEqual(self.valid_formatted_tag, tag);
         tag = tag_validator.get_tag_substring_by_end_index(self.valid_formatted_tag, 0);
         self.assertEqual(self.valid_formatted_tag, tag);
+
+    def test_is_extension_allowed_tag(self):
+        tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
+        extension_allowed_tag = tag_validator.is_extension_allowed_tag(tag_dictionaries,
+                                                                       self.extension_allowed_descendant_tag);
+        self.assertTrue(extension_allowed_tag);
+        extension_allowed_tag = tag_validator.is_extension_allowed_tag(tag_dictionaries, self.valid_formatted_tag);
+        self.assertFalse(extension_allowed_tag);
 
 if __name__ == '__main__':
     unittest.main();
