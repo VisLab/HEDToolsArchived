@@ -12,7 +12,5 @@ class Test(unittest.TestCase):
             error_report = error_reporter.report_error_type(error_type);
             self.assertIsInstance(error_report, basestring);
 
-
-
 if __name__ == '__main__':
     unittest.main();

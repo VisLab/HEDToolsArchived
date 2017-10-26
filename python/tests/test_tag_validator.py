@@ -82,18 +82,18 @@ class Test(unittest.TestCase):
         self.assertIsInstance(validation_error, basestring);
         self.assertTrue(validation_error);
 
-    def test_get_tag_path_slash_indices(self):
-        tag_path_slash_indices = tag_validator.get_tag_path_slash_indices(self.valid_formatted_tag);
-        self.assertIsInstance(tag_path_slash_indices, list);
+    def test_get_tag_slash_indices(self):
+        tag_slash_indices = tag_validator.get_tag_slash_indices(self.valid_formatted_tag);
+        self.assertIsInstance(tag_slash_indices, list);
 
-    def test_get_tag_path_by_slash_indicie(self):
-        tag_path_slash_indices = tag_validator.get_tag_path_slash_indices(self.valid_formatted_tag);
-        tag_path = tag_validator.get_tag_path_substring_by_end_index(self.valid_formatted_tag,
-                                                                             tag_path_slash_indices[0]);
-        self.assertIsInstance(tag_path, basestring);
-        self.assertNotEqual(self.valid_formatted_tag, tag_path);
-        tag_path = tag_validator.get_tag_path_substring_by_end_index(self.valid_formatted_tag, 0);
-        self.assertEqual(self.valid_formatted_tag, tag_path);
+    def test_get_tag_substring_by_end_index(self):
+        tag_slash_indices = tag_validator.get_tag_slash_indices(self.valid_formatted_tag);
+        tag = tag_validator.get_tag_substring_by_end_index(self.valid_formatted_tag,
+                                                                tag_slash_indices[0]);
+        self.assertIsInstance(tag, basestring);
+        self.assertNotEqual(self.valid_formatted_tag, tag);
+        tag = tag_validator.get_tag_substring_by_end_index(self.valid_formatted_tag, 0);
+        self.assertEqual(self.valid_formatted_tag, tag);
 
 if __name__ == '__main__':
     unittest.main();

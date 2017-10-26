@@ -33,12 +33,12 @@ def populate_tag_dictionaries(hed_xml_file_path):
     tag_dictionaries = {};
     hed_root_element = get_hed_root_element(hed_xml_file_path);
     unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG);
-    tag_paths, tag_elements = get_tag_paths_by_attribute(hed_root_element, \
-                                                                                            DEFAULT_UNIT_ATTRIBUTE);
-    tag_dictionaries['tags'] = populate_tag_path_dictionary(hed_root_element);
+    tags, tag_elements = get_tags_by_attribute(hed_root_element, \
+                                               DEFAULT_UNIT_ATTRIBUTE);
+    tag_dictionaries['tags'] = string_list_2_lowercase_dictionary(get_all_tags(hed_root_element)[0]);
     tag_dictionaries['unitClassUnits'] = populate_unit_class_units_dictionary(unit_class_elements);
     tag_dictionaries['unitClassDefaultUnits'] = populate_unit_class_default_unit_dictionary(unit_class_elements);
-    tag_dictionaries['tagDefaultUnits'] = populate_default_unit_tag_dictionary(tag_paths, tag_elements, \
+    tag_dictionaries['tagDefaultUnits'] = populate_default_unit_tag_dictionary(tags, tag_elements, \
                                                                                  DEFAULT_UNIT_ATTRIBUTE);
     tag_dictionaries.update(populate_tag_attribute_dictionaries(hed_root_element));
     return tag_dictionaries;
@@ -64,23 +64,6 @@ def populate_unit_class_units_dictionary(unit_class_elements):
         unit_class_element_units = get_element_tag_value(unit_class_element, UNIT_CLASS_UNITS_TAG);
         unit_class_units_dictionary[unit_class_element_name] = unit_class_element_units.split(',');
     return unit_class_units_dictionary;
-
-def populate_tag_path_dictionary(root_element):
-    """Populates a dictionary that contains all of the tag paths.
-
-    Parameters
-    ----------
-    root_element: Element
-        The root element of the HED XML file.
-
-    Returns
-    -------
-    dictionary
-        A dictionary that contains all of the tag paths.
-
-    """
-    tag_paths = get_all_tag_paths(root_element)[0];
-    return string_list_2_lowercase_dictionary(tag_paths);
 
 def populate_unit_class_default_unit_dictionary(unit_class_elements):
     """Populates a dictionary that contains unit class default units.
@@ -119,7 +102,7 @@ def populate_tag_attribute_dictionaries(root_element):
     """
     tag_attribute_dictionaries = {};
     for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
-        attribute_tag_paths, attribute_tag_elements = get_tag_paths_by_attribute(root_element, TAG_ATTRIBUTE);
+        attribute_tag_paths, attribute_tag_elements = get_tags_by_attribute(root_element, TAG_ATTRIBUTE);
         if EXTENSION_ALLOWED_ATTRIBUTE == TAG_ATTRIBUTE:
             tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
             leaf_tags = get_all_leaf_tags(root_element);
@@ -229,7 +212,7 @@ def get_element_tag_value(element, tag_name='name'):
     element: Element
         A element in the HED XML file.
     tag_name: string
-        The name of the element's tag.
+        The name of the XML element's tag. The default is 'name'.
 
     Returns
     -------
@@ -262,8 +245,8 @@ def get_parent_tag_name(tag_element):
     except:
         return '';
 
-def get_tag_path(tag_element):
-    """Gets the path of the given tag.
+def get_tag_name_from_tag_element(tag_element):
+    """Gets the tag name from a given tag element.
 
     Parameters
     ----------
@@ -273,67 +256,67 @@ def get_tag_path(tag_element):
     Returns
     -------
     string
-        The path of the tag. The tag and it's ancestor tags will be separated by /'s.
+        A tag. The tag and it's ancestor tags will be separated by /'s.
 
     """
     try:
-        all_tag_names = get_ancestor_tag_names(tag_element);
-        all_tag_names.insert(0, get_element_tag_value(tag_element));
-        all_tag_names.reverse();
-        return '/'.join(all_tag_names);
+        ancestor_tag_names = get_ancestor_tag_names(tag_element);
+        ancestor_tag_names.insert(0, get_element_tag_value(tag_element));
+        ancestor_tag_names.reverse();
+        return '/'.join(ancestor_tag_names);
     except:
         return '';
 
-def get_tag_paths_by_attribute(root_element, tag_attribute_name):
-    """Gets the tag paths that have a specific attribute.
+def get_tags_by_attribute(root_element, tag_attribute_name):
+    """Gets the tag that have a specific attribute.
 
     Parameters
     ----------
     root_element: Element
         The root element of the HED XML file.
     tag_attribute_name: string
-        The name of the attribute associated with the tag paths.
+        The name of the attribute associated with the tags.
 
     Returns
     -------
     tuple
-        A tuple containing tag paths and tag elements that have a specified attribute.
+        A tuple containing tags and tag elements that have a specified attribute.
 
     """
-    attribute_tag_paths = [];
+    attribute_tags = [];
     try:
         attribute_tag_elements = root_element.xpath('.//node[@%s]' % tag_attribute_name);
         for attribute_tag_element in attribute_tag_elements:
-            attribute_tag_paths.append(get_tag_path(attribute_tag_element));
+            attribute_tags.append(get_tag_name_from_tag_element(attribute_tag_element));
     except:
         pass;
-    return attribute_tag_paths, attribute_tag_elements;
+    return attribute_tags, attribute_tag_elements;
 
 
-def get_all_tag_paths(root_element, tag_element_name='node'):
-    """Gets the tag paths that have a specific attribute.
+def get_all_tags(root_element, tag_element_name='node'):
+    """Gets the tags that have a specific attribute.
 
     Parameters
     ----------
     root_element: Element
         The root element of the HED XML file.
     tag_element_name: string
-        The name of the tag elements.
+        The XML tag name of the tag elements. The default is 'node'.
 
     Returns
     -------
     tuple
-        A tuple containing all the tag paths and tag elements in the XML file.
+        A tuple containing all the tags and tag elements in the XML file.
 
     """
-    tag_paths = [];
+    tags = [];
     try:
         tag_elements = root_element.xpath('.//%s' % tag_element_name);
         for tag_element in tag_elements:
-            tag_paths.append(get_tag_path(tag_element));
+            tags.append(get_tag_name_from_tag_element(tag_element));
     except:
         pass;
-    return tag_paths, tag_elements;
+    return tags, tag_elements;
 
 def get_elements_by_attribute(root_element, attribute_name, element_name='node'):
     """Gets the elements that have a specific attribute.
@@ -344,6 +327,8 @@ def get_elements_by_attribute(root_element, attribute_name, element_name='node')
         The root element of the HED XML file.
     attribute_name: string
         The name of the attribute associated with the element.
+    element_name: string
+        The name of the XML element tag name. The default is 'node'.
 
     Returns
     -------
@@ -381,7 +366,7 @@ def get_elements_by_tag_name(root_element, tag_name):
         pass;
     return elements;
 
-def get_all_leaf_tags(root_element, tag_element_name='node'):
+def get_all_leaf_tags(root_element, tag_element_name='node', exclude_take_value_tags=True):
     """Gets the tag elements that are leaf nodes.
 
     Parameters
@@ -389,46 +374,48 @@ def get_all_leaf_tags(root_element, tag_element_name='node'):
     root_element: Element
         The root element of the HED XML file.
     tag_element_name: string
-        The name of the tag elements.
+        The name of the XML tag elements. The default is 'node'.
+    exclude_take_value_tags: boolean
+        True if to exclude tags that take values. False, if otherwise. The default is True.
 
     Returns
     -------
     dictionary
-        A dictionary containing the paths of the tags that are leaf nodes.
+        A dictionary containing the tags that are leaf nodes.
 
     """
     leaf_tags = {};
     tag_elements = get_elements_by_tag_name(root_element, tag_element_name);
     for tag_element in tag_elements:
         if len(get_elements_by_tag_name(tag_element, tag_element_name)) == 0:
-            tag_path = get_tag_path(tag_element);
-            leaf_tags[tag_path.lower()] = tag_path;
+            tag_name = get_tag_name_from_tag_element(tag_element);
+            if exclude_take_value_tags and tag_name[-1] == '#':
+                continue;
+            leaf_tags[tag_name.lower()] = tag_name;
     return leaf_tags;
 
-def tag_path_has_attribute(tag_dictionaries, tag_path, tag_attribute):
-    """Checks to see if the tag path has a specific attribute.
+def tag_has_attribute(tag_dictionaries, tag, tag_attribute):
+    """Checks to see if the tag has a specific attribute.
 
     Parameters
     ----------
     tag_dictionaries
         A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
-    tag_path: string
-        A tag path.
+    tag: string
+        A tag.
     tag_attribute: string
         A tag attribute.
     Returns
     -------
     boolean
-        True if the tag path has the specified attribute. False, if otherwise.
+        True if the tag has the specified attribute. False, if otherwise.
 
     """
-    if tag_path.lower() in tag_dictionaries[tag_attribute]:
+    if tag.lower() in tag_dictionaries[tag_attribute]:
             return True;
     return False;
 
 if __name__ == '__main__':
     root_element = get_hed_root_element('../tests/data/HED.xml');
-    # leaf_tags = get_all_leaf_tags(root_element, tag_element_name='node');
-    # print(leaf_tags.values());
-    tag_dictionaries = populate_tag_dictionaries('../tests/data/HED.xml');
-    print(len(tag_dictionaries[EXTENSION_ALLOWED_ATTRIBUTE]));
+    leaf_tags = get_all_leaf_tags(root_element, tag_element_name='node', exclude_take_value_tags=False);
+    print(len(leaf_tags));

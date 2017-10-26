@@ -45,12 +45,12 @@ class Test(unittest.TestCase):
         parent_tag_name = tag_dictionary.get_parent_tag_name(tag_element);
         self.assertIsInstance(parent_tag_name, basestring);
 
-    def test_get_tag_path(self):
+    def test_get_tag_name_from_tag_element(self):
         hed_root_element = tag_dictionary.get_hed_root_element(self.hed_xml);
-        all_nodes = hed_root_element.xpath('.//node');
-        random_node = random.randint(1, len(all_nodes));
-        tag_element = all_nodes[random_node];
-        parent_tag_name = tag_dictionary.get_tag_path(tag_element);
+        tag_elements = hed_root_element.xpath('.//node');
+        random_node = random.randint(1, len(tag_elements));
+        tag_element = tag_elements[random_node];
+        parent_tag_name = tag_dictionary.get_tag_name_from_tag_element(tag_element);
         self.assertIsInstance(parent_tag_name, basestring);
         self.assertTrue(parent_tag_name);
 
@@ -63,12 +63,12 @@ class Test(unittest.TestCase):
         self.assertIsInstance(all_ancestor_tags, list);
         self.assertTrue(all_ancestor_tags);
 
-    def test_get_tag_paths_by_attribute(self):
+    def test_get_tags_by_attribute(self):
         hed_root_element = tag_dictionary.get_hed_root_element(self.hed_xml);
         for tag_attribute in self.tag_attributes:
-            attribute_tag_paths, attribute_tag_elements = tag_dictionary.get_tag_paths_by_attribute(hed_root_element, tag_attribute);
-            self.assertIsInstance(attribute_tag_paths, list);
-            self.assertTrue(attribute_tag_paths);
+            attribute_tags, attribute_tag_elements = tag_dictionary.get_tags_by_attribute(hed_root_element, tag_attribute);
+            self.assertIsInstance(attribute_tags, list);
+            self.assertTrue(attribute_tags);
 
     def test_string_list_2_lowercase_dictionary(self):
         lowercase_dictionary = tag_dictionary.string_list_2_lowercase_dictionary(self.string_list);
@@ -91,9 +91,9 @@ class Test(unittest.TestCase):
 
     def test_populate_default_unit_tag_dictionary(self):
         hed_root_element = tag_dictionary.get_hed_root_element(self.hed_xml);
-        attribute_tag_paths, attribute_tag_elements = tag_dictionary.get_tag_paths_by_attribute( \
+        attribute_tags, attribute_tag_elements = tag_dictionary.get_tags_by_attribute( \
             hed_root_element, self.default_tag_attribute);
-        default_unit_tag_dictionary = tag_dictionary.populate_default_unit_tag_dictionary(attribute_tag_paths, \
+        default_unit_tag_dictionary = tag_dictionary.populate_default_unit_tag_dictionary(attribute_tags, \
                                                                                           attribute_tag_elements, \
                                                                                           self.default_tag_attribute);
         self.assertIsInstance(default_unit_tag_dictionary, dict);
@@ -115,16 +115,11 @@ class Test(unittest.TestCase):
         unit_class_units_dictionary = tag_dictionary.populate_unit_class_units_dictionary(unit_class_elements);
         self.assertIsInstance(unit_class_units_dictionary, dict);
 
-    def test_get_all_tag_paths(self):
+    def test_get_all_tags(self):
         hed_root_element = tag_dictionary.get_hed_root_element(self.hed_xml);
-        tag_paths, tag_elements = tag_dictionary.get_all_tag_paths(hed_root_element);
-        self.assertIsInstance(tag_paths, list);
+        tags, tag_elements = tag_dictionary.get_all_tags(hed_root_element);
+        self.assertIsInstance(tags, list);
         self.assertIsInstance(tag_elements, list);
-
-    def test_populate_tag_path_dictionary(self):
-        hed_root_element = tag_dictionary.get_hed_root_element(self.hed_xml);
-        tag_path_dictionary = tag_dictionary.populate_tag_path_dictionary(hed_root_element);
-        self.assertIsInstance(tag_path_dictionary, dict);
 
     def test_populate_tag_dictionaries(self):
         tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
@@ -137,18 +132,22 @@ class Test(unittest.TestCase):
             self.assertIsInstance(tag_dictionaries[tag_dictionary_key], dict);
 
     def test_get_all_leaf_tags(self):
+        hed_root_element = tag_dictionary.get_hed_root_element(self.hed_xml);
         tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
-        leaf_tags = tag_dictionary.get_all_leaf_tags(tag_dictionaries);
+        leaf_tags = tag_dictionary.get_all_leaf_tags(hed_root_element);
+        leaf_tags_with_take_value_tags = \
+            tag_dictionary.get_all_leaf_tags(hed_root_element, exclude_take_value_tags=False);
         self.assertIsInstance(leaf_tags, dict);
+        self.assertIsInstance(leaf_tags_with_take_value_tags, dict);
+        self.assertNotEqual(len(leaf_tags), len(leaf_tags_with_take_value_tags));
 
-    def test_tag_path_has_attribute(self):
+    def test_tag_has_attribute(self):
         tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
         for tag_attribute in self.tag_attributes:
             tag_attribute_keys = tag_dictionaries[tag_attribute].keys();
-            tag_path = tag_attribute_keys[0];
-            print(tag_path);
-            tag_path_has_attribute = tag_dictionary.tag_path_has_attribute(tag_dictionaries, tag_path, tag_attribute);
-            self.assertTrue(tag_path_has_attribute);
+            tag = tag_attribute_keys[0];
+            tag_has_attribute = tag_dictionary.tag_has_attribute(tag_dictionaries, tag, tag_attribute);
+            self.assertTrue(tag_has_attribute);
 
 if __name__ == '__main__':
     unittest.main();

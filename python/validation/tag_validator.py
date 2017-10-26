@@ -17,6 +17,7 @@ TAG_DICTIONARY_KEY = 'tags';
 TILDE_ERROR_TYPE = 'tilde';
 UNIQUE_ERROR_TYPE = 'unique';
 VALID_ERROR_TYPE = 'valid';
+EXTENSION_ALLOWED_ATTRIBUTE = 'extensionAllowed';
 
 def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
     """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
@@ -36,9 +37,34 @@ def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
 
     """
     validation_error = '';
-    if not tag_dictionaries[TAG_DICTIONARY_KEY].get(formatted_tag):
+    if is_extension_allowed_tag(tag_dictionaries, formatted_tag):
+        pass;
+    elif not tag_dictionaries[TAG_DICTIONARY_KEY].get(formatted_tag):
         validation_error = error_reporter.report_error_type(VALID_ERROR_TYPE, tag=original_tag);
     return validation_error;
+
+def is_extension_allowed_tag(tag_dictionaries, tag):
+    """Checks to see if the tag has the 'extensionAllowed' attribute.
+
+    Parameters
+    ----------
+    tag_dictionaries: dictionary
+        A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
+    tag: string
+        A tag.
+    Returns
+    -------
+    boolean
+        True if the tag has the 'extensionAllowed' attribute. False, if otherwise.
+
+    """
+    tag_slash_indices = get_tag_slash_indices(tag);
+    for tag_slash_index in tag_slash_indices:
+        tag_substring = get_tag_substring_by_end_index(tag, tag_slash_index);
+        if tag_dictionary.tag_has_attribute(tag_dictionaries, tag, EXTENSION_ALLOWED_ATTRIBUTE):
+            return True;
+    return False;
+
 
 def check_number_of_group_tildes(group_tag_string):
     """Reports a validation error if the tag group has too many tildes.
@@ -135,47 +161,43 @@ def check_if_multiple_unique_tags_exist(tag_dictionaries, original_tag_list, for
                                                                     tag_prefix=unique_tag_prefix);
     return validation_error;
 
-def get_tag_path_slash_indices(tag_path, slash='/'):
-    """Gets all of the indices in a tag path that are slashes.
+def get_tag_slash_indices(tag, slash='/'):
+    """Gets all of the indices in a tag that are slashes.
 
     Parameters
     ----------
-    tag_path: string
-        A tag path.
+    tag: string
+        A tag.
     slash: string
         The slash character. By default it is a forward slash.
     Returns
     -------
     list
-        A list containing the indices of the tag path slashes.
+        A list containing the indices of the tag slashes.
 
     """
-    return [s.start() for s in re.finditer(slash, tag_path)];
+    return [s.start() for s in re.finditer(slash, tag)];
 
-def get_tag_path_substring_by_end_index(tag_path, end_index):
-    """Gets a tag path substring from the start until the end index.
+def get_tag_substring_by_end_index(tag, end_index):
+    """Gets a tag substring from the start until the end index.
 
     Parameters
     ----------
-    tag_path: string
-        A tag path.
+    tag: string
+        A tag.
     end_index: int
-        A index for the tag path substring to end.
+        A index for the tag substring to end.
     Returns
     -------
     string
-        A tag path substring.
+        A tag substring.
 
     """
     if end_index != 0:
-        return tag_path[:end_index]
-    return tag_path;
+        return tag[:end_index]
+    return tag;
 
 if __name__ == '__main__':
+    print('yes')
     # hed_xml = '../tests/data/HED.xml';
     # tag_dictionaries = tag_dictionary.populate_tag_dictionaries(hed_xml);
-    # a = "This/Is/A/String";
-    # indices = get_tag_path_slash_indices(a);
-    # print(get_tag_path_by_slash_indicie(a, indices[1]));
-    a = "THe This This This This"
-    print(a.find("This"))
