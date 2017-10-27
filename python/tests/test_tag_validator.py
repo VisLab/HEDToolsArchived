@@ -16,6 +16,7 @@ class Test(unittest.TestCase):
         self.invalid_formatted_tag = 'this/is/a/tag';
         self.valid_original_tag = 'Event/Label';
         self.valid_formatted_tag = 'event/label';
+        self.tilde = '~';
         self.valid_takes_value_tag = 'event/label/This is a label';
         self.valid_tag_group_string = 'This/Is/A/Tag ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
         self.invalid_tag_group_string = 'This/Is/A/Tag ~ ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
