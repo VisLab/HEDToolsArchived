@@ -38,7 +38,7 @@ def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
 
     """
     validation_error = '';
-    if is_extension_allowed_tag(tag_dictionaries, formatted_tag):
+    if is_extension_allowed_tag(tag_dictionaries, formatted_tag) or tag_takes_value(tag_dictionaries, formatted_tag):
         pass;
     elif not tag_dictionaries[TAG_DICTIONARY_KEY].get(formatted_tag):
         validation_error = error_reporter.report_error_type(VALID_ERROR_TYPE, tag=original_tag);
