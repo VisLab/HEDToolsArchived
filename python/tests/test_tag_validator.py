@@ -17,6 +17,8 @@ class Test(unittest.TestCase):
         self.valid_original_tag = 'Event/Label';
         self.valid_formatted_tag = 'event/label';
         self.tilde = '~';
+        self.valid_is_numeric_tag = 'Attribute/Repetition/20';
+        self.valid_unit_class_tag = 'Attribute/Temporal rate/20 Hz';
         self.valid_takes_value_tag = 'event/label/This is a label';
         self.valid_tag_group_string = 'This/Is/A/Tag ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
         self.invalid_tag_group_string = 'This/Is/A/Tag ~ ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
@@ -114,6 +116,11 @@ class Test(unittest.TestCase):
         self.assertTrue(takes_value_tag);
         takes_value_tag = tag_validator.tag_takes_value(tag_dictionaries, self.valid_formatted_tag);
         self.assertFalse(takes_value_tag);
+
+    def test_is_numeric_tag(self):
+        tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
+        numeric_tag = tag_validator.is_numeric_tag(tag_dictionaries, self.valid_is_numeric_tag);
+        self.assertTrue(numeric_tag);
 
 if __name__ == '__main__':
     unittest.main();
