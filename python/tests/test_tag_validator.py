@@ -16,6 +16,7 @@ class Test(unittest.TestCase):
         self.invalid_formatted_tag = 'this/is/a/tag';
         self.valid_original_tag = 'Event/Label';
         self.valid_formatted_tag = 'event/label';
+        self.valid_takes_value_tag = 'event/label/This is a label';
         self.valid_tag_group_string = 'This/Is/A/Tag ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
         self.invalid_tag_group_string = 'This/Is/A/Tag ~ ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
         self.valid_original_unique_tag_list = ['Event/Label/This is a label',
@@ -103,6 +104,15 @@ class Test(unittest.TestCase):
         self.assertTrue(extension_allowed_tag);
         extension_allowed_tag = tag_validator.is_extension_allowed_tag(tag_dictionaries, self.valid_formatted_tag);
         self.assertFalse(extension_allowed_tag);
+
+
+    def test_tag_takes_value(self):
+        tag_dictionaries = tag_dictionary.populate_tag_dictionaries(self.hed_xml);
+        takes_value_tag = tag_validator.tag_takes_value(tag_dictionaries,
+                                                                       self.valid_takes_value_tag);
+        self.assertTrue(takes_value_tag);
+        takes_value_tag = tag_validator.tag_takes_value(tag_dictionaries, self.valid_formatted_tag);
+        self.assertFalse(takes_value_tag);
 
 if __name__ == '__main__':
     unittest.main();
