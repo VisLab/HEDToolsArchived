@@ -19,6 +19,7 @@ UNIQUE_ERROR_TYPE = 'unique';
 VALID_ERROR_TYPE = 'valid';
 EXTENSION_ALLOWED_ATTRIBUTE = 'extensionAllowed';
 TAKES_VALUE_ATTRIBUTE = 'takesValue';
+IS_NUMERIC_ATTRIBUTE = 'isNumeric';
 
 def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
     """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
@@ -44,7 +45,7 @@ def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
         validation_error = error_reporter.report_error_type(VALID_ERROR_TYPE, tag=original_tag);
     return validation_error;
 
-def is_extension_allowed_tag(tag_dictionaries, tag):
+def is_extension_allowed_tag(tag_dictionaries, formatted_tag):
     """Checks to see if the tag has the 'extensionAllowed' attribute. It will strip the tag until there are no more
     slashes to check if its ancestors have the attribute.
 
@@ -52,40 +53,62 @@ def is_extension_allowed_tag(tag_dictionaries, tag):
     ----------
     tag_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
-    tag: string
-        A tag.
+    formatted_tag: string
+        The tag that is used to do the validation.
     Returns
     -------
     boolean
         True if the tag has the 'extensionAllowed' attribute. False, if otherwise.
 
     """
-    tag_slash_indices = get_tag_slash_indices(tag);
+    tag_slash_indices = get_tag_slash_indices(formatted_tag);
     for tag_slash_index in tag_slash_indices:
-        tag_substring = get_tag_substring_by_end_index(tag, tag_slash_index);
+        tag_substring = get_tag_substring_by_end_index(formatted_tag, tag_slash_index);
         if tag_dictionary.tag_has_attribute(tag_dictionaries, tag_substring, EXTENSION_ALLOWED_ATTRIBUTE):
             return True;
     return False;
 
-def tag_takes_value(tag_dictionaries, tag):
+def tag_takes_value(tag_dictionaries, formatted_tag):
     """Checks to see if the tag has the 'takesValue' attribute.
 
     Parameters
     ----------
     tag_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
-    tag: string
-        A tag.
+    formatted_tag: string
+        The tag that is used to do the validation.
     Returns
     -------
     boolean
         True if the tag has the 'takesValue' attribute. False, if otherwise.
 
     """
-    last_tag_slash_index = tag.rfind('/');
+    last_tag_slash_index = formatted_tag.rfind('/');
     if last_tag_slash_index != -1:
-        takes_value_tag = tag[:last_tag_slash_index] + '/#';
+        takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
         return tag_dictionary.tag_has_attribute(tag_dictionaries, takes_value_tag, TAKES_VALUE_ATTRIBUTE);
+    return False;
+
+def is_numeric_tag(tag_dictionaries, formatted_tag):
+    """Checks to see if the tag has the 'isNumeric' attribute.
+
+    Parameters
+    ----------
+    tag_dictionaries: dictionary
+        A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
+    formatted_tag: string
+        The tag that is used to do the validation.
+    Returns
+    -------
+    boolean
+        True if the tag has the 'isNumeric' attribute. False, if otherwise.
+
+    """
+    last_tag_slash_index = formatted_tag.rfind('/');
+    if last_tag_slash_index != -1:
+        numeric_tag = formatted_tag[:last_tag_slash_index] + '/#';
+        print(numeric_tag);
+        return tag_dictionary.tag_has_attribute(tag_dictionaries, numeric_tag, IS_NUMERIC_ATTRIBUTE);
     return False;
 
 def check_number_of_group_tildes(group_tag_string):
