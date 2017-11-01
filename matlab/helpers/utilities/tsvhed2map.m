@@ -145,6 +145,7 @@ end
     function values = getLineValues(p, line, column, areTagColumns)
         % Reads the column values on a tab-delimited line
         delimitedLine = textscan(line, '%s', 'delimiter', '\t');
+        delimitedLine{1} = strtrim(strrep(delimitedLine{1}, '"', ''));
         if areTagColumns
             [delimitedLine{1}, column] = getSpecificColumns(p, ...
                 delimitedLine{1});
@@ -153,7 +154,6 @@ end
         availableColumns = intersect(delimitedLineCount, column);
         nonemptyColumns = availableColumns(~cellfun(@isempty, ...
             delimitedLine{1}(availableColumns)));
-        delimitedLine{1} = strtrim(strrep(delimitedLine{1}, '"', ''));
         values = strjoin(delimitedLine{1}(nonemptyColumns)', ', ');
     end % getLineValues
 
