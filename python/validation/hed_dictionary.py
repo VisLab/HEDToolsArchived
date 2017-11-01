@@ -21,7 +21,7 @@ UNIT_CLASS_UNITS_ELEMENT = 'units';
 UNIT_CLASS_DICTIONARY_KEYS = ['default', 'units'];
 UNITS_ELEMENT = 'units';
 
-def populate_hed_dictionaries(hed_xml_file_path):
+def populate_hed_dictionary(hed_xml_file_path):
     """Populates a dictionary of dictionaries that contains all of the tags, tag attributes, unit class units, and unit
        class attributes.
 
@@ -36,11 +36,13 @@ def populate_hed_dictionaries(hed_xml_file_path):
         attributes.
 
     """
-    hed_dictionaries = {};
+    hed_dictionary = {};
     root_element = get_hed_root_element(hed_xml_file_path);
     tag_dictionaries = populate_tag_dictionaries(root_element);
-    hed_dictionaries.update(tag_dictionaries);
-    return hed_dictionaries;
+    unit_class_dictionaries = populate_unit_class_dictionaries(root_element);
+    hed_dictionary.update(tag_dictionaries);
+    hed_dictionary.update(unit_class_dictionaries);
+    return hed_dictionary;
 
 def populate_tags_dictionary(root_element):
     """Populates a dictionary containing all of the tags.

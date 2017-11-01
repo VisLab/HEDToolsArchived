@@ -22,12 +22,12 @@ TAKES_VALUE_ATTRIBUTE = 'takesValue';
 IS_NUMERIC_ATTRIBUTE = 'isNumeric';
 UNIT_CLASS_ATTRIBUTE = 'unitClass';
 
-def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
+def check_if_tag_is_valid(hed_dictionaries, original_tag, formatted_tag):
     """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     original_tag: string
         The original tag that is used to report the error.
@@ -40,19 +40,19 @@ def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
 
     """
     validation_error = '';
-    if is_extension_allowed_tag(tag_dictionaries, formatted_tag) or tag_takes_value(tag_dictionaries, formatted_tag):
+    if is_extension_allowed_tag(hed_dictionaries, formatted_tag) or tag_takes_value(hed_dictionaries, formatted_tag):
         pass;
-    elif not tag_dictionaries[TAG_DICTIONARY_KEY].get(formatted_tag):
+    elif not hed_dictionaries[TAG_DICTIONARY_KEY].get(formatted_tag):
         validation_error = error_reporter.report_error_type(VALID_ERROR_TYPE, tag=original_tag);
     return validation_error;
 
-def is_extension_allowed_tag(tag_dictionaries, formatted_tag):
+def is_extension_allowed_tag(hed_dictionaries, formatted_tag):
     """Checks to see if the tag has the 'extensionAllowed' attribute. It will strip the tag until there are no more
     slashes to check if its ancestors have the attribute.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     formatted_tag: string
         The tag that is used to do the validation.
@@ -65,16 +65,16 @@ def is_extension_allowed_tag(tag_dictionaries, formatted_tag):
     tag_slash_indices = get_tag_slash_indices(formatted_tag);
     for tag_slash_index in tag_slash_indices:
         tag_substring = get_tag_substring_by_end_index(formatted_tag, tag_slash_index);
-        if hed_dictionary.tag_has_attribute(tag_dictionaries, tag_substring, EXTENSION_ALLOWED_ATTRIBUTE):
+        if hed_dictionary.tag_has_attribute(hed_dictionaries, tag_substring, EXTENSION_ALLOWED_ATTRIBUTE):
             return True;
     return False;
 
-def tag_takes_value(tag_dictionaries, formatted_tag):
+def tag_takes_value(hed_dictionaries, formatted_tag):
     """Checks to see if the tag has the 'takesValue' attribute.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     formatted_tag: string
         The tag that is used to do the validation.
@@ -87,15 +87,15 @@ def tag_takes_value(tag_dictionaries, formatted_tag):
     last_tag_slash_index = formatted_tag.rfind('/');
     if last_tag_slash_index != -1:
         takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
-        return hed_dictionary.tag_has_attribute(tag_dictionaries, takes_value_tag, TAKES_VALUE_ATTRIBUTE);
+        return hed_dictionary.tag_has_attribute(hed_dictionaries, takes_value_tag, TAKES_VALUE_ATTRIBUTE);
     return False;
 
-def is_unit_class_tag(tag_dictionaries, formatted_tag):
+def is_unit_class_tag(hed_dictionaries, formatted_tag):
     """Checks to see if the tag has the 'unitClass' attribute.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     formatted_tag: string
         The tag that is used to do the validation.
@@ -108,15 +108,15 @@ def is_unit_class_tag(tag_dictionaries, formatted_tag):
     last_tag_slash_index = formatted_tag.rfind('/');
     if last_tag_slash_index != -1:
         takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
-        return hed_dictionary.tag_has_attribute(tag_dictionaries, takes_value_tag, UNIT_CLASS_ATTRIBUTE);
+        return hed_dictionary.tag_has_attribute(hed_dictionaries, takes_value_tag, UNIT_CLASS_ATTRIBUTE);
     return False;
 
-def is_numeric_tag(tag_dictionaries, formatted_tag):
+def is_numeric_tag(hed_dictionaries, formatted_tag):
     """Checks to see if the tag has the 'isNumeric' attribute.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     formatted_tag: string
         The tag that is used to do the validation.
@@ -130,7 +130,7 @@ def is_numeric_tag(tag_dictionaries, formatted_tag):
     if last_tag_slash_index != -1:
         numeric_tag = formatted_tag[:last_tag_slash_index] + '/#';
         print(numeric_tag);
-        return hed_dictionary.tag_has_attribute(tag_dictionaries, numeric_tag, IS_NUMERIC_ATTRIBUTE);
+        return hed_dictionary.tag_has_attribute(hed_dictionaries, numeric_tag, IS_NUMERIC_ATTRIBUTE);
     return False;
 
 def check_number_of_group_tildes(group_tag_string):
@@ -152,12 +152,12 @@ def check_number_of_group_tildes(group_tag_string):
     return validation_error;
 
 
-def check_if_tag_requires_child(tag_dictionaries, original_tag, formatted_tag):
+def check_if_tag_requires_child(hed_dictionaries, original_tag, formatted_tag):
     """Reports a validation error if the tag provided has the 'requireChild' attribute.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     original_tag: string
         The original tag that is used to report the error.
@@ -170,17 +170,17 @@ def check_if_tag_requires_child(tag_dictionaries, original_tag, formatted_tag):
 
     """
     validation_error = '';
-    if tag_dictionaries[REQUIRE_CHILD_ERROR_TYPE].get(formatted_tag):
+    if hed_dictionaries[REQUIRE_CHILD_ERROR_TYPE].get(formatted_tag):
         validation_error = error_reporter.report_error_type(REQUIRE_CHILD_ERROR_TYPE, tag=original_tag);
     return validation_error;
 
 
-def check_for_required_tags(tag_dictionaries, formatted_tag_list):
+def check_for_required_tags(hed_dictionaries, formatted_tag_list):
     """Reports a validation error if the required tags aren't present.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     original_tag: string
         The original tag that is used to report the error.
@@ -193,19 +193,19 @@ def check_for_required_tags(tag_dictionaries, formatted_tag_list):
 
     """
     validation_error = '';
-    required_tag_prefixes = tag_dictionaries[REQUIRED_ERROR_TYPE];
+    required_tag_prefixes = hed_dictionaries[REQUIRED_ERROR_TYPE];
     for required_tag_prefix in required_tag_prefixes:
         if sum([x.startswith(required_tag_prefix) for x in formatted_tag_list]) < 1:
             validation_error += error_reporter.report_error_type(REQUIRED_ERROR_TYPE,
                                                                  tag_prefix=required_tag_prefix);
     return validation_error;
 
-def check_if_multiple_unique_tags_exist(tag_dictionaries, original_tag_list, formatted_tag_list):
+def check_if_multiple_unique_tags_exist(hed_dictionaries, original_tag_list, formatted_tag_list):
     """Reports a validation error if two or more tags start with a tag prefix that has the 'unique' attribute.
 
     Parameters
     ----------
-    tag_dictionaries: dictionary
+    hed_dictionaries: dictionary
         A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
     original_tag_list: list
         A list containing tags that are used to report the error.
@@ -218,7 +218,7 @@ def check_if_multiple_unique_tags_exist(tag_dictionaries, original_tag_list, for
 
     """
     validation_error = '';
-    unique_tag_prefixes = tag_dictionaries[UNIQUE_ERROR_TYPE];
+    unique_tag_prefixes = hed_dictionaries[UNIQUE_ERROR_TYPE];
     for unique_tag_prefix in unique_tag_prefixes:
         unique_tag_prefix_boolean_mask = [x.startswith(unique_tag_prefix) for x in formatted_tag_list];
         if sum(unique_tag_prefix_boolean_mask) > 1:

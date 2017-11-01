@@ -8,11 +8,10 @@ class Test(unittest.TestCase):
     def setUpClass(self):
         self.hed_xml = '../tests/data/HED.xml';
         self.REQUIRE_CHILD_DICTIONARY_KEY = 'requireChild';
-        self.tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        random_require_child_key = random.randint(0, len(self.tag_dictionaries[self.REQUIRE_CHILD_DICTIONARY_KEY]));
-        random_tag_key = random.randint(0, len(self.tag_dictionaries['tags']));
+        self.hed_dictionary = hed_dictionary.populate_hed_dictionary(self.hed_xml);
+        random_require_child_key = random.randint(0, len(self.hed_dictionary[self.REQUIRE_CHILD_DICTIONARY_KEY]));
         self.required_child_tag = \
-            self.tag_dictionaries[self.REQUIRE_CHILD_DICTIONARY_KEY][self.tag_dictionaries[self.REQUIRE_CHILD_DICTIONARY_KEY].keys()[random_require_child_key]];
+            self.hed_dictionary[self.REQUIRE_CHILD_DICTIONARY_KEY][self.hed_dictionary[self.REQUIRE_CHILD_DICTIONARY_KEY].keys()[random_require_child_key]];
         self.invalid_original_tag = 'This/Is/A/Tag';
         self.invalid_formatted_tag = 'this/is/a/tag';
         self.valid_original_tag = 'Event/Label';
@@ -38,25 +37,22 @@ class Test(unittest.TestCase):
         self.extension_allowed_descendant_tag = 'Item/Object/Tool/Hammer';
 
     def test_check_if_tag_is_valid(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        validation_error = tag_validator.check_if_tag_is_valid(self.tag_dictionaries, self.invalid_original_tag, \
-                                                           self.invalid_formatted_tag);
+        validation_error = tag_validator.check_if_tag_is_valid(self.hed_dictionary, self.invalid_original_tag, \
+                                                               self.invalid_formatted_tag);
         self.assertIsInstance(validation_error, basestring);
         self.assertTrue(validation_error);
-        validation_error = tag_validator.check_if_tag_is_valid(self.tag_dictionaries, self.valid_original_tag, \
-                                                           self.valid_formatted_tag);
+        validation_error = tag_validator.check_if_tag_is_valid(self.hed_dictionary, self.valid_original_tag, \
+                                                               self.valid_formatted_tag);
         self.assertIsInstance(validation_error, basestring);
         self.assertFalse(validation_error);
 
     def test_check_if_tag_requires_child(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        validation_error = tag_validator.check_if_tag_requires_child(self.tag_dictionaries, self.required_child_tag, \
-                                                           self.required_child_tag);
+        validation_error = tag_validator.check_if_tag_requires_child(self.hed_dictionary, self.required_child_tag, \
+                                                                     self.required_child_tag);
         self.assertIsInstance(validation_error, basestring);
         self.assertFalse(validation_error);
 
     def test_check_number_of_group_tildes(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
         validation_error = tag_validator.check_number_of_group_tildes(self.valid_tag_group_string);
         self.assertIsInstance(validation_error, basestring);
         self.assertFalse(validation_error);
@@ -65,26 +61,24 @@ class Test(unittest.TestCase):
         self.assertTrue(validation_error);
 
     def test_check_if_multiple_unique_tags_exist(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        validation_error = tag_validator.check_if_multiple_unique_tags_exist(tag_dictionaries, \
+        validation_error = tag_validator.check_if_multiple_unique_tags_exist(self.hed_dictionary, \
                                                                              self.valid_original_unique_tag_list, \
                                                                              self.valid_formatted_unique_tag_list);
         self.assertIsInstance(validation_error, basestring);
         self.assertFalse(validation_error);
-        validation_error = tag_validator.check_if_multiple_unique_tags_exist(tag_dictionaries, \
+        validation_error = tag_validator.check_if_multiple_unique_tags_exist(self.hed_dictionary, \
                                                                              self.invalid_original_unique_tag_list, \
                                                                              self.invalid_formatted_unique_tag_list);
         self.assertIsInstance(validation_error, basestring);
         self.assertTrue(validation_error);
 
     def test_check_for_required_tags(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        validation_error = tag_validator.check_for_required_tags(tag_dictionaries, 
-                                                                             self.valid_formatted_required_tag_list);
+        validation_error = tag_validator.check_for_required_tags(self.hed_dictionary,
+                                                                 self.valid_formatted_required_tag_list);
         self.assertIsInstance(validation_error, basestring);
         self.assertFalse(validation_error);
-        validation_error = tag_validator.check_for_required_tags(tag_dictionaries, 
-                                                                             self.invalid_formatted_required_tag_list);
+        validation_error = tag_validator.check_for_required_tags(self.hed_dictionary,
+                                                                 self.invalid_formatted_required_tag_list);
         self.assertIsInstance(validation_error, basestring);
         self.assertTrue(validation_error);
 
@@ -94,38 +88,31 @@ class Test(unittest.TestCase):
 
     def test_get_tag_substring_by_end_index(self):
         tag_slash_indices = tag_validator.get_tag_slash_indices(self.valid_formatted_tag);
-        tag = tag_validator.get_tag_substring_by_end_index(self.valid_formatted_tag,
-                                                                tag_slash_indices[0]);
+        tag = tag_validator.get_tag_substring_by_end_index(self.valid_formatted_tag, tag_slash_indices[0]);
         self.assertIsInstance(tag, basestring);
         self.assertNotEqual(self.valid_formatted_tag, tag);
         tag = tag_validator.get_tag_substring_by_end_index(self.valid_formatted_tag, 0);
         self.assertEqual(self.valid_formatted_tag, tag);
 
     def test_is_extension_allowed_tag(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        extension_allowed_tag = tag_validator.is_extension_allowed_tag(tag_dictionaries,
+        extension_allowed_tag = tag_validator.is_extension_allowed_tag(self.hed_dictionary,
                                                                        self.extension_allowed_descendant_tag);
         self.assertTrue(extension_allowed_tag);
-        extension_allowed_tag = tag_validator.is_extension_allowed_tag(tag_dictionaries, self.valid_formatted_tag);
+        extension_allowed_tag = tag_validator.is_extension_allowed_tag(self.hed_dictionary, self.valid_formatted_tag);
         self.assertFalse(extension_allowed_tag);
 
-
     def test_tag_takes_value(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        takes_value_tag = tag_validator.tag_takes_value(tag_dictionaries,
-                                                                       self.valid_takes_value_tag);
+        takes_value_tag = tag_validator.tag_takes_value(self.hed_dictionary, self.valid_takes_value_tag);
         self.assertTrue(takes_value_tag);
-        takes_value_tag = tag_validator.tag_takes_value(tag_dictionaries, self.valid_formatted_tag);
+        takes_value_tag = tag_validator.tag_takes_value(self.hed_dictionary, self.valid_formatted_tag);
         self.assertFalse(takes_value_tag);
 
     def test_is_numeric_tag(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        numeric_tag = tag_validator.is_numeric_tag(tag_dictionaries, self.valid_is_numeric_tag);
+        numeric_tag = tag_validator.is_numeric_tag(self.hed_dictionary, self.valid_is_numeric_tag);
         self.assertTrue(numeric_tag);
 
     def test_is_unit_class_tag(self):
-        tag_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
-        unit_class_tag = tag_validator.is_unit_class_tag(tag_dictionaries, self.valid_unit_class_tag);
+        unit_class_tag = tag_validator.is_unit_class_tag(self.hed_dictionary, self.valid_unit_class_tag);
         self.assertTrue(unit_class_tag);
 
 if __name__ == '__main__':

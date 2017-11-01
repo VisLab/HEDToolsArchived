@@ -120,7 +120,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(tag_elements, list);
 
     def test_populate_tag_dictionaries(self):
-        hed_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
+        hed_dictionaries = hed_dictionary.populate_hed_dictionary(self.hed_xml);
         for hed_dictionary_key in hed_dictionaries:
             self.assertIsInstance(hed_dictionaries[hed_dictionary_key], dict);
 
@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
         self.assertNotEqual(len(leaf_tags), len(leaf_tags_with_take_value_tags));
 
     def test_tag_has_attribute(self):
-        hed_dictionaries = hed_dictionary.populate_hed_dictionaries(self.hed_xml);
+        hed_dictionaries = hed_dictionary.populate_hed_dictionary(self.hed_xml);
         for tag_attribute in self.tag_attributes:
             tag_attribute_keys = hed_dictionaries[tag_attribute].keys();
             if tag_attribute_keys:
