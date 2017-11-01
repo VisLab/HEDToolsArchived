@@ -1,7 +1,8 @@
 '''
 This module is used to store all HED tags, tag attributes, unit classes, and unit class attributes in a dictionary.
-The dictionary is a dictionary of dictionaries.
-
+The dictionary is a dictionary of dictionaries. The dictionary names are 'default', 'extensionAllowed', 'isNumeric',
+'position', 'predicateType', 'recommended', 'required', 'requireChild', 'tags', 'takesValue', 'unique', 'units', and
+'unitClass'.
 Created on Sept 21, 2017
 
 @author: Jeremy Cockfield
@@ -9,15 +10,20 @@ Created on Sept 21, 2017
 '''
 
 from defusedxml.lxml import parse;
-TAG_ATTRIBUTES = ['extensionAllowed', 'requireChild', 'takesValue', 'isNumeric', 'required', 'recommended', \
-                               'position', 'unique', 'predicateType', 'default'];
 DEFAULT_UNIT_ATTRIBUTE = 'default';
 EXTENSION_ALLOWED_ATTRIBUTE = 'extensionAllowed';
-UNIT_CLASS_TAG = 'unitClass';
-UNIT_CLASS_UNITS_TAG = 'units';
+TAG_DICTIONARY_KEYS = ['default', 'extensionAllowed', 'isNumeric', 'position', 'predicateType', 'recommended',
+                       'required', 'requireChild', 'tags', 'takesValue', 'unique', 'unitClass'];
+TAGS_DICTIONARY_KEY = 'tags';
+TAG_UNIT_CLASS_ATTRIBUTE = 'unitClass';
+UNIT_CLASS_ELEMENT = 'unitClass';
+UNIT_CLASS_UNITS_ELEMENT = 'units';
+UNIT_CLASS_DICTIONARY_KEYS = ['default', 'units'];
+UNITS_ELEMENT = 'units';
 
-def populate_tag_dictionaries(hed_xml_file_path):
-    """Populates a dictionary containing all of the tags, tag attributes, unit class units, and unit class attributes.
+def populate_hed_dictionaries(hed_xml_file_path):
+    """Populates a dictionary of dictionaries that contains all of the tags, tag attributes, unit class units, and unit
+       class attributes.
 
     Parameters
     ----------
@@ -26,23 +32,88 @@ def populate_tag_dictionaries(hed_xml_file_path):
 
     Returns
     -------
+        A dictionary of dictionaries that contains all of the tags, tag attributes, unit class units, and unit class
+        attributes.
+
+    """
+    hed_dictionaries = {};
+    root_element = get_hed_root_element(hed_xml_file_path);
+    tag_dictionaries = populate_tag_dictionaries(root_element);
+    hed_dictionaries.update(tag_dictionaries);
+    return hed_dictionaries;
+
+def populate_tags_dictionary(root_element):
+    """Populates a dictionary containing all of the tags.
+
+    Parameters
+    ----------
+    root_element: Element
+        The root element of the HED XML file.
+
+    Returns
+    -------
     dictionary
-        A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
+        A dictionary that contains all of the tags.
+
+    """
+    tags = get_all_tags(root_element)[0];
+    return string_list_2_lowercase_dictionary(tags);
+
+def populate_tag_dictionaries(root_element):
+    """Populates the HED dictionaries associated with tags and their attributes.
+
+    Parameters
+    ----------
+    root_element: Element
+        The root element of the HED XML file.
+
+    Returns
+    -------
+    dictionary
+        A dictionary of dictionaries that has been populated with dictionaries associated with tag attributes.
 
     """
     tag_dictionaries = {};
-    hed_root_element = get_hed_root_element(hed_xml_file_path);
-    unit_class_elements = get_elements_by_tag_name(hed_root_element, UNIT_CLASS_TAG);
-    tags, tag_elements = get_tags_by_attribute(hed_root_element, \
-                                               DEFAULT_UNIT_ATTRIBUTE);
-    tag_dictionaries['tags'] = string_list_2_lowercase_dictionary(get_all_tags(hed_root_element)[0]);
-    tag_dictionaries['unitClassUnits'] = populate_unit_class_units_dictionary(unit_class_elements);
-    tag_dictionaries['unitClassDefaultUnits'] = populate_unit_class_default_unit_dictionary(unit_class_elements);
-    tag_dictionaries['tagDefaultUnits'] = populate_default_unit_tag_dictionary(tags, tag_elements, \
-                                                                                 DEFAULT_UNIT_ATTRIBUTE);
-    tag_dictionaries.update(populate_tag_attribute_dictionaries(hed_root_element));
+    for TAG_DICTIONARY_KEY in TAG_DICTIONARY_KEYS:
+        tags, tag_elements = get_tags_by_attribute(root_element, TAG_DICTIONARY_KEY);
+        if EXTENSION_ALLOWED_ATTRIBUTE == TAG_DICTIONARY_KEY:
+            leaf_tags = get_all_leaf_tags(root_element);
+            tag_dictionary = string_list_2_lowercase_dictionary(tags);
+            tag_dictionary.update(leaf_tags);
+        elif DEFAULT_UNIT_ATTRIBUTE == TAG_DICTIONARY_KEY or TAG_UNIT_CLASS_ATTRIBUTE == TAG_DICTIONARY_KEY:
+            tag_dictionary = populate_tag_to_attribute_dictionary(tags, tag_elements, TAG_DICTIONARY_KEY);
+        elif TAGS_DICTIONARY_KEY == TAG_DICTIONARY_KEY:
+            tags = get_all_tags(root_element)[0];
+            tag_dictionary = string_list_2_lowercase_dictionary(tags);
+        else:
+            tag_dictionary = string_list_2_lowercase_dictionary(tags);
+        tag_dictionaries[TAG_DICTIONARY_KEY] = tag_dictionary;
     return tag_dictionaries;
 
+def populate_unit_class_dictionaries(root_element):
+    """Populates the HED dictionaries associated with all of the unit class units and unit class attributes.
+
+    Parameters
+    ----------
+    root_element: Element
+        The root element of the HED XML file.
+
+    Returns
+    -------
+    dictionary
+        A dictionary that contains all of the unit class units and unit class attributes.
+
+    """
+    unit_class_dictionaries = {};
+    for UNIT_CLASS_DICTIONARY_KEY in UNIT_CLASS_DICTIONARY_KEYS:
+        unit_class_dictionary = {};
+        unit_class_elements = get_elements_by_name(root_element, UNIT_CLASS_ELEMENT);
+        if UNITS_ELEMENT == UNIT_CLASS_DICTIONARY_KEY:
+            unit_class_dictionary = populate_unit_class_units_dictionary(unit_class_elements);
+        elif DEFAULT_UNIT_ATTRIBUTE == UNIT_CLASS_DICTIONARY_KEY:
+            unit_class_dictionary = populate_unit_class_default_unit_dictionary(unit_class_elements);
+        unit_class_dictionaries[UNIT_CLASS_DICTIONARY_KEY] = unit_class_dictionary;
+    return unit_class_dictionaries;
 
 def populate_unit_class_units_dictionary(unit_class_elements):
     """Populates a dictionary that contains unit class units.
@@ -61,7 +132,7 @@ def populate_unit_class_units_dictionary(unit_class_elements):
     unit_class_units_dictionary = {};
     for unit_class_element in unit_class_elements:
         unit_class_element_name = get_element_tag_value(unit_class_element);
-        unit_class_element_units = get_element_tag_value(unit_class_element, UNIT_CLASS_UNITS_TAG);
+        unit_class_element_units = get_element_tag_value(unit_class_element, UNIT_CLASS_UNITS_ELEMENT);
         unit_class_units_dictionary[unit_class_element_name] = unit_class_element_units.split(',');
     return unit_class_units_dictionary;
 
@@ -85,47 +156,17 @@ def populate_unit_class_default_unit_dictionary(unit_class_elements):
         unit_class_default_unit_dictionary[unit_class_element_name] = unit_class_element.attrib[DEFAULT_UNIT_ATTRIBUTE];
     return unit_class_default_unit_dictionary;
 
-
-def populate_tag_attribute_dictionaries(root_element):
-    """Populates the dictionaries associated with tags in the attribute dictionary.
-
-    Parameters
-    ----------
-    root_element: Element
-        The root element of the HED XML file.
-
-    Returns
-    -------
-    dictionary
-        A dictionary that has been populated with dictionaries associated with tag attributes.
-
-    """
-    tag_attribute_dictionaries = {};
-    for TAG_ATTRIBUTE in TAG_ATTRIBUTES:
-        attribute_tag_paths, attribute_tag_elements = get_tags_by_attribute(root_element, TAG_ATTRIBUTE);
-        if EXTENSION_ALLOWED_ATTRIBUTE == TAG_ATTRIBUTE:
-            tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
-            leaf_tags = get_all_leaf_tags(root_element);
-            tag_attribute_dictionary.update(leaf_tags);
-        elif DEFAULT_UNIT_ATTRIBUTE == TAG_ATTRIBUTE:
-            tag_attribute_dictionary = populate_default_unit_tag_dictionary(attribute_tag_paths,
-                                                                            attribute_tag_elements, TAG_ATTRIBUTE);
-        else:
-            tag_attribute_dictionary = string_list_2_lowercase_dictionary(attribute_tag_paths);
-        tag_attribute_dictionaries[TAG_ATTRIBUTE] = tag_attribute_dictionary;
-    return tag_attribute_dictionaries;
-
-def populate_default_unit_tag_dictionary(attribute_tag_paths, attribute_tag_elements, tag_attribute_name):
+def populate_tag_to_attribute_dictionary(tag_list, tag_element_list, attribute_name):
     """Populates the dictionaries associated with default unit tags in the attribute dictionary.
 
     Parameters
     ----------
-    attribute_tag_paths: string
-        A list containing tag paths that have a specified attribute.
-    attribute_tag_elements: Element
-        The Element that contains the attribute.
-    tag_attribute_name: string
-        The name of the attribute associated with the tag paths.
+    tag_list: list
+        A list containing tags that have a specific attribute.
+    tag_element_list: list
+        A list containing tag elements that have a specific attribute.
+    attribute_name: string
+        The name of the attribute associated with the tags and tag elements.
 
     Returns
     -------
@@ -133,11 +174,10 @@ def populate_default_unit_tag_dictionary(attribute_tag_paths, attribute_tag_elem
         The attribute dictionary that has been populated with dictionaries associated with tags.
 
     """
-    default_unit_tag_dictionary = {};
-    for index, attribute_tag_path in enumerate(attribute_tag_paths):
-        default_unit_tag_dictionary[attribute_tag_path.lower()] = \
-            attribute_tag_elements[index].attrib[tag_attribute_name];
-    return default_unit_tag_dictionary;
+    dictionary = {};
+    for index, tag in enumerate(tag_list):
+        dictionary[tag.lower()] = tag_element_list[index].attrib[attribute_name];
+    return dictionary;
 
 def string_list_2_lowercase_dictionary(string_list):
     """Converts a string list into a dictionary. The keys in the dictionary will be the lowercase values of the strings
@@ -159,7 +199,6 @@ def string_list_2_lowercase_dictionary(string_list):
         lowercase_dictionary[string_element.lower()] = string_element;
     return lowercase_dictionary;
 
-
 def get_hed_root_element(hed_xml_file_path):
     """Parses a xml file and returns the root element.
 
@@ -176,7 +215,6 @@ def get_hed_root_element(hed_xml_file_path):
     """
     hed_tree = parse(hed_xml_file_path);
     return hed_tree.getroot();
-
 
 def get_ancestor_tag_names(tag_element):
     """Gets all the ancestor tag names of a tag element.
@@ -283,14 +321,14 @@ def get_tags_by_attribute(root_element, tag_attribute_name):
         A tuple containing tags and tag elements that have a specified attribute.
 
     """
-    attribute_tags = [];
+    tags = [];
     try:
         attribute_tag_elements = root_element.xpath('.//node[@%s]' % tag_attribute_name);
         for attribute_tag_element in attribute_tag_elements:
-            attribute_tags.append(get_tag_name_from_tag_element(attribute_tag_element));
+            tags.append(get_tag_name_from_tag_element(attribute_tag_element));
     except:
         pass;
-    return attribute_tags, attribute_tag_elements;
+    return tags, attribute_tag_elements;
 
 
 def get_all_tags(root_element, tag_element_name='node'):
@@ -336,22 +374,22 @@ def get_elements_by_attribute(root_element, attribute_name, element_name='node')
         A list containing elements that have a specified attribute.
 
     """
-    attribute_elements = [];
+    elements = [];
     try:
-        attribute_elements = root_element.xpath('.//%s[@%s]' % (element_name, attribute_name));
+        elements = root_element.xpath('.//%s[@%s]' % (element_name, attribute_name));
     except:
         pass;
-    return attribute_elements;
+    return elements;
 
-def get_elements_by_tag_name(root_element, tag_name):
+def get_elements_by_name(root_element, element_name='node'):
     """Gets the elements that have a specific element name.
 
     Parameters
     ----------
     root_element: Element
         The root element of the HED XML file.
-    tag_name: string
-        The name of the element.
+    element_name: string
+        The name of the element. The default is 'node'.
 
     Returns
     -------
@@ -361,7 +399,7 @@ def get_elements_by_tag_name(root_element, tag_name):
     """
     elements = [];
     try:
-        elements = root_element.xpath('.//%s' % tag_name);
+        elements = root_element.xpath('.//%s' % element_name);
     except:
         pass;
     return elements;
@@ -385,22 +423,23 @@ def get_all_leaf_tags(root_element, tag_element_name='node', exclude_take_value_
 
     """
     leaf_tags = {};
-    tag_elements = get_elements_by_tag_name(root_element, tag_element_name);
+    tag_elements = get_elements_by_name(root_element, tag_element_name);
     for tag_element in tag_elements:
-        if len(get_elements_by_tag_name(tag_element, tag_element_name)) == 0:
+        if len(get_elements_by_name(tag_element, tag_element_name)) == 0:
             tag_name = get_tag_name_from_tag_element(tag_element);
             if exclude_take_value_tags and tag_name[-1] == '#':
                 continue;
             leaf_tags[tag_name.lower()] = tag_name;
     return leaf_tags;
 
-def tag_has_attribute(tag_dictionaries, tag, tag_attribute):
+def tag_has_attribute(hed_dictionaries, tag, tag_attribute):
     """Checks to see if the tag has a specific attribute.
 
     Parameters
     ----------
-    tag_dictionaries
-        A dictionary that contains all of the tags, tag attributes, unit class units, and unit class attributes.
+    hed_dictionaries
+        A dictionary of dictionaries that contains all of the tags, tag attributes, unit class units, and unit class
+        attributes.
     tag: string
         A tag.
     tag_attribute: string
@@ -411,7 +450,7 @@ def tag_has_attribute(tag_dictionaries, tag, tag_attribute):
         True if the tag has the specified attribute. False, if otherwise.
 
     """
-    if tag.lower() in tag_dictionaries[tag_attribute]:
+    if tag.lower() in hed_dictionaries[tag_attribute]:
             return True;
     return False;
 

@@ -7,7 +7,7 @@ Created on Oct 2, 2017
 
 '''
 
-from validation import error_reporter, tag_dictionary;
+from validation import error_reporter, hed_dictionary;
 from itertools import compress;
 import re;
 
@@ -20,6 +20,7 @@ VALID_ERROR_TYPE = 'valid';
 EXTENSION_ALLOWED_ATTRIBUTE = 'extensionAllowed';
 TAKES_VALUE_ATTRIBUTE = 'takesValue';
 IS_NUMERIC_ATTRIBUTE = 'isNumeric';
+UNIT_CLASS_ATTRIBUTE = 'unitClass';
 
 def check_if_tag_is_valid(tag_dictionaries, original_tag, formatted_tag):
     """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
@@ -64,7 +65,7 @@ def is_extension_allowed_tag(tag_dictionaries, formatted_tag):
     tag_slash_indices = get_tag_slash_indices(formatted_tag);
     for tag_slash_index in tag_slash_indices:
         tag_substring = get_tag_substring_by_end_index(formatted_tag, tag_slash_index);
-        if tag_dictionary.tag_has_attribute(tag_dictionaries, tag_substring, EXTENSION_ALLOWED_ATTRIBUTE):
+        if hed_dictionary.tag_has_attribute(tag_dictionaries, tag_substring, EXTENSION_ALLOWED_ATTRIBUTE):
             return True;
     return False;
 
@@ -86,7 +87,28 @@ def tag_takes_value(tag_dictionaries, formatted_tag):
     last_tag_slash_index = formatted_tag.rfind('/');
     if last_tag_slash_index != -1:
         takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
-        return tag_dictionary.tag_has_attribute(tag_dictionaries, takes_value_tag, TAKES_VALUE_ATTRIBUTE);
+        return hed_dictionary.tag_has_attribute(tag_dictionaries, takes_value_tag, TAKES_VALUE_ATTRIBUTE);
+    return False;
+
+def is_unit_class_tag(tag_dictionaries, formatted_tag):
+    """Checks to see if the tag has the 'unitClass' attribute.
+
+    Parameters
+    ----------
+    tag_dictionaries: dictionary
+        A dictionary containing containing all of the tags, tag attributes, unit class units, and unit class attributes.
+    formatted_tag: string
+        The tag that is used to do the validation.
+    Returns
+    -------
+    boolean
+        True if the tag has the 'unitClass' attribute. False, if otherwise.
+
+    """
+    last_tag_slash_index = formatted_tag.rfind('/');
+    if last_tag_slash_index != -1:
+        takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
+        return hed_dictionary.tag_has_attribute(tag_dictionaries, takes_value_tag, UNIT_CLASS_ATTRIBUTE);
     return False;
 
 def is_numeric_tag(tag_dictionaries, formatted_tag):
@@ -108,7 +130,7 @@ def is_numeric_tag(tag_dictionaries, formatted_tag):
     if last_tag_slash_index != -1:
         numeric_tag = formatted_tag[:last_tag_slash_index] + '/#';
         print(numeric_tag);
-        return tag_dictionary.tag_has_attribute(tag_dictionaries, numeric_tag, IS_NUMERIC_ATTRIBUTE);
+        return hed_dictionary.tag_has_attribute(tag_dictionaries, numeric_tag, IS_NUMERIC_ATTRIBUTE);
     return False;
 
 def check_number_of_group_tildes(group_tag_string):
