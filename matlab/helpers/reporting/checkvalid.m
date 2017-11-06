@@ -62,14 +62,14 @@ function [errors, errorTags] = checkvalid(hedMaps, originalTags, ...
 errors = '';
 errorTags = {};
 errorsIndex = 1;
-checkValidTags(originalTags, formattedTags, false);
+checkValidTags(originalTags, formattedTags);
 
-    function checkValidTags(originalTags, formattedTags, isGroup)
+    function checkValidTags(originalTags, formattedTags)
         % Checks if the tags are valid
         numTags = length(formattedTags);
         for a = 1:numTags
             if ~ischar(formattedTags{a})
-                checkValidTags(originalTags{a}, formattedTags{a}, true);
+                checkValidTags(originalTags{a}, formattedTags{a});
                 continue;
             end
             if isTilde(formattedTags{a}) || ...
@@ -78,7 +78,7 @@ checkValidTags(originalTags, formattedTags, false);
                 continue;
             end
             if ~tagAllowExtensions(formattedTags{a})
-                generateErrors(originalTags, a, isGroup);
+                generateErrors(originalTags, a);
             end
         end
         errorTags(cellfun('isempty', errorTags)) = [];
@@ -98,16 +98,15 @@ checkValidTags(originalTags, formattedTags, false);
         end
     end % convertToValueTag
 
-    function generateErrors(originalTags, tagIndex, isGroup)
+    function generateErrors(originalTags, tagIndex)
         % Generates errors for tags that are not valid
         tagString = originalTags{tagIndex};
-        if isGroup
-            tagString = [originalTags{tagIndex}, ' in group ' ,...
-                vTagList.stringify({originalTags})];
+        if ~any(ismember(tagString, errorTags))
+            errors = ...
+                [errors, generateerror('valid', '', tagString, '','')];
+            errorTags{errorsIndex} = originalTags{tagIndex};
+            errorsIndex = errorsIndex + 1;
         end
-        errors = [errors, generateerror('valid', '', tagString, '','')];
-        errorTags{errorsIndex} = originalTags{tagIndex};
-        errorsIndex = errorsIndex + 1;
     end % generateError
 
     function [isExtensionTag, extensionParentTag] = tagAllowExtensions(tag)
