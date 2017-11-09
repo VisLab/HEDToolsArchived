@@ -63,9 +63,9 @@ function [errors, errorTags] = checkunique(hedMaps, originalTags, ...
 errors = '';
 errorTags = {};
 uniqueTags = hedMaps.unique.values();
-checkUniqueTags(originalTags, formattedTags, false);
+checkUniqueTags(originalTags, formattedTags);
 
-    function checkUniqueTags(originalTags, formattedTags, isGroup)
+    function checkUniqueTags(originalTags, formattedTags)
         % Looks for two or more tags that are descendants of a unique tag
         numTags = length(uniqueTags);
         for uniqueTagsIndex = 1:numTags
@@ -75,29 +75,24 @@ checkUniqueTags(originalTags, formattedTags, false);
             if sum(foundIndexes) > 1
                 foundIndexes = find(foundIndexes);
                 generateErrors(uniqueTagsIndex, foundIndexes, ...
-                    originalTags, isGroup);
+                    originalTags);
             end
         end
         numTags = length(originalTags);
         for a = 1:numTags
             if ~ischar(originalTags{a})
-                checkUniqueTags(originalTags{a}, formattedTags{a}, true)
+                checkUniqueTags(originalTags{a}, formattedTags{a})
             end
         end
     end % checkUniqueTags
 
     function generateErrors(uniqueTagsIndex, foundIndexes, ...
-            originalTags, isGroup)
+            originalTags)
         % Generates a unique tag error if two or more tags are descendants
         % of a unique tag
         numIndexes = length(foundIndexes);
         for foundIndex = 1:numIndexes
             tagString = originalTags{foundIndexes(foundIndex)};
-            if isGroup
-                tagString = [originalTags{foundIndexes(foundIndex)}, ...
-                    ' in group ' ,...
-                    vTagList.stringify({originalTags})];
-            end
             errors = [errors, generateerror('unique', '', tagString, ...
                 uniqueTags{uniqueTagsIndex}, '')];     %#ok<AGROW>
             errorTags{end+1} = uniqueTags{uniqueTagsIndex}; %#ok<AGROW>
