@@ -59,38 +59,36 @@
 
 function [warnings, warningTags] = checkcaps(hedMaps, originalTags, ...
     formattedTags)
-numElements = findNumElements(originalTags);
 warnings = '';
-warningTags = cell(1, numElements);
+warningTags = {};
 warningsIndex = 1;
-checkTagCaps(originalTags, formattedTags, false);
+checkTagCaps(originalTags, formattedTags);
 warningTags(cellfun('isempty', warningTags)) = [];
 
-    function checkTagCaps(originalTags, formattedTags, isGroup)
+    function checkTagCaps(originalTags, formattedTags)
         % Checks if the tags are capitalized correctly
         numTags = length(formattedTags);
         for a = 1:numTags
             if ~ischar(formattedTags{a})
-                checkTagCaps(originalTags{a}, formattedTags{a}, true);
+                checkTagCaps(originalTags{a}, formattedTags{a});
                 continue;
             end
             if findCaps(formattedTags{a})
-                generateWarnings(originalTags, a, isGroup);
+                generateWarnings(originalTags, a);
             end
         end
     end % checkTagCaps
 
-    function generateWarnings(originalTags, tagIndex, isGroup)
+    function generateWarnings(originalTags, tagIndex)
         % Generates capitalization tag warnings if the tag isn't correctly
         % capitalized
         tagString = originalTags{tagIndex};
-        if isGroup
-            tagString = [originalTags{tagIndex}, ' in group ' ,...
-                vTagList.stringify({originalTags})];
+        if ~any(ismember(tagString, warningTags))
+            warnings = [warnings, generatewarning('cap', '', ...
+                tagString, '')];
+            warningTags{warningsIndex} = originalTags{tagIndex};
+            warningsIndex = warningsIndex + 1;
         end
-        warnings = [warnings, generatewarning('cap', '', tagString, '')];
-        warningTags{warningsIndex} = originalTags{tagIndex};
-        warningsIndex = warningsIndex + 1;
     end % generateWarnings
 
     function capsFound = findCaps(originalTag)
@@ -108,15 +106,5 @@ warningTags(cellfun('isempty', warningTags)) = [];
             capsFound = true;
         end
     end % findCaps
-
-    function numElements = findNumElements(originalTags)
-        % Finds the number of elements in a nested cell array
-        numElements = numel(originalTags);
-        for a = 1:numElements
-            if ~ischar(originalTags{a})
-                numElements = numElements + (numel(originalTags{a})-1);
-            end
-        end
-    end % findNumElements
 
 end % checkcaps
