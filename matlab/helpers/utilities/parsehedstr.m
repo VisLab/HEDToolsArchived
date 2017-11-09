@@ -4,7 +4,7 @@
 %
 % Usage:
 %
-%   >>  issues = parsestr(hedMaps, str, generateWarnings);
+%   >>  issues = parsehedstr(hedMaps, str, generateWarnings);
 %
 % Input:
 %
@@ -53,7 +53,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function issues = parsestr(hedMaps, str, generateWarnings)
+function issues = parsehedstr(hedMaps, str, generateWarnings)
 p = parseArguments(hedMaps, str, generateWarnings);
 issues = readStr(p);
 

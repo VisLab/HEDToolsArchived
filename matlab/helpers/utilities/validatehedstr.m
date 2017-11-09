@@ -4,9 +4,9 @@
 %
 % Usage:
 %
-%   >>  issues = validatestr(str);
+%   >>  issues = validatehedstr(str);
 %
-%   >>  issues = validatestr(str, varargin);
+%   >>  issues = validatehedstr(str, varargin);
 %
 % Input:
 %
@@ -48,7 +48,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function issues = validatestr(str, varargin)
+function issues = validatehedstr(str, varargin)
 p = parseArguments(str, varargin{:});
 issues = validate(p);
 
@@ -88,4 +88,4 @@ issues = validate(p);
         p = p.Results;
     end % parseArguments
 
-end % validatestr
+end % validatehedstr
