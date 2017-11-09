@@ -62,32 +62,30 @@ function [errors, errorTags] = checkrequirechild(hedMaps, original, ...
 errors = '';
 errorTags = {};
 requireChildTags = hedMaps.requireChild;
-checkTags(original, canonical, false);
+checkTags(original, canonical);
 
-    function checkTags(originalTags, formattedTags, isGroup)
+    function checkTags(originalTags, formattedTags)
         % Checks the tags that require children
         numTags = length(formattedTags);
         for a = 1:numTags
             if ~ischar(formattedTags{a})
-                checkTags(originalTags{a}, formattedTags{a}, true);
+                checkTags(originalTags{a}, formattedTags{a});
                 return;
             elseif requireChildTags.isKey(lower(formattedTags{a}))
-                generateErrors(originalTags, a, isGroup);
+                generateErrors(originalTags, a);
             end
         end
     end % checkTags
 
-    function generateErrors(originalTags, tagIndex, isGroup)
+    function generateErrors(originalTags, tagIndex)
         % Generates require child tag errors if the require child tag is
         % present in the tag list
         tagString = originalTags{tagIndex};
-        if isGroup
-            tagString = [originalTags{tagIndex}, ' in group ' ,...
-                vTagList.stringify({originalTags})];
+        if ~any(ismember(tagString, errorTags))
+            errors = [errors, generateerror('requireChild', '', ...
+                tagString, '', '')];
+            errorTags{end+1} = originalTags{tagIndex};
         end
-        errors = [errors, generateerror('requireChild', '', tagString, ...
-            '', '')];
-        errorTags{end+1} = originalTags{tagIndex};
     end % generateErrors
 
 end % checkrequirechild
