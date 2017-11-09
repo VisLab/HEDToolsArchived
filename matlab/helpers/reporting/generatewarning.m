@@ -42,7 +42,7 @@ warning = '';
 switch(type)
     case 'cap'
         warning = sprintf(['\tWARNING: First word not captilized or camel ' ...
-            'case - %s\n'], tag);
+            'case - "%s"\n'], tag);
     case 'correct'
         warning = sprintf('No warnings were found.');
     case 'event'
