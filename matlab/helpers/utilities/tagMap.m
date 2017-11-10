@@ -238,7 +238,8 @@ classdef tagMap < hgsetget
                 values = [];
                 return;
             else
-                eStruct = loadjson(json);
+                eStruct = loadjson(json, 'SimplifyCell', 1, ...
+                    'FastArrayParser', 0);
                 for a = 1:length(eStruct)
                     newTagList = tagList(eStruct(a).code);
                     tags = eStruct(a).tags;
