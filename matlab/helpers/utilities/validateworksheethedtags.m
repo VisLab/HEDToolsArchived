@@ -91,7 +91,7 @@ issues = reportValidationIssues(inputArguments);
         issues = cell(1, numberOfWorksheetRows);
         rowNumber = getFirstRowNumberForValidation(inputArguments);
         for a = rowNumber:numberOfWorksheetRows
-            issue = parsestr(hedMaps, worksheetTags{a}, ...
+            issue = parsehedstr(hedMaps, worksheetTags{a}, ...
                 inputArguments.generateWarnings);
             if ~isempty(issue)
                 issues{a} = sprintf('Issues in row %d:\n%s', a, issue);

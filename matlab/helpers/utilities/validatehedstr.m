@@ -55,7 +55,7 @@ issues = validate(p);
     function issues = validate(p)
         % Validates a cellstr
         p.hedMaps = getHEDMaps(p);
-        issues = parsestr(p.hedMaps, p.str, p.generateWarnings);
+        issues = parsehedstr(p.hedMaps, p.str, p.generateWarnings);
     end % validate
 
     function hedMaps = getHEDMaps(p)
