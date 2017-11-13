@@ -6,6 +6,8 @@ Created on Oct 2, 2017
 @author: Jeremy Cockfield
 
 '''
+
+
 def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_class_units=''):
     """Reports the validation error based on the type of error.
 
