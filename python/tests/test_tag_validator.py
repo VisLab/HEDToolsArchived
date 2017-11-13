@@ -12,7 +12,7 @@ class Test(unittest.TestCase):
         cls.hed_dictionary = HedDictionary(cls.hed_xml);
         cls.tag_validator = TagValidator(cls.hed_dictionary);
         random_require_child_key = \
-            random.randint(0, len(cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY]));
+            random.randint(1, len(cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY]));
         cls.required_child_tag = \
             cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY][cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY].keys()[random_require_child_key]];
         cls.invalid_original_tag = 'This/Is/A/Tag';
@@ -125,6 +125,10 @@ class Test(unittest.TestCase):
         validation_warning = self.tag_validator.check_capitalization(self.valid_unit_class_tag,
                                                                      self.valid_unit_class_tag);
         self.assertFalse(validation_warning);
+
+    def test_replace_tag_name_with_pound(self):
+        takes_value_tag = self.tag_validator.replace_tag_name_with_pound(self, self.valid_takes_value_tag);
+        self.assertTrue(takes_value_tag);
 
 if __name__ == '__main__':
     unittest.main();
