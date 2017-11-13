@@ -126,11 +126,9 @@ class TagValidator:
             True if the tag has the 'takesValue' attribute. False, if otherwise.
 
         """
-        last_tag_slash_index = formatted_tag.rfind('/');
-        if last_tag_slash_index != -1:
-            takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
-            return self.hed_dictionary.tag_has_attribute(takes_value_tag,
-                                                         TagValidator.TAKES_VALUE_ATTRIBUTE);
+        takes_value_tag = self.replace_tag_name_with_pound(formatted_tag);
+        return self.hed_dictionary.tag_has_attribute(takes_value_tag,
+                                                     TagValidator.TAKES_VALUE_ATTRIBUTE);
         return False;
 
     def is_unit_class_tag(self, formatted_tag):
@@ -146,12 +144,58 @@ class TagValidator:
             True if the tag has the 'unitClass' attribute. False, if otherwise.
 
         """
-        last_tag_slash_index = formatted_tag.rfind('/');
-        if last_tag_slash_index != -1:
-            takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
-            return self.hed_dictionary.tag_has_attribute(takes_value_tag,
+        takes_value_tag = self.replace_tag_name_with_pound(formatted_tag);
+        return self.hed_dictionary.tag_has_attribute(takes_value_tag,
                                                          TagValidator.UNIT_CLASS_ATTRIBUTE);
         return False;
+
+    def replace_tag_name_with_pound(self, formatted_tag):
+        """Replaces the tag name with the pound sign.
+
+        Parameters
+        ----------
+        formatted_tag: string
+            The tag that is used to do the validation.
+        Returns
+        -------
+        string
+            A tag with the a pound sign in place of it's name.
+
+        """
+        pound_sign_tag = '#';
+        last_tag_slash_index = formatted_tag.rfind('/');
+        if last_tag_slash_index != -1:
+            pound_sign_tag = formatted_tag[:last_tag_slash_index] + '/#';
+        return pound_sign_tag;
+
+    def check_tag_unit_class_units(self, original_tag, formatted_tag):
+        """Reports a validation error if the tag provided has a unit class and the units are incorrect.
+
+        Parameters
+        ----------
+        original_tag: string
+            The original tag that is used to report the error.
+        formatted_tag: string
+            The tag that is used to do the validation.
+        Returns
+        -------
+        string
+            A validation error string. If no errors are found then an empty string is returned.
+
+        """
+        validation_error = '';
+        if self.is_unit_class_tag(formatted_tag):
+            last_tag_slash_index = formatted_tag.rfind('/');
+            if last_tag_slash_index != -1:
+                takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
+                return self.hed_dictionary.tag_has_attribute(takes_value_tag,
+                                                             TagValidator.UNIT_CLASS_ATTRIBUTE);
+        return validation_error;
+
+    def get_unit_class_units(self, formatted_tag):
+        units = [];
+        if self.is_unit_class_tag(formatted_tag):
+            self.hed_dictionary_dictionaries['unitClass'];
 
     def is_numeric_tag(self, formatted_tag):
         """Checks to see if the tag has the 'isNumeric' attribute.
