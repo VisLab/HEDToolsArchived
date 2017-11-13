@@ -7,14 +7,13 @@ Created on Oct 2, 2017
 
 '''
 
-from validation import error_reporter, hed_dictionary;
+from validation import error_reporter, warning_reporter;
 from itertools import compress;
 import re;
-from validation.hed_dictionary import HedDictionary
-
+from hed_dictionary import HedDictionary
 
 class TagValidator:
-
+    CAMEL_CASE_EXPRESSION = "([A-Z-]+\s*[a-z-]*)+";
     REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
     REQUIRED_ERROR_TYPE = 'required';
     TAG_DICTIONARY_KEY = 'tags';
@@ -66,6 +65,31 @@ class TagValidator:
         elif not self.hed_dictionary_dictionaries[TagValidator.TAG_DICTIONARY_KEY].get(formatted_tag):
             validation_error = error_reporter.report_error_type(TagValidator.VALID_ERROR_TYPE, tag=original_tag);
         return validation_error;
+
+    def check_capitalization(self, original_tag, formatted_tag):
+        """Reports a validation warning if the tag isn't correctly capitalized.
+
+        Parameters
+        ----------
+        original_tag: string
+            The original tag that is used to report the warning.
+        formatted_tag: string
+            The tag that is used to do the validation.
+        Returns
+        -------
+        string
+            A validation warning string. If no warnings are found then an empty string is returned.
+
+        """
+        validation_warning = '';
+        tag_names = original_tag.split("/");
+        if not self.tag_takes_value(formatted_tag):
+            for tag_name in tag_names:
+                correct_tag_name = tag_name.capitalize();
+                if tag_name != correct_tag_name and not re.search(self.CAMEL_CASE_EXPRESSION, tag_name):
+                    validation_warning = warning_reporter.report_warning_type("cap", tag=original_tag);
+                    break;
+            return validation_warning;
 
     def is_extension_allowed_tag(self, formatted_tag):
         """Checks to see if the tag has the 'extensionAllowed' attribute. It will strip the tag until there are no more
@@ -126,7 +150,7 @@ class TagValidator:
         if last_tag_slash_index != -1:
             takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
             return self.hed_dictionary.tag_has_attribute(takes_value_tag,
-                                                                      TagValidator.UNIT_CLASS_ATTRIBUTE);
+                                                         TagValidator.UNIT_CLASS_ATTRIBUTE);
         return False;
 
     def is_numeric_tag(self, formatted_tag):
@@ -277,6 +301,8 @@ class TagValidator:
         return tag;
 
 if __name__ == '__main__':
-    print('yes')
-    # hed_xml = '../tests/data/HED.xml';
-    # tag_dictionaries = tag_dictionary.populate_tag_dictionaries(hed_xml);
+    original_tag = 'This/Is th fdjd/Tag';
+    hed_dictionary = HedDictionary('../tests/data/HED.xml');
+    tag_validator = TagValidator(hed_dictionary);
+    validation_warning = tag_validator.check_capitalization(original_tag);
+    print(validation_warning)
