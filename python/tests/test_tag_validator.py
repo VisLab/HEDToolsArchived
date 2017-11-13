@@ -112,5 +112,19 @@ class Test(unittest.TestCase):
         unit_class_tag = self.tag_validator.is_unit_class_tag(self.valid_unit_class_tag);
         self.assertTrue(unit_class_tag);
 
+    def test_check_capitalization(self):
+        validation_warning = self.tag_validator.check_capitalization(self.valid_original_tag,
+                                                                     self.valid_original_tag);
+        self.assertFalse(validation_warning);
+        validation_warning = self.tag_validator.check_capitalization(self.valid_formatted_tag,
+                                                                     self.valid_formatted_tag);
+        self.assertTrue(validation_warning);
+        validation_warning = self.tag_validator.check_capitalization(self.valid_is_numeric_tag,
+                                                                     self.valid_is_numeric_tag);
+        self.assertFalse(validation_warning);
+        validation_warning = self.tag_validator.check_capitalization(self.valid_unit_class_tag,
+                                                                     self.valid_unit_class_tag);
+        self.assertFalse(validation_warning);
+
 if __name__ == '__main__':
     unittest.main();
