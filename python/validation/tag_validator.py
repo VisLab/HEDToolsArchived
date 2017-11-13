@@ -12,6 +12,7 @@ from itertools import compress;
 import re;
 from hed_dictionary import HedDictionary
 
+
 class TagValidator:
     CAMEL_CASE_EXPRESSION = "([A-Z-]+\s*[a-z-]*)+";
     REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
@@ -24,6 +25,7 @@ class TagValidator:
     TAKES_VALUE_ATTRIBUTE = 'takesValue';
     IS_NUMERIC_ATTRIBUTE = 'isNumeric';
     UNIT_CLASS_ATTRIBUTE = 'unitClass';
+    UNIT_CLASS_UNITS_ELEMENT = 'units';
     hed_dictionary = None;
     hed_dictionary_dictionaries = None;
 
@@ -131,23 +133,22 @@ class TagValidator:
                                                      TagValidator.TAKES_VALUE_ATTRIBUTE);
         return False;
 
-    def is_unit_class_tag(self, formatted_tag):
+    def is_unit_class_tag(self, original_tag):
         """Checks to see if the tag has the 'unitClass' attribute.
 
         Parameters
         ----------
-        formatted_tag: string
-            The tag that is used to do the validation.
+        original_tag: string
+            The original tag that is used to report the error.
         Returns
         -------
         boolean
             True if the tag has the 'unitClass' attribute. False, if otherwise.
 
         """
-        takes_value_tag = self.replace_tag_name_with_pound(formatted_tag);
+        takes_value_tag = self.replace_tag_name_with_pound(original_tag);
         return self.hed_dictionary.tag_has_attribute(takes_value_tag,
-                                                         TagValidator.UNIT_CLASS_ATTRIBUTE);
-        return False;
+                                                     TagValidator.UNIT_CLASS_ATTRIBUTE);
 
     def replace_tag_name_with_pound(self, formatted_tag):
         """Replaces the tag name with the pound sign.
@@ -184,7 +185,7 @@ class TagValidator:
 
         """
         validation_error = '';
-        if self.is_unit_class_tag(formatted_tag):
+        if self.is_unit_class_tag(original_tag):
             last_tag_slash_index = formatted_tag.rfind('/');
             if last_tag_slash_index != -1:
                 takes_value_tag = formatted_tag[:last_tag_slash_index] + '/#';
@@ -192,10 +193,28 @@ class TagValidator:
                                                              TagValidator.UNIT_CLASS_ATTRIBUTE);
         return validation_error;
 
-    def get_unit_class_units(self, formatted_tag):
+    def get_tag_unit_class_units(self, formatted_tag):
+        """Gets the unit class units associated with a particular tag.
+
+        Parameters
+        ----------
+        formatted_tag: string
+            The tag that is used to do the validation.
+        Returns
+        -------
+        list
+            A list containing the unit class units associated with a particular tag. A empty list will be returned if
+            the tag doesn't have unit class units associated with it.
+
+        """
         units = [];
+        unit_class_tag = self.replace_tag_name_with_pound(formatted_tag);
         if self.is_unit_class_tag(formatted_tag):
-            self.hed_dictionary_dictionaries['unitClass'];
+            unit_classes = self.hed_dictionary_dictionaries[TagValidator.UNIT_CLASS_ATTRIBUTE][unit_class_tag];
+            unit_classes = unit_classes.split(',');
+            for unit_class in unit_classes:
+                units += (self.hed_dictionary_dictionaries[TagValidator.UNIT_CLASS_UNITS_ELEMENT][unit_class]);
+        return units;
 
     def is_numeric_tag(self, formatted_tag):
         """Checks to see if the tag has the 'isNumeric' attribute.
@@ -345,8 +364,8 @@ class TagValidator:
         return tag;
 
 if __name__ == '__main__':
-    original_tag = 'This/Is th fdjd/Tag';
+    original_tag = 'attribute/direction/top/34434';
     hed_dictionary = HedDictionary('../tests/data/HED.xml');
     tag_validator = TagValidator(hed_dictionary);
-    validation_warning = tag_validator.check_capitalization(original_tag);
-    print(validation_warning)
+    units = tag_validator.get_tag_unit_class_units(original_tag);
+    print(units)
