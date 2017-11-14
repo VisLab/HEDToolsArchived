@@ -141,5 +141,13 @@ class Test(unittest.TestCase):
         self.assertTrue(unit_class_units);
         self.assertIsInstance(unit_class_units, basestring);
 
+    def test_get_unit_class_default_unit(self):
+        default_units = self.tag_validator.get_unit_class_default_unit(self.valid_original_tag);
+        self.assertFalse(default_units);
+        self.assertIsInstance(default_units, basestring);
+        default_units = self.tag_validator.get_unit_class_default_unit(self.valid_formatted_unit_class_tag);
+        self.assertTrue(default_units);
+        self.assertIsInstance(default_units, basestring);
+
 if __name__ == '__main__':
     unittest.main();
