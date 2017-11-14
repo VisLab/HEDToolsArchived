@@ -132,9 +132,14 @@ class Test(unittest.TestCase):
         self.assertTrue(takes_value_tag);
 
     def test_get_unit_class_units(self):
-        unit_class_units = self.tag_validator.get_unit_class_units(self.valid_formatted_unit_class_tag);
+        unit_class_units = self.tag_validator.get_tag_unit_class_units(self.valid_formatted_unit_class_tag);
         self.assertTrue(unit_class_units);
-        self.assertIsInstance(unit_class_units, list)
+        self.assertIsInstance(unit_class_units, list);
+
+    def test_get_tag_name(self):
+        unit_class_units = self.tag_validator.get_tag_name(self.valid_original_tag);
+        self.assertTrue(unit_class_units);
+        self.assertIsInstance(unit_class_units, basestring);
 
 if __name__ == '__main__':
     unittest.main();
