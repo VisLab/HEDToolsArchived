@@ -15,6 +15,7 @@ from hed_dictionary import HedDictionary
 
 class TagValidator:
     CAMEL_CASE_EXPRESSION = '([A-Z-]+\s*[a-z-]*)+';
+    DEFAULT_UNIT_ATTRIBUTE = 'default';
     REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
     REQUIRED_ERROR_TYPE = 'required';
     TAG_DICTIONARY_KEY = 'tags';
@@ -195,11 +196,39 @@ class TagValidator:
         """
         validation_error = '';
         if self.is_unit_class_tag(formatted_tag):
-            tag_unit_class_units = self.get_tag_unit_class_units(formatted_tag);
-            tag_slash_indices = self.get_tag_slash_indices(formatted_tag)[-1];
+            tag_unit_class_units = tuple(self.get_tag_unit_class_units(formatted_tag));
+            tag_unit_values = self.get_tag_name(formatted_tag)[-1];
+
+            if not tag_unit_values.startswith(tag_unit_class_units) or not \
+                    tag_unit_values.endswith(tag_unit_class_units):
+                pass;
 
 
         return validation_error;
+
+    def check_if_tag_unit_class_units_exist(self, original_tag, formatted_tag):
+        """Reports a validation warning if the tag provided has a unit class but no units are not specified.
+
+        Parameters
+        ----------
+        original_tag: string
+            The original tag that is used to report the error.
+        formatted_tag: string
+            The tag that is used to do the validation.
+        Returns
+        -------
+        string
+            A validation warning string. If no errors are found then an empty string is returned.
+
+        """
+        validation_warning = '';
+        if self.is_unit_class_tag(formatted_tag):
+            tag_unit_class_units = tuple(self.get_tag_unit_class_units(formatted_tag));
+            tag_unit_values = self.get_tag_name(formatted_tag)[-1];
+            digit_expression = '^\d+$';
+            if re.search(digit_expression, tag_unit_values):
+                validation_warning = warning_reporter.report_warning_type('unitClass', tag=original_tag);
+        return validation_warning;
 
     def get_tag_name(self, tag):
         """Gets the tag name from the tag path
@@ -242,6 +271,34 @@ class TagValidator:
             for unit_class in unit_classes:
                 units += (self.hed_dictionary_dictionaries[TagValidator.UNIT_CLASS_UNITS_ELEMENT][unit_class]);
         return units;
+
+    def get_unit_class_default_unit(self, formatted_tag):
+        """Gets the default unit class unit that is associated with the specified tag.
+
+        Parameters
+        ----------
+        formatted_tag: string
+            The tag that is used to do the validation.
+        Returns
+        -------
+        string
+            The default unit class unit associated with the specific tag. If the tag doesn't have a unit class then an
+            empty string is returned.
+
+        """
+        default_unit = '';
+        unit_class_tag = self.replace_tag_name_with_pound(formatted_tag);
+        if self.is_unit_class_tag(formatted_tag):
+            has_default_attribute = self.hed_dictionary.tag_has_attribute(formatted_tag,
+                                                                          TagValidator.DEFAULT_UNIT_ATTRIBUTE);
+            if has_default_attribute:
+                default_unit = self.hed_dictionary_dictionaries[TagValidator.DEFAULT_UNIT_ATTRIBUTE][formatted_tag];
+            elif unit_class_tag in self.hed_dictionary_dictionaries[TagValidator.UNIT_CLASS_ATTRIBUTE]:
+                unit_classes = \
+                    self.hed_dictionary_dictionaries[TagValidator.UNIT_CLASS_ATTRIBUTE][unit_class_tag].split(',');
+                first_unit_class = unit_classes[0];
+                default_unit = self.hed_dictionary_dictionaries[TagValidator.DEFAULT_UNIT_ATTRIBUTE][first_unit_class];
+        return default_unit;
 
     def is_numeric_tag(self, formatted_tag):
         """Checks to see if the tag has the 'isNumeric' attribute.
@@ -391,12 +448,9 @@ class TagValidator:
         return tag;
 
 if __name__ == '__main__':
-    original_tag = 'attribute/direction/top/34434';
+    original_tag = 'attribute/repetition/34434';
+    # original_tag = 'attribute/direction/top/34434';
     hed_dictionary = HedDictionary('../tests/data/HED.xml');
     tag_validator = TagValidator(hed_dictionary);
-    # units = tag_validator.get_tag_unit_class_units(original_tag);
-    # print(units)
-    tag = 'abc'
-    a = tag_validator.get_tag_name(original_tag);
-    if a:
-        print(a)
+    default_unit = tag_validator.get_unit_class_default_unit(original_tag);
+    print(default_unit)
