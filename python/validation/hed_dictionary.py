@@ -116,7 +116,7 @@ class HedDictionary:
                 tag_dictionary = self._string_list_2_lowercase_dictionary(tags);
                 tag_dictionary.update(leaf_tags_dictionary);
             elif HedDictionary.DEFAULT_UNIT_ATTRIBUTE == TAG_DICTIONARY_KEY or \
-                            HedDictionary.TAG_UNIT_CLASS_ATTRIBUTE == TAG_DICTIONARY_KEY:
+                 HedDictionary.TAG_UNIT_CLASS_ATTRIBUTE == TAG_DICTIONARY_KEY:
                 tag_dictionary = self._populate_tag_to_attribute_dictionary(tags, tag_elements, TAG_DICTIONARY_KEY);
             elif HedDictionary.TAGS_DICTIONARY_KEY == TAG_DICTIONARY_KEY:
                 tags = self.get_all_tags()[0];
@@ -269,15 +269,12 @@ class HedDictionary:
 
         """
         ancestor_tags = [];
-        try:
-            parent_tag_name = self._get_parent_tag_name(tag_element);
-            parent_element = tag_element.getparent();
-            while parent_tag_name:
-                ancestor_tags.append(parent_tag_name);
-                parent_tag_name = self._get_parent_tag_name(parent_element);
-                parent_element = parent_element.getparent();
-        except:
-            pass;
+        parent_tag_name = self._get_parent_tag_name(tag_element);
+        parent_element = tag_element.getparent();
+        while parent_tag_name:
+            ancestor_tags.append(parent_tag_name);
+            parent_tag_name = self._get_parent_tag_name(parent_element);
+            parent_element = parent_element.getparent();
         return ancestor_tags;
 
     def _get_element_tag_value(self, element, tag_name='name'):
@@ -296,10 +293,7 @@ class HedDictionary:
             The value of the element's tag. If the element doesn't have the tag then it will return an empty string.
 
         """
-        try:
-            return element.find(tag_name).text;
-        except:
-            return '';
+        return element.find(tag_name).text;
 
     def _get_parent_tag_name(self, tag_element):
         """Gets the name of the tag parent element.
@@ -315,10 +309,10 @@ class HedDictionary:
             The name of the tag element's parent. If there is no parent tag then an empty string is returned.
 
         """
-        try:
-            parent_tag_element = tag_element.getparent();
-            return parent_tag_element.find('name').text;
-        except:
+        parent_tag_element = tag_element.getparent();
+        if parent_tag_element is not None:
+            return parent_tag_element.findtext('name');
+        else:
             return '';
 
     def _get_tag_path_from_tag_element(self, tag_element):
@@ -335,13 +329,10 @@ class HedDictionary:
             A tag path which is typically referred to as a tag. The tag and it's ancestor tags will be separated by /'s.
 
         """
-        try:
-            ancestor_tag_names = self._get_ancestor_tag_names(tag_element);
-            ancestor_tag_names.insert(0, self._get_element_tag_value(tag_element));
-            ancestor_tag_names.reverse();
-            return '/'.join(ancestor_tag_names);
-        except:
-            return '';
+        ancestor_tag_names = self._get_ancestor_tag_names(tag_element);
+        ancestor_tag_names.insert(0, self._get_element_tag_value(tag_element));
+        ancestor_tag_names.reverse();
+        return '/'.join(ancestor_tag_names);
 
     def get_tags_by_attribute(self, attribute_name):
         """Gets the tag that have a specific attribute.
@@ -358,13 +349,10 @@ class HedDictionary:
 
         """
         tags = [];
-        try:
-            tag_elements = self.root_element.xpath('.//node[@%s]' % attribute_name);
-            for attribute_tag_element in tag_elements:
-                tag = self._get_tag_path_from_tag_element(attribute_tag_element);
-                tags.append(tag);
-        except:
-            pass;
+        tag_elements = self.root_element.xpath('.//node[@%s]' % attribute_name);
+        for attribute_tag_element in tag_elements:
+            tag = self._get_tag_path_from_tag_element(attribute_tag_element);
+            tags.append(tag);
         return tags, tag_elements;
 
 
@@ -383,13 +371,10 @@ class HedDictionary:
 
         """
         tags = [];
-        try:
-            tag_elements = self.root_element.xpath('.//%s' % tag_element_name);
-            for tag_element in tag_elements:
-                tag = self._get_tag_path_from_tag_element(tag_element);
-                tags.append(tag);
-        except:
-            pass;
+        tag_elements = self.root_element.xpath('.//%s' % tag_element_name);
+        for tag_element in tag_elements:
+            tag = self._get_tag_path_from_tag_element(tag_element);
+            tags.append(tag);
         return tags, tag_elements;
 
     def _get_elements_by_attribute(self, attribute_name, element_name='node'):
@@ -408,12 +393,7 @@ class HedDictionary:
             A list containing elements that have a specified attribute.
 
         """
-        elements = [];
-        try:
-            elements = self.root_element.xpath('.//%s[@%s]' % (element_name, attribute_name));
-        except:
-            pass;
-        return elements;
+        return self.root_element.xpath('.//%s[@%s]' % (element_name, attribute_name));
 
     def _get_elements_by_name(self, element_name='node', parent_element=None):
         """Gets the elements that have a specific element name.
@@ -432,14 +412,10 @@ class HedDictionary:
             A list containing elements that have a specific element name.
 
         """
-        elements = [];
-        try:
-            if parent_element is None:
-                elements = self.root_element.xpath('.//%s' % element_name);
-            else:
-                elements = parent_element.xpath('.//%s' % element_name);
-        except:
-            pass;
+        if parent_element is None:
+            elements = self.root_element.xpath('.//%s' % element_name);
+        else:
+            elements = parent_element.xpath('.//%s' % element_name);
         return elements;
 
     def _get_all_leaf_tags(self, element_name='node', exclude_take_value_tags=True):
@@ -490,5 +466,7 @@ class HedDictionary:
 
 if __name__ == '__main__':
     dictionaries = HedDictionary('../tests/data/HED.xml');
-    leaf_tags = dictionaries.get_all_leaf_tags();
-    print(len(leaf_tags));
+    tag_elements = dictionaries.root_element.xpath('.//sdddds');
+    print(tag_elements)
+    # leaf_tags = dictionaries.get_all_leaf_tags();
+    # print(len(leaf_tags));
