@@ -19,6 +19,10 @@ class Test(unittest.TestCase):
         cls.invalid_formatted_tag = 'this/is/a/tag';
         cls.valid_original_tag = 'Event/Label';
         cls.valid_formatted_tag = 'event/label';
+        cls.valid_hed_string = 'event/label/hed string, event/description/this is a hed string, ' \
+                               'event/category/participant response';
+        cls.invalid_hed_string = 'event/label/hed string, event/description/this is a hed string, ' \
+                                 'event/category/participant response, (()))';
         cls.tilde = '~';
         cls.valid_is_numeric_tag = 'Attribute/Repetition/20';
         cls.valid_formatted_is_numeric_tag = 'attribute/repetition/20';
@@ -140,45 +144,55 @@ class Test(unittest.TestCase):
         self.assertIsInstance(unit_class_units, list);
 
     def test_get_tag_name(self):
-        unit_class_units = self.tag_validator.get_tag_name(self.valid_original_tag);
-        self.assertTrue(unit_class_units);
-        self.assertIsInstance(unit_class_units, basestring);
+        tag_name = self.tag_validator.get_tag_name(self.valid_original_tag);
+        self.assertTrue(tag_name);
+        self.assertIsInstance(tag_name, basestring);
 
     def test_get_unit_class_default_unit(self):
-        default_units = self.tag_validator.get_unit_class_default_unit(self.valid_original_tag);
-        self.assertFalse(default_units);
-        self.assertIsInstance(default_units, basestring);
-        default_units = self.tag_validator.get_unit_class_default_unit(self.valid_formatted_unit_class_tag);
-        self.assertTrue(default_units);
-        self.assertIsInstance(default_units, basestring);
+        default_unit = self.tag_validator.get_unit_class_default_unit(self.valid_original_tag);
+        self.assertFalse(default_unit);
+        self.assertIsInstance(default_unit, basestring);
+        default_unit = self.tag_validator.get_unit_class_default_unit(self.valid_formatted_unit_class_tag);
+        self.assertTrue(default_unit);
+        self.assertIsInstance(default_unit, basestring);
 
-    def test_get_unit_class_default_unit(self):
-        default_units = self.tag_validator.check_if_tag_unit_class_units_exist(self.valid_formatted_unit_class_tag,
-                                                                               self.valid_formatted_unit_class_tag);
-        self.assertFalse(default_units);
-        self.assertIsInstance(default_units, basestring);
-        default_units = \
+    def test_check_if_tag_unit_class_units_exist(self):
+        validation_warning = self.tag_validator.check_if_tag_unit_class_units_exist(self.valid_formatted_unit_class_tag,
+                                                                                    self.valid_formatted_unit_class_tag);
+        self.assertFalse(validation_warning);
+        self.assertIsInstance(validation_warning, basestring);
+        validation_warning = \
             self.tag_validator.check_if_tag_unit_class_units_exist(self.valid_formatted_unit_class_tag_no_units,
                                                                    self.valid_formatted_unit_class_tag_no_units);
-        self.assertTrue(default_units);
-        self.assertIsInstance(default_units, basestring);
+        self.assertTrue(validation_warning);
+        self.assertIsInstance(validation_warning, basestring);
 
     def test_check_if_tag_unit_class_units_are_valid(self):
-        units_are_valid = \
+        validation_error = \
             self.tag_validator.check_if_tag_unit_class_units_are_valid(self.valid_formatted_unit_class_tag,
                                                                        self.valid_formatted_unit_class_tag);
-        self.assertFalse(units_are_valid);
-        self.assertIsInstance(units_are_valid, basestring);
-        units_are_valid = \
+        self.assertFalse(validation_error);
+        self.assertIsInstance(validation_error, basestring);
+        validation_error = \
             self.tag_validator.check_if_tag_unit_class_units_are_valid(self.valid_formatted_unit_class_tag_no_units,
                                                                        self.valid_formatted_unit_class_tag_no_units);
-        self.assertFalse(units_are_valid);
-        self.assertIsInstance(units_are_valid, basestring);
-        units_are_valid = \
+        self.assertFalse(validation_error);
+        self.assertIsInstance(validation_error, basestring);
+        validation_error = \
             self.tag_validator.check_if_tag_unit_class_units_are_valid(self.invalid_formatted_unit_class_tag,
                                                                        self.invalid_formatted_unit_class_tag);
-        self.assertTrue(units_are_valid);
-        self.assertIsInstance(units_are_valid, basestring);
+        self.assertTrue(validation_error);
+        self.assertIsInstance(validation_error, basestring);
+
+    def test_count_tag_group_brackets(self):
+        validation_error = \
+            self.tag_validator.count_tag_group_brackets(self.valid_hed_string);
+        self.assertFalse(validation_error);
+        self.assertIsInstance(validation_error, basestring);
+        validation_error = \
+            self.tag_validator.count_tag_group_brackets(self.invalid_hed_string);
+        self.assertTrue(validation_error);
+        self.assertIsInstance(validation_error, basestring);
 
 if __name__ == '__main__':
     unittest.main();
