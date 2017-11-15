@@ -223,11 +223,13 @@ class TagValidator:
         """
         validation_warning = '';
         if self.is_unit_class_tag(formatted_tag):
-            tag_unit_class_units = tuple(self.get_tag_unit_class_units(formatted_tag));
-            tag_unit_values = self.get_tag_name(formatted_tag)[-1];
+            # tag_unit_class_units = tuple(self.get_tag_unit_class_units(formatted_tag));
+            tag_unit_values = self.get_tag_name(formatted_tag);
             digit_expression = '^\d+$';
             if re.search(digit_expression, tag_unit_values):
-                validation_warning = warning_reporter.report_warning_type('unitClass', tag=original_tag);
+                default_unit = self.get_unit_class_default_unit(formatted_tag);
+                validation_warning = warning_reporter.report_warning_type('unitClass', tag=original_tag,
+                                                                          default_unit=default_unit);
         return validation_warning;
 
     def get_tag_name(self, tag):
@@ -448,9 +450,9 @@ class TagValidator:
         return tag;
 
 if __name__ == '__main__':
-    original_tag = 'attribute/repetition/34434';
-    # original_tag = 'attribute/direction/top/34434';
+    # original_tag = 'attribute/repetition/34434';
+    original_tag = 'attribute/direction/top/34434';
     hed_dictionary = HedDictionary('../tests/data/HED.xml');
     tag_validator = TagValidator(hed_dictionary);
-    default_unit = tag_validator.get_unit_class_default_unit(original_tag);
-    print(default_unit)
+    unit_class_units_exist = tag_validator.check_if_tag_unit_class_units_exist(original_tag, original_tag);
+    print(unit_class_units_exist)
