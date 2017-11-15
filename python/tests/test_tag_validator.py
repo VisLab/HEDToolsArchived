@@ -21,8 +21,10 @@ class Test(unittest.TestCase):
         cls.valid_formatted_tag = 'event/label';
         cls.tilde = '~';
         cls.valid_is_numeric_tag = 'Attribute/Repetition/20';
+        cls.valid_formatted_is_numeric_tag = 'attribute/repetition/20';
         cls.valid_unit_class_tag = 'Attribute/Temporal rate/20 Hz';
         cls.valid_formatted_unit_class_tag = 'attribute/temporal rate/20 Hz';
+        cls.valid_formatted_unit_class_tag_no_units = 'attribute/temporal rate/20';
         cls.valid_takes_value_tag = 'event/label/This is a label';
         cls.valid_tag_group_string = 'This/Is/A/Tag ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
         cls.invalid_tag_group_string = 'This/Is/A/Tag ~ ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
@@ -148,6 +150,18 @@ class Test(unittest.TestCase):
         default_units = self.tag_validator.get_unit_class_default_unit(self.valid_formatted_unit_class_tag);
         self.assertTrue(default_units);
         self.assertIsInstance(default_units, basestring);
+
+    def test_get_unit_class_default_unit(self):
+        default_units = self.tag_validator.check_if_tag_unit_class_units_exist(self.valid_formatted_unit_class_tag,
+                                                                               self.valid_formatted_unit_class_tag);
+        self.assertFalse(default_units);
+        self.assertIsInstance(default_units, basestring);
+        default_units = \
+            self.tag_validator.check_if_tag_unit_class_units_exist(self.valid_formatted_unit_class_tag_no_units,
+                                                                   self.valid_formatted_unit_class_tag_no_units);
+        self.assertTrue(default_units);
+        self.assertIsInstance(default_units, basestring);
+
 
 if __name__ == '__main__':
     unittest.main();
