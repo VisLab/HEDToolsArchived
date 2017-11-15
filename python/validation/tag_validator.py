@@ -16,6 +16,7 @@ from hed_dictionary import HedDictionary
 class TagValidator:
     CAMEL_CASE_EXPRESSION = '([A-Z-]+\s*[a-z-]*)+';
     DEFAULT_UNIT_ATTRIBUTE = 'default';
+    DIGIT_EXPRESSION = '^\d+$';
     REQUIRE_CHILD_ERROR_TYPE = 'requireChild';
     REQUIRED_ERROR_TYPE = 'required';
     TAG_DICTIONARY_KEY = 'tags';
@@ -179,7 +180,7 @@ class TagValidator:
             pound_sign_tag = formatted_tag[:last_tag_slash_index] + '/#';
         return pound_sign_tag;
 
-    def check_tag_unit_class_units(self, original_tag, formatted_tag):
+    def check_if_tag_unit_class_units_are_valid(self, original_tag, formatted_tag):
         """Reports a validation error if the tag provided has a unit class and the units are incorrect.
 
         Parameters
@@ -197,13 +198,12 @@ class TagValidator:
         validation_error = '';
         if self.is_unit_class_tag(formatted_tag):
             tag_unit_class_units = tuple(self.get_tag_unit_class_units(formatted_tag));
-            tag_unit_values = self.get_tag_name(formatted_tag)[-1];
-
-            if not tag_unit_values.startswith(tag_unit_class_units) or not \
-                    tag_unit_values.endswith(tag_unit_class_units):
-                pass;
-
-
+            tag_unit_values = self.get_tag_name(formatted_tag);
+            if not re.search(TagValidator.DIGIT_EXPRESSION, tag_unit_values) and \
+                    not tag_unit_values.startswith(tag_unit_class_units) and \
+                    not tag_unit_values.endswith(tag_unit_class_units):
+                validation_error = error_reporter.report_error_type('unitClass', tag=original_tag,
+                                                                    unit_class_units=','.join(tag_unit_class_units));
         return validation_error;
 
     def check_if_tag_unit_class_units_exist(self, original_tag, formatted_tag):
@@ -223,10 +223,8 @@ class TagValidator:
         """
         validation_warning = '';
         if self.is_unit_class_tag(formatted_tag):
-            # tag_unit_class_units = tuple(self.get_tag_unit_class_units(formatted_tag));
             tag_unit_values = self.get_tag_name(formatted_tag);
-            digit_expression = '^\d+$';
-            if re.search(digit_expression, tag_unit_values):
+            if re.search(TagValidator.DIGIT_EXPRESSION, tag_unit_values):
                 default_unit = self.get_unit_class_default_unit(formatted_tag);
                 validation_warning = warning_reporter.report_warning_type('unitClass', tag=original_tag,
                                                                           default_unit=default_unit);
@@ -272,7 +270,7 @@ class TagValidator:
             unit_classes = unit_classes.split(',');
             for unit_class in unit_classes:
                 units += (self.hed_dictionary_dictionaries[TagValidator.UNIT_CLASS_UNITS_ELEMENT][unit_class]);
-        return units;
+        return map(str.lower, units);
 
     def get_unit_class_default_unit(self, formatted_tag):
         """Gets the default unit class unit that is associated with the specified tag.
@@ -454,5 +452,5 @@ if __name__ == '__main__':
     original_tag = 'attribute/direction/top/34434';
     hed_dictionary = HedDictionary('../tests/data/HED.xml');
     tag_validator = TagValidator(hed_dictionary);
-    unit_class_units_exist = tag_validator.check_if_tag_unit_class_units_exist(original_tag, original_tag);
-    print(unit_class_units_exist)
+    units_are_valid = tag_validator.check_if_tag_unit_class_units_are_valid(original_tag, original_tag);
+    print(units_are_valid)
