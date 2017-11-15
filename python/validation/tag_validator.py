@@ -14,6 +14,7 @@ from hed_dictionary import HedDictionary
 
 
 class TagValidator:
+    BRACKET_ERROR_TYPE = 'bracket';
     CAMEL_CASE_EXPRESSION = '([A-Z-]+\s*[a-z-]*)+';
     DEFAULT_UNIT_ATTRIBUTE = 'default';
     DIGIT_EXPRESSION = '^\d+$';
@@ -447,10 +448,33 @@ class TagValidator:
             return tag[:end_index]
         return tag;
 
+    def count_tag_group_brackets(self, hed_string):
+        """Reports a validation error if there are an unequal number of opening or closing parentheses. This is the
+         first check before the tags are parsed.
+
+        Parameters
+        ----------
+        hed_string: string
+            A hed string.
+        Returns
+        -------
+        string
+            A validation error string. If no errors are found then an empty string is returned.
+
+        """
+        validation_error = '';
+        number_of_opening_brackets = hed_string.count('(');
+        number_of_closing_brackets = hed_string.count(')');
+        if number_of_opening_brackets != number_of_closing_brackets:
+            validation_error = error_reporter.report_error_type(TagValidator.BRACKET_ERROR_TYPE,
+                                                                opening_bracket_count=number_of_opening_brackets,
+                                                                closing_bracket_count=number_of_closing_brackets);
+        return validation_error;
+
 if __name__ == '__main__':
     # original_tag = 'attribute/repetition/34434';
     original_tag = 'attribute/direction/top/34434';
     hed_dictionary = HedDictionary('../tests/data/HED.xml');
     tag_validator = TagValidator(hed_dictionary);
-    units_are_valid = tag_validator.check_if_tag_unit_class_units_are_valid(original_tag, original_tag);
+    units_are_valid = tag_validator.count_tag_group_brackets('fdskjfdkjd,()(()())))))))');
     print(units_are_valid)
