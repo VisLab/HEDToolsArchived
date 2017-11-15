@@ -8,7 +8,8 @@ Created on Oct 2, 2017
 '''
 
 
-def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_class_units=''):
+def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_class_units='', opening_bracket_count=0,
+                      closing_bracket_count=0):
     """Reports the validation error based on the type of error.
 
     Parameters
@@ -30,6 +31,8 @@ def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_clas
 
     """
     error_types = {
+        'bracket': '\tERROR: Number of opening and closing brackets are unequal. %s opening brackets. %s '
+                   'closing brackets\n' % (opening_bracket_count, closing_bracket_count),
         'isNumeric': '\tERROR: Invalid numeric tag - \"%s\"\n' % tag,
         'line': 'Issues on line %s:\n' % str(error_line),
         'required': '\tERROR: Tag with prefix \"%s\" is required\n' % tag_prefix,
