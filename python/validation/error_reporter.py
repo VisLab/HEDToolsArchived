@@ -36,7 +36,7 @@ def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_clas
         'requireChild':'tERROR: Descendant tag required - \"%s\"\n' % tag,
         'tilde': '\tERROR: Too many tildes - group \"%s\"\n' % tag,
         'unique': '\tERROR: Multiple unique tags (prefix \"%s\") - \"%s\"\n' % (tag_prefix, tag),
-        'unitClass': '\tERROR: Invalid unit - \"%s\" (valid units are "%s")\n' % (tag, unit_class_units),
+        'unitClass': '\tERROR: Invalid unit - \"%s\" valid units are "%s"\n' % (tag, unit_class_units),
         'valid': '\tERROR: Invalid HED tag - \"%s\"\n' % tag
 
     }
