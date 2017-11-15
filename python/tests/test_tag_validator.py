@@ -12,7 +12,7 @@ class Test(unittest.TestCase):
         cls.hed_dictionary = HedDictionary(cls.hed_xml);
         cls.tag_validator = TagValidator(cls.hed_dictionary);
         random_require_child_key = \
-            random.randint(1, len(cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY]));
+            random.randint(2, len(cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY]));
         cls.required_child_tag = \
             cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY][cls.hed_dictionary.get_dictionaries()[cls.REQUIRE_CHILD_DICTIONARY_KEY].keys()[random_require_child_key]];
         cls.invalid_original_tag = 'This/Is/A/Tag';
@@ -23,7 +23,8 @@ class Test(unittest.TestCase):
         cls.valid_is_numeric_tag = 'Attribute/Repetition/20';
         cls.valid_formatted_is_numeric_tag = 'attribute/repetition/20';
         cls.valid_unit_class_tag = 'Attribute/Temporal rate/20 Hz';
-        cls.valid_formatted_unit_class_tag = 'attribute/temporal rate/20 Hz';
+        cls.valid_formatted_unit_class_tag = 'attribute/temporal rate/20 hz';
+        cls.invalid_formatted_unit_class_tag = 'attribute/temporal rate/20 sdfkjsdfkjdfskjs';
         cls.valid_formatted_unit_class_tag_no_units = 'attribute/temporal rate/20';
         cls.valid_takes_value_tag = 'event/label/This is a label';
         cls.valid_tag_group_string = 'This/Is/A/Tag ~ This/Is/Another/Tag ~ This/Is/A/Different/Tag';
@@ -162,6 +163,22 @@ class Test(unittest.TestCase):
         self.assertTrue(default_units);
         self.assertIsInstance(default_units, basestring);
 
+    def test_check_if_tag_unit_class_units_are_valid(self):
+        units_are_valid = \
+            self.tag_validator.check_if_tag_unit_class_units_are_valid(self.valid_formatted_unit_class_tag,
+                                                                       self.valid_formatted_unit_class_tag);
+        self.assertFalse(units_are_valid);
+        self.assertIsInstance(units_are_valid, basestring);
+        units_are_valid = \
+            self.tag_validator.check_if_tag_unit_class_units_are_valid(self.valid_formatted_unit_class_tag_no_units,
+                                                                       self.valid_formatted_unit_class_tag_no_units);
+        self.assertFalse(units_are_valid);
+        self.assertIsInstance(units_are_valid, basestring);
+        units_are_valid = \
+            self.tag_validator.check_if_tag_unit_class_units_are_valid(self.invalid_formatted_unit_class_tag,
+                                                                       self.invalid_formatted_unit_class_tag);
+        self.assertTrue(units_are_valid);
+        self.assertIsInstance(units_are_valid, basestring);
 
 if __name__ == '__main__':
     unittest.main();
