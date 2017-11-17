@@ -20,13 +20,13 @@ class Test(unittest.TestCase):
         self.assertTrue(tag_set);
         self.assertIsInstance(tag_set, set);
 
-    def test_remove_elements_from_set(self):
+    def test_get_top_level_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
         tag_set = hed_string_delimiter.get_tag_set();
-        tag_set_with_removed_elements = hed_string_delimiter.remove_elements_from_set(tag_set, self.removal_elements);
-        self.assertTrue(tag_set_with_removed_elements);
-        self.assertIsInstance(tag_set_with_removed_elements, set);
-        self.assertNotEqual(len(tag_set), len(tag_set_with_removed_elements));
+        top_level_tag_set = hed_string_delimiter.get_top_level_tags();
+        self.assertTrue(top_level_tag_set);
+        self.assertIsInstance(top_level_tag_set, set);
+        self.assertNotEqual(len(tag_set), len(top_level_tag_set));
 
 if __name__ == '__main__':
     unittest.main();
