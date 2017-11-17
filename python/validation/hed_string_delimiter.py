@@ -18,7 +18,7 @@ class HedStringDelimiter:
 
     def __init__(self, hed_string):
         self.hed_string = hed_string;
-        self.tag_set = self.split_hed_string();
+        self.tag_set = self._split_hed_string();
 
     def get_tag_set(self):
         """Gets the tag_set field.
@@ -33,7 +33,7 @@ class HedStringDelimiter:
         """
         return self.tag_set
 
-    def split_hed_string(self):
+    def _split_hed_string(self):
         """Splits the tags and non-nested groups in a hed string based on a delimiter. The default delimiter is a comma.
 
         Parameters
@@ -82,12 +82,12 @@ class HedStringDelimiter:
         event_level_tag_set = self.remove_elements_from_set(event_level_tag_set, groups_to_remove);
         return event_level_tag_set;
 
-    def remove_elements_from_set(self, removal_set, removal_element_list):
+    def remove_elements_from_set(self, original_set, removal_element_list):
         """Remove a specified list elements from a set.
 
         Parameters
         ----------
-        removal_set: set
+        original_set: set
             A set containing elements.
         removal_element_list: list
             A list of elements that will be removed from the set.
@@ -97,9 +97,10 @@ class HedStringDelimiter:
             A set with the removed elements.
 
         """
+        new_set = copy.deepcopy(original_set);
         for removal_element in removal_element_list:
-            removal_set.remove(removal_element);
-        return removal_set;
+            new_set.remove(removal_element);
+        return new_set;
 
 if __name__ == '__main__':
     hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
