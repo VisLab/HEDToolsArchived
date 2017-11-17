@@ -17,6 +17,18 @@ class HedStringDelimiter:
     CLOSING_GROUP_CHARACTER = ')';
 
     def __init__(self, hed_string):
+        """Constructor for the HedStringDelimiter class.
+
+        Parameters
+        ----------
+        hed_string
+            A hed string consisting of tags and tag groups.
+        Returns
+        -------
+        HedStringDelimiter object
+            A HedStringDelimiter object.
+
+        """
         self.hed_string = hed_string;
         self.tag_set = self._split_hed_string();
 
@@ -31,7 +43,11 @@ class HedStringDelimiter:
             A set containing the individual tags and tag groups in the hed string. Nested tag groups are not split.
 
         """
-        return self.tag_set
+        return self.tag_set;
+
+    def get_nested_group_tags(self):
+        nested_group_tags = set();
+
 
     def _split_hed_string(self):
         """Splits the tags and non-nested groups in a hed string based on a delimiter. The default delimiter is a comma.
@@ -73,17 +89,36 @@ class HedStringDelimiter:
             A set containing the top level tags.
 
         """
-        groups_to_remove = [];
-        top_level_tag_set = copy.deepcopy(self.tag_set);
-        for top_level_tag_or_group in self.tag_set:
-            if top_level_tag_or_group.startswith(HedStringDelimiter.OPENING_GROUP_CHARACTER) and \
-               top_level_tag_or_group.endswith(HedStringDelimiter.CLOSING_GROUP_CHARACTER):
-                top_level_tag_set.remove(top_level_tag_or_group);
-        top_level_tag_set = self.remove_elements_from_set(top_level_tag_set, groups_to_remove);
-        return top_level_tag_set;
+        top_level_tags = copy.deepcopy(self.tag_set);
+        for tag_or_group in self.tag_set:
+            if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
+                top_level_tags.remove(tag_or_group);
+        return top_level_tags;
+
+    @staticmethod
+    def hed_string_is_a_group(hed_string):
+        """Returns true if
+
+        Parameters
+        ----------
+        hed_string
+            A hed string consisting of tags and tag groups.
+        Returns
+        -------
+        boolean
+            True if the hed string is a group. False, if not a group.
+
+        """
+        hed_string = hed_string.strip();
+        if hed_string.startswith(HedStringDelimiter.OPENING_GROUP_CHARACTER) and \
+                hed_string.endswith(HedStringDelimiter.CLOSING_GROUP_CHARACTER):
+            return True;
+        return False;
+
 
 if __name__ == '__main__':
-    hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
-    hed_string_delimiter = HedStringDelimiter(hed_string);
-    tags = hed_string_delimiter.get_top_level_tags();
-    print(tags);
+    # hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
+    # hed_string_delimiter = HedStringDelimiter(hed_string);
+    # tags = hed_string_delimiter.get_tag_set();
+    is_group = HedStringDelimiter.hed_string_is_a_group(')')
+    print(is_group);
