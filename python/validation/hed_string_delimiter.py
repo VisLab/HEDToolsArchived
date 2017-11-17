@@ -74,33 +74,13 @@ class HedStringDelimiter:
 
         """
         groups_to_remove = [];
-        event_level_tag_set = copy.deepcopy(self.tag_set);
-        for top_level_tag_or_group in event_level_tag_set:
+        top_level_tag_set = copy.deepcopy(self.tag_set);
+        for top_level_tag_or_group in self.tag_set:
             if top_level_tag_or_group.startswith(HedStringDelimiter.OPENING_GROUP_CHARACTER) and \
                top_level_tag_or_group.endswith(HedStringDelimiter.CLOSING_GROUP_CHARACTER):
-                groups_to_remove.append(top_level_tag_or_group);
-        event_level_tag_set = self.remove_elements_from_set(event_level_tag_set, groups_to_remove);
-        return event_level_tag_set;
-
-    def remove_elements_from_set(self, original_set, removal_element_list):
-        """Remove a specified list elements from a set.
-
-        Parameters
-        ----------
-        original_set: set
-            A set containing elements.
-        removal_element_list: list
-            A list of elements that will be removed from the set.
-        Returns
-        -------
-        set
-            A set with the removed elements.
-
-        """
-        new_set = copy.deepcopy(original_set);
-        for removal_element in removal_element_list:
-            new_set.remove(removal_element);
-        return new_set;
+                top_level_tag_set.remove(top_level_tag_or_group);
+        top_level_tag_set = self.remove_elements_from_set(top_level_tag_set, groups_to_remove);
+        return top_level_tag_set;
 
 if __name__ == '__main__':
     hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
