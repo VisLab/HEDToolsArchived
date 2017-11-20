@@ -1,5 +1,5 @@
 '''
-This module is used to split HED tags into dictionaries.
+This module is used to split tags in a HED string .
 
 Created on Nov 15, 2017
 
