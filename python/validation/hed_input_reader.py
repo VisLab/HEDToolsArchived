@@ -1,5 +1,5 @@
-import warnings;
 import xlrd;
+
 
 class HedInputReader:
 
@@ -7,52 +7,65 @@ class HedInputReader:
     CSV_EXTENSION = ['csv'];
     EXCEL_EXTENSION = ['xls', 'xlsx'];
     FILE_EXTENSION = ['csv', 'tsv', 'txt', 'xls', 'xlsx'];
+    TEXT_EXTENSION = ['csv', 'tsv', 'txt'];
     STRING_INPUT = 'string';
     FILE_INPUT = 'file';
     TAB_DELIMITER = '\t';
     COMMA_DELIMITER = ',';
 
-
     def __init__(self, hed_input, hed_tag_columns=2, worksheet='', specific_hed_tag_columns={}):
         self.hed_input = hed_input;
-        self.hed_tag_columns;
+        self.hed_tag_columns = HedInputReader.subtract_1_from_list_elements(hed_tag_columns);
         self.worksheet = worksheet;
         self.specific_hed_tag_columns = specific_hed_tag_columns;
-        self.check_hed_input_type(hed_input);
-        self.file_extension = HedInputReader.get_file_extension(hed_input);
-        if HedInputReader.get_file_extension(hed_input) in HedInputReader.FILE_EXTENSION:
-            self.validate_hed_tags_in_file(hed_input);
-
-
-        if self.type == HedInputReader.STRING_INPUT:
-            self.validate_hed_string(hed_input);
+        if self.hed_input_has_valid_file_extension:
+            pass;
         else:
+            self.validate_hed_string(self.hed_input);
+
+    def hed_input_is_a_text
 
     def validate_hed_tags_in_file(self):
-        with open
-        pass;
 
-    def check_hed_input_type(self, hed_input):
-        split_hed_input = hed_input.rsplit('.', 1);
-        if split_hed_input > 1:
-            self.type = HedInputReader.FILE_INPUT;
-            extension = split_hed_input[-1].lower();
-            if extension in HedInputReader.TSV_EXTENSION:
-                self.delimiter = HedInputReader.TAB_DELIMITER;
-            elif extension in HedInputReader.CSV_EXTENSION:
-                self.delimiter = HedInputReader.COMMA_DELIMITER;
-            elif extension in HedInputReader.EXCEL_EXTENSION:
+    pass;
+
+    def hed_input_has_valid_file_extension(self):
+        """Checks to see if the hed input has a valid file extension.
+
+        Parameters
+        ----------
+        Returns
+        -------
+        boolean
+            True if the hed input has a valid file extension. False, if otherwise.
+
+        """
+        hed_input_has_extension = HedInputReader.file_path_has_extension(self.hed_input);
+        hed_input_file_extension = HedInputReader.get_file_extension(self.hed_input);
+        if hed_input_has_extension and hed_input_file_extension in HedInputReader.FILE_EXTENSION:
+            return True;
+        return False;
+
+    def validate_hed_tags_in_text_file(self):
+        with open(self.hed_input) as opened_text_file:
+            for text_file_line in opened_text_file:
+                HedInputReader.get_hed_tag_from_text_file(text_file_line, self.hed_tag_columns, self.column_delimiter)
                 pass;
-            else:
-                warnings.warn('File input specified is not supported');
-        else:
-            self.type = HedInputReader.FILE_INPUT;
+
+
+    def check_hed_input_type(self):
+        if extension in HedInputReader.TSV_EXTENSION:
+            self.delimiter = HedInputReader.TAB_DELIMITER;
+        elif extension in HedInputReader.CSV_EXTENSION:
+            self.delimiter = HedInputReader.COMMA_DELIMITER;
+        elif extension in HedInputReader.EXCEL_EXTENSION:
+            pass;
 
     def validate_hed_string(self, hed_string):
-        pass;
+        return '';
 
     @staticmethod
-    def open_workbook_worksheet(self, workbook_path, worksheet_name=''):
+    def open_workbook_worksheet(workbook_path, worksheet_name=''):
         """Opens an Excel workbook worksheet.
 
         Parameters
@@ -92,14 +105,14 @@ class HedInputReader:
         pass;
 
     @staticmethod
-    def get_hed_tag_from_text_file(file_object, tag_columns, column_delimiter):
+    def get_hed_tag_from_text_file_line(text_file_line, hed_tag_columns, column_delimiter):
         """Reads the next line of HED tags from the text file.
 
         Parameters
         ----------
-        file_object: file object
-             A file object pointing to a text file.
-        tag_columns: list
+        text_file_line: string
+            The line in the text file that contains the HED tags.
+        hed_tag_columns: list
             A list of integers containing the columns that contain the HED tags.
         column_delimiter: string
             A delimiter used to split the columns.
@@ -109,7 +122,24 @@ class HedInputReader:
             A list of containing the HED tags. Each element in the list contains the HED tags from a particular column.
 
         """
+        split_line = text_file_line.split(column_delimiter);
         pass;
+
+    @staticmethod
+    def subtract_1_from_list_elements(integer_list):
+        """Reads the next line of HED tags from the text file.
+
+        Parameters
+        ----------
+        integer_list: list
+            A list of integers.
+        Returns
+        -------
+        list
+            A list of containing each element subtracted by 1.
+
+        """
+        return [x-1 for x in integer_list];
 
     @staticmethod
     def file_path_has_extension(file_path):
