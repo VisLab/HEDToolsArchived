@@ -141,6 +141,26 @@ class HedStringDelimiter:
                 self.tag_set.add(tag_or_group);
 
     @staticmethod
+    def format_hed_tag(hed_tag):
+        """Format a single HED tag. Slashes in the beginning and end are removed and the tag is converted to lowercase.
+
+        Parameters
+        ----------
+        hed_tag
+            A HED tag
+        Returns
+        -------
+        string
+            The formatted version of the HED tag.
+
+        """
+        if hed_tag.startswith('/'):
+            hed_tag = hed_tag[1:];
+        if hed_tag.endswith('/'):
+            hed_tag = hed_tag[:-1];
+        return hed_tag.lower();
+
+    @staticmethod
     def split_hed_string(hed_string):
         """Splits the tags and non-nested groups in a hed string based on a delimiter. The default delimiter is a comma.
 
