@@ -8,11 +8,18 @@ class Test(unittest.TestCase):
         cls.mixed_hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
         cls.group_hed_string = '(tag1, tag2)';
         cls.removal_elements = ['(tag2,tag5,(tag1),tag6)', '(tag3,tag5,tag6)'];
+        cls.unformatted_tag = '/Event/label/This label ends with a slash/'
 
     def test_split_hed_string(self):
         split_hed_string = HedStringDelimiter.split_hed_string(self.mixed_hed_string);
         self.assertTrue(split_hed_string);
         self.assertIsInstance(split_hed_string, list);
+
+    def test_format_hed_tag(self):
+        formatted_tag = HedStringDelimiter.format_hed_tag(self.unformatted_tag);
+        self.assertTrue(formatted_tag);
+        self.assertIsInstance(formatted_tag, basestring)
+        self.assertNotEqual(self.unformatted_tag, formatted_tag);
 
     def test_get_tag_set(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
