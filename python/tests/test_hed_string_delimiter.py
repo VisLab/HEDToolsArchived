@@ -22,6 +22,18 @@ class Test(unittest.TestCase):
         self.assertIsInstance(formatted_tag_set, set);
         self.assertEqual(len(tag_set), len(formatted_tag_set));
 
+    def test_format_hed_tags_in_list(self):
+        hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
+        top_level_tags = hed_string_delimiter.get_top_level_tags();
+        formatted_top_level_tags = HedStringDelimiter.format_hed_tags_in_list(top_level_tags);
+        self.assertIsInstance(formatted_top_level_tags, list);
+        self.assertEqual(len(top_level_tags), len(formatted_top_level_tags));
+        tag_groups = hed_string_delimiter.get_tag_groups();
+        formatted_tag_groups = HedStringDelimiter.format_hed_tags_in_list(tag_groups);
+        self.assertIsInstance(formatted_tag_groups, list);
+        self.assertEqual(len(tag_groups), len(formatted_tag_groups));
+
+
     def test_format_hed_tag(self):
         formatted_tag = HedStringDelimiter.format_hed_tag(self.unformatted_tag);
         correct_formatted_tag = self.unformatted_tag[1:-1].lower();
