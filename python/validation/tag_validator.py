@@ -49,15 +49,6 @@ class TagValidator:
         self.hed_dictionary = hed_dictionary;
         self.hed_dictionary_dictionaries = hed_dictionary.get_dictionaries();
 
-    def create_unit_class_regular_expression(self, unit_class_units):
-        unit_class_regular_expression = '';
-        if len(unit_class_units) > 0:
-            units_alternation_expression = unit_class_units[0];
-            for unit in unit_class_units[1:]:
-                units_alternation_expression += '|' + unit;
-            unit_class_regular_expression = '^\s*'+ units_alternation_expression
-
-
     def check_if_tag_is_valid(self, original_tag, formatted_tag):
         """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
 
