@@ -17,9 +17,11 @@ class Test(unittest.TestCase):
 
     def test_format_hed_tag(self):
         formatted_tag = HedStringDelimiter.format_hed_tag(self.unformatted_tag);
+        correct_formatted_tag = self.unformatted_tag[1:-1].lower();
         self.assertTrue(formatted_tag);
         self.assertIsInstance(formatted_tag, basestring)
         self.assertNotEqual(self.unformatted_tag, formatted_tag);
+        self.assertEqual(formatted_tag, correct_formatted_tag);
 
     def test_get_tag_set(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
