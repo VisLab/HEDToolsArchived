@@ -33,9 +33,9 @@ class HedStringDelimiter:
         self.tag_set = set();
         self.tag_groups = [];
         self.hed_string = hed_string;
-        self.split_hed_string = HedStringDelimiter.split_hed_string(hed_string);
+        self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self._find_top_level_tags();
-        self._find_group_tags(self.split_hed_string);
+        self._find_group_tags(self.split_hed_string_list);
 
     def get_split_hed_string(self):
         """Gets the split_hed_string field.
@@ -48,7 +48,7 @@ class HedStringDelimiter:
             A list containing the individual tags and tag groups in the hed string. Nested tag groups are not split.
 
         """
-        return self.split_hed_string;
+        return self.split_hed_string_list;
 
     def get_hed_string(self):
         """Gets the hed_string field.
@@ -102,23 +102,23 @@ class HedStringDelimiter:
         """
         return self.tag_groups;
 
-    def _find_group_tags(self, group_tag_set):
+    def _find_group_tags(self, tag_group_list):
         """Finds the tags that are in groups and put them in a set. The groups themselves are also put into a list.
 
         Parameters
         ----------
-        group_tag_set
-            A set containing the group tags.
+        tag_group_list: list
+            A list containing the group tags.
         Returns
         -------
 
         """
-        for tag_or_group in group_tag_set:
+        for tag_or_group in tag_group_list:
             if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
-                tag_group = HedStringDelimiter.remove_group_parentheses(tag_or_group)
-                nested_group_tag_set = HedStringDelimiter.split_hed_string(tag_group);
-                self._find_group_tags(nested_group_tag_set);
-                self.tag_groups.append(nested_group_tag_set);
+                tag_group_string = HedStringDelimiter.remove_group_parentheses(tag_or_group)
+                nested_group_tag_list = HedStringDelimiter.split_hed_string_into_list(tag_group_string);
+                self._find_group_tags(nested_group_tag_list);
+                self.tag_groups.append(nested_group_tag_list);
             else:
                 self.tag_set.add(tag_or_group);
 
@@ -127,14 +127,12 @@ class HedStringDelimiter:
 
         Parameters
         ----------
-        split_hed_string
-            A list containing the individual tags and tag groups in the hed string. Nested tag groups are not split.
         Returns
         -------
 
         """
-        self.top_level_tags = copy.copy(self.split_hed_string);
-        for tag_or_group in self.split_hed_string:
+        self.top_level_tags = copy.copy(self.split_hed_string_list);
+        for tag_or_group in self.split_hed_string_list:
             if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
                 self.top_level_tags.remove(tag_or_group);
             else:
@@ -146,7 +144,7 @@ class HedStringDelimiter:
 
         Parameters
         ----------
-        hed_tag
+        hed_tag: string
             A HED tag
         Returns
         -------
@@ -161,7 +159,27 @@ class HedStringDelimiter:
         return hed_tag.lower();
 
     @staticmethod
-    def split_hed_string(hed_string):
+    def format_hed_tags_in_set(hed_tags_set):
+        """Format the HED tags in a set.
+
+        Parameters
+        ----------
+        hed_tags_set: set
+            A HED tag
+        Returns
+        -------
+        string
+            The formatted version of the HED tag.
+
+        """
+        formatted_hed_tags_set = set();
+        for hed_tag in hed_tags_set:
+            formatted_hed_tag = HedStringDelimiter.format_hed_tag(hed_tag);
+            formatted_hed_tags_set.add(formatted_hed_tag);
+        return formatted_hed_tags_set;
+
+    @staticmethod
+    def split_hed_string_into_list(hed_string):
         """Splits the tags and non-nested groups in a hed string based on a delimiter. The default delimiter is a comma.
 
         Parameters
