@@ -18,18 +18,42 @@ class HedInputReader:
         self.hed_tag_columns = HedInputReader.subtract_1_from_list_elements(hed_tag_columns);
         self.worksheet = worksheet;
         self.specific_hed_tag_columns = specific_hed_tag_columns;
-        if self.hed_input_has_valid_file_extension:
-            pass;
+        if HedInputReader.hed_input_has_valid_file_extension(self.hed_input):
+            self.file_extension = HedInputReader.get_file_extension(self.hed_input);
+            if HedInputReader.file_is_a_text_file(self.file_extension):
+                self.delimiter = HedInputReader.get_delimiter_from_text_file_extension(self.file_extension);
+                self.validate_hed_tags_in_text_file(self);
+            else:
+                pass;
         else:
             self.validate_hed_string(self.hed_input);
 
-    def hed_input_is_a_text
+    def validate_hed_tags_in_text_file(self):
+        with open(self.hed_input) as opened_text_file:
+            for text_file_line in opened_text_file:
+                hed_string = HedInputReader.get_hed_string_from_text_file_line(text_file_line, self.hed_tag_columns,
+                                                                             self.column_delimiter);
+                self.validate_hed_string(hed_string);
+                pass;
 
-    def validate_hed_tags_in_file(self):
+    @staticmethod
+    def file_is_a_text_file(file_extension):
+        """Checks to see if the file extension provided is one that corresponds to a text file.
 
-    pass;
+         Parameters
+         ----------
+         file_extension: string
+            A file extension.
+         Returns
+         -------
+         boolean
+             True if the file is a text file. False, if otherwise.
 
-    def hed_input_has_valid_file_extension(self):
+         """
+        return file_extension in HedInputReader.TEXT_EXTENSION;
+
+    @staticmethod
+    def hed_input_has_valid_file_extension(hed_input):
         """Checks to see if the hed input has a valid file extension.
 
         Parameters
@@ -40,29 +64,35 @@ class HedInputReader:
             True if the hed input has a valid file extension. False, if otherwise.
 
         """
-        hed_input_has_extension = HedInputReader.file_path_has_extension(self.hed_input);
-        hed_input_file_extension = HedInputReader.get_file_extension(self.hed_input);
-        if hed_input_has_extension and hed_input_file_extension in HedInputReader.FILE_EXTENSION:
-            return True;
-        return False;
+        hed_input_has_extension = HedInputReader.file_path_has_extension(hed_input);
+        hed_input_file_extension = HedInputReader.get_file_extension(hed_input);
+        return hed_input_has_extension and hed_input_file_extension in HedInputReader.FILE_EXTENSION;
 
-    def validate_hed_tags_in_text_file(self):
-        with open(self.hed_input) as opened_text_file:
-            for text_file_line in opened_text_file:
-                HedInputReader.get_hed_tag_from_text_file(text_file_line, self.hed_tag_columns, self.column_delimiter)
-                pass;
+    @staticmethod
+    def get_delimiter_from_text_file_extension(file_extension):
+        """Gets the delimiter that is associated with the file extension.
 
+        Parameters
+        ----------
+        file_extension: string
+            A file extension.
+        Returns
+        -------
+        string
+            The delimiter that is associated with the file extension. For example, .txt and .tsv will return tab
+            as the delimiter and .csv will return comma as the delimiter.
+        """
+        delimiter = '';
+        if file_extension in HedInputReader.TSV_EXTENSION:
+            delimiter = HedInputReader.TAB_DELIMITER;
+        elif file_extension in HedInputReader.CSV_EXTENSION:
+            delimiter = HedInputReader.COMMA_DELIMITER;
+        return delimiter;
 
-    def check_hed_input_type(self):
-        if extension in HedInputReader.TSV_EXTENSION:
-            self.delimiter = HedInputReader.TAB_DELIMITER;
-        elif extension in HedInputReader.CSV_EXTENSION:
-            self.delimiter = HedInputReader.COMMA_DELIMITER;
-        elif extension in HedInputReader.EXCEL_EXTENSION:
-            pass;
-
+    @staticmethod
     def validate_hed_string(self, hed_string):
         return '';
+
 
     @staticmethod
     def open_workbook_worksheet(workbook_path, worksheet_name=''):
@@ -105,8 +135,9 @@ class HedInputReader:
         pass;
 
     @staticmethod
-    def get_hed_tag_from_text_file_line(text_file_line, hed_tag_columns, column_delimiter):
-        """Reads the next line of HED tags from the text file.
+    def get_hed_string_from_text_file_line(text_file_line, hed_tag_columns, column_delimiter):
+        """Reads in the current line of HED tags from the text file. The hed tag columns will be concatenated to form a
+           HED string.
 
         Parameters
         ----------
@@ -118,12 +149,15 @@ class HedInputReader:
             A delimiter used to split the columns.
         Returns
         -------
-        list
-            A list of containing the HED tags. Each element in the list contains the HED tags from a particular column.
+        string
+            A HED string containing the concatenated HED tag columns.
 
         """
         split_line = text_file_line.split(column_delimiter);
-        pass;
+        hed_tags = [];
+        for hed_tag_column in hed_tag_columns:
+            hed_tags.append(split_line[hed_tag_column]);
+        return ','.join(hed_tags);
 
     @staticmethod
     def subtract_1_from_list_elements(integer_list):
