@@ -13,11 +13,31 @@ class HedInputReader:
     TAB_DELIMITER = '\t';
     COMMA_DELIMITER = ',';
 
-    def __init__(self, hed_input, hed_tag_columns=2, worksheet='', specific_hed_tag_columns={}):
+    def __init__(self, hed_input, hed_tag_columns=2, worksheet='', prefixed_hed_tag_columns={}):
+        """Constructor for the HedInputReader class.
+
+        Parameters
+        ----------
+        hed_input: string
+            A HED string or a spreadsheet file containing HED tags. If a string is passed in then no other arguments
+            need to be specified.
+        hed_tag_columns: list
+            A list of integers containing the columns that contain the HED tags. The default value is the 2nd column.
+        worksheet: string
+            The name of the Excel workbook worksheet that contains the HED tags.
+        prefixed_hed_tag_columns: dictionary
+            A dictionary containing the HED tag column names that corresponds to tags that need to be prefixed with a
+            parent tag path.
+        Returns
+        -------
+        HedInputReader object
+            A HedInputReader object.
+
+        """
         self.hed_input = hed_input;
         self.hed_tag_columns = HedInputReader.subtract_1_from_list_elements(hed_tag_columns);
         self.worksheet = worksheet;
-        self.specific_hed_tag_columns = specific_hed_tag_columns;
+        self.prefixed_hed_tag_columns = prefixed_hed_tag_columns;
         if HedInputReader.hed_input_has_valid_file_extension(self.hed_input):
             self.file_extension = HedInputReader.get_file_extension(self.hed_input);
             if HedInputReader.file_is_a_text_file(self.file_extension):
@@ -32,7 +52,7 @@ class HedInputReader:
         with open(self.hed_input) as opened_text_file:
             for text_file_line in opened_text_file:
                 hed_string = HedInputReader.get_hed_string_from_text_file_line(text_file_line, self.hed_tag_columns,
-                                                                             self.column_delimiter);
+                                                                               self.column_delimiter);
                 self.validate_hed_string(hed_string);
                 pass;
 
@@ -135,7 +155,8 @@ class HedInputReader:
         pass;
 
     @staticmethod
-    def get_hed_string_from_text_file_line(text_file_line, hed_tag_columns, column_delimiter):
+    def get_hed_string_from_text_file_line(text_file_line, hed_tag_columns, column_delimiter,
+                                           prefixed_hed_tag_columns={}):
         """Reads in the current line of HED tags from the text file. The hed tag columns will be concatenated to form a
            HED string.
 
@@ -147,6 +168,9 @@ class HedInputReader:
             A list of integers containing the columns that contain the HED tags.
         column_delimiter: string
             A delimiter used to split the columns.
+        prefixed_hed_tag_columns: dictionary
+            A dictionary containing the HED tag column names that corresponds to tags that need to be prefixed with a
+            parent tag path.
         Returns
         -------
         string
