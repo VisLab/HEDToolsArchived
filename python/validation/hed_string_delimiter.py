@@ -36,6 +36,7 @@ class HedStringDelimiter:
         self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self._find_top_level_tags();
         self._find_group_tags(self.split_hed_string_list);
+        self.formatted_tag_set = HedStringDelimiter.format_hed_tags_in_set(self.tag_set);
 
     def get_split_hed_string(self):
         """Gets the split_hed_string field.
@@ -159,13 +160,37 @@ class HedStringDelimiter:
         return hed_tag.lower();
 
     @staticmethod
+    def format_hed_tags_in_list(hed_tags_list):
+        """Format the HED tags in a list. The list can be nested. Groups are represented as lists themselves.
+
+        Parameters
+        ----------
+        hed_tags_list: list
+            A list containing HED tags. Groups are lists inside of the list.
+        Returns
+        -------
+        list
+            A list with the HED tags formatted.
+
+        """
+        formatted_hed_tags_list = list();
+        for hed_tag_or_hed_tag_group in hed_tags_list:
+            if isinstance(hed_tag_or_hed_tag_group, list):
+                formatted_tag_group_list = HedStringDelimiter.format_hed_tags_in_list(hed_tag_or_hed_tag_group);
+                formatted_hed_tags_list.append(formatted_tag_group_list);
+            else:
+                formatted_hed_tag = HedStringDelimiter.format_hed_tag(hed_tag_or_hed_tag_group);
+                formatted_hed_tags_list.append(formatted_hed_tag);
+        return formatted_hed_tags_list;
+
+    @staticmethod
     def format_hed_tags_in_set(hed_tags_set):
         """Format the HED tags in a set.
 
         Parameters
         ----------
         hed_tags_set: set
-            A HED tag
+            A set containing HED tags.
         Returns
         -------
         string
