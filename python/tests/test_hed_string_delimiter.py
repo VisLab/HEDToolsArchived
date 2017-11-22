@@ -10,10 +10,17 @@ class Test(unittest.TestCase):
         cls.removal_elements = ['(tag2,tag5,(tag1),tag6)', '(tag3,tag5,tag6)'];
         cls.unformatted_tag = '/Event/label/This label ends with a slash/'
 
-    def test_split_hed_string(self):
-        split_hed_string = HedStringDelimiter.split_hed_string(self.mixed_hed_string);
+    def test_split_hed_string_into_list(self):
+        split_hed_string = HedStringDelimiter.split_hed_string_into_list(self.mixed_hed_string);
         self.assertTrue(split_hed_string);
         self.assertIsInstance(split_hed_string, list);
+
+    def test_format_hed_tags_in_set(self):
+        hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
+        tag_set = hed_string_delimiter.get_tag_set();
+        formatted_tag_set = HedStringDelimiter.format_hed_tags_in_set(tag_set);
+        self.assertIsInstance(formatted_tag_set, set);
+        self.assertEqual(len(tag_set), len(formatted_tag_set));
 
     def test_format_hed_tag(self):
         formatted_tag = HedStringDelimiter.format_hed_tag(self.unformatted_tag);
