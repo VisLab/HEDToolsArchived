@@ -23,7 +23,7 @@ class HedStringDelimiter:
         Parameters
         ----------
         hed_string
-            A hed string consisting of tags and tag groups.
+            A HED string consisting of tags and tag groups.
         Returns
         -------
         HedStringDelimiter object
@@ -32,21 +32,24 @@ class HedStringDelimiter:
         """
         self.tag_set = set();
         self.tag_groups = [];
+        self.top_level_tags = [];
         self.hed_string = hed_string;
         self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self._find_top_level_tags();
         self._find_group_tags(self.split_hed_string_list);
         self.formatted_tag_set = HedStringDelimiter.format_hed_tags_in_set(self.tag_set);
+        self.formatted_top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags);
+        self.formatted_tag_groups = HedStringDelimiter.format_hed_tags_in_list(self.tag_groups);
 
-    def get_split_hed_string(self):
-        """Gets the split_hed_string field.
+    def get_split_hed_string_list(self):
+        """Gets the split_hed_string_list field.
 
         Parameters
         ----------
         Returns
         -------
         list
-            A list containing the individual tags and tag groups in the hed string. Nested tag groups are not split.
+            A list containing the individual tags and tag groups in the HED string. Nested tag groups are not split.
 
         """
         return self.split_hed_string_list;
@@ -72,7 +75,20 @@ class HedStringDelimiter:
         Returns
         -------
         set
-            A set containing the individual tags in the hed string.
+            A set containing the individual tags in the HED string.
+
+        """
+        return self.tag_set;
+
+    def get_formatted_tag_set(self):
+        """Gets the formatted_tag_set field.
+
+        Parameters
+        ----------
+        Returns
+        -------
+        set
+            A set containing the individual tags in the HED string.
 
         """
         return self.tag_set;
@@ -85,7 +101,7 @@ class HedStringDelimiter:
         Returns
         -------
         set
-            A set containing the individual tags and tag groups in the hed string. Nested tag groups are not split.
+            A set containing the individual tags and tag groups in the HED string. Nested tag groups are not split.
 
         """
         return self.top_level_tags;
@@ -98,7 +114,7 @@ class HedStringDelimiter:
         Returns
         -------
         list
-            A list of a lists containing all of the tag groups in a hed string. Each list is a tag group.
+            A list of a lists containing all of the tag groups in a HED string. Each list is a tag group.
 
         """
         return self.tag_groups;
@@ -124,7 +140,7 @@ class HedStringDelimiter:
                 self.tag_set.add(tag_or_group);
 
     def _find_top_level_tags(self):
-        """Finds all of the tags at the top-level in a hed string. All group tags will be removed.
+        """Finds all of the tags at the top-level in a HED string. All group tags will be removed.
 
         Parameters
         ----------
@@ -205,7 +221,7 @@ class HedStringDelimiter:
 
     @staticmethod
     def split_hed_string_into_list(hed_string):
-        """Splits the tags and non-nested groups in a hed string based on a delimiter. The default delimiter is a comma.
+        """Splits the tags and non-nested groups in a HED string based on a delimiter. The default delimiter is a comma.
 
         Parameters
         ----------
@@ -214,7 +230,7 @@ class HedStringDelimiter:
         Returns
         -------
         list
-            A list containing the individual tags and tag groups in the hed string. Nested tag groups are not split.
+            A list containing the individual tags and tag groups in the HED string. Nested tag groups are not split.
 
         """
         split_hed_string = [];
@@ -241,16 +257,16 @@ class HedStringDelimiter:
 
     @staticmethod
     def hed_string_is_a_group(hed_string):
-        """Returns true if the hed string is a group.
+        """Returns true if the HED string is a group.
 
         Parameters
         ----------
         hed_string
-            A hed string consisting of tags and tag groups.
+            A HED string consisting of tags and tag groups.
         Returns
         -------
         boolean
-            True if the hed string is a group. False, if not a group.
+            True if the HED string is a group. False, if not a group.
 
         """
         hed_string = hed_string.strip();
