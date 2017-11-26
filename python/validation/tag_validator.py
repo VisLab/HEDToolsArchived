@@ -49,6 +49,20 @@ class TagValidator:
         self.hed_dictionary = hed_dictionary;
         self.hed_dictionary_dictionaries = hed_dictionary.get_dictionaries();
 
+    def run_through_validation_gauntlet(self, original_tag, formatted_tag, original_top_level_tags,
+                                        formatted_top_level_tags, tag_group):
+        validation_issues = '';
+        validation_issues += self.check_if_tag_is_valid(self, original_tag, formatted_tag);
+        validation_issues += self.check_if_tag_unit_class_units_are_valid(self, original_tag, formatted_tag);
+        validation_issues += self.check_if_tag_unit_class_units_are_valid(self, original_tag, formatted_tag);
+        validation_issues += self.check_for_required_tags(self, formatted_top_level_tags);
+        validation_issues += self.check_number_of_group_tildes(self, tag_group);
+        validation_issues += self.check_if_tag_requires_child(self, original_tag, formatted_tag);
+        validation_issues += self.check_if_multiple_unique_tags_exist(self, original_tag_list, formatted_tag_list)
+
+        validation_issues += self.check_if_tag_unit_class_units_exist(self, original_tag, formatted_tag);
+        validation_issues += self.check_capitalization(self, original_tag, formatted_tag);
+
     def check_if_tag_is_valid(self, original_tag, formatted_tag):
         """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
 
@@ -312,13 +326,13 @@ class TagValidator:
             return self.hed_dictionary.tag_has_attribute(numeric_tag, TagValidator.IS_NUMERIC_ATTRIBUTE);
         return False;
 
-    def check_number_of_group_tildes(self, group_tag_string):
+    def check_number_of_group_tildes(self, tag_group):
         """Reports a validation error if the tag group has too many tildes.
 
         Parameters
         ----------
-        group_tag_string: string
-            A group tag string.
+        tag_group: list
+            A list containing the tags in a group.
         Returns
         -------
         string
@@ -326,8 +340,8 @@ class TagValidator:
 
         """
         validation_error = '';
-        if group_tag_string.count('~') > 2:
-            validation_error = error_reporter.report_error_type(TagValidator.TILDE_ERROR_TYPE, group_tag_string);
+        if tag_group.count('~') > 2:
+            validation_error = error_reporter.report_error_type(TagValidator.TILDE_ERROR_TYPE, tag_group);
         return validation_error;
 
 
@@ -352,16 +366,13 @@ class TagValidator:
                                                                 tag=original_tag);
         return validation_error;
 
-
-    def check_for_required_tags(self, formatted_tag_list):
+    def check_for_required_tags(self, formatted_top_level_tags):
         """Reports a validation error if the required tags aren't present.
 
         Parameters
         ----------
-        original_tag: string
-            The original tag that is used to report the error.
-        formatted_tag: string
-            The tag that is used to do the validation.
+        formatted_top_level_tags: list
+            A list containing the top-level tags.
         Returns
         -------
         string
@@ -371,7 +382,7 @@ class TagValidator:
         validation_error = '';
         required_tag_prefixes = self.hed_dictionary_dictionaries[TagValidator.REQUIRED_ERROR_TYPE];
         for required_tag_prefix in required_tag_prefixes:
-            if sum([x.startswith(required_tag_prefix) for x in formatted_tag_list]) < 1:
+            if sum([x.startswith(required_tag_prefix) for x in formatted_top_level_tags]) < 1:
                 validation_error += error_reporter.report_error_type(TagValidator.REQUIRED_ERROR_TYPE,
                                                                      tag_prefix=required_tag_prefix);
         return validation_error;
