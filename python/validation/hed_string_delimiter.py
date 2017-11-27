@@ -101,10 +101,10 @@ class HedStringDelimiter:
         Returns
         -------
         set
-            A set containing the individual tags in the HED string.
+            A set containing the individual formatted tags in the HED string.
 
         """
-        return self.tag_set;
+        return self.formatted_tag_set;
 
     def get_top_level_tags(self):
         """Gets the top_level_tags field.
