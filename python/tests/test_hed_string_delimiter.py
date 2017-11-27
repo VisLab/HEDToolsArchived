@@ -66,6 +66,14 @@ class Test(unittest.TestCase):
         self.assertIsInstance(top_level_tags, list);
         self.assertNotEqual(len(tag_set), len(top_level_tags));
 
+    def test_get_formatted_top_level_tags(self):
+        hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
+        tag_set = hed_string_delimiter.get_tag_set();
+        formatted_top_level_tags = hed_string_delimiter.get_formatted_top_level_tags();
+        self.assertTrue(formatted_top_level_tags);
+        self.assertIsInstance(formatted_top_level_tags, list);
+        self.assertNotEqual(len(tag_set), len(formatted_top_level_tags));
+
     def test__find_top_level_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
         tag_set = hed_string_delimiter.get_tag_set();
