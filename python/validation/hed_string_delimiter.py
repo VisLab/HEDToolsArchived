@@ -80,6 +80,19 @@ class HedStringDelimiter:
         """
         return self.tag_set;
 
+    def get_formatted_tag_groups(self):
+        """Gets the formatted_tag_groups field.
+
+        Parameters
+        ----------
+        Returns
+        -------
+        list
+            A list containing all of the groups with formatted tags.
+
+        """
+        return self.formatted_tag_groups;
+
     def get_formatted_tag_set(self):
         """Gets the formatted_tag_set field.
 
