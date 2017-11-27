@@ -1,4 +1,8 @@
 import xlrd;
+from validation.hed_dictionary import HedDictionary
+from validation.tag_validator import TagValidator;
+from validation.hed_string_delimiter import HedStringDelimiter;
+from validation import error_reporter;
 
 
 class HedInputReader:
@@ -12,8 +16,9 @@ class HedInputReader:
     FILE_INPUT = 'file';
     TAB_DELIMITER = '\t';
     COMMA_DELIMITER = ',';
+    HED_XML_FILE = '../hed/HED.xml';
 
-    def __init__(self, hed_input, hed_tag_columns=2, worksheet='', prefixed_hed_tag_columns={}):
+    def __init__(self, hed_input, hed_tag_columns=[2], has_headers=True, worksheet='', prefixed_hed_tag_columns={}):
         """Constructor for the HedInputReader class.
 
         Parameters
@@ -38,23 +43,90 @@ class HedInputReader:
         self.hed_tag_columns = HedInputReader.subtract_1_from_list_elements(hed_tag_columns);
         self.worksheet = worksheet;
         self.prefixed_hed_tag_columns = prefixed_hed_tag_columns;
+        self.hed_dictionary = HedDictionary(HedInputReader.HED_XML_FILE);
+        self.tag_validator = TagValidator(self.hed_dictionary);
         if HedInputReader.hed_input_has_valid_file_extension(self.hed_input):
             self.file_extension = HedInputReader.get_file_extension(self.hed_input);
             if HedInputReader.file_is_a_text_file(self.file_extension):
-                self.delimiter = HedInputReader.get_delimiter_from_text_file_extension(self.file_extension);
-                self.validate_hed_tags_in_text_file(self);
+                self.column_delimiter = HedInputReader.get_delimiter_from_text_file_extension(self.file_extension);
+                self.validation_issues = self.validate_hed_tags_in_text_file();
             else:
                 pass;
         else:
-            self.validate_hed_string(self.hed_input);
+            self.validation_issues = self.validate_hed_string(self.hed_input);
 
     def validate_hed_tags_in_text_file(self):
+        validation_issues = '';
         with open(self.hed_input) as opened_text_file:
-            for text_file_line in opened_text_file:
+            for text_file_line_number, text_file_line in enumerate(opened_text_file):
                 hed_string = HedInputReader.get_hed_string_from_text_file_line(text_file_line, self.hed_tag_columns,
                                                                                self.column_delimiter);
-                self.validate_hed_string(hed_string);
-                pass;
+                line_validation_issues = self.validate_hed_string(hed_string);
+                if line_validation_issues:
+                    validation_issues += HedInputReader.generate_line_issue_message(text_file_line_number) + \
+                                        line_validation_issues;
+        return validation_issues;
+
+    @staticmethod
+    def generate_line_issue_message(line_number, has_headers=True):
+        """Generates a line issue message that is associated with a particular line in a spreadsheet.
+
+         Parameters
+         ----------
+         line_number: integer
+            The line number that the issue is associated with.
+         Returns
+         -------
+         string
+             The line issue message.
+
+         """
+        if has_headers:
+            line_number += 1;
+        return error_reporter.report_error_type('line', error_line=line_number);
+
+
+    def validate_hed_string(self, hed_string):
+        validation_issues = '';
+        hed_string_delimiter = HedStringDelimiter(hed_string);
+        validation_issues += self.tag_validator.run_pre_validator(hed_string);
+        if not validation_issues:
+            validation_issues += self.validate_individual_tags_in_hed_string(hed_string_delimiter);
+            validation_issues += self.validate_tag_levels_in_hed_string(hed_string_delimiter);
+            validation_issues += self.validate_groups_in_hed_string(hed_string_delimiter);
+        return validation_issues;
+
+    def validate_tag_levels_in_hed_string(self, hed_string_delimiter):
+        validation_issues = '';
+        tag_groups = hed_string_delimiter.get_tag_groups();
+        formatted_tag_groups = hed_string_delimiter.get_formatted_tag_groups();
+        original_and_formatted_tag_groups = zip(tag_groups, formatted_tag_groups);
+        for original_tag_group, formatted_tag_group in original_and_formatted_tag_groups:
+            validation_issues += self.tag_validator.run_tag_level_validators(original_tag_group, formatted_tag_group);
+        top_level_tags = hed_string_delimiter.get_top_level_tags();
+        formatted_top_level_tags = hed_string_delimiter.get_formatted_top_level_tags();
+        original_and_formatted_top_level_tags = zip(top_level_tags, formatted_top_level_tags);
+        for top_level_tag, formatted_top_level_tag in original_and_formatted_top_level_tags:
+            validation_issues += self.tag_validator.run_tag_level_validators(top_level_tag, formatted_top_level_tag);
+        return validation_issues;
+
+    def validate_groups_in_hed_string(self, hed_string_delimiter):
+        validation_issues = '';
+        tag_groups = hed_string_delimiter.get_tag_groups();
+        formatted_tag_groups = hed_string_delimiter.get_formatted_tag_groups();
+        original_and_formatted_tag_groups = zip(tag_groups, formatted_tag_groups);
+        for original_tag_group, formatted_tag_group in original_and_formatted_tag_groups:
+            validation_issues += self.tag_validator.run_tag_group_validators(original_tag_group, formatted_tag_group);
+        return validation_issues;
+
+    def validate_individual_tags_in_hed_string(self, hed_string_delimiter):
+        validation_issues = '';
+        tag_set = hed_string_delimiter.get_tag_set();
+        formatted_tag_set = hed_string_delimiter.get_formatted_tag_set();
+        original_and_formatted_tags = zip(tag_set, formatted_tag_set);
+        for original_tag, formatted_tag in original_and_formatted_tags:
+            validation_issues += self.tag_validator.run_individual_tag_validators(original_tag, formatted_tag);
+        return validation_issues;
 
     @staticmethod
     def file_is_a_text_file(file_extension):
@@ -108,11 +180,6 @@ class HedInputReader:
         elif file_extension in HedInputReader.CSV_EXTENSION:
             delimiter = HedInputReader.COMMA_DELIMITER;
         return delimiter;
-
-    @staticmethod
-    def validate_hed_string(self, hed_string):
-        return '';
-
 
     @staticmethod
     def open_workbook_worksheet(workbook_path, worksheet_name=''):
@@ -233,9 +300,12 @@ class HedInputReader:
         """
         return file_path.rsplit('.', 1)[-1].lower();
 
+
 if __name__ == '__main__':
-    a = 'fdskjfdkfjdkdslfjtsv';
-    print(a.rsplit('.', 1)[-1]);
+    spreadsheet_path = '../tests/data/BCIT_GuardDuty_HED_tag_spec_v27.tsv';
+    hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[2]);
+    print(hed_input_reader.validation_issues);
+
 
 
 
