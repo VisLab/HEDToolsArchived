@@ -29,6 +29,7 @@ class TagValidator:
     IS_NUMERIC_ATTRIBUTE = 'isNumeric';
     UNIT_CLASS_ATTRIBUTE = 'unitClass';
     UNIT_CLASS_UNITS_ELEMENT = 'units';
+    TILDE = '~';
     hed_dictionary = None;
     hed_dictionary_dictionaries = None;
 
@@ -49,19 +50,29 @@ class TagValidator:
         self.hed_dictionary = hed_dictionary;
         self.hed_dictionary_dictionaries = hed_dictionary.get_dictionaries();
 
-    def run_through_validation_gauntlet(self, original_tag, formatted_tag, original_top_level_tags,
-                                        formatted_top_level_tags, tag_group):
+    def run_individual_tag_validators(self, original_tag, formatted_tag, check_for_warnings=False):
         validation_issues = '';
-        validation_issues += self.check_if_tag_is_valid(self, original_tag, formatted_tag);
-        validation_issues += self.check_if_tag_unit_class_units_are_valid(self, original_tag, formatted_tag);
-        validation_issues += self.check_if_tag_unit_class_units_are_valid(self, original_tag, formatted_tag);
-        validation_issues += self.check_for_required_tags(self, formatted_top_level_tags);
-        validation_issues += self.check_number_of_group_tildes(self, tag_group);
-        validation_issues += self.check_if_tag_requires_child(self, original_tag, formatted_tag);
-        validation_issues += self.check_if_multiple_unique_tags_exist(self, original_tag_list, formatted_tag_list)
+        validation_issues += self.check_if_tag_is_valid(original_tag, formatted_tag);
+        validation_issues += self.check_if_tag_unit_class_units_are_valid(original_tag, formatted_tag);
+        validation_issues += self.check_if_tag_unit_class_units_are_valid(original_tag, formatted_tag);
+        validation_issues += self.check_if_tag_requires_child(original_tag, formatted_tag);
+        if check_for_warnings:
+            validation_issues += self.check_if_tag_unit_class_units_exist(original_tag, formatted_tag);
+            validation_issues += self.check_capitalization(original_tag, formatted_tag);
+        return validation_issues;
 
-        validation_issues += self.check_if_tag_unit_class_units_exist(self, original_tag, formatted_tag);
-        validation_issues += self.check_capitalization(self, original_tag, formatted_tag);
+    def run_tag_group_validators(self, tag_group):
+        validation_issues = '';
+        validation_issues += self.check_number_of_group_tildes(tag_group);
+        return validation_issues;
+
+    def run_pre_validator(self, hed_string):
+        return self.count_tag_group_brackets(hed_string);
+
+    def run_tag_level_validators(self, original_tag_list, formatted_tag_list):
+        validation_issues = '';
+        validation_issues += self.check_if_multiple_unique_tags_exist(original_tag_list, formatted_tag_list);
+        return validation_issues;
 
     def check_if_tag_is_valid(self, original_tag, formatted_tag):
         """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
@@ -79,7 +90,8 @@ class TagValidator:
 
         """
         validation_error = '';
-        if self.is_extension_allowed_tag(formatted_tag) or self.tag_takes_value(formatted_tag):
+        if self.is_extension_allowed_tag(formatted_tag) or self.tag_takes_value(formatted_tag) or \
+                        formatted_tag == TagValidator.TILDE:
             pass;
         elif not self.hed_dictionary_dictionaries[TagValidator.TAG_DICTIONARY_KEY].get(formatted_tag):
             validation_error = error_reporter.report_error_type(TagValidator.VALID_ERROR_TYPE, tag=original_tag);
