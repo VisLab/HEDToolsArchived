@@ -183,7 +183,8 @@ class HedStringDelimiter:
 
     @staticmethod
     def format_hed_tag(hed_tag):
-        """Format a single HED tag. Slashes in the beginning and end are removed and the tag is converted to lowercase.
+        """Format a single HED tag. Slashes and double quotes in the beginning and end are removed and the tag is
+           converted to lowercase.
 
         Parameters
         ----------
@@ -195,6 +196,11 @@ class HedStringDelimiter:
             The formatted version of the HED tag.
 
         """
+        hed_tag = hed_tag.strip();
+        if hed_tag.startswith('"'):
+            hed_tag = hed_tag[1:];
+        if hed_tag.endswith('"'):
+            hed_tag = hed_tag[:-1];
         if hed_tag.startswith('/'):
             hed_tag = hed_tag[1:];
         if hed_tag.endswith('/'):
