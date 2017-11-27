@@ -39,6 +39,12 @@ class Test(unittest.TestCase):
         self.assertTrue(tag_set);
         self.assertIsInstance(tag_set, set);
 
+    def test_get_formatted_tag_set(self):
+        hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
+        formatted_tag_set = hed_string_delimiter.get_formatted_tag_set();
+        self.assertTrue(formatted_tag_set);
+        self.assertIsInstance(formatted_tag_set, set);
+
     def test_get_hed_string(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
         hed_string = hed_string_delimiter.get_hed_string();
