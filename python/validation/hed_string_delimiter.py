@@ -113,11 +113,24 @@ class HedStringDelimiter:
         ----------
         Returns
         -------
-        set
-            A set containing the individual tags and tag groups in the HED string. Nested tag groups are not split.
+        list
+            A list containing the top-level tags in a HED string.
 
         """
         return self.top_level_tags;
+
+    def get_formatted_top_level_tags(self):
+        """Gets the formatted_top_level_tags field.
+
+        Parameters
+        ----------
+        Returns
+        -------
+        list
+            A list containing the top-level formatted tags in a HED string.
+
+        """
+        return self.formatted_top_level_tags;
 
     def get_tag_groups(self):
         """Gets the tag_groups field.
