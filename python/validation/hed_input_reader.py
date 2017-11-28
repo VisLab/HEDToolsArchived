@@ -60,7 +60,7 @@ class HedInputReader:
         validation_issues = '';
         with open(self.hed_input) as opened_text_file:
             for text_file_line_number, text_file_line in enumerate(opened_text_file):
-                if self.has_headers and text_file_line_number == 0:
+                if HedInputReader.row_contains_headers(self.has_headers, text_file_line_number):
                     continue;
                 validation_issues = self.append_validation_issues_if_found(validation_issues,
                                                                            text_file_line_number, text_file_line);
@@ -74,7 +74,7 @@ class HedInputReader:
         validation_issues: string
             A validation string that contains all the issues found in the spreadsheet.
          line_number: integer
-            The line number that the issues is associated with.
+            The line number that the issues are associated with.
         file_line: string
             The line in the spreadsheet that contains the HED string.
          Returns
@@ -91,6 +91,24 @@ class HedInputReader:
                 validation_issues += HedInputReader.generate_line_issue_message(line_number) + \
                                      line_validation_issues;
         return validation_issues;
+
+    @staticmethod
+    def row_contains_headers(has_headers, row_number):
+        """Checks to see if the row contains headers.
+
+         Parameters
+         ----------
+        has_headers: boolean
+            True if file has headers. False, if otherwise.
+         row_number: integer
+            The row number of the spreadsheet.
+         Returns
+         -------
+         boolean
+             True if the row contains the headers. False, if otherwise.
+
+         """
+        return has_headers and row_number == 0
 
     @staticmethod
     def generate_line_issue_message(line_number, has_headers=True):
