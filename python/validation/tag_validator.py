@@ -74,6 +74,11 @@ class TagValidator:
         validation_issues += self.check_if_multiple_unique_tags_exist(original_tag_list, formatted_tag_list);
         return validation_issues;
 
+    def run_top_level_validators(self, formatted_top_level_tags):
+        validation_issues = '';
+        validation_issues += self.check_for_required_tags(formatted_top_level_tags);
+        return validation_issues;
+
     def check_if_tag_is_valid(self, original_tag, formatted_tag):
         """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
 
