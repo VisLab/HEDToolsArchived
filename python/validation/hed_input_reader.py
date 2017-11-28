@@ -141,6 +141,18 @@ class HedInputReader:
         return error_reporter.report_error_type('row', error_row=row_number);
 
     def validate_hed_string(self, hed_string):
+        """Validates the tags in a HED string.
+
+         Parameters
+         ----------
+         hed_string: string
+            A HED string.
+         Returns
+         -------
+         string
+             The validation issues associated with the HED string.
+
+         """
         validation_issues = '';
         hed_string_delimiter = HedStringDelimiter(hed_string);
         validation_issues += self.tag_validator.run_pre_validator(hed_string);
