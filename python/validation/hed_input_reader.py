@@ -62,13 +62,34 @@ class HedInputReader:
             for text_file_line_number, text_file_line in enumerate(opened_text_file):
                 if self.has_headers and text_file_line_number == 0:
                     continue;
-                hed_string = HedInputReader.get_hed_string_from_text_file_line(text_file_line, self.hed_tag_columns,
-                                                                               self.column_delimiter);
-                if hed_string:
-                    line_validation_issues = self.validate_hed_string(hed_string);
-                    if line_validation_issues:
-                        validation_issues += HedInputReader.generate_line_issue_message(text_file_line_number) + \
-                                            line_validation_issues;
+                validation_issues = self.append_validation_issues_if_found(validation_issues,
+                                                                           text_file_line_number, text_file_line);
+        return validation_issues;
+
+    def append_validation_issues_if_found(self, validation_issues, line_number, file_line):
+        """Appends the validation issues associated with a particular line in a spreadsheet.
+
+         Parameters
+         ----------
+        validation_issues: string
+            A validation string that contains all the issues found in the spreadsheet.
+         line_number: integer
+            The line number that the issues is associated with.
+        file_line: string
+            The line in the spreadsheet that contains the HED string.
+         Returns
+         -------
+         string
+             The validation issues with the appended issues found in the particular line.
+
+         """
+        hed_string = HedInputReader.get_hed_string_from_text_file_line(file_line, self.hed_tag_columns,
+                                                                       self.column_delimiter);
+        if hed_string:
+            line_validation_issues = self.validate_hed_string(hed_string);
+            if line_validation_issues:
+                validation_issues += HedInputReader.generate_line_issue_message(line_number) + \
+                                     line_validation_issues;
         return validation_issues;
 
     @staticmethod
