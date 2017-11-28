@@ -158,8 +158,9 @@ class HedStringDelimiter:
 
         """
         for tag_or_group in tag_group_list:
+            print(tag_or_group);
             if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
-                tag_group_string = HedStringDelimiter.remove_group_parentheses(tag_or_group)
+                tag_group_string = HedStringDelimiter.remove_group_parentheses(tag_or_group);
                 nested_group_tag_list = HedStringDelimiter.split_hed_string_into_list(tag_group_string);
                 self._find_group_tags(nested_group_tag_list);
                 self.tag_groups.append(nested_group_tag_list);
@@ -277,7 +278,7 @@ class HedStringDelimiter:
                 number_of_opening_parentheses += 1;
             if character == HedStringDelimiter.CLOSING_GROUP_CHARACTER:
                 number_of_closing_parentheses += 1;
-            if character == HedStringDelimiter.TILDE:
+            if number_of_opening_parentheses == number_of_closing_parentheses and character == HedStringDelimiter.TILDE:
                 split_hed_string.append(current_tag.strip());
                 split_hed_string.append(HedStringDelimiter.TILDE);
                 current_tag = '';
