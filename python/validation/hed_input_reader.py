@@ -153,6 +153,24 @@ class HedInputReader:
             validation_issues += self.tag_validator.run_tag_level_validators(top_level_tag, formatted_top_level_tag);
         return validation_issues;
 
+    def validate_top_levels_in_hed_string(self, hed_string_delimiter):
+        """Validates the top-level tags in a HED string.
+
+         Parameters
+         ----------
+         hed_string_delimiter: HedStringDelimiter object
+            A HEDStringDelimiter object.
+         Returns
+         -------
+         string
+             The validation issues associated with the top-level tags in the HED string.
+
+         """
+        validation_issues = '';
+        formatted_top_level_tags = hed_string_delimiter.get_formatted_top_level_tags();
+        validation_issues += self.tag_validator.run_top_level_validators(formatted_top_level_tags);
+        return validation_issues;
+
     def validate_groups_in_hed_string(self, hed_string_delimiter):
         """Validates the groups in a HED string.
 
