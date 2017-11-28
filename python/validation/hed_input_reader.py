@@ -59,37 +59,37 @@ class HedInputReader:
     def validate_hed_tags_in_text_file(self):
         validation_issues = '';
         with open(self.hed_input) as opened_text_file:
-            for text_file_line_number, text_file_line in enumerate(opened_text_file):
-                if HedInputReader.row_contains_headers(self.has_headers, text_file_line_number):
+            for text_file_row_number, text_file_row in enumerate(opened_text_file):
+                if HedInputReader.row_contains_headers(self.has_headers, text_file_row_number):
                     continue;
                 validation_issues = self.append_validation_issues_if_found(validation_issues,
-                                                                           text_file_line_number, text_file_line);
+                                                                           text_file_row_number, text_file_row);
         return validation_issues;
 
-    def append_validation_issues_if_found(self, validation_issues, line_number, file_line):
-        """Appends the validation issues associated with a particular line in a spreadsheet.
+    def append_validation_issues_if_found(self, validation_issues, row_number, file_row):
+        """Appends the validation issues associated with a particular row in a spreadsheet.
 
          Parameters
          ----------
         validation_issues: string
             A validation string that contains all the issues found in the spreadsheet.
-         line_number: integer
-            The line number that the issues are associated with.
-        file_line: string
-            The line in the spreadsheet that contains the HED string.
+         row_number: integer
+            The row number that the issues are associated with.
+        file_row: string
+            The row in the spreadsheet that contains the HED string.
          Returns
          -------
          string
-             The validation issues with the appended issues found in the particular line.
+             The validation issues with the appended issues found in the particular row.
 
          """
-        hed_string = HedInputReader.get_hed_string_from_text_file_line(file_line, self.hed_tag_columns,
-                                                                       self.column_delimiter);
+        hed_string = HedInputReader.get_hed_string_from_text_file_row(file_row, self.hed_tag_columns,
+                                                                      self.column_delimiter);
         if hed_string:
-            line_validation_issues = self.validate_hed_string(hed_string);
-            if line_validation_issues:
-                validation_issues += HedInputReader.generate_line_issue_message(line_number) + \
-                                     line_validation_issues;
+            row_validation_issues = self.validate_hed_string(hed_string);
+            if row_validation_issues:
+                validation_issues += HedInputReader.generate_row_issue_message(row_number) + \
+                                     row_validation_issues;
         return validation_issues;
 
     @staticmethod
@@ -111,22 +111,22 @@ class HedInputReader:
         return has_headers and row_number == 0
 
     @staticmethod
-    def generate_line_issue_message(line_number, has_headers=True):
-        """Generates a line issue message that is associated with a particular line in a spreadsheet.
+    def generate_row_issue_message(row_number, has_headers=True):
+        """Generates a row issue message that is associated with a particular row in a spreadsheet.
 
          Parameters
          ----------
-         line_number: integer
-            The line number that the issue is associated with.
+         row_number: integer
+            The row number that the issue is associated with.
          Returns
          -------
          string
-             The line issue message.
+             The row issue message.
 
          """
         if has_headers:
-            line_number += 1;
-        return error_reporter.report_error_type('line', error_line=line_number);
+            row_number += 1;
+        return error_reporter.report_error_type('line', error_row=row_number);
 
 
     def validate_hed_string(self, hed_string):
@@ -250,7 +250,7 @@ class HedInputReader:
 
     @staticmethod
     def get_hed_tag_from_excel_file(worksheet, tag_columns):
-        """Reads the next line of HED tags from the excel file.
+        """Reads the next row of HED tags from the excel file.
 
         Parameters
         ----------
@@ -267,15 +267,15 @@ class HedInputReader:
         pass;
 
     @staticmethod
-    def get_hed_string_from_text_file_line(text_file_line, hed_tag_columns, column_delimiter,
-                                           prefixed_hed_tag_columns={}):
-        """Reads in the current line of HED tags from the text file. The hed tag columns will be concatenated to form a
+    def get_hed_string_from_text_file_row(text_file_row, hed_tag_columns, column_delimiter,
+                                          prefixed_hed_tag_columns={}):
+        """Reads in the current row of HED tags from the text file. The hed tag columns will be concatenated to form a
            HED string.
 
         Parameters
         ----------
-        text_file_line: string
-            The line in the text file that contains the HED tags.
+        text_file_row: string
+            The row in the text file that contains the HED tags.
         hed_tag_columns: list
             A list of integers containing the columns that contain the HED tags.
         column_delimiter: string
@@ -289,15 +289,15 @@ class HedInputReader:
             A HED string containing the concatenated HED tag columns.
 
         """
-        split_line = text_file_line.split(column_delimiter);
+        split_row = text_file_row.split(column_delimiter);
         hed_tags = [];
         for hed_tag_column in hed_tag_columns:
-            hed_tags.append(split_line[hed_tag_column]);
+            hed_tags.append(split_row[hed_tag_column]);
         return ','.join(hed_tags);
 
     @staticmethod
     def subtract_1_from_list_elements(integer_list):
-        """Reads the next line of HED tags from the text file.
+        """Reads the next row of HED tags from the text file.
 
         Parameters
         ----------
@@ -331,7 +331,7 @@ class HedInputReader:
 
     @staticmethod
     def get_file_extension(file_path):
-        """Reads the next line of HED tags from the text file.
+        """Reads the next row of HED tags from the text file.
 
         Parameters
         ----------
