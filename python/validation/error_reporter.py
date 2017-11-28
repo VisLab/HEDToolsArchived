@@ -8,7 +8,7 @@ Created on Oct 2, 2017
 '''
 
 
-def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_class_units='', opening_bracket_count=0,
+def report_error_type(error_type, error_row=1, tag='', tag_prefix='', unit_class_units='', opening_bracket_count=0,
                       closing_bracket_count=0):
     """Reports the validation error based on the type of error.
 
@@ -16,8 +16,8 @@ def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_clas
     ----------
     error_type: string
         The type of validation error.
-    error_line: int
-        The line number that the error occurred on.
+    error_row: int
+        The row number that the error occurred on.
     tag: string
         The tag that generated the error. The original tag not the formatted one.
     tag_prefix: string
@@ -34,7 +34,7 @@ def report_error_type(error_type, error_line=1, tag='', tag_prefix='', unit_clas
         'bracket': '\tERROR: Number of opening and closing brackets are unequal. %s opening brackets. %s '
                    'closing brackets\n' % (opening_bracket_count, closing_bracket_count),
         'isNumeric': '\tERROR: Invalid numeric tag - \"%s\"\n' % tag,
-        'line': 'Issues on line %s:\n' % str(error_line),
+        'row': 'Issues on row %s:\n' % str(error_row),
         'required': '\tERROR: Tag with prefix \"%s\" is required\n' % tag_prefix,
         'requireChild':'tERROR: Descendant tag required - \"%s\"\n' % tag,
         'tilde': '\tERROR: Too many tildes - group \"%s\"\n' % tag,

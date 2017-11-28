@@ -126,7 +126,7 @@ class HedInputReader:
          """
         if has_headers:
             row_number += 1;
-        return error_reporter.report_error_type('line', error_row=row_number);
+        return error_reporter.report_error_type('row', error_row=row_number);
 
 
     def validate_hed_string(self, hed_string):
