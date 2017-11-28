@@ -70,6 +70,21 @@ class TagValidator:
         return self.count_tag_group_brackets(hed_string);
 
     def run_tag_level_validators(self, original_tag_list, formatted_tag_list):
+        """Runs the validators on tags at each level in a HED string. This pertains to the top-level, all groups,
+           and nested groups.
+
+         Parameters
+         ----------
+         original_tag_list: list
+            A list containing the original tags.
+        formatted_tag_list: list
+            A list containing formatted tags.
+         Returns
+         -------
+         string
+             The validation issues associated with each level in the HED string.
+
+         """
         validation_issues = '';
         validation_issues += self.check_if_multiple_unique_tags_exist(original_tag_list, formatted_tag_list);
         return validation_issues;
