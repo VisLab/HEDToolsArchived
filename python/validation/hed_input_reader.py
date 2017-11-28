@@ -64,10 +64,11 @@ class HedInputReader:
                     continue;
                 hed_string = HedInputReader.get_hed_string_from_text_file_line(text_file_line, self.hed_tag_columns,
                                                                                self.column_delimiter);
-                line_validation_issues = self.validate_hed_string(hed_string);
-                if line_validation_issues:
-                    validation_issues += HedInputReader.generate_line_issue_message(text_file_line_number) + \
-                                        line_validation_issues;
+                if hed_string:
+                    line_validation_issues = self.validate_hed_string(hed_string);
+                    if line_validation_issues:
+                        validation_issues += HedInputReader.generate_line_issue_message(text_file_line_number) + \
+                                            line_validation_issues;
         return validation_issues;
 
     @staticmethod
@@ -307,10 +308,10 @@ class HedInputReader:
 
 
 if __name__ == '__main__':
-    spreadsheet_path = '../tests/data/BCIT_GuardDuty_HED_tag_spec_v27.tsv';
+    spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
     # hed_string = 'Event/Category/Participant response, ' \
     #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
-    hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[2]);
+    hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[6]);
     print(hed_input_reader.validation_issues);
 
 
