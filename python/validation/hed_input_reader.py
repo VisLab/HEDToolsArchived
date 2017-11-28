@@ -174,11 +174,21 @@ class HedInputReader:
         return validation_issues;
 
     def validate_individual_tags_in_hed_string(self, hed_string_delimiter):
+        """Validates the individual tags in a HED string.
+
+         Parameters
+         ----------
+         hed_string_delimiter: HedStringDelimiter object
+            A HEDStringDelimiter object.
+         Returns
+         -------
+         string
+             The validation issues associated with the individual tags.
+
+         """
         validation_issues = '';
         tag_set = hed_string_delimiter.get_tag_set();
         formatted_tag_set = hed_string_delimiter.get_formatted_tag_set();
-        # print(tag_set)
-        # print(formatted_tag_set)
         original_and_formatted_tags = zip(tag_set, formatted_tag_set);
         for original_tag, formatted_tag in original_and_formatted_tags:
             validation_issues += self.tag_validator.run_individual_tag_validators(original_tag, formatted_tag);
