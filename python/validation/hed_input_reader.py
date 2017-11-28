@@ -104,42 +104,6 @@ class HedInputReader:
                                      row_validation_issues;
         return validation_issues;
 
-    @staticmethod
-    def row_contains_headers(has_headers, row_number):
-        """Checks to see if the row contains headers.
-
-         Parameters
-         ----------
-        has_headers: boolean
-            True if file has headers. False, if otherwise.
-         row_number: integer
-            The row number of the spreadsheet.
-         Returns
-         -------
-         boolean
-             True if the row contains the headers. False, if otherwise.
-
-         """
-        return has_headers and row_number == 0
-
-    @staticmethod
-    def generate_row_issue_message(row_number, has_headers=True):
-        """Generates a row issue message that is associated with a particular row in a spreadsheet.
-
-         Parameters
-         ----------
-         row_number: integer
-            The row number that the issue is associated with.
-         Returns
-         -------
-         string
-             The row issue message.
-
-         """
-        if has_headers:
-            row_number += 1;
-        return error_reporter.report_error_type('row', error_row=row_number);
-
     def validate_hed_string(self, hed_string):
         """Validates the tags in a HED string.
 
@@ -230,6 +194,42 @@ class HedInputReader:
         for original_tag, formatted_tag in original_and_formatted_tags:
             validation_issues += self.tag_validator.run_individual_tag_validators(original_tag, formatted_tag);
         return validation_issues;
+
+    @staticmethod
+    def row_contains_headers(has_headers, row_number):
+        """Checks to see if the row contains headers.
+
+         Parameters
+         ----------
+        has_headers: boolean
+            True if file has headers. False, if otherwise.
+         row_number: integer
+            The row number of the spreadsheet.
+         Returns
+         -------
+         boolean
+             True if the row contains the headers. False, if otherwise.
+
+         """
+        return has_headers and row_number == 0
+
+    @staticmethod
+    def generate_row_issue_message(row_number, has_headers=True):
+        """Generates a row issue message that is associated with a particular row in a spreadsheet.
+
+         Parameters
+         ----------
+         row_number: integer
+            The row number that the issue is associated with.
+         Returns
+         -------
+         string
+             The row issue message.
+
+         """
+        if has_headers:
+            row_number += 1;
+        return error_reporter.report_error_type('row', error_row=row_number);
 
     @staticmethod
     def file_is_a_text_file(file_extension):
