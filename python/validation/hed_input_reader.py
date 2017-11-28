@@ -28,6 +28,8 @@ class HedInputReader:
             need to be specified.
         hed_tag_columns: list
             A list of integers containing the columns that contain the HED tags. The default value is the 2nd column.
+        has_headers: boolean
+            True if file has headers. False, if otherwise.
         worksheet: string
             The name of the Excel workbook worksheet that contains the HED tags.
         prefixed_hed_tag_columns: dictionary
