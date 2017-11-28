@@ -151,6 +151,19 @@ class HedInputReader:
         return validation_issues;
 
     def validate_tag_levels_in_hed_string(self, hed_string_delimiter):
+        """Validates the tags at each level in a HED string. This pertains to the top-level, all groups, and nested
+           groups.
+
+         Parameters
+         ----------
+         hed_string_delimiter: HedStringDelimiter object
+            A HEDStringDelimiter object.
+         Returns
+         -------
+         string
+             The validation issues associated with each level in the HED string.
+
+         """
         validation_issues = '';
         tag_groups = hed_string_delimiter.get_tag_groups();
         formatted_tag_groups = hed_string_delimiter.get_formatted_tag_groups();
