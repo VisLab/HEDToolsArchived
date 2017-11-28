@@ -13,6 +13,7 @@ import copy;
 
 class HedStringDelimiter:
     DELIMITER = ',';
+    DOUBLE_QUOTE_CHARACTER = '"';
     OPENING_GROUP_CHARACTER = '(';
     CLOSING_GROUP_CHARACTER = ')';
     TILDE = '~';
@@ -30,14 +31,14 @@ class HedStringDelimiter:
             A HedStringDelimiter object.
 
         """
-        self.tag_set = set();
+        self.tags = [];
         self.tag_groups = [];
         self.top_level_tags = [];
         self.hed_string = hed_string;
         self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self._find_top_level_tags();
         self._find_group_tags(self.split_hed_string_list);
-        self.formatted_tag_set = HedStringDelimiter.format_hed_tags_in_set(self.tag_set);
+        self.formatted_tag_set = HedStringDelimiter.format_hed_tags_in_list(self.tags);
         self.formatted_top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags);
         self.formatted_tag_groups = HedStringDelimiter.format_hed_tags_in_list(self.tag_groups);
 
@@ -74,11 +75,11 @@ class HedStringDelimiter:
         ----------
         Returns
         -------
-        set
-            A set containing the individual tags in the HED string.
+        list
+            A list containing the individual tags in the HED string.
 
         """
-        return self.tag_set;
+        return self.tags;
 
     def get_formatted_tag_groups(self):
         """Gets the formatted_tag_groups field.
@@ -162,8 +163,8 @@ class HedStringDelimiter:
                 nested_group_tag_list = HedStringDelimiter.split_hed_string_into_list(tag_group_string);
                 self._find_group_tags(nested_group_tag_list);
                 self.tag_groups.append(nested_group_tag_list);
-            else:
-                self.tag_set.add(tag_or_group);
+            elif tag_or_group not in self.tags:
+                self.tags.append(tag_or_group);
 
     def _find_top_level_tags(self):
         """Finds all of the tags at the top-level in a HED string. All group tags will be removed.
@@ -178,8 +179,8 @@ class HedStringDelimiter:
         for tag_or_group in self.split_hed_string_list:
             if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
                 self.top_level_tags.remove(tag_or_group);
-            else:
-                self.tag_set.add(tag_or_group);
+            elif tag_or_group not in self.tags:
+                self.tags.append(tag_or_group);
 
     @staticmethod
     def format_hed_tag(hed_tag):
@@ -270,6 +271,8 @@ class HedStringDelimiter:
         number_of_closing_parentheses = 0;
         current_tag = '';
         for character in hed_string:
+            if character == HedStringDelimiter.DOUBLE_QUOTE_CHARACTER:
+                pass;
             if character == HedStringDelimiter.OPENING_GROUP_CHARACTER:
                 number_of_opening_parentheses += 1;
             if character == HedStringDelimiter.CLOSING_GROUP_CHARACTER:
