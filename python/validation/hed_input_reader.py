@@ -57,6 +57,16 @@ class HedInputReader:
             self.validation_issues = self.validate_hed_string(self.hed_input);
 
     def validate_hed_tags_in_text_file(self):
+        """Validates the HED tags in a text file.
+
+         Parameters
+         ----------
+         Returns
+         -------
+         string
+             The validation issues that were found in the text file.
+
+         """
         validation_issues = '';
         with open(self.hed_input) as opened_text_file:
             for text_file_row_number, text_file_row in enumerate(opened_text_file):
@@ -127,7 +137,6 @@ class HedInputReader:
         if has_headers:
             row_number += 1;
         return error_reporter.report_error_type('row', error_row=row_number);
-
 
     def validate_hed_string(self, hed_string):
         validation_issues = '';
