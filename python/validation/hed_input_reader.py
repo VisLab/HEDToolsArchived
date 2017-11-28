@@ -41,6 +41,7 @@ class HedInputReader:
         """
         self.hed_input = hed_input;
         self.hed_tag_columns = HedInputReader.subtract_1_from_list_elements(hed_tag_columns);
+        self.has_headers = has_headers;
         self.worksheet = worksheet;
         self.prefixed_hed_tag_columns = prefixed_hed_tag_columns;
         self.hed_dictionary = HedDictionary(HedInputReader.HED_XML_FILE);
@@ -59,6 +60,8 @@ class HedInputReader:
         validation_issues = '';
         with open(self.hed_input) as opened_text_file:
             for text_file_line_number, text_file_line in enumerate(opened_text_file):
+                if self.has_headers and text_file_line_number == 0:
+                    continue;
                 hed_string = HedInputReader.get_hed_string_from_text_file_line(text_file_line, self.hed_tag_columns,
                                                                                self.column_delimiter);
                 line_validation_issues = self.validate_hed_string(hed_string);
@@ -116,13 +119,15 @@ class HedInputReader:
         formatted_tag_groups = hed_string_delimiter.get_formatted_tag_groups();
         original_and_formatted_tag_groups = zip(tag_groups, formatted_tag_groups);
         for original_tag_group, formatted_tag_group in original_and_formatted_tag_groups:
-            validation_issues += self.tag_validator.run_tag_group_validators(original_tag_group, formatted_tag_group);
+            validation_issues += self.tag_validator.run_tag_group_validators(original_tag_group);
         return validation_issues;
 
     def validate_individual_tags_in_hed_string(self, hed_string_delimiter):
         validation_issues = '';
         tag_set = hed_string_delimiter.get_tag_set();
         formatted_tag_set = hed_string_delimiter.get_formatted_tag_set();
+        # print(tag_set)
+        # print(formatted_tag_set)
         original_and_formatted_tags = zip(tag_set, formatted_tag_set);
         for original_tag, formatted_tag in original_and_formatted_tags:
             validation_issues += self.tag_validator.run_individual_tag_validators(original_tag, formatted_tag);
@@ -303,6 +308,8 @@ class HedInputReader:
 
 if __name__ == '__main__':
     spreadsheet_path = '../tests/data/BCIT_GuardDuty_HED_tag_spec_v27.tsv';
+    # hed_string = 'Event/Category/Participant response, ' \
+    #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
     hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[2]);
     print(hed_input_reader.validation_issues);
 
