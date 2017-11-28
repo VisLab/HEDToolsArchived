@@ -229,6 +229,7 @@ class HedInputReader:
         string
             The delimiter that is associated with the file extension. For example, .txt and .tsv will return tab
             as the delimiter and .csv will return comma as the delimiter.
+
         """
         delimiter = '';
         if file_extension in HedInputReader.TSV_EXTENSION:
@@ -361,7 +362,7 @@ if __name__ == '__main__':
     spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
     # hed_string = 'Event/Category/Participant response, ' \
     #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
-    hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[6]);
+    hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[2]);
     print(hed_input_reader.validation_issues);
 
 
