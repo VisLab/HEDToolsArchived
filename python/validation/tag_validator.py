@@ -66,8 +66,23 @@ class TagValidator:
         validation_issues += self.check_number_of_group_tildes(tag_group);
         return validation_issues;
 
-    def run_pre_validator(self, hed_string):
-        return self.count_tag_group_brackets(hed_string);
+    def run_hed_string_validators(self, hed_string):
+        """Runs the validators on the HED string. If this is passed then all the other validators are run on the tags
+           and groups in the HED string.
+
+         Parameters
+         ----------
+         hed_string: string
+            A HED string.
+         Returns
+         -------
+         string
+             The validation issues associated with the HED string.
+
+         """
+        validation_issues = '';
+        validation_issues += self.count_tag_group_brackets(hed_string);
+        return validation_issues;
 
     def run_tag_level_validators(self, original_tag_list, formatted_tag_list):
         """Runs the validators on tags at each level in a HED string. This pertains to the top-level, all groups,
