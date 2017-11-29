@@ -51,6 +51,22 @@ class TagValidator:
         self.hed_dictionary_dictionaries = hed_dictionary.get_dictionaries();
 
     def run_individual_tag_validators(self, original_tag, formatted_tag, check_for_warnings=False):
+        """Runs the validators on the individual tags in a HED string.
+
+         Parameters
+         ----------
+         original_tag: string
+            A original tag.
+        formatted_tag: string
+            A format tag.
+        check_for_warnings: boolean
+            True, if to include issues found from the warning validators. False, if otherwise.
+         Returns
+         -------
+         string
+             The validation issues associated with the top-level in the HED string.
+
+         """
         validation_issues = '';
         validation_issues += self.check_if_tag_is_valid(original_tag, formatted_tag);
         validation_issues += self.check_if_tag_unit_class_units_are_valid(original_tag, formatted_tag);
