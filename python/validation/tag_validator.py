@@ -90,6 +90,18 @@ class TagValidator:
         return validation_issues;
 
     def run_top_level_validators(self, formatted_top_level_tags):
+        """Runs the validators on tags at the top-level in a HED string.
+
+         Parameters
+         ----------
+         formatted_top_level_tags: list
+            A list containing the top-level tags in a HED string.
+         Returns
+         -------
+         string
+             The validation issues associated with the top-level in the HED string.
+
+         """
         validation_issues = '';
         validation_issues += self.check_for_required_tags(formatted_top_level_tags);
         return validation_issues;
