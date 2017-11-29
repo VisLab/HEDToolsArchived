@@ -119,9 +119,10 @@ class HedInputReader:
          """
         validation_issues = '';
         hed_string_delimiter = HedStringDelimiter(hed_string);
-        validation_issues += self.tag_validator.run_pre_validator(hed_string);
+        validation_issues += self.tag_validator.run_hed_string_validators(hed_string);
         if not validation_issues:
             validation_issues += self.validate_individual_tags_in_hed_string(hed_string_delimiter);
+            validation_issues += self.validate_top_levels_in_hed_string(hed_string_delimiter);
             validation_issues += self.validate_tag_levels_in_hed_string(hed_string_delimiter);
             validation_issues += self.validate_groups_in_hed_string(hed_string_delimiter);
         return validation_issues;
@@ -366,11 +367,42 @@ class HedInputReader:
             A HED string containing the concatenated HED tag columns.
 
         """
-        split_row = text_file_row.split(column_delimiter);
         hed_tags = [];
+        if column_delimiter == HedInputReader.COMMA_DELIMITER:
+            split_row = HedInputReader.split_comma_separated_string_with_quotes(text_file_row);
+        else:
+            split_row = text_file_row.split(column_delimiter);
         for hed_tag_column in hed_tag_columns:
             hed_tags.append(split_row[hed_tag_column]);
         return ','.join(hed_tags);
+
+    @staticmethod
+    def split_comma_separated_string_with_quotes(comma_separated_string):
+        """Splits a comma separated-string. There maybe double quotes which signify
+
+        Parameters
+        ----------
+        comma_separated_string
+            A comma separated string.
+        Returns
+        -------
+        list
+            A list containing the individual tags and tag groups in the HED string. Nested tag groups are not split.
+
+        """
+        split_string = [];
+        number_of_double_quotes = 0;
+        current_tag = '';
+        for character in comma_separated_string:
+            if character == HedStringDelimiter.DOUBLE_QUOTE_CHARACTER:
+                number_of_double_quotes += 1;
+            elif number_of_double_quotes % 2 == 0 and character == HedStringDelimiter.DELIMITER:
+                split_string.append(current_tag.strip());
+                current_tag = '';
+            else:
+                current_tag += character;
+        split_string.append(current_tag.strip());
+        return split_string;
 
     @staticmethod
     def subtract_1_from_list_elements(integer_list):
@@ -427,8 +459,11 @@ if __name__ == '__main__':
     spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
     # hed_string = 'Event/Category/Participant response, ' \
     #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
-    hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[2]);
-    print(hed_input_reader.validation_issues);
+    # hed_input_reader = HedInputReader(spreadsheet_path, hed_tag_columns=[2]);
+    # print(hed_input_reader.validation_issues);
+    a = 'tag1,tag2,tag3,tag4';
+    split_string = HedInputReader.split_comma_separated_string_with_quotes(a);
+    print(split_string);
 
 
 
