@@ -78,6 +78,18 @@ class TagValidator:
         return validation_issues;
 
     def run_tag_group_validators(self, tag_group):
+        """Runs the validators on the groups in a HED string.
+
+         Parameters
+         ----------
+         tag_group: list
+            A list containing the tags in a group.
+         Returns
+         -------
+         string
+             The validation issues associated with the groups in a HED string.
+
+         """
         validation_issues = '';
         validation_issues += self.check_number_of_group_tildes(tag_group);
         return validation_issues;
@@ -93,7 +105,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with the HED string.
+             The validation issues associated with a HED string.
 
          """
         validation_issues = '';
@@ -113,7 +125,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with each level in the HED string.
+             The validation issues associated with each level in a HED string.
 
          """
         validation_issues = '';
@@ -130,7 +142,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with the top-level in the HED string.
+             The validation issues associated with the top-level in a HED string.
 
          """
         validation_issues = '';
