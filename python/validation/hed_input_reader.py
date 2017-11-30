@@ -17,10 +17,11 @@ class HedInputReader:
     TAB_DELIMITER = '\t';
     COMMA_DELIMITER = ',';
     HED_XML_FILE = '../hed/HED.xml';
-    PREFIX_TAG_COLUMN_TO_PATH = {'Attribute': 'Attribute/', 'Category': 'Event/Category',
-                                 'Description': 'Event/Description', 'Label': 'Event/Label', 'Long': 'Event/Long name'};
+    PREFIX_TAG_COLUMN_TO_PATH = {'Attribute': 'Attribute/', 'Category': 'Event/Category/',
+                                 'Description': 'Event/Description/', 'Label': 'Event/Label/',
+                                 'Long': 'Event/Long name/'};
 
-    def __init__(self, hed_input, tag_columns=[2], has_headers=True, worksheet='', prefixed_needed_tag_columns={}):
+    def __init__(self, hed_input, tag_columns=[2], has_headers=True, prefixed_needed_tag_columns={}, worksheet=''):
         """Constructor for the HedInputReader class.
 
         Parameters
@@ -46,8 +47,8 @@ class HedInputReader:
         self.hed_input = hed_input;
         self.tag_columns = HedInputReader.subtract_1_from_list_elements(tag_columns);
         self.has_headers = has_headers;
+        self.prefixed_needed_tag_columns = HedInputReader.subtract_1_from_dictionary_keys(prefixed_needed_tag_columns);
         self.worksheet = worksheet;
-        self.prefixed_needed_tag_columns = prefixed_needed_tag_columns;
         self.hed_dictionary = HedDictionary(HedInputReader.HED_XML_FILE);
         self.tag_validator = TagValidator(self.hed_dictionary);
         if HedInputReader.hed_input_has_valid_file_extension(self.hed_input):
@@ -371,10 +372,7 @@ class HedInputReader:
 
         """
         hed_tags = [];
-        # if column_delimiter == HedInputReader.COMMA_DELIMITER:
         split_row = HedInputReader.split_delimiter_separated_string_with_quotes(text_file_row, column_delimiter);
-        # else:
-        #     split_row = text_file_row.split(column_delimiter);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = split_row[hed_tag_column];
             if hed_tag_column in prefixed_needed_tag_columns:
@@ -390,9 +388,11 @@ class HedInputReader:
         prepended_hed_tags = [];
         split_hed_tags = hed_tags.split(',');
         for hed_tag in split_hed_tags:
-            prepended_hed_tag = prefixed_needed_tag_columns[prefixed_needed_tag_column_key] + hed_tag;
-            prepended_hed_tags.append(prepended_hed_tag);
-        return ','.join(hed_tags);
+            if hed_tag:
+                prefix_hed_tag_key = prefixed_needed_tag_columns[prefixed_needed_tag_column_key];
+                prepended_hed_tag = HedInputReader.PREFIX_TAG_COLUMN_TO_PATH[prefix_hed_tag_key] + hed_tag;
+                prepended_hed_tags.append(prepended_hed_tag);
+        return ','.join(prepended_hed_tags);
 
     @staticmethod
     def split_delimiter_separated_string_with_quotes(delimiter_separated_string, delimiter):
@@ -499,15 +499,12 @@ class HedInputReader:
 
 
 if __name__ == '__main__':
-    spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
     # hed_string = 'Event/Category/Participant response, ' \
     #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
+    spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
     prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
     hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[2,3,4,5,6,7], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
-    print(hed_input_reader.validation_issues);
-    # print(hed_input_reader.validation_issues);
-    # a = 'tag1,tag2,"tag3,tag4"';
-    # split_string = HedInputReader.split_delimiter_separated_string_with_quotes(a);
+    print(hed_input_reader.validation_issues)
 
 
 
