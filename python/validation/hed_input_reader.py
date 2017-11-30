@@ -377,9 +377,10 @@ class HedInputReader:
             row_hed_tags = split_row[hed_tag_column];
             if row_hed_tags:
                 if hed_tag_column in prefixed_needed_tag_columns:
-                    row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(row_hed_tags,
-                                                                                               prefixed_needed_tag_columns,
-                                                                                               hed_tag_column);
+                    row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(
+                        row_hed_tags,
+                        prefixed_needed_tag_columns,
+                        hed_tag_column);
                 hed_tags.append(row_hed_tags);
         return ','.join(hed_tags);
 
