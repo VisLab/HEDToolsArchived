@@ -373,6 +373,7 @@ class HedInputReader:
         """
         hed_tags = [];
         split_row_list = HedInputReader.split_delimiter_separated_string_with_quotes(text_file_row, column_delimiter);
+        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(split_row_list, hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = split_row_list[hed_tag_column];
             if row_hed_tags:
@@ -400,7 +401,7 @@ class HedInputReader:
             A list that only contains the HED tag columns that are less than the row column count.
 
         """
-        return filter(lambda x: x > len(split_row_list), hed_tag_columns);
+        return filter(lambda x: x < len(split_row_list), hed_tag_columns);
 
     @staticmethod
     def prepend_paths_to_prefixed_needed_tag_columns(hed_tags, prefixed_needed_tag_columns,
