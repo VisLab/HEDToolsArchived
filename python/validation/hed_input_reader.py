@@ -372,9 +372,9 @@ class HedInputReader:
 
         """
         hed_tags = [];
-        split_row = HedInputReader.split_delimiter_separated_string_with_quotes(text_file_row, column_delimiter);
+        split_row_list = HedInputReader.split_delimiter_separated_string_with_quotes(text_file_row, column_delimiter);
         for hed_tag_column in hed_tag_columns:
-            row_hed_tags = split_row[hed_tag_column];
+            row_hed_tags = split_row_list[hed_tag_column];
             if row_hed_tags:
                 if hed_tag_column in prefixed_needed_tag_columns:
                     row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(
@@ -383,6 +383,24 @@ class HedInputReader:
                         hed_tag_column);
                 hed_tags.append(row_hed_tags);
         return ','.join(hed_tags);
+
+    @staticmethod
+    def remove_hed_tag_columns_greater_than_row_count(split_row_list, hed_tag_columns):
+        """Removes the HED tag columns that are greater than the row column count.
+
+        Parameters
+        ----------
+        split_row_list: list
+            A list containing the values in a spreadsheet row.
+        hed_tag_columns: list
+            A list of integers containing the columns that contain the HED tags.
+        Returns
+        -------
+        list
+            A list that only contains the HED tag columns that are less than the row column count.
+
+        """
+        return filter(lambda x: x > len(split_row_list), hed_tag_columns);
 
     @staticmethod
     def prepend_paths_to_prefixed_needed_tag_columns(hed_tags, prefixed_needed_tag_columns,
@@ -505,7 +523,7 @@ if __name__ == '__main__':
     #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
     spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
     prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
-    hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[2,3,4,5,6,7], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
+    hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[2,3,4,5,6,7,10], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
     print(hed_input_reader.validation_issues)
 
 
