@@ -21,7 +21,7 @@ class HedInputReader:
                                  'Description': 'Event/Description/', 'Label': 'Event/Label/',
                                  'Long': 'Event/Long name/'};
 
-    def __init__(self, hed_input, tag_columns=[2], has_headers=True, prefixed_needed_tag_columns={}, worksheet=''):
+    def __init__(self, hed_input, tag_columns=[2], has_headers=True, prefixed_needed_tag_columns={}, worksheet_name=''):
         """Constructor for the HedInputReader class.
 
         Parameters
@@ -33,7 +33,7 @@ class HedInputReader:
             A list of integers containing the columns that contain the HED tags. The default value is the 2nd column.
         has_headers: boolean
             True if file has headers. False, if otherwise.
-        worksheet: string
+        worksheet_name: string
             The name of the Excel workbook worksheet that contains the HED tags.
         prefixed_needed_tag_columns: dictionary
             A dictionary containing the HED tag column names that corresponds to tags that need to be prefixed with a
@@ -48,7 +48,10 @@ class HedInputReader:
         self.tag_columns = HedInputReader.subtract_1_from_list_elements(tag_columns);
         self.has_headers = has_headers;
         self.prefixed_needed_tag_columns = HedInputReader.subtract_1_from_dictionary_keys(prefixed_needed_tag_columns);
-        self.worksheet = worksheet;
+        self.tag_columns = \
+            HedInputReader.add_prefixed_needed_tag_columns_to_tag_columns(self.tag_columns,
+                                                                          self.prefixed_needed_tag_columns);
+        self.worksheet_name = worksheet_name;
         self.hed_dictionary = HedDictionary(HedInputReader.HED_XML_FILE);
         self.tag_validator = TagValidator(self.hed_dictionary);
         if HedInputReader.hed_input_has_valid_file_extension(self.hed_input):
@@ -57,7 +60,7 @@ class HedInputReader:
                 self.column_delimiter = HedInputReader.get_delimiter_from_text_file_extension(self.file_extension);
                 self.validation_issues = self.validate_hed_tags_in_text_file();
             else:
-                pass;
+                self.validation_issues = self.validate_hed_tags_in_excel_worksheet();
         else:
             self.validation_issues = self.validate_hed_string(self.hed_input);
 
@@ -81,6 +84,28 @@ class HedInputReader:
                                                                            text_file_row_number, text_file_row);
         return validation_issues;
 
+    def validate_hed_tags_in_excel_worksheet(self):
+        """Validates the HED tags in a excel worksheet.
+
+         Parameters
+         ----------
+         Returns
+         -------
+         string
+             The validation issues that were found in a excel worksheet.
+
+         """
+        validation_issues = '';
+        opened_worksheet = HedInputReader.open_workbook_worksheet(self.hed_input, worksheet_name=self.worksheet_name);
+        number_of_rows = opened_worksheet.nrows;
+        for row_number in xrange(number_of_rows):
+            worksheet_row = opened_worksheet.row(row_number);
+            if HedInputReader.row_contains_headers(self.has_headers, row_number):
+                continue;
+            validation_issues = self.append_validation_issues_if_found(validation_issues,
+                                                                       row_number, worksheet_row);
+        return validation_issues;
+
     def append_validation_issues_if_found(self, validation_issues, row_number, file_row):
         """Appends the validation issues associated with a particular row in a spreadsheet.
 
@@ -98,9 +123,12 @@ class HedInputReader:
              The validation issues with the appended issues found in the particular row.
 
          """
-        hed_string = HedInputReader.get_hed_string_from_text_file_row(file_row, self.tag_columns,
-                                                                      self.column_delimiter,
-                                                                      self.prefixed_needed_tag_columns);
+        if HedInputReader.file_is_a_text_file(self.file_extension):
+            hed_string = HedInputReader.get_hed_string_from_text_file_row(file_row, self.tag_columns,
+                                                                          self.prefixed_needed_tag_columns);
+        else:
+            hed_string = HedInputReader.get_hed_string_from_worksheet_row(file_row, self.tag_columns,
+                                                                          self.prefixed_needed_tag_columns)
         if hed_string:
             row_validation_issues = self.validate_hed_string(hed_string);
             if row_validation_issues:
@@ -217,6 +245,10 @@ class HedInputReader:
         for original_tag, formatted_tag in original_and_formatted_tags:
             validation_issues += self.tag_validator.run_individual_tag_validators(original_tag, formatted_tag);
         return validation_issues;
+
+    @staticmethod
+    def add_prefixed_needed_tag_columns_to_tag_columns(tag_columns, prefixed_needed_tag_columns):
+        return tag_columns + list(set(prefixed_needed_tag_columns.keys()) - set(tag_columns));
 
     @staticmethod
     def row_contains_headers(has_headers, row_number):
@@ -346,7 +378,7 @@ class HedInputReader:
             A list of containing the HED tags. Each element in the list contains the HED tags from a particular column.
 
         """
-        pass;
+        row = worksheet.row_values;
 
     @staticmethod
     def get_hed_string_from_text_file_row(text_file_row, hed_tag_columns, column_delimiter,
@@ -376,6 +408,39 @@ class HedInputReader:
         hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(split_row_list, hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = split_row_list[hed_tag_column];
+            if row_hed_tags:
+                if hed_tag_column in prefixed_needed_tag_columns:
+                    row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(
+                        row_hed_tags,
+                        prefixed_needed_tag_columns,
+                        hed_tag_column);
+                hed_tags.append(row_hed_tags);
+        return ','.join(hed_tags);
+
+    @staticmethod
+    def get_hed_string_from_worksheet_row(worksheet_row, hed_tag_columns, prefixed_needed_tag_columns={}):
+        """Reads in the current row of HED tags from the text file. The hed tag columns will be concatenated to form a
+           HED string.
+
+        Parameters
+        ----------
+        worksheet_row: list
+            A list containing the values in the worksheet rows.
+        hed_tag_columns: list
+            A list of integers containing the columns that contain the HED tags.
+        prefixed_needed_tag_columns: dictionary
+            A dictionary containing the HED tag column names that corresponds to tags that need to be prefixed with a
+            parent tag path.
+        Returns
+        -------
+        string
+            A HED string containing the concatenated HED tag columns.
+
+        """
+        hed_tags = [];
+        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(worksheet_row, hed_tag_columns);
+        for hed_tag_column in hed_tag_columns:
+            row_hed_tags = worksheet_row[hed_tag_column].value;
             if row_hed_tags:
                 if hed_tag_column in prefixed_needed_tag_columns:
                     row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(
@@ -522,11 +587,10 @@ class HedInputReader:
 if __name__ == '__main__':
     # hed_string = 'Event/Category/Participant response, ' \
     #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
-    spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.tsv';
+    spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.csv';
     prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
-    hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[2,3,4,5,6,7,10], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
+    hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[6], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
     print(hed_input_reader.validation_issues)
-
 
 
 
