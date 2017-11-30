@@ -426,7 +426,7 @@ class HedInputReader:
 
     @staticmethod
     def subtract_1_from_list_elements(integer_list):
-        """Reads the next row of HED tags from the text file.
+        """Subtracts 1 from each integer in a list.
 
         Parameters
         ----------
@@ -442,16 +442,16 @@ class HedInputReader:
 
     @staticmethod
     def subtract_1_from_dictionary_keys(integer_dictionary):
-        """Reads the next row of HED tags from the text file.
+        """Subtracts 1 from each dictionary key.
 
         Parameters
         ----------
-        integer_list: list
-            A list of integers.
+        integer_dictionary: dictionary
+            A dictionary with integer keys.
         Returns
         -------
-        list
-            A list of containing each element subtracted by 1.
+        dictionary
+            A dictionary with the keys subtracted by 1.
 
         """
         minus_1_dictionary = {};
@@ -462,7 +462,7 @@ class HedInputReader:
         for key, value in key_values:
             minus_1_dictionary[key] = value;
         return minus_1_dictionary;
-    
+
     @staticmethod
     def file_path_has_extension(file_path):
         """Checks to see if file path has an extension.
