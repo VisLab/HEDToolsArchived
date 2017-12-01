@@ -68,8 +68,8 @@ class HedStringDelimiter:
         """
         return self.hed_string;
 
-    def get_tag_set(self):
-        """Gets the tag_set field.
+    def get_tags(self):
+        """Gets the tags field.
 
         Parameters
         ----------
