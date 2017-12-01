@@ -46,16 +46,32 @@ class HedInputReader:
         """
         self.hed_input = hed_input;
         self.prefixed_needed_tag_columns = HedInputReader.subtract_1_from_dictionary_keys(prefixed_needed_tag_columns);
-        self.tag_columns = HedInputReader.subtract_1_from_list_elements(tag_columns);
-        self.tag_columns = \
-            HedInputReader.add_prefixed_needed_tag_columns_to_tag_columns(self.tag_columns,
-                                                                          self.prefixed_needed_tag_columns);
+        self.tag_columns = self.convert_tag_columns_to_processing_format(self, tag_columns);
         self.has_headers = has_headers;
-
         self.worksheet_name = worksheet_name;
         self.hed_dictionary = HedDictionary(HedInputReader.HED_XML_FILE);
         self.tag_validator = TagValidator(self.hed_dictionary);
         self.validation_issues = self.validate_hed_input();
+
+    def convert_tag_columns_to_processing_format(self, tag_columns):
+        """Converts the tag columns list to a list that allows it to be internally processed. 1 is subtracted from
+           each tag column making it 0 based. Then the tag columns are combined with the prefix needed tag columns.
+
+        Parameters
+        ----------
+        tag_columns: list
+            A list of integers containing the columns that contain the HED tags.
+        Returns
+        -------
+        list
+            A list containing the modified list of tag columns that's used for processing.
+
+        """
+        tag_columns = HedInputReader.subtract_1_from_list_elements(tag_columns);
+        tag_columns = HedInputReader.add_prefixed_needed_tag_columns_to_tag_columns(tag_columns,
+                                                                                    self.prefixed_needed_tag_columns);
+        return tag_columns;
+
 
     def validate_hed_input(self):
         """Validates the HED tags in a string or a file.
