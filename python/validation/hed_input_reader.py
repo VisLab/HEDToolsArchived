@@ -143,8 +143,7 @@ class HedInputReader:
         if hed_string:
             row_validation_issues = self.validate_hed_string(hed_string);
             if row_validation_issues:
-                validation_issues += HedInputReader.generate_row_issue_message(row_number) + \
-                                     row_validation_issues;
+                validation_issues += HedInputReader.generate_row_issue_message(row_number) + row_validation_issues;
         return validation_issues;
 
     def validate_hed_string(self, hed_string):
