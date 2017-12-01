@@ -93,8 +93,11 @@ class HedInputReader:
             for text_file_row_number, text_file_row in enumerate(opened_text_file):
                 if HedInputReader.row_contains_headers(self.has_headers, text_file_row_number):
                     continue;
-                validation_issues = self.append_validation_issues_if_found(validation_issues,
-                                                                           text_file_row_number, text_file_row);
+                hed_string = HedInputReader.get_hed_string_from_text_file_row(text_file_row, self.tag_columns,
+                                                                              self.column_delimiter,
+                                                                              self.prefixed_needed_tag_columns);
+                validation_issues = self.append_validation_issues_if_found(validation_issues, text_file_row_number,
+                                                                           hed_string);
         return validation_issues;
 
     def validate_hed_tags_in_excel_worksheet(self):
@@ -115,11 +118,12 @@ class HedInputReader:
             worksheet_row = opened_worksheet.row(row_number);
             if HedInputReader.row_contains_headers(self.has_headers, row_number):
                 continue;
-            validation_issues = self.append_validation_issues_if_found(validation_issues,
-                                                                       row_number, worksheet_row);
+            hed_string = HedInputReader.get_hed_string_from_worksheet_row(worksheet_row, self.tag_columns,
+                                                                          self.prefixed_needed_tag_columns);
+            validation_issues = self.append_validation_issues_if_found(validation_issues, row_number, hed_string);
         return validation_issues;
 
-    def append_validation_issues_if_found(self, validation_issues, row_number, file_row):
+    def append_validation_issues_if_found(self, validation_issues, row_number, hed_string):
         """Appends the validation issues associated with a particular row in a spreadsheet.
 
          Parameters
@@ -128,21 +132,14 @@ class HedInputReader:
             A validation string that contains all the issues found in the spreadsheet.
          row_number: integer
             The row number that the issues are associated with.
-        file_row: string
-            The row in the spreadsheet that contains the HED string.
+        hed_string: string
+            A HED string.
          Returns
          -------
          string
              The validation issues with the appended issues found in the particular row.
 
          """
-        if HedInputReader.file_is_a_text_file(self.file_extension):
-            hed_string = HedInputReader.get_hed_string_from_text_file_row(file_row, self.tag_columns,
-                                                                          self.column_delimiter,
-                                                                          self.prefixed_needed_tag_columns);
-        else:
-            hed_string = HedInputReader.get_hed_string_from_worksheet_row(file_row, self.tag_columns,
-                                                                          self.prefixed_needed_tag_columns)
         if hed_string:
             row_validation_issues = self.validate_hed_string(hed_string);
             if row_validation_issues:
