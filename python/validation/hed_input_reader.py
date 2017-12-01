@@ -550,14 +550,7 @@ class HedInputReader:
             A dictionary with the keys subtracted by 1.
 
         """
-        minus_1_dictionary = {};
-        keys = integer_dictionary.keys();
-        keys = [x-1 for x in keys];
-        values = integer_dictionary.values();
-        key_values = zip(keys, values);
-        for key, value in key_values:
-            minus_1_dictionary[key] = value;
-        return minus_1_dictionary;
+        return {key-1: value for key, value in integer_dictionary.iteritems()};
 
     @staticmethod
     def file_path_has_extension(file_path):
