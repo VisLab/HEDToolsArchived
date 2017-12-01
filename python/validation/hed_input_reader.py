@@ -138,6 +138,7 @@ class HedInputReader:
          """
         if HedInputReader.file_is_a_text_file(self.file_extension):
             hed_string = HedInputReader.get_hed_string_from_text_file_row(file_row, self.tag_columns,
+                                                                          self.column_delimiter,
                                                                           self.prefixed_needed_tag_columns);
         else:
             hed_string = HedInputReader.get_hed_string_from_worksheet_row(file_row, self.tag_columns,
