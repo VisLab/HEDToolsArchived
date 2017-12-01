@@ -64,6 +64,19 @@ class HedInputReader:
         else:
             self.validation_issues = self.validate_hed_string(self.hed_input);
 
+    def get_validation_issues(self):
+        """Gets the validation issues.
+
+         Parameters
+         ----------
+         Returns
+         -------
+         string
+             The validation issues that were found.
+
+         """
+        return self.validation_issues;
+
     def validate_hed_tags_in_text_file(self):
         """Validates the HED tags in a text file.
 
@@ -585,8 +598,6 @@ class HedInputReader:
 
 
 if __name__ == '__main__':
-    # hed_string = 'Event/Category/Participant response, ' \
-    #              '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
     spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.csv';
     prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
     hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[6], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
