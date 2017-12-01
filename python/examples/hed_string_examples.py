@@ -10,7 +10,8 @@ if __name__ == '__main__':
 
     # Example 2: Invalid HED string
     hed_string_2 = 'Event/Category/Participant response, ' \
-                   '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger)';
+                   '(Participant ~ Action/Button press/Keyboard ~ Participant/Effect/Body part/Arm/Hand/Finger),' \
+                   'dskfjkf/dskjdfkj/sdkjdsfkjdf/sdlfdjdsjklj';
 
     hed_input_reader = HedInputReader(hed_string_2);
     print('HED string 2 validation issues:\n' + hed_input_reader.get_validation_issues());
