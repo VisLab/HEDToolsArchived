@@ -12,5 +12,10 @@ class Test(unittest.TestCase):
         self.assertIsInstance(file_extension, basestring);
         self.assertTrue(file_extension);
 
+    def test_file_path_has_extension(self):
+        file_extension = HedInputReader.file_path_has_extension(self.file_with_extension);
+        self.assertIsInstance(file_extension, bool);
+        self.assertTrue(file_extension);
+
 if __name__ == '__main__':
     unittest.main();
