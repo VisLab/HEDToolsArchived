@@ -479,7 +479,7 @@ class HedInputReader:
             A list that only contains the HED tag columns that are less than the row column count.
 
         """
-        return filter(lambda x: x < len(split_row_list), hed_tag_columns);
+        return sorted(filter(lambda x: x < len(split_row_list), hed_tag_columns));
 
     @staticmethod
     def prepend_paths_to_prefixed_needed_tag_columns(hed_tags, prefixed_needed_tag_columns,
@@ -598,10 +598,8 @@ class HedInputReader:
 
 
 if __name__ == '__main__':
-    spreadsheet_path = '../tests/data/TX14 HED Tags v9.87.csv';
-    prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
-    hed_input_reader = HedInputReader(spreadsheet_path, tag_columns=[6], prefixed_needed_tag_columns=prefixed_needed_tag_columns);
-    print(hed_input_reader.validation_issues)
+    a = HedInputReader.subtract_1_from_list_elements([1,2,3]);
+    print(a);
 
 
 
