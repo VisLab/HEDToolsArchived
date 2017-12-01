@@ -45,24 +45,53 @@ class HedInputReader:
 
         """
         self.hed_input = hed_input;
-        self.tag_columns = HedInputReader.subtract_1_from_list_elements(tag_columns);
-        self.has_headers = has_headers;
         self.prefixed_needed_tag_columns = HedInputReader.subtract_1_from_dictionary_keys(prefixed_needed_tag_columns);
+        self.tag_columns = HedInputReader.subtract_1_from_list_elements(tag_columns);
         self.tag_columns = \
             HedInputReader.add_prefixed_needed_tag_columns_to_tag_columns(self.tag_columns,
                                                                           self.prefixed_needed_tag_columns);
+        self.has_headers = has_headers;
+
         self.worksheet_name = worksheet_name;
         self.hed_dictionary = HedDictionary(HedInputReader.HED_XML_FILE);
         self.tag_validator = TagValidator(self.hed_dictionary);
+        self.validation_issues = self.validate_hed_input();
+
+    def validate_hed_input(self):
+        """Validates the HED tags in a string or a file.
+
+         Parameters
+         ----------
+         Returns
+         -------
+         string
+             The validation issues that were found.
+
+         """
         if HedInputReader.hed_input_has_valid_file_extension(self.hed_input):
-            self.file_extension = HedInputReader.get_file_extension(self.hed_input);
-            if HedInputReader.file_is_a_text_file(self.file_extension):
-                self.column_delimiter = HedInputReader.get_delimiter_from_text_file_extension(self.file_extension);
-                self.validation_issues = self.validate_hed_tags_in_text_file();
-            else:
-                self.validation_issues = self.validate_hed_tags_in_excel_worksheet();
+            validation_issues = self.validate_hed_tags_in_file();
         else:
-            self.validation_issues = self.validate_hed_string(self.hed_input);
+            validation_issues = self.validate_hed_string(self.hed_input);
+        return validation_issues;
+
+    def validate_hed_tags_in_file(self):
+        """Validates the HED tags in a file.
+
+         Parameters
+         ----------
+         Returns
+         -------
+         string
+             The validation issues that were found.
+
+         """
+        file_extension = HedInputReader.get_file_extension(self.hed_input);
+        if HedInputReader.file_is_a_text_file(file_extension):
+            column_delimiter = HedInputReader.get_delimiter_from_text_file_extension(file_extension);
+            validation_issues = self.validate_hed_tags_in_text_file(column_delimiter);
+        else:
+            validation_issues = self.validate_hed_tags_in_excel_worksheet();
+        return validation_issues;
 
     def get_validation_issues(self):
         """Gets the validation issues.
@@ -77,7 +106,7 @@ class HedInputReader:
          """
         return self.validation_issues;
 
-    def validate_hed_tags_in_text_file(self):
+    def validate_hed_tags_in_text_file(self, column_delimiter):
         """Validates the HED tags in a text file.
 
          Parameters
@@ -94,7 +123,7 @@ class HedInputReader:
                 if HedInputReader.row_contains_headers(self.has_headers, text_file_row_number):
                     continue;
                 hed_string = HedInputReader.get_hed_string_from_text_file_row(text_file_row, self.tag_columns,
-                                                                              self.column_delimiter,
+                                                                              column_delimiter,
                                                                               self.prefixed_needed_tag_columns);
                 validation_issues = self.append_validation_issues_if_found(validation_issues, text_file_row_number,
                                                                            hed_string);
