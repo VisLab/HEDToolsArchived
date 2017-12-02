@@ -461,8 +461,8 @@ class HedInputReader:
         hed_tags = [];
         split_row_list = HedInputReader.split_delimiter_separated_string_with_quotes(text_file_row, column_delimiter);
         row_column_count = len(split_row_list);
-        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_column_count(row_column_count,
-                                                                                              hed_tag_columns);
+        hed_tag_columns = HedInputReader.remove_tag_columns_greater_than_row_column_count(row_column_count,
+                                                                                          hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = split_row_list[hed_tag_column];
             if row_hed_tags:
@@ -494,8 +494,8 @@ class HedInputReader:
         """
         hed_tags = [];
         row_column_count = len(worksheet_row);
-        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_column_count(row_column_count,
-                                                                                              hed_tag_columns);
+        hed_tag_columns = HedInputReader.remove_tag_columns_greater_than_row_column_count(row_column_count,
+                                                                                          hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = worksheet_row[hed_tag_column].value;
             if row_hed_tags:
@@ -506,7 +506,7 @@ class HedInputReader:
         return ','.join(hed_tags);
 
     @staticmethod
-    def remove_hed_tag_columns_greater_than_row_column_count(row_column_count, hed_tag_columns):
+    def remove_tag_columns_greater_than_row_column_count(row_column_count, hed_tag_columns):
         """Removes the HED tag columns that are greater than the row column count.
 
         Parameters
