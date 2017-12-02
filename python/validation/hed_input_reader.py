@@ -294,7 +294,7 @@ class HedInputReader:
 
          """
         validation_issues = '';
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         formatted_tag_set = hed_string_delimiter.get_formatted_tag_set();
         original_and_formatted_tags = zip(tag_set, formatted_tag_set);
         for original_tag, formatted_tag in original_and_formatted_tags:
@@ -582,12 +582,12 @@ class HedInputReader:
         return [x-1 for x in integer_list];
 
     @staticmethod
-    def subtract_1_from_dictionary_keys(integer_dictionary):
+    def subtract_1_from_dictionary_keys(integer_key_dictionary):
         """Subtracts 1 from each dictionary key.
 
         Parameters
         ----------
-        integer_dictionary: dictionary
+        integer_key_dictionary: dictionary
             A dictionary with integer keys.
         Returns
         -------
@@ -595,7 +595,7 @@ class HedInputReader:
             A dictionary with the keys subtracted by 1.
 
         """
-        return {key-1: value for key, value in integer_dictionary.iteritems()};
+        return {key-1: value for key, value in integer_key_dictionary.iteritems()};
 
     @staticmethod
     def file_path_has_extension(file_path):
@@ -633,8 +633,9 @@ class HedInputReader:
 
 
 if __name__ == '__main__':
-    a = HedInputReader.subtract_1_from_list_elements([1,2,3]);
-    print(a);
+    a = HedInputReader('a,b,c');
+    print(a._hed_input);
+
 
 
 
