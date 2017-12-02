@@ -11,6 +11,12 @@ class Test(unittest.TestCase):
         cls.comma_separated_string_with_double_quotes = 'a,b,c,"d,e,f"';
         cls.comma_delimited_list_with_double_quotes = ['a', 'b', 'c', "d,e,f"];
         cls.comma_delimiter = ',';
+        cls.attribute_key = 'Attribute';
+        cls.category_key = 'Category';
+        cls.attribute_tag = 'Onset';
+        cls.attribute_onset_tag = 'Attribute/Onset';
+        cls.category_partipant_and_stimulus_tags = 'Event/Category/Participant response,Event/Category/Stimulus';
+        cls.category_tags = 'Participant response, Stimulus';
 
     def test_get_file_extension(self):
         file_extension = HedInputReader.get_file_extension(self.file_with_extension);
@@ -46,6 +52,17 @@ class Test(unittest.TestCase):
             self.comma_delimiter);
         self.assertIsInstance(split_string, list);
         self.assertEqual(split_string, self.comma_delimited_list_with_double_quotes);
+
+    def test_prepend_path_to_prefixed_needed_tag_column(self):
+        prepended_hed_string = HedInputReader.prepend_path_to_prefixed_needed_tag_column(self.attribute_tag,
+                                                                                         self.attribute_key);
+        self.assertIsInstance(prepended_hed_string, basestring);
+        self.assertEqual(prepended_hed_string, self.attribute_onset_tag);
+        prepended_hed_string = HedInputReader.prepend_path_to_prefixed_needed_tag_column(self.category_tags,
+                                                                                         self.category_key);
+        self.assertIsInstance(prepended_hed_string, basestring);
+        self.assertEqual(prepended_hed_string, self.category_partipant_and_stimulus_tags);
+
 
 
 
