@@ -8,6 +8,9 @@ class Test(unittest.TestCase):
         cls.file_with_extension = 'file_with_extension.txt';
         cls.integer_key_dictionary = {1: 'one', 2: 'two', 3: 'three'};
         cls.integer_list = [1, 2, 3];
+        cls.zero_based_tag_columns = [0, 1, 2, 3, 4];
+        cls.zero_based_row_column_count = 3;
+        cls.zero_based_tag_columns_less_than_row_column_count = [0, 1, 2];
         cls.comma_separated_string_with_double_quotes = 'a,b,c,"d,e,f"';
         cls.comma_delimited_list_with_double_quotes = ['a', 'b', 'c', "d,e,f"];
         cls.comma_delimiter = ',';
@@ -62,6 +65,13 @@ class Test(unittest.TestCase):
                                                                                          self.category_key);
         self.assertIsInstance(prepended_hed_string, basestring);
         self.assertEqual(prepended_hed_string, self.category_partipant_and_stimulus_tags);
+
+    def test_remove_hed_tag_columns_greater_than_row_column_count(self):
+        rows_less_than_row_column_count = HedInputReader.remove_hed_tag_columns_greater_than_row_column_count(
+            self.zero_based_row_column_count, self.zero_based_tag_columns);
+        self.assertIsInstance(rows_less_than_row_column_count, list);
+        self.assertEqual(rows_less_than_row_column_count, self.zero_based_tag_columns_less_than_row_column_count);
+
 
 
 
