@@ -460,7 +460,9 @@ class HedInputReader:
         """
         hed_tags = [];
         split_row_list = HedInputReader.split_delimiter_separated_string_with_quotes(text_file_row, column_delimiter);
-        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(split_row_list, hed_tag_columns);
+        row_column_count = len(split_row_list);
+        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(row_column_count,
+                                                                                       hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = split_row_list[hed_tag_column];
             if row_hed_tags:
@@ -491,7 +493,9 @@ class HedInputReader:
 
         """
         hed_tags = [];
-        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(worksheet_row, hed_tag_columns);
+        row_column_count = len(worksheet_row);
+        hed_tag_columns = HedInputReader.remove_hed_tag_columns_greater_than_row_count(row_column_count,
+                                                                                       hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
             row_hed_tags = worksheet_row[hed_tag_column].value;
             if row_hed_tags:
@@ -502,13 +506,13 @@ class HedInputReader:
         return ','.join(hed_tags);
 
     @staticmethod
-    def remove_hed_tag_columns_greater_than_row_count(split_row_list, hed_tag_columns):
+    def remove_hed_tag_columns_greater_than_row_count(row_column_count, hed_tag_columns):
         """Removes the HED tag columns that are greater than the row column count.
 
         Parameters
         ----------
-        split_row_list: list
-            A list containing the values in a spreadsheet row.
+        row_column_count: integer
+            The number of columns in the row.
         hed_tag_columns: list
             A list of integers containing the columns that contain the HED tags.
         Returns
@@ -517,7 +521,7 @@ class HedInputReader:
             A list that only contains the HED tag columns that are less than the row column count.
 
         """
-        return sorted(filter(lambda x: x < len(split_row_list), hed_tag_columns));
+        return sorted(filter(lambda x: x < row_column_count, hed_tag_columns));
 
     @staticmethod
     def prepend_path_to_prefixed_needed_tag_column(hed_tags, prefix_hed_tag_key):
