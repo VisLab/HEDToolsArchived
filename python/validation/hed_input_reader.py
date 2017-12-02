@@ -465,7 +465,7 @@ class HedInputReader:
             row_hed_tags = split_row_list[hed_tag_column];
             if row_hed_tags:
                 if hed_tag_column in prefixed_needed_tag_columns:
-                    row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(
+                    row_hed_tags = HedInputReader.prepend_path_to_prefixed_needed_tag_column(
                         row_hed_tags,
                         prefixed_needed_tag_columns,
                         hed_tag_column);
@@ -498,7 +498,7 @@ class HedInputReader:
             row_hed_tags = worksheet_row[hed_tag_column].value;
             if row_hed_tags:
                 if hed_tag_column in prefixed_needed_tag_columns:
-                    row_hed_tags = HedInputReader.prepend_paths_to_prefixed_needed_tag_columns(
+                    row_hed_tags = HedInputReader.prepend_path_to_prefixed_needed_tag_column(
                         row_hed_tags,
                         prefixed_needed_tag_columns,
                         hed_tag_column);
@@ -524,13 +524,26 @@ class HedInputReader:
         return sorted(filter(lambda x: x < len(split_row_list), hed_tag_columns));
 
     @staticmethod
-    def prepend_paths_to_prefixed_needed_tag_columns(hed_tags, prefixed_needed_tag_columns,
-                                                     prefixed_needed_tag_column_key):
+    def prepend_path_to_prefixed_needed_tag_column(hed_tags, prefix_hed_tag_key):
+        """Prepends the tag paths to the tag column tags that need them.
+
+        Parameters
+        ----------
+        hed_tags: list
+            A list containing HED tags associated with a particular column that needs a tag prefix prepended to its
+            tags.
+        prefix_hed_tag_key: string
+            A string dictionary key that corresponds to the tag prefix that will be prepended to the column tags.
+        Returns
+        -------
+        string
+            A comma separated string that contains the HED tags with the tag prefix prepended to each of them.
+
+        """
         prepended_hed_tags = [];
         split_hed_tags = hed_tags.split(',');
         for hed_tag in split_hed_tags:
             if hed_tag:
-                prefix_hed_tag_key = prefixed_needed_tag_columns[prefixed_needed_tag_column_key];
                 prepended_hed_tag = HedInputReader.PREFIX_TAG_COLUMN_TO_PATH[prefix_hed_tag_key] + hed_tag;
                 prepended_hed_tags.append(prepended_hed_tag);
         return ','.join(prepended_hed_tags);
