@@ -66,8 +66,8 @@ class Test(unittest.TestCase):
         self.assertIsInstance(prepended_hed_string, basestring);
         self.assertEqual(prepended_hed_string, self.category_partipant_and_stimulus_tags);
 
-    def test_remove_hed_tag_columns_greater_than_row_column_count(self):
-        rows_less_than_row_column_count = HedInputReader.remove_hed_tag_columns_greater_than_row_column_count(
+    def test_remove_tag_columns_greater_than_row_column_count(self):
+        rows_less_than_row_column_count = HedInputReader.remove_tag_columns_greater_than_row_column_count(
             self.zero_based_row_column_count, self.zero_based_tag_columns);
         self.assertIsInstance(rows_less_than_row_column_count, list);
         self.assertEqual(rows_less_than_row_column_count, self.zero_based_tag_columns_less_than_row_column_count);
