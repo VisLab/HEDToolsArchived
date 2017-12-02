@@ -538,6 +538,7 @@ class HedInputReader:
         """
         prepended_hed_tags = [];
         split_hed_tags = hed_tags.split(',');
+        split_hed_tags = [x.strip() for x in split_hed_tags];
         for hed_tag in split_hed_tags:
             if hed_tag:
                 prepended_hed_tag = HedInputReader.PREFIX_TAG_COLUMN_TO_PATH[prefix_hed_tag_key] + hed_tag;
