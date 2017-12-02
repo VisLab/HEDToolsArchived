@@ -5,7 +5,7 @@ from validation.hed_input_reader import HedInputReader;
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.file_with_extension = 'file_with_extension.txt';
+        cls.text_file_with_extension = 'file_with_extension.txt';
         cls.integer_key_dictionary = {1: 'one', 2: 'two', 3: 'three'};
         cls.integer_list = [1, 2, 3];
         cls.zero_based_tag_columns = [0, 1, 2, 3, 4];
@@ -21,13 +21,19 @@ class Test(unittest.TestCase):
         cls.category_partipant_and_stimulus_tags = 'Event/Category/Participant response,Event/Category/Stimulus';
         cls.category_tags = 'Participant response, Stimulus';
 
+    def test_get_delimiter_from_text_file_extension(self):
+        text_file_extension = HedInputReader.get_file_extension(self.text_file_with_extension)
+        text_file_delimiter = HedInputReader.get_delimiter_from_text_file_extension(text_file_extension);
+        self.assertIsInstance(text_file_delimiter, basestring);
+        self.assertEqual(text_file_delimiter, HedInputReader.TAB_DELIMITER);
+
     def test_get_file_extension(self):
-        file_extension = HedInputReader.get_file_extension(self.file_with_extension);
+        file_extension = HedInputReader.get_file_extension(self.text_file_with_extension);
         self.assertIsInstance(file_extension, basestring);
         self.assertTrue(file_extension);
 
     def test_file_path_has_extension(self):
-        file_extension = HedInputReader.file_path_has_extension(self.file_with_extension);
+        file_extension = HedInputReader.file_path_has_extension(self.text_file_with_extension);
         self.assertIsInstance(file_extension, bool);
         self.assertTrue(file_extension);
 
@@ -71,10 +77,6 @@ class Test(unittest.TestCase):
             self.zero_based_row_column_count, self.zero_based_tag_columns);
         self.assertIsInstance(rows_less_than_row_column_count, list);
         self.assertEqual(rows_less_than_row_column_count, self.zero_based_tag_columns_less_than_row_column_count);
-
-
-
-
 
 if __name__ == '__main__':
     unittest.main();
