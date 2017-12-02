@@ -525,8 +525,8 @@ class HedInputReader:
 
         Parameters
         ----------
-        hed_tags: list
-            A list containing HED tags associated with a particular column that needs a tag prefix prepended to its
+        hed_tags: string
+            A string containing HED tags associated with a particular column that needs a tag prefix prepended to its
             tags.
         prefix_hed_tag_key: string
             A string dictionary key that corresponds to the tag prefix that will be prepended to the column tags.
