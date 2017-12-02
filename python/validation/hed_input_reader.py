@@ -418,24 +418,6 @@ class HedInputReader:
         return workbook.sheet_names(worksheet_name);
 
     @staticmethod
-    def get_hed_tag_from_excel_file(worksheet, tag_columns):
-        """Reads the next row of HED tags from the excel file.
-
-        Parameters
-        ----------
-        worksheet: Sheet object
-             A Sheet object representing an Excel workbook worksheet.
-        tag_columns: list
-            A list of integers containing the columns that contain the HED tags.
-        Returns
-        -------
-        list
-            A list of containing the HED tags. Each element in the list contains the HED tags from a particular column.
-
-        """
-        row = worksheet.row_values;
-
-    @staticmethod
     def get_hed_string_from_text_file_row(text_file_row, hed_tag_columns, column_delimiter,
                                           prefixed_needed_tag_columns={}):
         """Reads in the current row of HED tags from the text file. The hed tag columns will be concatenated to form a
