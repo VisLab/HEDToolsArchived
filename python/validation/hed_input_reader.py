@@ -236,9 +236,7 @@ class HedInputReader:
             validation_issues += self._tag_validator.run_tag_level_validators(original_tag_group, formatted_tag_group);
         top_level_tags = hed_string_delimiter.get_top_level_tags();
         formatted_top_level_tags = hed_string_delimiter.get_formatted_top_level_tags();
-        original_and_formatted_top_level_tags = zip(top_level_tags, formatted_top_level_tags);
-        for top_level_tag, formatted_top_level_tag in original_and_formatted_top_level_tags:
-            validation_issues += self._tag_validator.run_tag_level_validators(top_level_tag, formatted_top_level_tag);
+        validation_issues += self._tag_validator.run_tag_level_validators(top_level_tags, formatted_top_level_tags);
         return validation_issues;
 
     def _validate_top_levels_in_hed_string(self, hed_string_delimiter):
