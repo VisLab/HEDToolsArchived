@@ -1,5 +1,6 @@
 import unittest;
 from validation.hed_input_reader import HedInputReader;
+from validation.hed_string_delimiter import HedStringDelimiter;
 import random;
 
 
@@ -19,7 +20,7 @@ class Test(unittest.TestCase):
         cls.attribute_key = 'Attribute';
         cls.category_key = 'Category';
         cls.attribute_tag = 'Onset';
-        cls.invalid_hed_string = 'this/is/not/a/valid/tag1,this/is/not/a/valid/tag2';
+        cls.hed_string_with_invalid_tags = 'this/is/not/a/valid/tag1,this/is/not/a/valid/tag2';
         cls.attribute_onset_tag = 'Attribute/Onset';
         cls.category_partipant_and_stimulus_tags = 'Event/Category/Participant response,Event/Category/Stimulus';
         cls.category_tags = 'Participant response, Stimulus';
@@ -36,7 +37,13 @@ class Test(unittest.TestCase):
         self.assertIsInstance(validation_issues, basestring);
 
     def test_validate_hed_string(self):
-        validation_issues = self.generic_hed_input_reader._validate_hed_string(self.invalid_hed_string);
+        validation_issues = self.generic_hed_input_reader._validate_hed_string(self.hed_string_with_invalid_tags);
+        self.assertIsInstance(validation_issues, basestring);
+        self.assertTrue(validation_issues);
+
+    def test__validate_individual_tags_in_hed_string(self):
+        hed_string_delimiter = HedStringDelimiter(self.hed_string_with_invalid_tags);
+        validation_issues = self.generic_hed_input_reader._validate_individual_tags_in_hed_string(hed_string_delimiter);
         self.assertIsInstance(validation_issues, basestring);
         self.assertTrue(validation_issues);
 
@@ -45,7 +52,7 @@ class Test(unittest.TestCase):
         self.assertFalse(self.validation_issues);
         validation_issues = self.generic_hed_input_reader._append_validation_issues_if_found(self.validation_issues,
                                                                                              row_number,
-                                                                                             self.invalid_hed_string);
+                                                                                             self.hed_string_with_invalid_tags);
         self.assertIsInstance(validation_issues, basestring);
         self.assertTrue(validation_issues);
 
