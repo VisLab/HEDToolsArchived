@@ -5,9 +5,10 @@ from validation.hed_input_reader import HedInputReader;
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.generic_hed_input_reader = HedInputReader('abc');
         cls.text_file_with_extension = 'file_with_extension.txt';
         cls.integer_key_dictionary = {1: 'one', 2: 'two', 3: 'three'};
-        cls.integer_list = [1, 2, 3];
+        cls.one_based_tag_columns = [1, 2, 3];
         cls.zero_based_tag_columns = [0, 1, 2, 3, 4];
         cls.zero_based_row_column_count = 3;
         cls.zero_based_tag_columns_less_than_row_column_count = [0, 1, 2];
@@ -20,6 +21,12 @@ class Test(unittest.TestCase):
         cls.attribute_onset_tag = 'Attribute/Onset';
         cls.category_partipant_and_stimulus_tags = 'Event/Category/Participant response,Event/Category/Stimulus';
         cls.category_tags = 'Participant response, Stimulus';
+
+    def test__convert_tag_columns_to_processing_format(self):
+        processing_tag_columns = self.generic_hed_input_reader._convert_tag_columns_to_processing_format(
+            self.one_based_tag_columns);
+        self.assertIsInstance(processing_tag_columns, list);
+        self.assertEqual(processing_tag_columns, self.zero_based_tag_columns_less_than_row_column_count);
 
     def test_get_delimiter_from_text_file_extension(self):
         text_file_extension = HedInputReader.get_file_extension(self.text_file_with_extension)
@@ -47,12 +54,12 @@ class Test(unittest.TestCase):
         self.assertEqual(original_dictionary_key_sum - new_dictionary_key_sum, original_dictionary_key_length);
 
     def test_subtract_1_from_list_elements(self):
-        one_subtracted_list = HedInputReader.subtract_1_from_list_elements(self.integer_list);
+        one_subtracted_list = HedInputReader.subtract_1_from_list_elements(self.one_based_tag_columns);
         self.assertIsInstance(one_subtracted_list, list);
         self.assertTrue(one_subtracted_list);
-        original_list_sum = sum(self.integer_list);
+        original_list_sum = sum(self.one_based_tag_columns);
         new_list_sum = sum(one_subtracted_list);
-        original_list_length = len(self.integer_list);
+        original_list_length = len(self.one_based_tag_columns);
         self.assertEqual(original_list_sum - new_list_sum, original_list_length);
 
     def test_split_delimiter_separated_string_with_quotes(self):
