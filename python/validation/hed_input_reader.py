@@ -430,7 +430,7 @@ class HedInputReader:
         workbook = xlrd.open_workbook(workbook_path);
         if not worksheet_name:
             return workbook.sheet_by_index(0);
-        return workbook.sheet_names(worksheet_name);
+        return workbook.sheet_by_name(worksheet_name);
 
     @staticmethod
     def get_hed_string_from_text_file_row(text_file_row, hed_tag_columns, column_delimiter,
