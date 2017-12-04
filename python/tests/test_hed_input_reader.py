@@ -10,6 +10,7 @@ class Test(unittest.TestCase):
         cls.generic_hed_input_reader = HedInputReader('Attribute/Onset');
         cls.text_file_with_extension = 'file_with_extension.txt';
         cls.integer_key_dictionary = {1: 'one', 2: 'two', 3: 'three'};
+        cls.float_value = 1.1;
         cls.one_based_tag_columns = [1, 2, 3];
         cls.zero_based_tag_columns = [0, 1, 2, 3, 4];
         cls.zero_based_row_column_count = 3;
@@ -137,6 +138,11 @@ class Test(unittest.TestCase):
             self.zero_based_row_column_count, self.zero_based_tag_columns);
         self.assertIsInstance(rows_less_than_row_column_count, list);
         self.assertEqual(rows_less_than_row_column_count, self.zero_based_tag_columns_less_than_row_column_count);
+
+    def test_convert_column_to_unicode_if_not(self):
+        unicode_value = HedInputReader.convert_column_to_unicode_if_not(self.float_value);
+        self.assertIsInstance(unicode_value, unicode)
+
 
 if __name__ == '__main__':
     unittest.main();
