@@ -1,5 +1,6 @@
 import unittest;
 from validation.hed_input_reader import HedInputReader;
+import random;
 
 
 class Test(unittest.TestCase):
@@ -18,9 +19,11 @@ class Test(unittest.TestCase):
         cls.attribute_key = 'Attribute';
         cls.category_key = 'Category';
         cls.attribute_tag = 'Onset';
+        cls.invalid_hed_string = 'this/is/not/a/valid/tag1,this/is/not/a/valid/tag2';
         cls.attribute_onset_tag = 'Attribute/Onset';
         cls.category_partipant_and_stimulus_tags = 'Event/Category/Participant response,Event/Category/Stimulus';
         cls.category_tags = 'Participant response, Stimulus';
+        cls.validation_issues = '';
 
     def test__convert_tag_columns_to_processing_format(self):
         processing_tag_columns = self.generic_hed_input_reader._convert_tag_columns_to_processing_format(
@@ -31,6 +34,15 @@ class Test(unittest.TestCase):
     def test__validate_hed_input(self):
         validation_issues = self.generic_hed_input_reader._validate_hed_input();
         self.assertIsInstance(validation_issues, basestring);
+
+    def test__append_validation_issues_if_found(self):
+        row_number = random.randint(0,100);
+        self.assertFalse(self.validation_issues);
+        validation_issues = self.generic_hed_input_reader._append_validation_issues_if_found(self.validation_issues,
+                                                                                             row_number,
+                                                                                             self.invalid_hed_string);
+        self.assertIsInstance(validation_issues, basestring);
+        self.assertTrue(validation_issues);
 
     def test_get_validation_issues(self):
         validation_issues = self.generic_hed_input_reader.get_validation_issues();
