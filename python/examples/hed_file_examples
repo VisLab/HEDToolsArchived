@@ -1,0 +1,26 @@
+from validation.hed_input_reader import HedInputReader
+import os;
+
+if __name__ == '__main__':
+    example_data_path = '../tests/data/';
+    bcit_guard_duty_path = os.path.join(example_data_path, 'BCIT_GuardDuty_HED_tag_spec_v27.tsv');
+    tx_14_path = os.path.join(example_data_path, 'TX14 HED Tags v9.87.csv');
+    tx_16_path = os.path.join(example_data_path, 'TX16 HED Tags v5.9.xlsx');
+    bcit_rsvp = os.path.join(example_data_path, 'BCIT RSVP HED Tags v46.0.xlsx');
+    bcit_driving = os.path.join(example_data_path, 'BCIT Driving HED Tags v46.0.xlsx');
+
+    # Example 1: Valid TSV file
+    hed_input_reader = HedInputReader(bcit_guard_duty_path, tag_columns=[2]);
+    print('BCIT_GuardDuty_HED_tag_spec_v27.tsv validation issues:\n' + hed_input_reader.get_validation_issues());
+
+    # Example 2: Valid CSV file
+    prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
+    hed_input_reader = HedInputReader(tx_14_path, tag_columns=[6],
+                                      prefixed_needed_tag_columns=prefixed_needed_tag_columns);
+    print('TX14 HED Tags v9.87.csv validation issues:\n' + hed_input_reader.get_validation_issues());
+
+    # Example 3: Valid XLSX file
+    prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'}
+    hed_input_reader = HedInputReader(bcit_rsvp, tag_columns=[2],
+                                      prefixed_needed_tag_columns=prefixed_needed_tag_columns);
+    print('TX16 HED Tags v9.87.xlsx validation issues:\n' + hed_input_reader.get_validation_issues());
