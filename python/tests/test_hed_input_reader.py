@@ -35,6 +35,11 @@ class Test(unittest.TestCase):
         validation_issues = self.generic_hed_input_reader._validate_hed_input();
         self.assertIsInstance(validation_issues, basestring);
 
+    def test_validate_hed_string(self):
+        validation_issues = self.generic_hed_input_reader._validate_hed_string(self.invalid_hed_string);
+        self.assertIsInstance(validation_issues, basestring);
+        self.assertTrue(validation_issues);
+
     def test__append_validation_issues_if_found(self):
         row_number = random.randint(0,100);
         self.assertFalse(self.validation_issues);
