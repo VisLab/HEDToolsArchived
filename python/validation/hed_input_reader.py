@@ -494,13 +494,32 @@ class HedInputReader:
         hed_tag_columns = HedInputReader.remove_tag_columns_greater_than_row_column_count(row_column_count,
                                                                                           hed_tag_columns);
         for hed_tag_column in hed_tag_columns:
-            row_hed_tags = worksheet_row[hed_tag_column].value;
+            row_hed_tags = HedInputReader.convert_column_to_unicode_if_not(worksheet_row[hed_tag_column].value);
             if row_hed_tags:
                 if hed_tag_column in prefixed_needed_tag_columns:
                     row_hed_tags = HedInputReader.prepend_path_to_prefixed_needed_tag_column(
                         row_hed_tags, prefixed_needed_tag_columns[hed_tag_column]);
                 hed_tags.append(row_hed_tags);
         return ','.join(hed_tags);
+
+    @staticmethod
+    def convert_column_to_unicode_if_not(column_value):
+        """Converts a column value to a unicode string if it is not.
+
+          Parameters
+          ----------
+          column_value: scalar value
+              A scalar column value. This will mostly be a numerical value.
+          Returns
+          -------
+          string
+              A unicode string representing the column value.
+
+          """
+        if not isinstance(column_value, unicode):
+            column_value = unicode(column_value);
+        return column_value;
+
 
     @staticmethod
     def remove_tag_columns_greater_than_row_column_count(row_column_count, hed_tag_columns):
