@@ -1,3 +1,15 @@
+'''
+This module contains the HedInputReader class which is used to validate the tags in a HED string or a file. The file
+types include .tsv, .txt, .csv, .xls, and .xlsx. To get the validation issues after creating a HedInputReader class call
+the get_validation_issues() function.
+
+Created on Oct 2, 2017
+
+@author: Jeremy Cockfield
+
+'''
+
+
 import xlrd;
 from validation.hed_dictionary import HedDictionary
 from validation.tag_validator import TagValidator;
@@ -36,8 +48,13 @@ class HedInputReader:
         worksheet_name: string
             The name of the Excel workbook worksheet that contains the HED tags.
         prefixed_needed_tag_columns: dictionary
-            A dictionary containing the HED tag column names that corresponds to tags that need to be prefixed with a
-            parent tag path.
+            A dictionary with keys pertaining to the HED tag columns that correspond to tags that need to be prefixed
+            with a parent tag path. For example,
+            prefixed_needed_tag_columns = {2: 'Long', 3: 'Description', 4: 'Label', 5: 'Category', 7: 'Attribute'};
+            The second column contains tags that need Event/Long name/ prepended to them, the third column contains
+            tags that need Event/Description/ prepended to them, the fourth column contains tags that need
+            Event/Label/ prepended to them, the fifth column contains tags that needs Event/Category/ prepended to
+            them, the seventh column contains tags that needs Attribute/ prepended to them.
         Returns
         -------
         HedInputReader object
