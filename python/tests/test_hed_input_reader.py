@@ -5,7 +5,7 @@ from validation.hed_input_reader import HedInputReader;
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.generic_hed_input_reader = HedInputReader('abc');
+        cls.generic_hed_input_reader = HedInputReader('Attribute/Onset');
         cls.text_file_with_extension = 'file_with_extension.txt';
         cls.integer_key_dictionary = {1: 'one', 2: 'two', 3: 'three'};
         cls.one_based_tag_columns = [1, 2, 3];
@@ -27,6 +27,10 @@ class Test(unittest.TestCase):
             self.one_based_tag_columns);
         self.assertIsInstance(processing_tag_columns, list);
         self.assertEqual(processing_tag_columns, self.zero_based_tag_columns_less_than_row_column_count);
+
+    def test__validate_hed_input(self):
+        validation_issues = self.generic_hed_input_reader._validate_hed_input();
+        self.assertIsInstance(validation_issues, basestring);
 
     def test_get_delimiter_from_text_file_extension(self):
         text_file_extension = HedInputReader.get_file_extension(self.text_file_with_extension)
