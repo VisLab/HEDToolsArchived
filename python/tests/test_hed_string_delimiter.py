@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
 
     def test_format_hed_tags_in_set(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         formatted_tag_set = HedStringDelimiter.format_hed_tags_in_set(tag_set);
         self.assertIsInstance(formatted_tag_set, set);
         self.assertEqual(len(tag_set), len(formatted_tag_set));
@@ -39,17 +39,17 @@ class Test(unittest.TestCase):
         self.assertIsInstance(formatted_tag, basestring);
         self.assertEqual(formatted_tag, self.formatted_tag);
 
-    def test_get_tag_set(self):
+    def test_get_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         self.assertTrue(tag_set);
-        self.assertIsInstance(tag_set, set);
+        self.assertIsInstance(tag_set, list);
 
-    def test_get_formatted_tag_set(self):
+    def test_get_formatted_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        formatted_tag_set = hed_string_delimiter.get_formatted_tag_set();
-        self.assertTrue(formatted_tag_set);
-        self.assertIsInstance(formatted_tag_set, set);
+        formatted_tags = hed_string_delimiter.get_formatted_tags();
+        self.assertTrue(formatted_tags);
+        self.assertIsInstance(formatted_tags, list);
 
     def test_get_hed_string(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
@@ -66,7 +66,7 @@ class Test(unittest.TestCase):
 
     def test_get_top_level_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         top_level_tags = hed_string_delimiter.get_top_level_tags();
         self.assertTrue(top_level_tags);
         self.assertIsInstance(top_level_tags, list);
@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
 
     def test_get_formatted_top_level_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         formatted_top_level_tags = hed_string_delimiter.get_formatted_top_level_tags();
         self.assertTrue(formatted_top_level_tags);
         self.assertIsInstance(formatted_top_level_tags, list);
@@ -82,7 +82,7 @@ class Test(unittest.TestCase):
 
     def test__find_top_level_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         top_level_tags_1 = hed_string_delimiter.get_top_level_tags();
         self.assertTrue(top_level_tags_1);
         self.assertIsInstance(top_level_tags_1, list);
@@ -96,7 +96,7 @@ class Test(unittest.TestCase):
 
     def test_get_tag_groups(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         group_tags = hed_string_delimiter.get_tag_groups();
         self.assertTrue(group_tags);
         self.assertIsInstance(group_tags, list);
@@ -104,7 +104,7 @@ class Test(unittest.TestCase):
 
     def test_get_formatted_tag_groups(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         formatted_group_tags = hed_string_delimiter.get_formatted_tag_groups();
         self.assertTrue(formatted_group_tags);
         self.assertIsInstance(formatted_group_tags, list);
@@ -112,7 +112,7 @@ class Test(unittest.TestCase):
 
     def test_find_group_tags(self):
         hed_string_delimiter = HedStringDelimiter(self.mixed_hed_string);
-        tag_set = hed_string_delimiter.get_tag_set();
+        tag_set = hed_string_delimiter.get_tags();
         group_tags_1 = hed_string_delimiter.get_tag_groups();
         self.assertTrue(group_tags_1);
         self.assertIsInstance(group_tags_1, list);
