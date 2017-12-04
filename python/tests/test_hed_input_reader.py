@@ -49,6 +49,12 @@ class Test(unittest.TestCase):
         self.assertIsInstance(validation_issues, basestring);
         self.assertTrue(validation_issues);
 
+    def test__validate_top_levels_in_hed_string(self):
+        hed_string_delimiter = HedStringDelimiter(self.hed_string_with_invalid_tags);
+        validation_issues = self.generic_hed_input_reader._validate_top_levels_in_hed_string(hed_string_delimiter);
+        self.assertIsInstance(validation_issues, basestring);
+        self.assertTrue(validation_issues);
+
     def test__validate_groups_in_hed_string(self):
         hed_string_delimiter = HedStringDelimiter(self.hed_string_with_too_many_tildes);
         validation_issues = self.generic_hed_input_reader._validate_groups_in_hed_string(hed_string_delimiter);
