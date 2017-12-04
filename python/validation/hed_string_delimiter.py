@@ -38,7 +38,7 @@ class HedStringDelimiter:
         self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self._find_top_level_tags();
         self._find_group_tags(self.split_hed_string_list);
-        self.formatted_tag_set = HedStringDelimiter.format_hed_tags_in_list(self.tags);
+        self.formatted_tags = HedStringDelimiter.format_hed_tags_in_list(self.tags);
         self.formatted_top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags);
         self.formatted_tag_groups = HedStringDelimiter.format_hed_tags_in_list(self.tag_groups);
 
@@ -94,18 +94,18 @@ class HedStringDelimiter:
         """
         return self.formatted_tag_groups;
 
-    def get_formatted_tag_set(self):
-        """Gets the formatted_tag_set field.
+    def get_formatted_tags(self):
+        """Gets the formatted_tags field.
 
         Parameters
         ----------
         Returns
         -------
-        set
-            A set containing the individual formatted tags in the HED string.
+        list
+            A list containing the individual formatted tags in the HED string.
 
         """
-        return self.formatted_tag_set;
+        return self.formatted_tags;
 
     def get_top_level_tags(self):
         """Gets the top_level_tags field.
