@@ -20,6 +20,7 @@ class Test(unittest.TestCase):
         cls.attribute_key = 'Attribute';
         cls.category_key = 'Category';
         cls.attribute_tag = 'Onset';
+        cls.hed_string_with_multiple_unique_tags = 'event/label/this is a label,event/label/this is another label';
         cls.hed_string_with_invalid_tags = 'this/is/not/a/valid/tag1,this/is/not/a/valid/tag2';
         cls.hed_string_with_too_many_tildes = '(this/is/not/a/valid/tag1~this/is/not/a/valid/tag2' \
                                                  '~this/is/not/a/valid/tag3~this/is/not/a/valid/tag4)';
@@ -52,6 +53,12 @@ class Test(unittest.TestCase):
     def test__validate_top_levels_in_hed_string(self):
         hed_string_delimiter = HedStringDelimiter(self.hed_string_with_invalid_tags);
         validation_issues = self.generic_hed_input_reader._validate_top_levels_in_hed_string(hed_string_delimiter);
+        self.assertIsInstance(validation_issues, basestring);
+        self.assertTrue(validation_issues);
+
+    def test__validate_tag_levels_in_hed_string(self):
+        hed_string_delimiter = HedStringDelimiter(self.hed_string_with_multiple_unique_tags);
+        validation_issues = self.generic_hed_input_reader._validate_tag_levels_in_hed_string(hed_string_delimiter);
         self.assertIsInstance(validation_issues, basestring);
         self.assertTrue(validation_issues);
 
