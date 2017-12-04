@@ -21,6 +21,8 @@ class Test(unittest.TestCase):
         cls.category_key = 'Category';
         cls.attribute_tag = 'Onset';
         cls.hed_string_with_invalid_tags = 'this/is/not/a/valid/tag1,this/is/not/a/valid/tag2';
+        cls.hed_string_with_too_many_tildes = '(this/is/not/a/valid/tag1~this/is/not/a/valid/tag2' \
+                                                 '~this/is/not/a/valid/tag3~this/is/not/a/valid/tag4)';
         cls.attribute_onset_tag = 'Attribute/Onset';
         cls.category_partipant_and_stimulus_tags = 'Event/Category/Participant response,Event/Category/Stimulus';
         cls.category_tags = 'Participant response, Stimulus';
@@ -44,6 +46,12 @@ class Test(unittest.TestCase):
     def test__validate_individual_tags_in_hed_string(self):
         hed_string_delimiter = HedStringDelimiter(self.hed_string_with_invalid_tags);
         validation_issues = self.generic_hed_input_reader._validate_individual_tags_in_hed_string(hed_string_delimiter);
+        self.assertIsInstance(validation_issues, basestring);
+        self.assertTrue(validation_issues);
+
+    def test__validate_groups_in_hed_string(self):
+        hed_string_delimiter = HedStringDelimiter(self.hed_string_with_too_many_tildes);
+        validation_issues = self.generic_hed_input_reader._validate_groups_in_hed_string(hed_string_delimiter);
         self.assertIsInstance(validation_issues, basestring);
         self.assertTrue(validation_issues);
 
