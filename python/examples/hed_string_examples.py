@@ -18,8 +18,8 @@ if __name__ == '__main__':
 
     # Example 3: Invalid HED string
     hed_string_3 = 'Event/Description/The start of increasing the size of sector, Event/Label/Sector start, ' \
-    'Event/Category/Experimental stimulus/Instruction/Attend, (Item/2D shape/Sector, Attribute/Visual/Color/Red) ' \
+    'Event/Category/Experimental stimulus/Instruction/Attend, (Item/2D shape/Sector, Attribute/Visual/Color/Red) f' \
     '(Item/2D shape/Ellipse/Circle, Attribute/Visual/Color / Red), Sensory presentation/Visual, ' \
     'Participant/Efffectt/Visual, Participant/Effect/Cognitive/Target';
     hed_input_reader = HedInputReader(hed_string_3);
-    print('HED string 2 validation issues:\n' + hed_input_reader.get_validation_issues());
+    print('HED string 3 validation issues:\n' + hed_input_reader.get_validation_issues());
