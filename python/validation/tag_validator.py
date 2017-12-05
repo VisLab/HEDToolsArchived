@@ -619,11 +619,3 @@ class TagValidator:
                                                                 opening_bracket_count=number_of_opening_brackets,
                                                                 closing_bracket_count=number_of_closing_brackets);
         return validation_error;
-
-if __name__ == '__main__':
-    # original_tag = 'attribute/repetition/34434';
-    original_tag = 'attribute/direction/top/34434';
-    hed_dictionary = HedDictionary('../tests/data/HED.xml');
-    tag_validator = TagValidator(hed_dictionary);
-    units_are_valid = tag_validator.count_tag_group_brackets('fdskjfdkjd,()(()())))))))');
-    print(units_are_valid)

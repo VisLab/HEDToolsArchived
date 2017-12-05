@@ -32,11 +32,11 @@ class HedStringDelimiter:
 
         """
         self.hed_string = hed_string;
-        self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
+        self._split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self.tags = [];
         self.tag_groups = [];
         self.top_level_tags = self._find_top_level_tags();
-        self._find_group_tags(self.split_hed_string_list);
+        self._find_group_tags(self._split_hed_string_list);
         self.tags = HedStringDelimiter.format_hed_tags_in_list(self.tags, True);
         self.top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags, True);
         self.tag_groups = HedStringDelimiter.format_hed_tags_in_list(self.tag_groups, True);
@@ -55,7 +55,7 @@ class HedStringDelimiter:
             A list containing the individual tags and tag groups in the HED string. Nested tag groups are not split.
 
         """
-        return self.split_hed_string_list;
+        return self._split_hed_string_list;
 
     def get_hed_string(self):
         """Gets the hed_string field.
@@ -179,8 +179,8 @@ class HedStringDelimiter:
             A list containing the top-level tags.
 
         """
-        top_level_tags = copy.copy(self.split_hed_string_list);
-        for tag_or_group in self.split_hed_string_list:
+        top_level_tags = copy.copy(self._split_hed_string_list);
+        for tag_or_group in self._split_hed_string_list:
             if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
                 top_level_tags.remove(tag_or_group);
             elif tag_or_group not in self.tags:
@@ -344,11 +344,3 @@ class HedStringDelimiter:
     @staticmethod
     def remove_group_parentheses(tag_group):
         return tag_group[1:-1];
-
-
-if __name__ == '__main__':
-    # hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
-    # hed_string_delimiter = HedStringDelimiter(hed_string);
-    # tags = hed_string_delimiter.get_tag_set();
-    is_group = HedStringDelimiter.hed_string_is_a_group(')')
-    print(is_group);

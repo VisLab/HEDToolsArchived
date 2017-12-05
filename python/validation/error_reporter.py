@@ -45,7 +45,3 @@ def report_error_type(error_type, error_row=1, tag='', tag_prefix='', unit_class
 
     }
     return error_types.get(error_type, None);
-
-
-if __name__ == '__main__':
-    print(report_error_type('valid', 'Event/Label'));

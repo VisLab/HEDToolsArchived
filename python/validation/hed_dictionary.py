@@ -463,10 +463,3 @@ class HedDictionary:
         if tag.lower() in self.dictionaries[tag_attribute]:
                 return True;
         return False;
-
-if __name__ == '__main__':
-    dictionaries = HedDictionary('../tests/data/HED.xml');
-    tag_elements = dictionaries.root_element.xpath('.//sdddds');
-    print(tag_elements)
-    # leaf_tags = dictionaries.get_all_leaf_tags();
-    # print(len(leaf_tags));

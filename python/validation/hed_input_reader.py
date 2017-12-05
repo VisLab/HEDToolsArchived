@@ -660,13 +660,3 @@ class HedInputReader:
 
         """
         return file_path.rsplit('.', 1)[-1].lower();
-
-
-if __name__ == '__main__':
-    a = HedInputReader('a,b,c');
-    print(a._hed_input);
-
-
-
-
-
