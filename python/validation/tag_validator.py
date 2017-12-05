@@ -109,7 +109,7 @@ class TagValidator:
 
          """
         validation_issues = '';
-        validation_issues += self.count_tag_group_brackets(hed_string);
+        validation_issues += TagValidator.count_tag_group_brackets(hed_string);
         return validation_issues;
 
     def run_tag_level_validators(self, original_tag_list, formatted_tag_list):
@@ -537,7 +537,8 @@ class TagValidator:
             return tag[:end_index]
         return tag;
 
-    def count_tag_group_brackets(self, hed_string):
+    @staticmethod
+    def count_tag_group_brackets(hed_string):
         """Reports a validation error if there are an unequal number of opening or closing parentheses. This is the
          first check before the tags are parsed.
 
