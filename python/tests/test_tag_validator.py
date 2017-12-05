@@ -24,6 +24,8 @@ class Test(unittest.TestCase):
         cls.invalid_hed_string = 'event/label/hed string, event/description/this is a hed string, ' \
                                  'event/category/participant response, (()))';
         cls.tilde = '~';
+        cls.comma = ','
+        cls.at_sign = '@';
         cls.valid_is_numeric_tag = 'Attribute/Repetition/20';
         cls.valid_formatted_is_numeric_tag = 'attribute/repetition/20';
         cls.valid_unit_class_tag = 'Attribute/Temporal rate/20 Hz';
@@ -202,6 +204,14 @@ class Test(unittest.TestCase):
         print(validation_error)
         self.assertTrue(validation_error);
         self.assertIsInstance(validation_error, basestring);
+
+    def test_character_is_delimiter(self):
+        is_a_delimiter = TagValidator.character_is_delimiter(self.comma);
+        self.assertTrue(is_a_delimiter);
+        is_a_delimiter = TagValidator.character_is_delimiter(self.comma);
+        self.assertTrue(is_a_delimiter);
+        is_a_delimiter = TagValidator.character_is_delimiter(self.at_sign);
+        self.assertFalse(is_a_delimiter);
 
 if __name__ == '__main__':
     unittest.main();
