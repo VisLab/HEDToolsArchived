@@ -115,6 +115,7 @@ class TagValidator:
          """
         validation_issues = '';
         validation_issues += TagValidator.count_tag_group_brackets(hed_string);
+        validation_issues += TagValidator.find_missing_commas_in_hed_string(hed_string);
         return validation_issues;
 
     def run_tag_level_validators(self, original_tag_list, formatted_tag_list):
@@ -561,7 +562,7 @@ class TagValidator:
         last_non_empty_character = '';
         for character in hed_string:
             current_tag += character;
-            if character != ' ':
+            if not character.isspace():
                 if TagValidator.character_is_delimiter(character):
                     current_tag = '';
                 if last_non_empty_character and not TagValidator.character_is_delimiter(last_non_empty_character) and \
