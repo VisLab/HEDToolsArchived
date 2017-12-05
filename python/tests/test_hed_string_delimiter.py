@@ -7,6 +7,8 @@ class Test(unittest.TestCase):
     def setUpClass(cls):
         cls.mixed_hed_string = 'tag1,(tag2,tag5,(tag1),tag6),tag2,(tag3,tag5,tag6),tag3';
         cls.group_hed_string = '(tag1, tag2)';
+        cls.empty_hed_string = '';
+        cls.newline_hed_string = '\n';
         cls.removal_elements = ['(tag2,tag5,(tag1),tag6)', '(tag3,tag5,tag6)'];
         cls.unformatted_tag = '/Event/label/This label ends with a slash/';
         cls.formatted_tag = 'event/label/this label ends with a slash'
@@ -131,6 +133,14 @@ class Test(unittest.TestCase):
         is_group = HedStringDelimiter.hed_string_is_a_group(self.group_hed_string);
         self.assertTrue(is_group);
         self.assertIsInstance(is_group, bool);
+
+    def test_string_is_space_or_empty(self):
+        is_space_or_empty = HedStringDelimiter.string_is_space_or_empty(self.mixed_hed_string);
+        self.assertFalse(is_space_or_empty);
+        is_space_or_empty = HedStringDelimiter.string_is_space_or_empty(self.empty_hed_string);
+        self.assertTrue(is_space_or_empty);
+        is_space_or_empty = HedStringDelimiter.string_is_space_or_empty(self.newline_hed_string);
+        self.assertTrue(is_space_or_empty);
 
 
 if __name__ == '__main__':
