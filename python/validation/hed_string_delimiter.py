@@ -32,12 +32,15 @@ class HedStringDelimiter:
 
         """
         self.tags = [];
-        self.tag_groups = [];
         self.top_level_tags = [];
+        self.tag_groups = []
         self.hed_string = hed_string;
         self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
         self._find_top_level_tags();
         self._find_group_tags(self.split_hed_string_list);
+        self.tags = HedStringDelimiter.format_hed_tags_in_list(self.tags, True);
+        self.top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags, True);
+        self.tag_groups = HedStringDelimiter.format_hed_tags_in_list(self.tag_groups, True);
         self.formatted_tags = HedStringDelimiter.format_hed_tags_in_list(self.tags);
         self.formatted_top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags);
         self.formatted_tag_groups = HedStringDelimiter.format_hed_tags_in_list(self.tag_groups);
@@ -183,7 +186,7 @@ class HedStringDelimiter:
                 self.tags.append(tag_or_group);
 
     @staticmethod
-    def format_hed_tag(hed_tag):
+    def format_hed_tag(hed_tag, only_remove_new_line=False):
         """Format a single HED tag. Slashes and double quotes in the beginning and end are removed and the tag is
            converted to lowercase.
 
@@ -197,8 +200,10 @@ class HedStringDelimiter:
             The formatted version of the HED tag.
 
         """
+        hed_tag = hed_tag.replace('\n', ' ');
+        if only_remove_new_line:
+            return hed_tag;
         hed_tag = hed_tag.strip();
-        # hed_tag = hed_tag.replace('\n', ' ');
         if hed_tag.startswith('"'):
             hed_tag = hed_tag[1:];
         if hed_tag.endswith('"'):
@@ -210,7 +215,7 @@ class HedStringDelimiter:
         return hed_tag.lower();
 
     @staticmethod
-    def format_hed_tags_in_list(hed_tags_list):
+    def format_hed_tags_in_list(hed_tags_list, only_remove_new_line=False):
         """Format the HED tags in a list. The list can be nested. Groups are represented as lists themselves.
 
         Parameters
@@ -226,10 +231,12 @@ class HedStringDelimiter:
         formatted_hed_tags_list = list();
         for hed_tag_or_hed_tag_group in hed_tags_list:
             if isinstance(hed_tag_or_hed_tag_group, list):
-                formatted_tag_group_list = HedStringDelimiter.format_hed_tags_in_list(hed_tag_or_hed_tag_group);
+                formatted_tag_group_list = HedStringDelimiter.format_hed_tags_in_list(hed_tag_or_hed_tag_group,
+                                                                                      only_remove_new_line);
                 formatted_hed_tags_list.append(formatted_tag_group_list);
             else:
-                formatted_hed_tag = HedStringDelimiter.format_hed_tag(hed_tag_or_hed_tag_group);
+                formatted_hed_tag = HedStringDelimiter.format_hed_tag(hed_tag_or_hed_tag_group,
+                                                                      only_remove_new_line);
                 formatted_hed_tags_list.append(formatted_hed_tag);
         return formatted_hed_tags_list;
 
