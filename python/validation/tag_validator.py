@@ -562,21 +562,38 @@ class TagValidator:
         for character in hed_string:
             current_tag += character;
             if character != ' ':
-                if character == TagValidator.COMMA or character == TagValidator.TILDE:
+                if TagValidator.character_is_delimiter(character):
                     current_tag = '';
-                if last_non_empty_character and (last_non_empty_character != TagValidator or last_non_empty_character != TagValidator.TILDE)\
-                        and character == TagValidator.OPENING_GROUP_BRACKET:
+                if last_non_empty_character and not TagValidator.character_is_delimiter(last_non_empty_character) and \
+                                character == TagValidator.OPENING_GROUP_BRACKET:
                     current_tag = current_tag[:-1].strip();
                     validation_error = error_reporter.report_error_type(TagValidator.COMMA_ERROR_TYPE, tag=current_tag);
                     break;
-                if last_non_empty_character == TagValidator.CLOSING_GROUP_BRACKET and (character != TagValidator\
-                    or character != TagValidator.TILDE):
+                if last_non_empty_character == TagValidator.CLOSING_GROUP_BRACKET and not \
+                        TagValidator.character_is_delimiter(character):
                     current_tag = current_tag[:-1].strip();
                     validation_error = error_reporter.report_error_type(TagValidator.COMMA_ERROR_TYPE, tag=current_tag);
                     break;
                 last_non_empty_character = character;
         return validation_error;
 
+    @staticmethod
+    def character_is_delimiter(character):
+        """Checks to see if the character is a delimiter. A delimiter is a commma or a tilde.
+
+        Parameters
+        ----------
+        character: character
+            A string character.
+        Returns
+        -------
+        string
+            Returns true if the character is a delimiter. False, if otherwise. A delimiter is a comma or a tilde.
+
+        """
+        if character == TagValidator.COMMA or character == TagValidator.TILDE:
+            return True;
+        return False;
 
     @staticmethod
     def count_tag_group_brackets(hed_string):
