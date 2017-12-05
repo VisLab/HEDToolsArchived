@@ -198,6 +198,7 @@ class HedStringDelimiter:
 
         """
         hed_tag = hed_tag.strip();
+        # hed_tag = hed_tag.replace('\n', ' ');
         if hed_tag.startswith('"'):
             hed_tag = hed_tag[1:];
         if hed_tag.endswith('"'):
@@ -278,17 +279,38 @@ class HedStringDelimiter:
             if character == HedStringDelimiter.CLOSING_GROUP_CHARACTER:
                 number_of_closing_parentheses += 1;
             if number_of_opening_parentheses == number_of_closing_parentheses and character == HedStringDelimiter.TILDE:
-                split_hed_string.append(current_tag.strip());
+                if not HedStringDelimiter.string_is_space_or_empty(current_tag):
+                    split_hed_string.append(current_tag.strip());
                 split_hed_string.append(HedStringDelimiter.TILDE);
                 current_tag = '';
             elif number_of_opening_parentheses == number_of_closing_parentheses and character == \
                     HedStringDelimiter.DELIMITER:
-                split_hed_string.append(current_tag.strip());
+                if not HedStringDelimiter.string_is_space_or_empty(current_tag):
+                    split_hed_string.append(current_tag.strip());
                 current_tag = '';
             else:
                 current_tag += character;
-        split_hed_string.append(current_tag.strip());
+        if not HedStringDelimiter.string_is_space_or_empty(current_tag):
+            split_hed_string.append(current_tag.strip());
         return split_hed_string;
+
+    @staticmethod
+    def string_is_space_or_empty(string):
+        """Checks to see if the string contains all spaces or is empty.
+
+        Parameters
+        ----------
+        string
+            A string.
+        Returns
+        -------
+        boolean
+            True if the string contains all spaces or is empty. False, if otherwise.
+
+        """
+        if string.isspace() or not string:
+            return True;
+        return False;
 
     @staticmethod
     def hed_string_is_a_group(hed_string):
