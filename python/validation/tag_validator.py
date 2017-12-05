@@ -15,6 +15,7 @@ from hed_dictionary import HedDictionary
 
 class TagValidator:
     BRACKET_ERROR_TYPE = 'bracket';
+    COMMA_ERROR_TYPE = 'comma';
     CAMEL_CASE_EXPRESSION = '([A-Z-]+\s*[a-z-]*)+';
     DEFAULT_UNIT_ATTRIBUTE = 'default';
     DIGIT_EXPRESSION = '^\d+$';
@@ -29,6 +30,10 @@ class TagValidator:
     IS_NUMERIC_ATTRIBUTE = 'isNumeric';
     UNIT_CLASS_ATTRIBUTE = 'unitClass';
     UNIT_CLASS_UNITS_ELEMENT = 'units';
+    OPENING_GROUP_BRACKET = '(';
+    CLOSING_GROUP_BRACKET = ')';
+    DOUBLE_QUOTE = '"';
+    COMMA = ',';
     TILDE = '~';
     hed_dictionary = None;
     hed_dictionary_dictionaries = None;
@@ -536,6 +541,42 @@ class TagValidator:
         if end_index != 0:
             return tag[:end_index]
         return tag;
+
+    @staticmethod
+    def find_missing_commas_in_hed_string(hed_string):
+        """Reports a validation error if there are missing commas before and after groups.
+
+        Parameters
+        ----------
+        hed_string: string
+            A hed string.
+        Returns
+        -------
+        string
+            A validation error string. If no errors are found then an empty string is returned.
+
+        """
+        validation_error = '';
+        current_tag = '';
+        last_non_empty_character = '';
+        for character in hed_string:
+            current_tag += character;
+            if character != ' ':
+                if character == TagValidator.COMMA or character == TagValidator.TILDE:
+                    current_tag = '';
+                if last_non_empty_character and (last_non_empty_character != TagValidator or last_non_empty_character != TagValidator.TILDE)\
+                        and character == TagValidator.OPENING_GROUP_BRACKET:
+                    current_tag = current_tag[:-1].strip();
+                    validation_error = error_reporter.report_error_type(TagValidator.COMMA_ERROR_TYPE, tag=current_tag);
+                    break;
+                if last_non_empty_character == TagValidator.CLOSING_GROUP_BRACKET and (character != TagValidator\
+                    or character != TagValidator.TILDE):
+                    current_tag = current_tag[:-1].strip();
+                    validation_error = error_reporter.report_error_type(TagValidator.COMMA_ERROR_TYPE, tag=current_tag);
+                    break;
+                last_non_empty_character = character;
+        return validation_error;
+
 
     @staticmethod
     def count_tag_group_brackets(hed_string):
