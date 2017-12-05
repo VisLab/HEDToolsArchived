@@ -2,7 +2,7 @@ from validation.hed_input_reader import HedInputReader
 import os;
 
 if __name__ == '__main__':
-    example_data_path = '../tests/data/';
+    example_data_path = 'path/to/example/data';
     bcit_guard_duty_path = os.path.join(example_data_path, 'BCIT_GuardDuty_HED_tag_spec_v27.tsv');
     tx_14_path = os.path.join(example_data_path, 'TX14 HED Tags v9.87.csv');
     tx_16_path = os.path.join(example_data_path, 'TX16 HED Tags v5.9.xlsx');
