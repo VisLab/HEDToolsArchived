@@ -185,12 +185,10 @@ class Test(unittest.TestCase):
         self.assertIsInstance(validation_error, basestring);
 
     def test_count_tag_group_brackets(self):
-        validation_error = \
-            self.tag_validator.count_tag_group_brackets(self.valid_hed_string);
+        validation_error = TagValidator.count_tag_group_brackets(self.valid_hed_string);
         self.assertFalse(validation_error);
         self.assertIsInstance(validation_error, basestring);
-        validation_error = \
-            self.tag_validator.count_tag_group_brackets(self.invalid_hed_string);
+        validation_error = TagValidator.count_tag_group_brackets(self.invalid_hed_string);
         self.assertTrue(validation_error);
         self.assertIsInstance(validation_error, basestring);
 
