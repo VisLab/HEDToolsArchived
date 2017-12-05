@@ -46,6 +46,8 @@ class Test(unittest.TestCase):
         cls.invalid_formatted_required_tag_list = ['event/label/this is a label',
              'event/description/this is a description'];
         cls.extension_allowed_descendant_tag = 'Item/Object/Tool/Hammer';
+        cls.missing_comma_hed_string = '(Item/2D shape/Sector, Attribute/Visual/Color/Red) f ' \
+                                       '(Item/2D shape/Ellipse/Circle, Attribute/Visual/Color / Red)';
 
     def test_check_if_tag_is_valid(self):
         validation_error = self.tag_validator.check_if_tag_is_valid(self.invalid_original_tag,
@@ -189,6 +191,15 @@ class Test(unittest.TestCase):
         self.assertFalse(validation_error);
         self.assertIsInstance(validation_error, basestring);
         validation_error = TagValidator.count_tag_group_brackets(self.invalid_hed_string);
+        self.assertTrue(validation_error);
+        self.assertIsInstance(validation_error, basestring);
+
+    def test_find_missing_commas_in_hed_string(self):
+        validation_error = TagValidator.find_missing_commas_in_hed_string(self.valid_hed_string);
+        self.assertFalse(validation_error);
+        self.assertIsInstance(validation_error, basestring);
+        validation_error = TagValidator.find_missing_commas_in_hed_string(self.missing_comma_hed_string);
+        print(validation_error)
         self.assertTrue(validation_error);
         self.assertIsInstance(validation_error, basestring);
 
