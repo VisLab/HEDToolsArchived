@@ -31,12 +31,11 @@ class HedStringDelimiter:
             A HedStringDelimiter object.
 
         """
-        self.tags = [];
-        self.top_level_tags = [];
-        self.tag_groups = []
         self.hed_string = hed_string;
         self.split_hed_string_list = HedStringDelimiter.split_hed_string_into_list(hed_string);
-        self._find_top_level_tags();
+        self.tags = [];
+        self.tag_groups = [];
+        self.top_level_tags = self._find_top_level_tags();
         self._find_group_tags(self.split_hed_string_list);
         self.tags = HedStringDelimiter.format_hed_tags_in_list(self.tags, True);
         self.top_level_tags = HedStringDelimiter.format_hed_tags_in_list(self.top_level_tags, True);
@@ -176,14 +175,17 @@ class HedStringDelimiter:
         ----------
         Returns
         -------
+        list
+            A list containing the top-level tags.
 
         """
-        self.top_level_tags = copy.copy(self.split_hed_string_list);
+        top_level_tags = copy.copy(self.split_hed_string_list);
         for tag_or_group in self.split_hed_string_list:
             if HedStringDelimiter.hed_string_is_a_group(tag_or_group):
-                self.top_level_tags.remove(tag_or_group);
+                top_level_tags.remove(tag_or_group);
             elif tag_or_group not in self.tags:
                 self.tags.append(tag_or_group);
+        return top_level_tags;
 
     @staticmethod
     def format_hed_tag(hed_tag, only_remove_new_line=False):
