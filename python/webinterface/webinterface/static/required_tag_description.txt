@@ -1,0 +1,1 @@
+Tags with the required attribute must for present in each and every event. These currently are tags that start with the prefixes /Event/Category, /Event/Description and /Event/Label.

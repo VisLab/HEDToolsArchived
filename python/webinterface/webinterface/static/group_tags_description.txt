@@ -1,0 +1,1 @@
+Tags in groups can have no more than 2 tildes. For example, (/Participant ~ /Action/Type/Allow/Access ~ /Item/Object/Person/ID Holder) is a valid group containing tildes.

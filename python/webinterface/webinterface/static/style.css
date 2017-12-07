@@ -1,0 +1,170 @@
+body {
+    margin: 0 0 100px; /* bottom = footer height */
+}
+
+#error_description_title {
+    font-weight: bold;
+}
+
+#error_descriptions a {
+    background-color: #f0f0f5;
+    text-decoration: none;
+    border-radius: 15px;
+    padding: 5px;
+    margin: 5px;
+    display: block;
+    width: 70%;
+}
+
+#error_descriptions p {
+    padding: 5px;
+    margin: 5px;
+    display: block;
+    width: 70%;
+}
+
+#flash_message {
+    width: 500px;
+    margin: auto auto 25px auto;
+    list-style-type: none;
+    font-size: larger;
+    border-radius: 5px;
+    padding: 200px auto 200px auto;
+}
+
+#footer {
+    position: absolute;
+    text-align: center;
+    left: 0;
+    bottom: 0;
+    height: 50px;
+    width: 100%;
+    min-width: 900px;
+    background: #f0f0f5;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+#logo {
+    background-image: url(/static/logo.png);
+    background-size: 100% 100%;
+    margin-bottom: 30px;
+    height: 100px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#main_navigation {
+    padding-top: 20px;
+    margin-bottom: 40px;
+}
+
+#main_navigation a {
+    font-size: 150%;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    color: black;
+    width: 150px;
+}
+
+#main {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+    min-width: 900px;
+    overflow: auto;
+}
+
+#side_navigation {
+    padding-right: 20px;
+    width: 30%;
+    border-right: solid;
+    border-color: grey;
+    float: left;
+    overflow: hidden;
+}
+
+#title {
+    float: left;
+}
+
+#title h1 {
+    margin: 0px;
+    text-decoration: underline;
+}
+
+#title h3 {
+    text-indent: 50px;
+    margin: 0px;
+}
+
+#content {
+    text-align: center;
+    margin-left: 35%;
+    width: 60%;
+}
+
+#validation_form * {
+    margin: auto;
+}
+
+#validation_form input[type="text"] {
+    width: 150px;
+    text-align: center;
+}
+
+#validation_form select {
+    display: block;
+    margin-bottom: 25px;
+}
+
+#validation_form input {
+    display: block;
+    margin-bottom: 25px;
+}
+
+#validation_form input[type="checkbox"] {
+    display: inline;
+}
+
+#validation_form button {
+    width: 150px;
+    height: 30px;
+    display: block;
+}
+
+#validation_form table {
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+#validation_form table td {
+    padding: 5px;
+    border: 1px solid black;
+}
+
+#warning_description_title {
+    font-weight: bold;
+}
+
+#warning_descriptions a {
+    background-color: #f0f0f5;
+    text-decoration: none;
+    border-radius: 15px;
+    padding: 5px;
+    margin: 5px;
+    display: block;
+    width: 70%;
+}
+
+#warning_descriptions p {
+    padding: 5px;
+    margin: 5px;
+    display: block;
+    width: 70%;
+}

@@ -1,0 +1,57 @@
+{% macro create_validation_descriptions() %}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    {% set error_description_ids = ['require_tags', 'unique_tags', 'child_required_tags', 'numerical_tags', 'group_tags'] %}
+    {% set error_description_names = ['Required tags missing', 'Multiple unique tags', 'Parent tag specified when child is required', 'Non-numerical values for numerical tags', 'Too many tildes in tag groups'] %}
+    {% set error_description_files = ['/static/required_tag_description.txt', '/static/unique_tag_description.txt', '/static/require_child_tag_description.txt', '/static/numerical_tag_description.txt', '/static/group_tags_description.txt'] %}
+    {% set warning_description_ids = ['missing_unit_tags', 'capitalizing_tags'] %}
+    {% set warning_description_names = ['No units specified for numerical tags', 'Capitalization in subsequent words of a tag'] %}
+    {% set warning_description_files = ['/static/missing_unit_description.txt', '/static/capitalization_description.txt'] %}
+    {% if error_description_names %}
+        <p>What is a <span style="font-weight:bold">error</span>? What is a
+            <span style="font-weight:bold">warning</span>?
+            <span style="font-weight:bold">Click on</span> a description below for more details.</p>
+        <div id="error_descriptions">
+            <label id="error_description_title">Errors</label>
+            <ul>
+                {% for description in error_description_names %}
+                    <a id="error_{{ error_description_ids[loop.index0] }}"> {{ description }}</a>
+                    <p id="explanation_error_{{ error_description_ids[loop.index0] }}"
+                       description_file="{{ error_description_files[loop.index0] }}"></p>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="warning_descriptions">
+            <label id="warning_description_title">Warnings</label>
+            <ul>
+                {% for description in warning_description_names %}
+                    <a id="warning_{{ warning_description_ids[loop.index0] }}"> {{ description }}</a>
+                    <p id="explanation_warning_{{ warning_description_ids[loop.index0] }}"
+                       description_file="{{ warning_description_files[loop.index0] }}"></p>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <script>
+        $(document).ready(function () {
+            $("#error_descriptions p").each(function () {
+                $(this).load($(this).attr("description_file"));
+                $(this).hide();
+            });
+
+
+            $("#error_descriptions a").click(function () {
+                $("#explanation_" + $(this).attr("id")).toggle();
+            });
+
+            $("#warning_descriptions p").each(function () {
+                $(this).load($(this).attr("description_file"));
+                $(this).hide();
+            });
+
+            $("#warning_descriptions a").click(function () {
+                $("#explanation_" + $(this).attr("id")).toggle();
+            });
+        });
+    </script>
+{% endmacro %}

@@ -1,0 +1,1 @@
+Tags with the requireChild attribute cannot be present in any event. Instead a descendant of these tags will have to be in its place. For example, the tag Event/Category cannot be present in an event. However, Event/Category/Participant response can because it is a descendant of Event/Category and doesn't have the requireChild attribute.

@@ -1,0 +1,1 @@
+The first word in each tag should be capitalized and all subsequent words should be lowercase. This doesn't apply to tags that take a value. For example, /Event/Category/Experimental Stimulus is discouraged. The Stimulus part should be lowercase.
