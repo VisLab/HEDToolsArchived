@@ -5,8 +5,7 @@ import tempfile;
 import xlrd;
 from flask import abort, Flask, render_template, request, Response;
 from werkzeug.utils import secure_filename;
-
-from webinterface.forms import ValidationForm;
+from forms import ValidationForm;
 
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
