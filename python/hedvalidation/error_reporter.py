@@ -10,12 +10,12 @@ Created on Oct 2, 2017
 
 def report_error_type(error_type, error_row=1, tag='', tag_prefix='', unit_class_units='', opening_bracket_count=0,
                       closing_bracket_count=0):
-    """Reports the validation error based on the type of error.
+    """Reports the abc error based on the type of error.
 
     Parameters
     ----------
     error_type: string
-        The type of validation error.
+        The type of abc error.
     error_row: int
         The row number that the error occurred on.
     tag: string

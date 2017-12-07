@@ -1,14 +1,16 @@
+import random;
 import unittest;
+import os;
 import defusedxml;
 from defusedxml.lxml import parse;
-from validation.hed_dictionary import HedDictionary;
-import random;
+
+from hedvalidation.hed_dictionary import HedDictionary;
 
 
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.hed_xml = 'data/HED.xml';
+        cls.hed_xml = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/HED.xml');
         cls.hed_dictionary = HedDictionary(cls.hed_xml);
         cls.unit_class_tag = 'unitClass';
         cls.tag_attributes = ['default', 'extensionAllowed', 'isNumeric', 'position', 'predicateType',

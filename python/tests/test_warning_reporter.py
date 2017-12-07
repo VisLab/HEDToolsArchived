@@ -1,5 +1,5 @@
 import unittest;
-from validation import warning_reporter;
+from hedvalidation import warning_reporter
 
 
 class Test(unittest.TestCase):

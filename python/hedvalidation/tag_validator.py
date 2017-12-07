@@ -7,10 +7,10 @@ Created on Oct 2, 2017
 
 '''
 
-from validation import error_reporter, warning_reporter;
-from itertools import compress;
 import re;
-from hed_dictionary import HedDictionary
+from itertools import compress;
+from hedvalidation import error_reporter;
+from hedvalidation import warning_reporter
 
 
 class TagValidator:
@@ -69,7 +69,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with the top-level in the HED string.
+             The abc issues associated with the top-level in the HED string.
 
          """
         validation_issues = '';
@@ -92,7 +92,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with the groups in a HED string.
+             The abc issues associated with the groups in a HED string.
 
          """
         validation_issues = '';
@@ -110,7 +110,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with a HED string.
+             The abc issues associated with a HED string.
 
          """
         validation_issues = '';
@@ -131,7 +131,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with each level in a HED string.
+             The abc issues associated with each level in a HED string.
 
          """
         validation_issues = '';
@@ -148,7 +148,7 @@ class TagValidator:
          Returns
          -------
          string
-             The validation issues associated with the top-level in a HED string.
+             The abc issues associated with the top-level in a HED string.
 
          """
         validation_issues = '';
@@ -156,18 +156,18 @@ class TagValidator:
         return validation_issues;
 
     def check_if_tag_is_valid(self, original_tag, formatted_tag):
-        """Reports a validation error if the tag provided is not a valid tag or doesn't take a value.
+        """Reports a abc error if the tag provided is not a valid tag or doesn't take a value.
 
         Parameters
         ----------
         original_tag: string
             The original tag that is used to report the error.
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -179,18 +179,18 @@ class TagValidator:
         return validation_error;
 
     def check_capitalization(self, original_tag, formatted_tag):
-        """Reports a validation warning if the tag isn't correctly capitalized.
+        """Reports a abc warning if the tag isn't correctly capitalized.
 
         Parameters
         ----------
         original_tag: string
             The original tag that is used to report the warning.
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
-            A validation warning string. If no warnings are found then an empty string is returned.
+            A abc warning string. If no warnings are found then an empty string is returned.
 
         """
         validation_warning = '';
@@ -210,7 +210,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         boolean
@@ -231,7 +231,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         boolean
@@ -249,7 +249,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         boolean
@@ -266,7 +266,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
@@ -280,18 +280,18 @@ class TagValidator:
         return pound_sign_tag;
 
     def check_if_tag_unit_class_units_are_valid(self, original_tag, formatted_tag):
-        """Reports a validation error if the tag provided has a unit class and the units are incorrect.
+        """Reports a abc error if the tag provided has a unit class and the units are incorrect.
 
         Parameters
         ----------
         original_tag: string
             The original tag that is used to report the error.
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -306,18 +306,18 @@ class TagValidator:
         return validation_error;
 
     def check_if_tag_unit_class_units_exist(self, original_tag, formatted_tag):
-        """Reports a validation warning if the tag provided has a unit class but no units are not specified.
+        """Reports a abc warning if the tag provided has a unit class but no units are not specified.
 
         Parameters
         ----------
         original_tag: string
             The original tag that is used to report the error.
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
-            A validation warning string. If no errors are found then an empty string is returned.
+            A abc warning string. If no errors are found then an empty string is returned.
 
         """
         validation_warning = '';
@@ -354,7 +354,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         list
@@ -377,7 +377,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
@@ -405,7 +405,7 @@ class TagValidator:
         Parameters
         ----------
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         boolean
@@ -420,7 +420,7 @@ class TagValidator:
         return False;
 
     def check_number_of_group_tildes(self, tag_group):
-        """Reports a validation error if the tag group has too many tildes.
+        """Reports a abc error if the tag group has too many tildes.
 
         Parameters
         ----------
@@ -429,7 +429,7 @@ class TagValidator:
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -439,18 +439,18 @@ class TagValidator:
 
 
     def check_if_tag_requires_child(self, original_tag, formatted_tag):
-        """Reports a validation error if the tag provided has the 'requireChild' attribute.
+        """Reports a abc error if the tag provided has the 'requireChild' attribute.
 
         Parameters
         ----------
         original_tag: string
             The original tag that is used to report the error.
         formatted_tag: string
-            The tag that is used to do the validation.
+            The tag that is used to do the abc.
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -460,7 +460,7 @@ class TagValidator:
         return validation_error;
 
     def check_for_required_tags(self, formatted_top_level_tags):
-        """Reports a validation error if the required tags aren't present.
+        """Reports a abc error if the required tags aren't present.
 
         Parameters
         ----------
@@ -469,7 +469,7 @@ class TagValidator:
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -481,18 +481,18 @@ class TagValidator:
         return validation_error;
 
     def check_if_multiple_unique_tags_exist(self, original_tag_list, formatted_tag_list):
-        """Reports a validation error if two or more tags start with a tag prefix that has the 'unique' attribute.
+        """Reports a abc error if two or more tags start with a tag prefix that has the 'unique' attribute.
 
         Parameters
         ----------
         original_tag_list: list
             A list containing tags that are used to report the error.
         formatted_tag_list: list
-            A list containing tags that are used to do the validation.
+            A list containing tags that are used to do the abc.
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -545,7 +545,7 @@ class TagValidator:
 
     @staticmethod
     def find_missing_commas_in_hed_string(hed_string):
-        """Reports a validation error if there are missing commas before and after groups.
+        """Reports a abc error if there are missing commas before and after groups.
 
         Parameters
         ----------
@@ -554,7 +554,7 @@ class TagValidator:
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';
@@ -598,7 +598,7 @@ class TagValidator:
 
     @staticmethod
     def count_tag_group_brackets(hed_string):
-        """Reports a validation error if there are an unequal number of opening or closing parentheses. This is the
+        """Reports a abc error if there are an unequal number of opening or closing parentheses. This is the
          first check before the tags are parsed.
 
         Parameters
@@ -608,7 +608,7 @@ class TagValidator:
         Returns
         -------
         string
-            A validation error string. If no errors are found then an empty string is returned.
+            A abc error string. If no errors are found then an empty string is returned.
 
         """
         validation_error = '';

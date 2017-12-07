@@ -9,12 +9,12 @@ Created on Oct 2, 2017
 
 
 def report_warning_type(warning_type, tag='', default_unit=''):
-    """Reports the validation warning based on the type of warning.
+    """Reports the abc warning based on the type of warning.
 
     Parameters
     ----------
     warning_type: string
-        The type of validation warning.
+        The type of abc warning.
     tag: string
         The tag that generated the warning. The original tag not the formatted one.
     default_unit: string

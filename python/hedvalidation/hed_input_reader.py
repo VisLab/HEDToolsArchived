@@ -11,11 +11,11 @@ Created on Oct 2, 2017
 
 
 import xlrd;
-from validation.hed_dictionary import HedDictionary
-from validation.tag_validator import TagValidator;
-from validation.hed_string_delimiter import HedStringDelimiter;
-from validation import error_reporter;
-
+import os;
+from hedvalidation import error_reporter;
+from hedvalidation.hed_dictionary import HedDictionary
+from hedvalidation.tag_validator import TagValidator;
+from hedvalidation.hed_string_delimiter import HedStringDelimiter;
 
 class HedInputReader:
 
@@ -28,7 +28,7 @@ class HedInputReader:
     FILE_INPUT = 'file';
     TAB_DELIMITER = '\t';
     COMMA_DELIMITER = ',';
-    HED_XML_FILE = '../hed/HED.xml';
+    HED_XML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hed/HED.xml');
     PREFIX_TAG_COLUMN_TO_PATH = {'Attribute': 'Attribute/', 'Category': 'Event/Category/',
                                  'Description': 'Event/Description/', 'Label': 'Event/Label/',
                                  'Long': 'Event/Long name/'};
@@ -98,7 +98,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues that were found.
+             The abc issues that were found.
 
          """
         if HedInputReader.hed_input_has_valid_file_extension(self._hed_input):
@@ -115,7 +115,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues that were found.
+             The abc issues that were found.
 
          """
         file_extension = HedInputReader.get_file_extension(self._hed_input);
@@ -127,14 +127,14 @@ class HedInputReader:
         return validation_issues;
 
     def get_validation_issues(self):
-        """Gets the validation issues.
+        """Gets the abc issues.
 
          Parameters
          ----------
          Returns
          -------
          string
-             The validation issues that were found.
+             The abc issues that were found.
 
          """
         return self.validation_issues;
@@ -147,7 +147,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues that were found in the text file.
+             The abc issues that were found in the text file.
 
          """
         validation_issues = '';
@@ -170,7 +170,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues that were found in a excel worksheet.
+             The abc issues that were found in a excel worksheet.
 
          """
         validation_issues = '';
@@ -186,12 +186,12 @@ class HedInputReader:
         return validation_issues;
 
     def _append_validation_issues_if_found(self, validation_issues, row_number, hed_string):
-        """Appends the validation issues associated with a particular row in a spreadsheet.
+        """Appends the abc issues associated with a particular row in a spreadsheet.
 
          Parameters
          ----------
         validation_issues: string
-            A validation string that contains all the issues found in the spreadsheet.
+            A abc string that contains all the issues found in the spreadsheet.
          row_number: integer
             The row number that the issues are associated with.
         hed_string: string
@@ -199,7 +199,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues with the appended issues found in the particular row.
+             The abc issues with the appended issues found in the particular row.
 
          """
         if hed_string:
@@ -218,7 +218,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues associated with the HED string.
+             The abc issues associated with the HED string.
 
          """
         validation_issues = '';
@@ -242,7 +242,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues associated with each level in the HED string.
+             The abc issues associated with each level in the HED string.
 
          """
         validation_issues = '';
@@ -266,7 +266,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues associated with the top-level tags in the HED string.
+             The abc issues associated with the top-level tags in the HED string.
 
          """
         validation_issues = '';
@@ -284,7 +284,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues associated with the groups in the HED string.
+             The abc issues associated with the groups in the HED string.
 
          """
         validation_issues = '';
@@ -305,7 +305,7 @@ class HedInputReader:
          Returns
          -------
          string
-             The validation issues associated with the individual tags in the HED string.
+             The abc issues associated with the individual tags in the HED string.
 
          """
         validation_issues = '';

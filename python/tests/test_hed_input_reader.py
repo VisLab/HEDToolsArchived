@@ -1,7 +1,8 @@
-import unittest;
-from validation.hed_input_reader import HedInputReader;
-from validation.hed_string_delimiter import HedStringDelimiter;
 import random;
+import unittest;
+
+from hedvalidation.hed_string_delimiter import HedStringDelimiter;
+from hedvalidation.hed_input_reader import HedInputReader;
 
 
 class Test(unittest.TestCase):

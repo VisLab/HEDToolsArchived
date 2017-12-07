@@ -1,13 +1,14 @@
-import unittest;
-from validation.tag_validator import TagValidator;
-from validation.hed_dictionary import HedDictionary;
 import random;
+import os;
+import unittest;
+from hedvalidation.tag_validator import TagValidator;
+from hedvalidation.hed_dictionary import HedDictionary;
 
 
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.hed_xml = '../tests/data/HED.xml';
+        cls.hed_xml = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/HED.xml');
         cls.REQUIRE_CHILD_DICTIONARY_KEY = 'requireChild';
         cls.hed_dictionary = HedDictionary(cls.hed_xml);
         cls.tag_validator = TagValidator(cls.hed_dictionary);
