@@ -231,7 +231,7 @@
                     flashWorksheetNumberMessage(worksheetsInfo['worksheet_names']);
                 },
                 error: function () {
-                    flashMessageOnScreen('Worksheet could not be processed.', 'error');
+                    flashMessageOnScreen('Spreadsheet could not be processed.', 'error');
                 }
             });
         }
@@ -262,6 +262,7 @@
                 processData: false,
                 dataType: 'json',
                 success: function (worksheetHeadersInfo) {
+                    setComponentsRelatedToSpreadsheetHeaders(spreadsheetHeadersInfo);
                     setComponentsRelatedToSpreadsheetHeaders(worksheetHeadersInfo);
                     flashSpreadsheetHeaderMessage(worksheetHeadersInfo['worksheet_tag_columns_indices']);
                 },
