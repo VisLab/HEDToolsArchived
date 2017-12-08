@@ -535,10 +535,34 @@ def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spre
     if worksheet_name:
         spreadsheet_headers_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
     else:
-        spreadsheet_headers_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
+        column_delimiter = get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
+        spreadsheet_headers_info['spreadsheet_headers'] = get_text_file_headers(spreadsheet_file_path,
+                                                                                column_delimiter);
     spreadsheet_headers_info['spreadsheet_tag_columns_indices'] = \
         _get_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheet_headers']);
     return spreadsheet_headers_info;
+
+def get_text_file_headers(text_file_path, column_delimiter):
+    """Gets the text spreadsheet headers.
+
+    Parameters
+    ----------
+    text_file_path: string
+        The path to a text file.
+    column_delimiter: string
+        The spreadsheet column delimiter.
+
+    Returns
+    -------
+    string
+        The spreadsheet column delimiter based on the file extension.
+
+    """
+    text_file_headers = [];
+    with open(text_file_path, 'r') as opened_text_file:
+        first_line = opened_text_file.readline();
+        text_file_headers = first_line.split(column_delimiter);
+    return text_file_headers;
 
 def get_column_delimiter_based_on_file_extension(file_name_or_path):
     """Gets the spreadsheet column delimiter based on the file extension.
