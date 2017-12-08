@@ -36,7 +36,7 @@
                 getWorksheetsInfo(spreadsheetFile);
             }
             else if (fileHasValidExtension(spreadsheetPath, TEXT_FILE_EXTENSIONS)) {
-                getWorksheetsInfo(spreadsheetFile);
+                getSpreadsheetHeadersInfo(spreadsheetFile);
             }else {
                 resetAndHideForm();
                 flashInvalidExcelExtensionMessage();
@@ -253,7 +253,9 @@
         function getSpreadsheetHeadersInfo(spreadsheetFile, worksheetName) {
             var formData = new FormData();
             formData.append('spreadsheet_file', spreadsheetFile);
-            formData.append('worksheet_name', worksheetName);
+            if (typeof worksheetName !== 'undefined') {
+                formData.append('worksheet_name', worksheetName);
+            }
             $.ajax({
                 type: 'POST',
                 url: "{{url_for('get_spreadsheet_headers_info')}}",
@@ -261,13 +263,12 @@
                 contentType: false,
                 processData: false,
                 dataType: 'json',
-                success: function (worksheetHeadersInfo) {
+                success: function (spreadsheetHeadersInfo) {
                     setComponentsRelatedToSpreadsheetHeaders(spreadsheetHeadersInfo);
-                    setComponentsRelatedToSpreadsheetHeaders(worksheetHeadersInfo);
-                    flashSpreadsheetHeaderMessage(worksheetHeadersInfo['worksheet_tag_columns_indices']);
+                    flashSpreadsheetHeaderMessage(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
                 },
                 error: function () {
-                    alert('File could not be processed.');
+                    flashMessageOnScreen('Spreadsheet could not be processed.', 'error');
                 }
             });
         }
