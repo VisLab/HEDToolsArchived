@@ -299,6 +299,20 @@
         }
 
         /**
+         * Shows additional options in the form.
+         */
+        function showAdditionalOptions(){
+            $('#additional_options').show();
+        }
+
+        /**
+         * Hides additional options in the form.
+         */
+        function hideAdditionalOptions(){
+            $('#additional_options').hide();
+        }
+
+        /**
          * Sets the components related to the Excel worksheet headers.
          * @param {JSON} spreadsheetHeadersInfo - A JSON object containing information related to the spreadsheet
          * headers.
@@ -311,6 +325,7 @@
                 setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers'],
                     spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
             }
+            showAdditionalOptions();
         }
 
         /**
@@ -348,7 +363,6 @@
             for (var i = 0; i < numberOfWorksheetNames; i++) {
                 worksheetSelectbox.append(new Option(worksheetNames[i], worksheetNames[i]));
             }
-            $('#additional_options').show();
         }
 
         /**
