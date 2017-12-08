@@ -218,7 +218,8 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     validation_input_arguments = {};
     validation_input_arguments['spreadsheet_path'] = workbook_file_path;
     validation_input_arguments['worksheet'] = validation_form_request_object.form['worksheet'];
-    validation_input_arguments['tag_columns'] = validation_form_request_object.form['tag_columns'].split();
+    validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag_columns'].split(','));
+    print(validation_input_arguments['tag_columns'])
     validation_input_arguments['has_headers'] = _get_optional_validation_form_arguments(
         validation_form_request_object.form, 'has_headers');
     validation_input_arguments['prefix_needed_tag_columns'] = _get_optional_validation_form_arguments(
