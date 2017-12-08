@@ -118,18 +118,35 @@ def _validate_spreadsheet_in_form(validation_form_request_object):
             spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
             validation_input_arguments = _get_validation_input_arguments_from_validation_form(
                 validation_form_request_object, spreadsheet_file_path);
-            print(validation_input_arguments);
             validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
-            print('yes');
             validation_status['download_file'] = _save_validation_issues_to_file_in_upload_folder(
                 spreadsheet_file.filename, validation_issues);
-            validation_status['row_issue_count'] = len(validation_issues);
-            print(validation_status['row_issue_count']);
+            validation_status['row_issue_count'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
             return json.dumps(validation_status);
         except:
             return abort(500);
         finally:
             _delete_file_if_it_exist(spreadsheet_file_path);
+
+def _get_the_number_of_rows_with_validation_issues(validation_issues):
+    """Gets the number of rows in the spreadsheet that has validation issues.
+
+    Parameters
+    ----------
+    validation_issues: string
+        A string containing the validation issues found in the spreadsheet.
+
+    Returns
+    -------
+        integer
+        A integer representing the number of spreadsheet rows that had validation issues.
+    """
+    number_of_rows_with_issues = 0;
+    split_validation_issues = validation_issues.split('\n');
+    for validation_issue_line in split_validation_issues:
+        if not validation_issue_line.startswith('\t'):
+            number_of_rows_with_issues += 1;
+    return number_of_rows_with_issues;
 
 def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues):
     """Saves the validation issues found to a file in the upload folder.
