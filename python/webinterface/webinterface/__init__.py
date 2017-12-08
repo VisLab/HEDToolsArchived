@@ -1,11 +1,11 @@
 import json;
 import os;
 import tempfile;
-
 import xlrd;
 from flask import abort, Flask, render_template, request, Response;
 from werkzeug.utils import secure_filename;
 from forms import ValidationForm;
+from hed_input_reader import HedInputReader;
 
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
@@ -118,7 +118,9 @@ def _validate_spreadsheet_in_form(validation_form_request_object):
             spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
             validation_input_arguments = _get_validation_input_arguments_from_validation_form(
                 validation_form_request_object, spreadsheet_file_path);
-            validation_issues = _validate_spreadsheet(validation_input_arguments);
+            print(validation_input_arguments);
+            validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
+            print('yes');
             validation_status['download_file'] = _save_validation_issues_to_file_in_upload_folder(
                 spreadsheet_file.filename, validation_issues);
             validation_status['row_issue_count'] = len(validation_issues);
@@ -214,7 +216,7 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
         A dictionary containing input arguments for calling the underlying validation function.
     """
     validation_input_arguments = {};
-    validation_input_arguments['spreadsheet'] = workbook_file_path;
+    validation_input_arguments['spreadsheet_path'] = workbook_file_path;
     validation_input_arguments['worksheet'] = validation_form_request_object.form['worksheet'];
     validation_input_arguments['tag_columns'] = validation_form_request_object.form['tag_columns'].split();
     validation_input_arguments['has_headers'] = _get_optional_validation_form_arguments(
@@ -323,7 +325,7 @@ def _copy_file_line_by_line(file_object_1, file_object_2):
     except:
         return False;
 
-def _validate_spreadsheet(validation_arguments):
+def _report_spreadsheet_validation_issues(validation_arguments):
     """Validates the HED tags in a worksheet by calling the validateworksheethedtags() function using the MATLAB engine.
 
     The underlying validateworksheethedtags() MATLAB function is called to do the validation.
@@ -342,8 +344,10 @@ def _validate_spreadsheet(validation_arguments):
         row in the worksheet that generated issues.
 
     """
-    validation_issues = '';
-    return validation_issues;
+    hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
+                                      tag_columns=validation_arguments['tag_columns'],
+                                      has_headers=validation_arguments['has_headers']);
+    return hed_input_reader.get_validation_issues();
 
 
 @app.route('/getworksheetsinfo', methods=['POST'])
