@@ -3,7 +3,7 @@
 
     <form id="validation_form" method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
-        {{ render_field(form.spreadsheet, accept=".xls,.xlsx") }}
+        {{ render_field(form.spreadsheet) }}
         <div id="additional_options">
             {{ render_field(form.worksheet) }}
             <table id="spreadsheet_headers_table"></table>
