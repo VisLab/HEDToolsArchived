@@ -19,7 +19,7 @@
         const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
         const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
         $(document).ready(function () {
-            $('#additional_options').hide();
+            hideAdditionalOptions();
         });
 
         /**
@@ -101,7 +101,7 @@
          */
         function resetAndHideForm() {
             $('#validation_form')[0].reset();
-            $('#additional_options').hide();
+            hideAdditionalOptions();
         }
 
         /**
