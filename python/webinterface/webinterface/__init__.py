@@ -12,6 +12,7 @@ UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = 'fsdlkfjs#(*09dfdkn325489!*#&9309!(094'
 EXCEL_FILE_EXTENSIONS = ['xls', 'xlsx'];
 TAG_COLUMN_NAMES = ['Attribute', 'Category', 'Description', 'Event Details', 'Label', 'Long Name'];
+FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
 @app.route('/', strict_slashes=False, methods=['GET', 'POST'])
 def validate_spreadsheet_from_form():
@@ -202,12 +203,12 @@ def _generate_spreadsheet_validation_filename(spreadsheet_filename):
     """
     return 'validated_' + secure_filename(spreadsheet_filename).rsplit('.')[0] + '.txt';
 
-def _get_file_extension(filename):
+def _get_file_extension(file_name_or_path):
     """Get the file extension from the specified filename. This can be the full path or just the name of the file.
 
        Parameters
        ----------
-       filename: string
+       file_name_or_path: string
            The name or full path of a file.
 
        Returns
@@ -215,7 +216,7 @@ def _get_file_extension(filename):
        string
            The extension of the file.
        """
-    return secure_filename(filename).rsplit('.')[-1];
+    return secure_filename(file_name_or_path).rsplit('.')[-1];
 
 def _get_validation_input_arguments_from_validation_form(validation_form_request_object, workbook_file_path):
     """Gets the validation function input arguments from a request object associated with the validation form.
@@ -435,11 +436,14 @@ def get_spreadsheet_headers_info():
         if _spreadsheet_file_present_in_form(request):
             spreadsheet_file = request.files['spreadsheet_file'];
             spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
-            if spreadsheet_file_path:
+            if spreadsheet_file_path and _worksheet_name_present_in_form(request):
                 worksheet_name = request.form['worksheet_name'];
                 spreadsheet_headers_info = _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, \
                                                                                          spreadsheet_file_path, \
                                                                                          worksheet_name);
+            else:
+                spreadsheet_headers_info = _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, \
+                                                                                         spreadsheet_file_path);
         return json.dumps(spreadsheet_headers_info);
     except:
         return abort(500);
@@ -528,10 +532,33 @@ def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spre
         A dictionary populated with information related to the spreadsheet headers.
 
     """
-    spreadsheet_headers_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
+    if worksheet_name:
+        spreadsheet_headers_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
+    else:
+        spreadsheet_headers_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
     spreadsheet_headers_info['spreadsheet_tag_columns_indices'] = \
         _get_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheet_headers']);
     return spreadsheet_headers_info;
+
+def get_column_delimiter_based_on_file_extension(file_name_or_path):
+    """Gets the spreadsheet column delimiter based on the file extension.
+
+    Parameters
+    ----------
+    file_name_or_path: string
+        A file name or path.
+
+    Returns
+    -------
+    string
+        The spreadsheet column delimiter based on the file extension.
+
+    """
+    column_delimiter = '';
+    file_extension = _get_file_extension(file_name_or_path);
+    if file_extension in FILE_EXTENSION_TO_DELIMITER_DICTIONARY:
+        column_delimiter = FILE_EXTENSION_TO_DELIMITER_DICTIONARY.get(file_extension);
+    return column_delimiter;
 
 def _worksheet_name_present_in_form(validation_form_request_object):
     """Checks to see if a worksheet name is present in a request object from the validation form.
