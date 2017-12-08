@@ -432,7 +432,7 @@ def get_spreadsheet_headers_info():
     spreadsheet_file_path = '';
     try:
         spreadsheet_headers_info = _initialize_spreadsheet_headers_info_dictionary();
-        if _spreadsheet_file_and_worksheet_name_present_in_form(request):
+        if _spreadsheet_file_present_in_form(request):
             spreadsheet_file = request.files['spreadsheet_file'];
             spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
             if spreadsheet_file_path:
@@ -532,24 +532,6 @@ def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spre
     spreadsheet_headers_info['spreadsheet_tag_columns_indices'] = \
         _get_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheet_headers']);
     return spreadsheet_headers_info;
-
-def _spreadsheet_file_and_worksheet_name_present_in_form(validation_form_request_object):
-    """Checks to see if a spreadsheet file and a worksheet name is present in a request object from the validation
-     form.
-
-    Parameters
-    ----------
-    validation_form_request_object: Request object
-        A Request object containing user data from the validation form.
-
-    Returns
-    -------
-    boolean
-        True if a workbook file and worksheet name are present in a request object from the validation form.
-
-    """
-    return 'spreadsheet_file' in validation_form_request_object.files and \
-           'worksheet_name' in validation_form_request_object.form
 
 def _worksheet_name_present_in_form(validation_form_request_object):
     """Checks to see if a worksheet name is present in a request object from the validation form.
