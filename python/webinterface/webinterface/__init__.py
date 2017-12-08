@@ -551,6 +551,22 @@ def _spreadsheet_file_and_worksheet_name_present_in_form(validation_form_request
     return 'spreadsheet_file' in validation_form_request_object.files and \
            'worksheet_name' in validation_form_request_object.form
 
+def _worksheet_name_present_in_form(validation_form_request_object):
+    """Checks to see if a worksheet name is present in a request object from the validation form.
+
+    Parameters
+    ----------
+    validation_form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    boolean
+        True if a worksheet name is present in a request object from the validation form.
+
+    """
+    return 'worksheet_name' in validation_form_request_object.form;
+
 def _save_spreadsheet_file_to_upload_folder(spreadsheet_file_object):
     """Save an spreadsheet file to the upload folder.
 
