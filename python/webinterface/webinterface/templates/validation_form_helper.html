@@ -5,12 +5,14 @@
         {{ form.csrf_token }}
         {{ render_field(form.spreadsheet) }}
         <div id="additional_options">
-            {{ render_field(form.worksheet) }}
-            <table id="spreadsheet_headers_table"></table>
-            {{ render_field(form.tag_columns) }}
-            {{ render_field(form.has_headers) }}
-            {{ render_field(form.generate_warnings) }}
-            <button id="validate" type="button">Validate</button>
+                <div id="worksheet_option">
+                {{ render_field(form.worksheet) }}
+                </div>
+                <table id="spreadsheet_headers_table"></table>
+                {{ render_field(form.tag_columns) }}
+                {{ render_field(form.has_headers) }}
+                {{ render_field(form.generate_warnings) }}
+                <button id="validate" type="button">Validate</button>
         </div>
     </form>
 
@@ -34,9 +36,11 @@
             }
             else if (fileHasValidExtension(spreadsheetPath, EXCEL_FILE_EXTENSIONS)) {
                 getWorksheetsInfo(spreadsheetFile);
+                showAdditionalOptions();
             }
             else if (fileHasValidExtension(spreadsheetPath, TEXT_FILE_EXTENSIONS)) {
                 getSpreadsheetHeadersInfo(spreadsheetFile);
+                showAdditionalOptions(false);
             }else {
                 resetAndHideForm();
                 flashInvalidExcelExtensionMessage();
@@ -300,9 +304,13 @@
 
         /**
          * Shows additional options in the form.
+         * @param {JSON} showWorksheets - If false, don't show worksheets in form.
          */
-        function showAdditionalOptions(){
+        function showAdditionalOptions(showWorksheets){
             $('#additional_options').show();
+            if (typeof showWorksheets !== 'undefined' && !showWorksheets) {
+                $('#worksheet_option').hide();
+            }
         }
 
         /**
@@ -325,7 +333,6 @@
                 setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers'],
                     spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
             }
-            showAdditionalOptions();
         }
 
         /**
