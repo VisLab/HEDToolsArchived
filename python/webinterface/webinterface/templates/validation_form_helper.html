@@ -329,23 +329,12 @@
             if (spreadsheetHeadersAreEmpty(spreadsheetHeadersInfo['spreadsheet_headers'])) {
                 setComponentsRelatedToEmptySpreadsheetHeaders();
             } else {
-                setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers'],
-                    spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
+                setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers']);
             }
-        }
-
-                /**
-         * Sets the components related to the Excel worksheet headers.
-         * @param {JSON} spreadsheetHeadersInfo - A JSON object containing information related to the spreadsheet
-         * headers.
-         * This information contains the names of the headers and column indices that contain HED tags.
-         */
-        function setComponentsRelatedToSpreadsheetHeaders(spreadsheetHeadersInfo) {
-            if (spreadsheetHeadersAreEmpty(spreadsheetHeadersInfo['spreadsheet_headers'])) {
-                setComponentsRelatedToEmptySpreadsheetHeaders();
+            if (spreadsheetTagColumnsIndicesAreEmpty(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices'])){
+                setComponentsRelatedToEmptySpreadsheetTagColumnIndices();
             } else {
-                setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers'],
-                    spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
+                populateTagColumnsTextbox(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
             }
         }
 
@@ -355,18 +344,24 @@
          * @param {Array} spreadsheetTagColumnIndices - An integer array of tag column indices found in the spreadsheet
          * headers.
          */
-        function setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeaders, spreadsheetTagColumnIndices) {
+        function setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeaders) {
             populateSpreadsheetHeadersTable(spreadsheetHeaders);
-            populateTagColumnsTextbox(spreadsheetTagColumnIndices);
             $('#has_headers').prop('checked', true);
             $('#spreadsheet_headers_table').show();
+        }
+
+
+        /**
+         * Sets the components related to the spreadsheet tag column indices when they are empty.
+         */
+        function setComponentsRelatedToEmptySpreadsheetTagColumnIndices() {
+            $('#tag_columns').val('2');
         }
 
         /**
          * Sets the components related to Excel worksheet headers when they are all empty.
          */
         function setComponentsRelatedToEmptySpreadsheetHeaders() {
-            $('#tag_columns').val('2');
             $('#has_headers').prop('checked', false);
             $('#spreadsheet_headers_table').hide();
         }
@@ -416,10 +411,10 @@
          */
         function spreadsheetTagColumnsIndicesAreEmpty(spreadsheetTagColumnsIndices) {
             var numberOfTagColumnIndices = spreadsheetTagColumnsIndices.length;
-            if (numberOfTagColumnIndices.length > 0) {
-                return true;
+            if (numberOfTagColumnIndices > 0) {
+                return false;
             }
-            return false;
+            return true;
         }
 
         /**
