@@ -10,9 +10,9 @@ from hed_input_reader import HedInputReader;
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = 'fsdlkfjs#(*09dfdkn325489!*#&9309!(094'
-EXCEL_FILE_EXTENSIONS = ['xls', 'xlsx'];
+SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 TAG_COLUMN_NAMES = ['Attribute', 'Category', 'Description', 'Event Details', 'Label', 'Long Name'];
-FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
+SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
 @app.route('/', strict_slashes=False, methods=['GET', 'POST'])
 def validate_spreadsheet_from_form():
@@ -112,9 +112,8 @@ def _validate_spreadsheet_in_form(validation_form_request_object):
         500 error message is returned.
     """
     validation_status = {};
-
     spreadsheet_file = validation_form_request_object.files['spreadsheet'];
-    if _file_has_valid_extension(spreadsheet_file, EXCEL_FILE_EXTENSIONS):
+    if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
         try:
             spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
             validation_input_arguments = _get_validation_input_arguments_from_validation_form(
@@ -235,9 +234,9 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     """
     validation_input_arguments = {};
     validation_input_arguments['spreadsheet_path'] = workbook_file_path;
-    validation_input_arguments['worksheet'] = validation_form_request_object.form['worksheet'];
+    if _worksheet_name_present_in_form(validation_form_request_object):
+        validation_input_arguments['worksheet'] = validation_form_request_object.form['worksheet'];
     validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag_columns'].split(','));
-    print(validation_input_arguments['tag_columns'])
     validation_input_arguments['has_headers'] = _get_optional_validation_form_arguments(
         validation_form_request_object.form, 'has_headers');
     validation_input_arguments['prefix_needed_tag_columns'] = _get_optional_validation_form_arguments(
@@ -580,8 +579,8 @@ def get_column_delimiter_based_on_file_extension(file_name_or_path):
     """
     column_delimiter = '';
     file_extension = _get_file_extension(file_name_or_path);
-    if file_extension in FILE_EXTENSION_TO_DELIMITER_DICTIONARY:
-        column_delimiter = FILE_EXTENSION_TO_DELIMITER_DICTIONARY.get(file_extension);
+    if file_extension in SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY:
+        column_delimiter = SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY.get(file_extension);
     return column_delimiter;
 
 def _worksheet_name_present_in_form(validation_form_request_object):
