@@ -143,9 +143,10 @@ def _get_the_number_of_rows_with_validation_issues(validation_issues):
     """
     number_of_rows_with_issues = 0;
     split_validation_issues = validation_issues.split('\n');
-    for validation_issue_line in split_validation_issues:
-        if not validation_issue_line.startswith('\t'):
-            number_of_rows_with_issues += 1;
+    if split_validation_issues != ['']:
+        for validation_issue_line in split_validation_issues:
+            if not validation_issue_line.startswith('\t'):
+                number_of_rows_with_issues += 1;
     return number_of_rows_with_issues;
 
 def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues):
