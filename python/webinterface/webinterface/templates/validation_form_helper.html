@@ -334,6 +334,21 @@
             }
         }
 
+                /**
+         * Sets the components related to the Excel worksheet headers.
+         * @param {JSON} spreadsheetHeadersInfo - A JSON object containing information related to the spreadsheet
+         * headers.
+         * This information contains the names of the headers and column indices that contain HED tags.
+         */
+        function setComponentsRelatedToSpreadsheetHeaders(spreadsheetHeadersInfo) {
+            if (spreadsheetHeadersAreEmpty(spreadsheetHeadersInfo['spreadsheet_headers'])) {
+                setComponentsRelatedToEmptySpreadsheetHeaders();
+            } else {
+                setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers'],
+                    spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
+            }
+        }
+
         /**
          * Sets the components related to the spreadsheet headers when they are not empty.
          * @param {Array} spreadsheetHeaders - An array containing the spreadsheet headers.
@@ -344,7 +359,6 @@
             populateSpreadsheetHeadersTable(spreadsheetHeaders);
             populateTagColumnsTextbox(spreadsheetTagColumnIndices);
             $('#has_headers').prop('checked', true);
-            $('#add_prefixes').prop('checked', true);
             $('#spreadsheet_headers_table').show();
         }
 
@@ -354,7 +368,6 @@
         function setComponentsRelatedToEmptySpreadsheetHeaders() {
             $('#tag_columns').val('2');
             $('#has_headers').prop('checked', false);
-            $('#add_prefixes').prop('checked', false);
             $('#spreadsheet_headers_table').hide();
         }
 
