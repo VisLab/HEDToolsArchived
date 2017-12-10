@@ -395,6 +395,20 @@
             return true;
         }
 
+                /**
+         * Checks to see if the spreadsheet tag column indices are empty.
+         * @param {Array} spreadsheetTagColumnsIndices - An array containing the tag column indices based on the
+         *                headers found in the spreadsheet.
+         * @returns {boolean} - True if the spreadsheet tag column indices array is empty.
+         */
+        function spreadsheetTagColumnsIndicesAreEmpty(spreadsheetTagColumnsIndices) {
+            var numberOfTagColumnIndices = spreadsheetTagColumnsIndices.length;
+            if (numberOfTagColumnIndices.length > 0) {
+                return true;
+            }
+            return false;
+        }
+
         /**
          * Populates a table containing the spreadsheet headers.
          * @param {Array} spreadsheetHeaders - An array containing the spreadsheet headers.
