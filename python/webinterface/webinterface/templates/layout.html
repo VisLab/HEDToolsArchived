@@ -9,6 +9,10 @@
 </head>
 <body>
 <div id="main">
+	<div id="logo">
+		{% block logo %}
+		{% endblock %}
+	</div>
 	<div id="main_navigation">
 		<nav>
             <a href="/">What is HED?</a> |
@@ -16,10 +20,6 @@
 			<a href="http://www.hedtags.org">HED documentation</a> |
 			<a href="http://visual.cs.utsa.edu/contact-info">Contact Us</a>
 		</nav>
-	</div>
-	<div id="logo">
-		{% block logo %}
-		{% endblock %}
 	</div>
 	<div id="page_title">
 		{% block page_title %}

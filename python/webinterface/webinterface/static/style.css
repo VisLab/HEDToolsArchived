@@ -53,9 +53,8 @@ html {
     background-size: 100% 100%;
     margin-bottom: 30px;
     height: 100px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 20%;
+    float: left;
 }
 
 #main_navigation {
