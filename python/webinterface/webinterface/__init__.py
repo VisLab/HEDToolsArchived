@@ -14,7 +14,7 @@ SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 TAG_COLUMN_NAMES = ['Attribute', 'Category', 'Description', 'Event Details', 'Label', 'Long Name'];
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
-@app.route('/', strict_slashes=False, methods=['GET', 'POST'])
+@app.route('/validation', strict_slashes=False, methods=['GET', 'POST'])
 def validate_spreadsheet_from_form():
     """Handles the site root and Validation tab functionality.
 
@@ -31,7 +31,22 @@ def validate_spreadsheet_from_form():
     form = ValidationForm();
     if request.method == 'POST':
         return _validate_spreadsheet_in_form(request);
-    return render_template('validation.html', form=form)
+    return render_template('validation.html', form=form);
+
+@app.route('/', strict_slashes=False, methods=['GET'])
+def render_main_page():
+    """Handles the site root.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Rendered template
+        A rendered template for the main page.
+
+    """
+    return render_template('hed.html')
 
 @app.route('/download/<filename>')
 def download_file_in_upload_directory(filename):
