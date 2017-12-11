@@ -6,6 +6,10 @@ body {
     font-weight: bold;
 }
 
+#page_title {
+    clear: both;
+}
+
 #error_descriptions a {
     background-color: #f0f0f5;
     text-decoration: none;
