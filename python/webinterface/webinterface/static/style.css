@@ -89,20 +89,6 @@ html {
     overflow: hidden;
 }
 
-#title {
-    float: left;
-}
-
-#title h1 {
-    margin: 0px;
-    text-decoration: underline;
-}
-
-#title h3 {
-    text-indent: 50px;
-    margin: 0px;
-}
-
 #content {
     text-align: center;
     margin-left: 35%;
