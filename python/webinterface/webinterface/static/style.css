@@ -40,6 +40,20 @@ html {
     float: left;
 }
 
+#main_navigation {
+    padding-top: 20px;
+    margin-bottom: 40px;
+}
+
+#main_navigation a {
+    font-size: 150%;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    color: black;
+    width: 150px;
+}
+
 #main {
     margin-left: auto;
     margin-right: auto;
