@@ -2,29 +2,8 @@ body {
     margin: 0 0 100px; /* bottom = footer height */
 }
 
-#error_description_title {
-    font-weight: bold;
-}
-
 hr {
     clear: both;
-}
-
-#error_descriptions a {
-    background-color: #f0f0f5;
-    text-decoration: none;
-    border-radius: 15px;
-    padding: 5px;
-    margin: 5px;
-    display: block;
-    width: 70%;
-}
-
-#error_descriptions p {
-    padding: 5px;
-    margin: 5px;
-    display: block;
-    width: 70%;
 }
 
 #flash_message {
