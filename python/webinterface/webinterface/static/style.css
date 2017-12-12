@@ -18,11 +18,9 @@ hr {
 #footer {
     position: absolute;
     text-align: center;
-    left: 0;
     bottom: 0;
     height: 50px;
-    width: 100%;
-    min-width: 900px;
+    width: 70%;
     background: #f0f0f5;
 }
 
