@@ -1,9 +1,6 @@
 {% extends "layout.html" %}
-{% from "validation_description_helper.html" import create_validation_descriptions %}
 {% from "validation_form_helper.html" import create_validation_form %}
-{% block page_title %}
-<h3>Validate HED</h3>
-{% endblock %}
 {% block content %}
-{{ create_validation_form(form) }}
+    <h3>Validate HED</h3>
+    {{ create_validation_form(form) }}
 {% endblock %}
