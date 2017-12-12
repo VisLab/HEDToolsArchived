@@ -62,12 +62,6 @@ html {
     overflow: auto;
 }
 
-#content {
-    text-align: center;
-    margin-left: 35%;
-    width: 60%;
-}
-
 #validation_form * {
     margin: auto;
 }
