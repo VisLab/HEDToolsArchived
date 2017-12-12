@@ -136,24 +136,3 @@ html {
     padding: 5px;
     border: 1px solid black;
 }
-
-#warning_description_title {
-    font-weight: bold;
-}
-
-#warning_descriptions a {
-    background-color: #f0f0f5;
-    text-decoration: none;
-    border-radius: 15px;
-    padding: 5px;
-    margin: 5px;
-    display: block;
-    width: 70%;
-}
-
-#warning_descriptions p {
-    padding: 5px;
-    margin: 5px;
-    display: block;
-    width: 70%;
-}
