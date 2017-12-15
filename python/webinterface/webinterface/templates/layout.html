@@ -1,42 +1,36 @@
 <!doctype html>
 <html>
 <head>
-	{% block head %}
-	<link rel="shortcut icon" href="/static/favicon.ico">
-	<link rel="stylesheet" type="text/css" href="/static/style.css">
-	<title>{% block title %}{% endblock %} HEDTools </title>
-	{% endblock %}
+    {% block head %}
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="shortcut icon" href="/static/favicon.ico">
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+        <title>
+            {% block title %}
+            {% endblock %}
+            HED
+        </title>
+    {% endblock %}
 </head>
 <body>
-<div id="main">
-	<div id="logo">
-		{% block logo %}
-		{% endblock %}
-	</div>
-	<div id="main_navigation">
-		<nav>
-            <a href="/">What is HED?</a> |
-			<a href="/validation">Validate HED</a> |
-			<a href="http://www.hedtags.org">HED documentation</a> |
-			<a href="http://visual.cs.utsa.edu/contact-info">Contact Us</a>
-		</nav>
-	</div>
-		<hr>
-		<div id="content">
-			<p id="flash_message"></p>
-			{% block content %}
-			{% endblock %}
-		</div>
-	<div id="footer">
-		{% block footer %}
-            <p><a href="https://github.com/BigEEGConsortium/HED-schema">
-                Hierarchical Event Descriptor (HED) Tags and related tools</a> are maintained by
-                <a href="https://github.com/BigEEGConsortium">BigEEGConsortium</a>.</p>
-		{% endblock %}
-	</div>
-</div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{{
-url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+<section class="page-header">
+    <h1 class="project-name">Hierarchical Event Descriptor (HED) Validator</h1>
+    <h2 class="project-tagline">Validating HED tags in spreadsheets</h2>
+    <a href="/" class="btn">What is HED?</a>
+    <a href="/validation" class="btn">Validate HED</a>
+    <a href="http://www.hedtags.org/" class="btn">HED documentation</a>
+    <a href="http://visual.cs.utsa.edu/contact-info" class="btn">Contact us</a>
+</section>
+<section class="main-content">
+    {% block content %}
+    {% endblock %}
+{#    <footer class="site-footer">#}
+{#        {% block footer %}#}
+{#            <p class="site-footer-owner"><a href="https://github.com/BigEEGConsortium/HED-schema">#}
+{#                Hierarchical Event Descriptor (HED) Tags and related tools</a> are maintained by#}
+{#                <a href="https://github.com/BigEEGConsortium">BigEEGConsortium</a>.</p>#}
+{#        {% endblock %}#}
+{#    </footer>#}
+</section>
 </body>
 </html>

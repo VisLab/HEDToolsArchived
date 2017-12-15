@@ -11,7 +11,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = 'fsdlkfjs#(*09dfdkn325489!*#&9309!(094'
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
-TAG_COLUMN_NAMES = ['Attribute', 'Category', 'Description', 'Event Details', 'Label', 'Long Name'];
+TAG_COLUMN_NAMES = ['Category', 'Description', 'Event Details', 'Label'];
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
 @app.route('/validation', strict_slashes=False, methods=['GET', 'POST'])

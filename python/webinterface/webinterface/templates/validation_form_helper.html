@@ -1,26 +1,63 @@
 {% macro create_validation_form(form) %}
     {% from "formhelpers.html" import render_field %}
-
-    <form id="validation_form" method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
-        {{ render_field(form.spreadsheet) }}
-        <div id="additional_options">
-                <div id="worksheet_option">
-                {{ render_field(form.worksheet) }}
-                </div>
-                <table id="spreadsheet_headers_table"></table>
-                {{ render_field(form.tag_columns) }}
-                {{ render_field(form.has_headers) }}
-                {{ render_field(form.generate_warnings) }}
-                <button id="validate" type="button">Validate</button>
+
+        <div class="form-group">
+            <p id="spreadsheet-flash"></p>
+            <label for="spreadsheet">1) Select spreadsheet:</label><br>
+            <input type="file" name="spreadsheet" id="spreadsheet">
         </div>
+
+        <div class="form-group">
+            <p id="worksheet-flash"></p>
+            <label for="worksheet">2) Choose a worksheet (for workbooks):</label><br>
+            <select name="worksheet" id="worksheet"></select>
+        </div>
+
+        <div class="form-group" id="spreadsheet-headers">
+            <label for="spreadsheet-headers-table">Spreadsheet headers</label>
+            <table id="spreadsheet-headers-table"></table>
+        </div>
+
+        <div class="form-group">
+            <p id="tag-columns-flash"></p>
+            <label for="tag-columns">3) Select tag columns (comma-separated):</label><br>
+            <input type="text" name="tag-columns" id="tag-columns">
+        </div>
+
+        <div class="form-group">
+            <label>4) Specify columns corresponding to required tags:</label><br>
+            <div class="option-group">
+                <label for="category-column">Category</label>
+                <input type="text" name="category-column" id="category-column">
+                <label for="description-column">Description</label>
+                <input type="text" name="description-column" id="description-column">
+                <label for="label-column">Label</label>
+                <input type="text" name="label-columns" id="label-column">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>5) Specify additional options:</label><br>
+            <div class="option-group">
+            <input type="checkbox" name="skip-headers" id="skip-headers"> Skip headers line
+            <input type="checkbox" name="generate-warnings" id="generate-warnings"> Include warnings in output file
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button id="validate" type="button">Submit</button>
+            <p id="submit-flash"></p>
+        </div>
+
     </form>
 
     <script>
         const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
         const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
         $(document).ready(function () {
-            hideAdditionalOptions();
+            hideSpreadsheetHeaders();
         });
 
         /**
@@ -35,12 +72,11 @@
             }
             else if (fileHasValidExtension(spreadsheetPath, EXCEL_FILE_EXTENSIONS)) {
                 getWorksheetsInfo(spreadsheetFile);
-                showAdditionalOptions();
             }
             else if (fileHasValidExtension(spreadsheetPath, TEXT_FILE_EXTENSIONS)) {
+                clearWorksheetSelectbox();
                 getSpreadsheetHeadersInfo(spreadsheetFile);
-                showAdditionalOptions(false);
-            }else {
+            } else {
                 resetAndHideForm();
                 flashInvalidExcelExtensionMessage();
 
@@ -65,12 +101,26 @@
         });
 
         /**
+         * Clears the worksheet select box.
+         */
+        function clearWorksheetSelectbox() {
+            $('#worksheet').empty();
+        }
+
+        /**
+         * Clears the required tag column text boxes.
+         */
+        function clearRequiredTagColumnTextboxes() {
+            $('.option-group input[type="text"]').val('');
+        }
+
+        /**
          * Flash a message on the screen.
          * @param {String} message - The message that will be flashed on the screen.
          * @param {String} category - The category of the message. The categories are 'error', 'success', and 'other'.
          */
-        function flashMessageOnScreen(message, category) {
-            var flashMessage = document.getElementById("flash_message")
+        function flashMessageOnScreen(message, category, flashMessageElementId) {
+            var flashMessage = document.getElementById(flashMessageElementId);
             flashMessage.innerHTML = message;
             setFlashMessageCategory(flashMessage, category);
         }
@@ -112,7 +162,7 @@
          * @param {Array} worksheetNames - An array containing the names of Excel workbook worksheets.
          */
         function flashSubmitMessages() {
-            flashMessageOnScreen('Worksheet is being validated ...', 'success')
+            flashMessageOnScreen('Worksheet is being validated ...', 'success', 'submit-flash')
         }
 
         /**
@@ -149,7 +199,7 @@
                         resetAndHideForm();
                     },
                     error: function () {
-                        flashMessageOnScreen('Spreadsheet could not be processed.', 'error');
+                        flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
                         resetAndHideForm();
                     }
                 }
@@ -165,9 +215,10 @@
         function checkRowIssueCount(rowIssueCount) {
             var issuesFound = false;
             if (rowIssueCount == 0) {
-                flashMessageOnScreen('No issues were found. Thank you!', 'success');
+                flashMessageOnScreen('No issues were found. Thank you!', 'success', 'submit-flash');
             } else {
-                flashMessageOnScreen(rowIssueCount.toString() + ' rows have issues. Creating attachment ...', 'error');
+                flashMessageOnScreen(rowIssueCount.toString() + ' rows have issues. Creating attachment ...', 'error',
+                    'submit-flash');
                 issuesFound = true;
             }
             return issuesFound;
@@ -180,9 +231,10 @@
          */
         function tagColumnsTextboxIsValid() {
             var pattern = new RegExp('^([ \\d]+,)*[ \\d]+$');
-            var valid = pattern.test($('#tag_columns').val());
+            var valid = pattern.test($('#tag-columns').val());
             if (!valid) {
-                flashMessageOnScreen('Tag column(s) must be a number or a comma-separated list of numbers', 'error')
+                flashMessageOnScreen('Tag column(s) must be a number or a comma-separated list of numbers', 'error',
+                'tag-columns-flash')
             }
             return valid;
         }
@@ -232,9 +284,10 @@
                 success: function (worksheetsInfo) {
                     setComponentsRelatedToWorksheets(worksheetsInfo);
                     flashWorksheetNumberMessage(worksheetsInfo['worksheet_names']);
+                    flashSpreadsheetHeaderMessage(worksheetsInfo['spreadsheet_tag_columns_indices']);
                 },
                 error: function () {
-                    flashMessageOnScreen('Spreadsheet could not be processed.', 'error');
+                    flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
                 }
             });
         }
@@ -245,7 +298,7 @@
          */
         function flashWorksheetNumberMessage(worksheetNames) {
             var numberOfWorksheets = worksheetNames.length.toString();
-            flashMessageOnScreen(numberOfWorksheets + ' worksheet(s) found', 'success');
+            flashMessageOnScreen(numberOfWorksheets + ' worksheet(s) found', 'success', 'worksheet-flash');
         }
 
         /**
@@ -271,7 +324,7 @@
                     flashSpreadsheetHeaderMessage(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
                 },
                 error: function () {
-                    flashMessageOnScreen('Spreadsheet could not be processed.', 'error');
+                    flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'spreadsheet-flash');
                 }
             });
         }
@@ -284,9 +337,9 @@
         function flashSpreadsheetHeaderMessage(spreadsheetTagColumnIndices) {
             var numberOfTagColumns = spreadsheetTagColumnIndices.length.toString();
             if (numberOfTagColumns == '0') {
-                flashMessageOnScreen('No tag columns found... Using the 2nd column', 'error');
+                flashMessageOnScreen('No tag columns found... Using the 2nd column', 'error', 'tag-columns-flash');
             } else {
-                flashMessageOnScreen(numberOfTagColumns + ' tag column(s) found', 'success');
+                flashMessageOnScreen(numberOfTagColumns + ' tag column(s) found', 'success', 'tag-columns-flash');
             }
         }
 
@@ -302,21 +355,17 @@
         }
 
         /**
-         * Shows additional options in the form.
-         * @param {JSON} showWorksheets - If false, don't show worksheets in form.
+         * Hides spreadsheet headers section in the form.
          */
-        function showAdditionalOptions(showWorksheets){
-            $('#additional_options').show();
-            if (typeof showWorksheets !== 'undefined' && !showWorksheets) {
-                $('#worksheet_option').hide();
-            }
+        function hideSpreadsheetHeaders() {
+            $('#spreadsheet-headers').hide();
         }
 
         /**
-         * Hides additional options in the form.
+         * Shows spreadsheet headers section in the form.
          */
-        function hideAdditionalOptions(){
-            $('#additional_options').hide();
+        function showSpreadsheetHeaders() {
+            $('#spreadsheet-headers').show();
         }
 
         /**
@@ -331,7 +380,7 @@
             } else {
                 setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers']);
             }
-            if (spreadsheetTagColumnsIndicesAreEmpty(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices'])){
+            if (spreadsheetTagColumnsIndicesAreEmpty(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices'])) {
                 setComponentsRelatedToEmptySpreadsheetTagColumnIndices();
             } else {
                 populateTagColumnsTextbox(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
@@ -346,8 +395,8 @@
          */
         function setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeaders) {
             populateSpreadsheetHeadersTable(spreadsheetHeaders);
-            $('#has_headers').prop('checked', true);
-            $('#spreadsheet_headers_table').show();
+            setSkipHeadersCheckboxToTrue();
+            showSpreadsheetHeaders();
         }
 
 
@@ -355,15 +404,30 @@
          * Sets the components related to the spreadsheet tag column indices when they are empty.
          */
         function setComponentsRelatedToEmptySpreadsheetTagColumnIndices() {
-            $('#tag_columns').val('2');
+            $('#tag-columns').val('2');
         }
 
         /**
          * Sets the components related to Excel worksheet headers when they are all empty.
          */
         function setComponentsRelatedToEmptySpreadsheetHeaders() {
-            $('#has_headers').prop('checked', false);
-            $('#spreadsheet_headers_table').hide();
+            clearRequiredTagColumnTextboxes();
+            setSkipHeadersCheckboxToFalse();
+            hideSpreadsheetHeaders();
+        }
+
+        /**
+         * Sets the skip headers checkbox to false.
+         */
+        function setSkipHeadersCheckboxToFalse() {
+            $('#skip-headers').prop('checked', false);
+        }
+
+        /**
+         * Sets the skip headers checkbox to true.
+         */
+        function setSkipHeadersCheckboxToTrue() {
+            $('#skip-headers').prop('checked', true);
         }
 
         /**
@@ -385,7 +449,7 @@
          * headers.
          */
         function populateTagColumnsTextbox(spreadsheetTagColumnIndices) {
-            $('#tag_columns').val(spreadsheetTagColumnIndices.sort().map(String));
+            $('#tag-columns').val(spreadsheetTagColumnIndices.sort().map(String));
         }
 
         /**
@@ -403,7 +467,7 @@
             return true;
         }
 
-                /**
+        /**
          * Checks to see if the spreadsheet tag column indices are empty.
          * @param {Array} spreadsheetTagColumnsIndices - An array containing the tag column indices based on the
          *                headers found in the spreadsheet.
@@ -422,7 +486,7 @@
          * @param {Array} spreadsheetHeaders - An array containing the spreadsheet headers.
          */
         function populateSpreadsheetHeadersTable(spreadsheetHeaders) {
-            var spreadsheetHeadersTable = $('#spreadsheet_headers_table');
+            var spreadsheetHeadersTable = $('#spreadsheet-headers-table');
             var spreadsheetHeadersRow = $('<tr/>');
             var numberOfSpreadsheetHeaders = spreadsheetHeaders.length;
             spreadsheetHeadersTable.empty();

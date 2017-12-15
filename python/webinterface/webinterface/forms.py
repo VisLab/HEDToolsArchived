@@ -16,10 +16,12 @@ class NonValidatingSelectField(SelectField):
         pass
 
 class ValidationForm(FlaskForm):
-    spreadsheet = FileField('Select Spreadsheet', validators=[FileAllowed(['xls', 'xlsx', 'txt', 'tsv', 'csv'],
+    spreadsheet = FileField('1) Select Spreadsheet', validators=[FileAllowed(['xls', 'xlsx', 'txt', 'tsv', 'csv'],
                                                                           'Excel or text spreadsheets only!')]);
-    worksheet = NonValidatingSelectField('Select Worksheet', coerce=str, choices=[]);
-    tag_columns = StringField('Tag columns', [validators.Optional(), validators.Regexp('^\s*(\d+(\s*,\s*\d+)*)?\s*$', \
-    message = 'Must be a number or a comma-separated list of numbers')]);
-    has_headers = BooleanField('Spreadsheet has headers', default=True);
+    worksheet = NonValidatingSelectField('2) Choose a worksheet', coerce=str, choices=[]);
+    tag_columns = StringField('3) Select tag columns',
+                              [validators.Optional(),
+                               validators.Regexp('^\s*(\d+(\s*,\s*\d+)*)?\s*$',
+                                                 message = 'Must be a number or a comma-separated list of numbers')]);
+    has_headers = BooleanField('5) Skip headers line', default=True);
     generate_warnings = BooleanField('Include warnings in output file');
