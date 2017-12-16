@@ -2,7 +2,6 @@
     {% from "formhelpers.html" import render_field %}
     <form method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
-
         <div class="form-group">
             <p id="spreadsheet-flash"></p>
             <label for="spreadsheet">1) Select spreadsheet:</label><br>
@@ -50,7 +49,6 @@
             <button id="validate" type="button">Submit</button>
             <p id="submit-flash"></p>
         </div>
-
     </form>
 
     <script>
@@ -283,8 +281,8 @@
                 dataType: 'json',
                 success: function (worksheetsInfo) {
                     setComponentsRelatedToWorksheets(worksheetsInfo);
-                    flashWorksheetNumberMessage(worksheetsInfo['worksheet_names']);
-                    flashSpreadsheetHeaderMessage(worksheetsInfo['spreadsheet_tag_columns_indices']);
+                    flashWorksheetNumberMessage(worksheetsInfo['worksheetNames']);
+                    flashSpreadsheetHeaderMessage(worksheetsInfo['spreadsheetTagColumnIndices']);
                 },
                 error: function () {
                     flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
@@ -321,7 +319,7 @@
                 dataType: 'json',
                 success: function (spreadsheetHeadersInfo) {
                     setComponentsRelatedToSpreadsheetHeaders(spreadsheetHeadersInfo);
-                    flashSpreadsheetHeaderMessage(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
+                    flashSpreadsheetHeaderMessage(spreadsheetHeadersInfo['spreadsheetTagColumnIndices']);
                 },
                 error: function () {
                     flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'spreadsheet-flash');
@@ -350,7 +348,7 @@
          * and column indices that contain HED tags in the first worksheet.
          */
         function setComponentsRelatedToWorksheets(worksheetsInfo) {
-            populateWorksheetSelectbox(worksheetsInfo['worksheet_names']);
+            populateWorksheetSelectbox(worksheetsInfo['worksheetNames']);
             setComponentsRelatedToSpreadsheetHeaders(worksheetsInfo);
         }
 
@@ -375,15 +373,15 @@
          * This information contains the names of the headers and column indices that contain HED tags.
          */
         function setComponentsRelatedToSpreadsheetHeaders(spreadsheetHeadersInfo) {
-            if (spreadsheetHeadersAreEmpty(spreadsheetHeadersInfo['spreadsheet_headers'])) {
+            if (spreadsheetHeadersAreEmpty(spreadsheetHeadersInfo['spreadsheetHeaders'])) {
                 setComponentsRelatedToEmptySpreadsheetHeaders();
             } else {
-                setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheet_headers']);
+                setComponentsRelatedToNonEmptySpreadsheetHeaders(spreadsheetHeadersInfo['spreadsheetHeaders']);
             }
-            if (spreadsheetTagColumnsIndicesAreEmpty(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices'])) {
+            if (spreadsheetTagColumnsIndicesAreEmpty(spreadsheetHeadersInfo['spreadsheetTagColumnIndices'])) {
                 setComponentsRelatedToEmptySpreadsheetTagColumnIndices();
             } else {
-                populateTagColumnsTextbox(spreadsheetHeadersInfo['spreadsheet_tag_columns_indices']);
+                populateTagColumnsTextbox(spreadsheetHeadersInfo['spreadsheetTagColumnIndices']);
             }
         }
 

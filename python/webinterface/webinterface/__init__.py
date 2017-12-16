@@ -480,7 +480,7 @@ def _initialize_worksheets_info_dictionary():
         A dictionary that will hold information related to the Excel worksheets.
 
     """
-    worksheets_info = {'worksheet_names': [], 'spreadsheet_headers': [], 'spreadsheet_tag_columns_indices': []};
+    worksheets_info = {'worksheetNames': [], 'spreadsheetHeaders': [], 'spreadsheetTagColumnIndices': []};
     return worksheets_info;
 
 def _initialize_spreadsheet_headers_info_dictionary():
@@ -497,7 +497,7 @@ def _initialize_spreadsheet_headers_info_dictionary():
         A dictionary that will hold information related to the spreadsheet headers.
 
     """
-    worksheet_headers_info = {'spreadsheet_headers': [], 'spreadsheet_tag_columns_indices': []};
+    worksheet_headers_info = {'spreadsheetHeaders': [], 'spreadsheetTagColumnIndices': []};
     return worksheet_headers_info;
 
 def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
@@ -519,11 +519,11 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
         A dictionary populated with information related to the Excel worksheets.
 
     """
-    worksheets_info['worksheet_names'] = _get_excel_workbook_worksheet_names(spreadsheet_file_path);
-    worksheets_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, \
-                                                                    worksheets_info['worksheet_names'][0]);
-    worksheets_info['spreadsheet_tag_columns_indices'] = \
-        _get_spreadsheet_tag_column_indices(worksheets_info['spreadsheet_headers']);
+    worksheets_info['worksheetNames'] = _get_excel_workbook_worksheet_names(spreadsheet_file_path);
+    worksheets_info['spreadsheetHeaders'] = _get_worksheet_headers(spreadsheet_file_path,
+                                                                   worksheets_info['worksheetNames'][0]);
+    worksheets_info['spreadsheetTagColumnIndices'] = \
+        _get_spreadsheet_tag_column_indices(worksheets_info['spreadsheetHeaders']);
     return worksheets_info;
 
 def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spreadsheet_file_path,
@@ -548,13 +548,13 @@ def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spre
 
     """
     if worksheet_name:
-        spreadsheet_headers_info['spreadsheet_headers'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
+        spreadsheet_headers_info['spreadsheetHeaders'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
     else:
         column_delimiter = get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
-        spreadsheet_headers_info['spreadsheet_headers'] = get_text_file_headers(spreadsheet_file_path,
-                                                                                column_delimiter);
-    spreadsheet_headers_info['spreadsheet_tag_columns_indices'] = \
-        _get_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheet_headers']);
+        spreadsheet_headers_info['spreadsheetHeaders'] = get_text_file_headers(spreadsheet_file_path,
+                                                                               column_delimiter);
+    spreadsheet_headers_info['spreadsheetTagColumnIndices'] = \
+        _get_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheetHeaders']);
     return spreadsheet_headers_info;
 
 def get_text_file_headers(text_file_path, column_delimiter):
