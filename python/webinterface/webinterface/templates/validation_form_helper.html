@@ -188,11 +188,11 @@
                     processData: false,
                     dataType: 'json',
                     success: function (validationStatus) {
-                        if (checkRowIssueCount(validationStatus['row_issue_count'])) {
-                            document.location = '/download/' + validationStatus['download_file'];
+                        if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
+                            document.location = '/download/' + validationStatus['downloadFile'];
                         }
                         else {
-                            document.location = '/delete/' + validationStatus['download_file'];
+                            document.location = '/delete/' + validationStatus['downloadFile'];
                         }
                         resetAndHideForm();
                     },

@@ -134,9 +134,9 @@ def _validate_spreadsheet_in_form(validation_form_request_object):
             validation_input_arguments = _get_validation_input_arguments_from_validation_form(
                 validation_form_request_object, spreadsheet_file_path);
             validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
-            validation_status['download_file'] = _save_validation_issues_to_file_in_upload_folder(
+            validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
                 spreadsheet_file.filename, validation_issues);
-            validation_status['row_issue_count'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
+            validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
             return json.dumps(validation_status);
         except:
             return abort(500);
