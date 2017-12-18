@@ -480,7 +480,7 @@ def _initialize_worksheets_info_dictionary():
         A dictionary that will hold information related to the Excel worksheets.
 
     """
-    worksheets_info = {'worksheetNames': [], 'spreadsheetColumnNames': [], 'spreadsheetTagColumnIndices': []};
+    worksheets_info = {'worksheetNames': [], 'columnNames': [], 'tagColumnIndices': []};
     return worksheets_info;
 
 def _initialize_spreadsheet_columns_info_dictionary():
@@ -497,7 +497,7 @@ def _initialize_spreadsheet_columns_info_dictionary():
         A dictionary that will hold information related to the spreadsheet columns.
 
     """
-    worksheet_columns_info = {'spreadsheetColumnNames': [], 'spreadsheetTagColumnIndices': []};
+    worksheet_columns_info = {'columnNames': [], 'tagColumnIndices': []};
     return worksheet_columns_info;
 
 def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
@@ -520,10 +520,10 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
 
     """
     worksheets_info['worksheetNames'] = _get_excel_workbook_worksheet_names(spreadsheet_file_path);
-    worksheets_info['spreadsheetColumnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
+    worksheets_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
                                                                             worksheets_info['worksheetNames'][0]);
-    worksheets_info['spreadsheetTagColumnIndices'] = \
-        _find_spreadsheet_tag_column_indices(worksheets_info['spreadsheetColumnNames']);
+    worksheets_info['tagColumnIndices'] = \
+        _get_spreadsheet_tag_column_indices(worksheets_info['columnNames'], TAG_COLUMN_NAMES, []);
     return worksheets_info;
 
 def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
@@ -548,14 +548,14 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
 
     """
     if worksheet_name:
-        spreadsheet_columns_info['spreadsheetColumnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
-                                                                                         worksheet_name);
+        spreadsheet_columns_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
+                                                                              worksheet_name);
     else:
         column_delimiter = get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
-        spreadsheet_columns_info['spreadsheetColumnNames'] = get_text_file_column_names(spreadsheet_file_path,
-                                                                                        column_delimiter);
-    spreadsheet_columns_info['spreadsheetTagColumnIndices'] = \
-        _find_spreadsheet_tag_column_indices(spreadsheet_columns_info['spreadsheetColumnNames']);
+        spreadsheet_columns_info['columnNames'] = get_text_file_column_names(spreadsheet_file_path,
+                                                                             column_delimiter);
+    spreadsheet_columns_info['tagColumnIndices'] = \
+        _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames'], TAG_COLUMN_NAMES, []);
     return spreadsheet_columns_info;
 
 def get_text_file_column_names(text_file_path, column_delimiter):
@@ -634,7 +634,7 @@ def _save_spreadsheet_file_to_upload_folder(spreadsheet_file_object):
     return spreadsheet_file_path;
 
 def _get_excel_workbook_worksheet_names(workbook_file_path):
-    """Get the worksheet names in an Excel workbook.
+    """Gets the worksheet names in an Excel workbook.
 
     Parameters
     ----------
@@ -651,8 +651,8 @@ def _get_excel_workbook_worksheet_names(workbook_file_path):
     worksheet_names = opened_workbook_file.sheet_names();
     return worksheet_names;
 
-def _find_spreadsheet_tag_column_indices(column_names, tag_column_names, initialized_list_or_dictionary):
-    """Finds the tag column indices in a spreadsheet. The indices found will be one-based.
+def _get_spreadsheet_tag_column_indices(column_names, tag_column_names, initialized_list_or_dictionary):
+    """Gets the tag column indices in a spreadsheet. The indices found will be one-based.
 
     Parameters
     ----------
