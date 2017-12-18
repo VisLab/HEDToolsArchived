@@ -123,7 +123,7 @@ def _validate_spreadsheet_in_form(validation_form_request_object):
     Returns
     -------
         string
-        A serialized JSON string containing information related to the worksheet headers. If the validation fails then a
+        A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
         500 error message is returned.
     """
     validation_status = {};
@@ -253,8 +253,8 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     if _worksheet_name_present_in_form(validation_form_request_object):
         validation_input_arguments['worksheet'] = validation_form_request_object.form['worksheet'];
     validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag_columns'].split(','));
-    validation_input_arguments['has_headers'] = _get_optional_validation_form_arguments(
-        validation_form_request_object.form, 'has_headers');
+    validation_input_arguments['has_column_names'] = _get_optional_validation_form_arguments(
+        validation_form_request_object.form, 'has_column_names');
     validation_input_arguments['prefix_needed_tag_columns'] = _get_optional_validation_form_arguments(
         validation_form_request_object.form, 'add_prefixes');
     validation_input_arguments['generate_warnings'] = _get_optional_validation_form_arguments(
@@ -380,7 +380,7 @@ def _report_spreadsheet_validation_issues(validation_arguments):
     """
     hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
                                       tag_columns=validation_arguments['tag_columns'],
-                                      has_headers=validation_arguments['has_headers']);
+                                      has_column_names=validation_arguments['has_column_names']);
     return hed_input_reader.get_validation_issues();
 
 
@@ -388,7 +388,7 @@ def _report_spreadsheet_validation_issues(validation_arguments):
 def get_worksheets_info():
     """Gets information related to the Excel worksheets.
 
-    This information contains the names of the worksheets in a workbook, the names of the headers in the first
+    This information contains the names of the worksheets in a workbook, the names of the columns in the first
     worksheet, and column indices that contain HED tags in the first worksheet.
 
     Parameters
@@ -430,11 +430,11 @@ def _spreadsheet_file_present_in_form(validation_form_request_object):
     """
     return 'spreadsheet_file' in validation_form_request_object.files
 
-@app.route('/getspreadsheetheadersinfo', methods=['POST'])
-def get_spreadsheet_headers_info():
-    """Gets information related to the spreadsheet headers.
+@app.route('/getspreadsheetcolumnsinfo', methods=['POST'])
+def get_spreadsheet_columns_info():
+    """Gets information related to the spreadsheet columns.
 
-    This information contains the names of the spreadsheet headers and column indices that contain HED tags.
+    This information contains the names of the spreadsheet columns and column indices that contain HED tags.
 
     Parameters
     ----------
@@ -442,24 +442,24 @@ def get_spreadsheet_headers_info():
     Returns
     -------
     string
-        A serialized JSON string containing information related to the worksheet headers.
+        A serialized JSON string containing information related to the spreadsheet columns.
 
     """
     spreadsheet_file_path = '';
     try:
-        spreadsheet_headers_info = _initialize_spreadsheet_headers_info_dictionary();
+        spreadsheet_columns_info = _initialize_spreadsheet_columns_info_dictionary();
         if _spreadsheet_file_present_in_form(request):
             spreadsheet_file = request.files['spreadsheet_file'];
             spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
             if spreadsheet_file_path and _worksheet_name_present_in_form(request):
                 worksheet_name = request.form['worksheet_name'];
-                spreadsheet_headers_info = _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, \
+                spreadsheet_columns_info = _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, \
                                                                                          spreadsheet_file_path, \
                                                                                          worksheet_name);
             else:
-                spreadsheet_headers_info = _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, \
+                spreadsheet_columns_info = _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, \
                                                                                          spreadsheet_file_path);
-        return json.dumps(spreadsheet_headers_info);
+        return json.dumps(spreadsheet_columns_info);
     except:
         return abort(500);
     finally:
@@ -468,7 +468,7 @@ def get_spreadsheet_headers_info():
 def _initialize_worksheets_info_dictionary():
     """Initializes a dictionary that will hold information related to the Excel worksheets.
 
-    This information contains the names of the worksheets in a workbook, the names of the headers in the first
+    This information contains the names of the worksheets in a workbook, the names of the columns in the first
     worksheet, and column indices that contain HED tags in the first worksheet.
 
     Parameters
@@ -480,13 +480,13 @@ def _initialize_worksheets_info_dictionary():
         A dictionary that will hold information related to the Excel worksheets.
 
     """
-    worksheets_info = {'worksheetNames': [], 'spreadsheetHeaders': [], 'spreadsheetTagColumnIndices': []};
+    worksheets_info = {'worksheetNames': [], 'spreadsheetColumnNames': [], 'spreadsheetTagColumnIndices': []};
     return worksheets_info;
 
-def _initialize_spreadsheet_headers_info_dictionary():
-    """Initializes a dictionary that will hold information related to the spreadsheet headers.
+def _initialize_spreadsheet_columns_info_dictionary():
+    """Initializes a dictionary that will hold information related to the spreadsheet columns.
 
-    This information contains the names of the spreadsheet headers and column indices that contain HED tags.
+    This information contains the names of the spreadsheet columns and column indices that contain HED tags.
 
     Parameters
     ----------
@@ -494,16 +494,16 @@ def _initialize_spreadsheet_headers_info_dictionary():
     Returns
     -------
     dictionary
-        A dictionary that will hold information related to the spreadsheet headers.
+        A dictionary that will hold information related to the spreadsheet columns.
 
     """
-    worksheet_headers_info = {'spreadsheetHeaders': [], 'spreadsheetTagColumnIndices': []};
-    return worksheet_headers_info;
+    worksheet_columns_info = {'spreadsheetColumnNames': [], 'spreadsheetTagColumnIndices': []};
+    return worksheet_columns_info;
 
 def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
     """Populate dictionary with information related to the Excel worksheets.
 
-    This information contains the names of the worksheets in a workbook, the names of the headers in the first
+    This information contains the names of the worksheets in a workbook, the names of the columns in the first
     worksheet, and column indices that contain HED tags in the first worksheet.
 
     Parameters
@@ -520,22 +520,22 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
 
     """
     worksheets_info['worksheetNames'] = _get_excel_workbook_worksheet_names(spreadsheet_file_path);
-    worksheets_info['spreadsheetHeaders'] = _get_worksheet_headers(spreadsheet_file_path,
-                                                                   worksheets_info['worksheetNames'][0]);
+    worksheets_info['spreadsheetColumnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
+                                                                            worksheets_info['worksheetNames'][0]);
     worksheets_info['spreadsheetTagColumnIndices'] = \
-        _find_spreadsheet_tag_column_indices(worksheets_info['spreadsheetHeaders']);
+        _find_spreadsheet_tag_column_indices(worksheets_info['spreadsheetColumnNames']);
     return worksheets_info;
 
-def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spreadsheet_file_path,
+def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
                                                   worksheet_name=''):
-    """Populate dictionary with information related to the spreadsheet headers.
+    """Populate dictionary with information related to the spreadsheet columns.
 
-    This information contains the names of the spreadsheet headers and column indices that contain HED tags.
+    This information contains the names of the spreadsheet columns and column indices that contain HED tags.
 
     Parameters
     ----------
-    spreadsheet_headers_info: dictionary
-        A dictionary that contains information related to the spreadsheet headers.
+    spreadsheet_columns_info: dictionary
+        A dictionary that contains information related to the spreadsheet column.
     spreadsheet_file_path: string
         The full path to a spreadsheet file.
     worksheet_name: string
@@ -544,21 +544,22 @@ def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spre
     Returns
     -------
     dictionary
-        A dictionary populated with information related to the spreadsheet headers.
+        A dictionary populated with information related to the spreadsheet columns.
 
     """
     if worksheet_name:
-        spreadsheet_headers_info['spreadsheetHeaders'] = _get_worksheet_headers(spreadsheet_file_path, worksheet_name);
+        spreadsheet_columns_info['spreadsheetColumnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
+                                                                                         worksheet_name);
     else:
         column_delimiter = get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
-        spreadsheet_headers_info['spreadsheetHeaders'] = get_text_file_headers(spreadsheet_file_path,
-                                                                               column_delimiter);
-    spreadsheet_headers_info['spreadsheetTagColumnIndices'] = \
-        _find_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheetHeaders']);
-    return spreadsheet_headers_info;
+        spreadsheet_columns_info['spreadsheetColumnNames'] = get_text_file_column_names(spreadsheet_file_path,
+                                                                                        column_delimiter);
+    spreadsheet_columns_info['spreadsheetTagColumnIndices'] = \
+        _find_spreadsheet_tag_column_indices(spreadsheet_columns_info['spreadsheetColumnNames']);
+    return spreadsheet_columns_info;
 
-def get_text_file_headers(text_file_path, column_delimiter):
-    """Gets the text spreadsheet headers.
+def get_text_file_column_names(text_file_path, column_delimiter):
+    """Gets the text spreadsheet column names.
 
     Parameters
     ----------
@@ -573,11 +574,10 @@ def get_text_file_headers(text_file_path, column_delimiter):
         The spreadsheet column delimiter based on the file extension.
 
     """
-    text_file_headers = [];
     with open(text_file_path, 'r') as opened_text_file:
         first_line = opened_text_file.readline();
-        text_file_headers = first_line.split(column_delimiter);
-    return text_file_headers;
+        text_file_columns = first_line.split(column_delimiter);
+    return text_file_columns;
 
 def get_column_delimiter_based_on_file_extension(file_name_or_path):
     """Gets the spreadsheet column delimiter based on the file extension.
@@ -700,8 +700,8 @@ def _find_str_index_in_list(list_of_strs, str_value):
     except ValueError:
         return -1;
 
-def _get_worksheet_headers(workbook_file_path, worksheet_name):
-    """Get the worksheet headers in a Excel workbook.
+def _get_worksheet_column_names(workbook_file_path, worksheet_name):
+    """Get the worksheet columns in a Excel workbook.
 
     Parameters
     ----------
@@ -713,13 +713,13 @@ def _get_worksheet_headers(workbook_file_path, worksheet_name):
     Returns
     -------
     list
-        A list containing the worksheet headers in an Excel workbook.
+        A list containing the worksheet columns in an Excel workbook.
 
     """
     opened_workbook_file = xlrd.open_workbook(workbook_file_path);
     opened_worksheet = opened_workbook_file.sheet_by_name(worksheet_name);
-    worksheet_headers = [opened_worksheet.cell(0, col_index).value for col_index in xrange(opened_worksheet.ncols)];
-    return worksheet_headers;
+    worksheet_column_names = [opened_worksheet.cell(0, col_index).value for col_index in xrange(opened_worksheet.ncols)];
+    return worksheet_column_names;
 
 if __name__ == '__main__':
     app.config.update(TEMPLATES_AUTO_RELOAD=True);
