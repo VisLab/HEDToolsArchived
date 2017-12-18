@@ -11,7 +11,8 @@ app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = 'fsdlkfjs#(*09dfdkn325489!*#&9309!(094'
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
-TAG_COLUMN_NAMES = ['Category', 'Description', 'Event Details', 'Label'];
+TAG_COLUMN_NAMES = ['Event Details'];
+REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
 @app.route('/validation', strict_slashes=False, methods=['GET', 'POST'])
@@ -524,6 +525,8 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
                                                                             worksheets_info['worksheetNames'][0]);
     worksheets_info['tagColumnIndices'] = \
         _get_spreadsheet_tag_column_indices(worksheets_info['columnNames'], TAG_COLUMN_NAMES, []);
+    worksheets_info['requiredTagColumnIndices'] = \
+        _get_spreadsheet_tag_column_indices(worksheets_info['columnNames'], REQUIRED_TAG_COLUMN_NAMES, {});
     return worksheets_info;
 
 def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
@@ -556,6 +559,8 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
                                                                              column_delimiter);
     spreadsheet_columns_info['tagColumnIndices'] = \
         _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames'], TAG_COLUMN_NAMES, []);
+    spreadsheet_columns_info['requiredTagColumnIndices'] = \
+        _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames'], REQUIRED_TAG_COLUMN_NAMES, {});
     return spreadsheet_columns_info;
 
 def get_text_file_column_names(text_file_path, column_delimiter):

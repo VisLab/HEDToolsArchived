@@ -40,8 +40,8 @@
         <div class="form-group">
             <label>5) Specify additional options:</label><br>
             <div class="option-group">
-            <input type="checkbox" name="has-column-names" id="has-column-names"> Spreadsheet has column names
-            <input type="checkbox" name="generate-warnings" id="generate-warnings"> Include warnings in output file
+                <input type="checkbox" name="has-column-names" id="has-column-names"> Spreadsheet has column names
+                <input type="checkbox" name="generate-warnings" id="generate-warnings"> Include warnings in output file
             </div>
         </div>
 
@@ -231,7 +231,7 @@
             var valid = pattern.test($('#tag-columns').val());
             if (!valid) {
                 flashMessageOnScreen('Tag column(s) must be a number or a comma-separated list of numbers', 'error',
-                'tag-columns-flash')
+                    'tag-columns-flash')
             }
             return valid;
         }
@@ -281,7 +281,8 @@
                 success: function (worksheetsInfo) {
                     setComponentsRelatedToWorksheets(worksheetsInfo);
                     flashWorksheetNumberMessage(worksheetsInfo['worksheetNames']);
-                    flashTagColumnCountMessage(worksheetsInfo['tagColumnIndices']);
+                    flashSpreadsheetTagColumnCountMessage(worksheetsInfo['tagColumnIndices'],
+                        worksheetsInfo['requiredTagColumnIndices']);
                 },
                 error: function () {
                     flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
@@ -318,7 +319,8 @@
                 dataType: 'json',
                 success: function (spreadsheetColumnsInfo) {
                     setComponentsRelatedToSpreadsheetColumns(spreadsheetColumnsInfo);
-                    flashTagColumnCountMessage(spreadsheetColumnsInfo['tagColumnIndices']);
+                    flashSpreadsheetTagColumnCountMessage(spreadsheetColumnsInfo['tagColumnIndices'],
+                        spreadsheetColumnsInfo['requiredTagColumnIndices']);
                 },
                 error: function () {
                     flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'spreadsheet-flash');
@@ -328,11 +330,11 @@
 
         /**
          * Flash a message showing the number of column columns that contain tags.
-         * @param {Array} spreadsheetTagColumnIndices - An array containing the indices of the column columns that
+         * @param {Array} TagColumnIndices - An array containing the indices of the column columns that
          * contain tags.
          */
-        function flashTagColumnCountMessage(spreadsheetTagColumnIndices) {
-            var numberOfTagColumns = spreadsheetTagColumnIndices.length.toString();
+        function flashSpreadsheetTagColumnCountMessage(TagColumnIndices, requiredTagColumnIndices) {
+            var numberOfTagColumns = (TagColumnIndices.length+Object.keys(requiredTagColumnIndices).length).toString();
             if (numberOfTagColumns == '0') {
                 flashMessageOnScreen('No tag columns found... Using the 2nd column', 'error', 'tag-columns-flash');
             } else {
@@ -381,6 +383,11 @@
                 setComponentsRelatedToEmptySpreadsheetTagColumnIndices();
             } else {
                 populateTagColumnsTextbox(spreadsheetColumnsInfo['tagColumnIndices']);
+            } if(dictionaryIsEmpty(spreadsheetColumnsInfo['requiredTagColumnIndices'])) {
+                clearRequiredTagColumnTextboxes();
+            } else {
+                populateRequiredTagColumnTextboxes(spreadsheetColumnsInfo['requiredTagColumnIndices']);
+
             }
         }
 
@@ -442,11 +449,22 @@
 
         /**
          * Populate the tag column textbox from the tag column indices found in the spreadsheet columns.
-         * @param {Array} spreadsheetTagColumnIndices - An integer array of tag column indices found in the spreadsheet
+         * @param {Array} tagColumnIndices - An integer array of tag column indices found in the spreadsheet
          * columns.
          */
-        function populateTagColumnsTextbox(spreadsheetTagColumnIndices) {
-            $('#tag-columns').val(spreadsheetTagColumnIndices.sort().map(String));
+        function populateTagColumnsTextbox(tagColumnIndices) {
+            $('#tag-columns').val(tagColumnIndices.sort().map(String));
+        }
+
+        /**
+         * Populate the required tag column textboxes from the tag column indices found in the spreadsheet columns.
+         * @param {Dictionary} requiredTagColumnIndices - A dictionary containing the required tag column indices found
+         * in the spreadsheet. The keys are the column names and the values are the indices.
+         */
+        function populateRequiredTagColumnTextboxes(requiredTagColumnIndices) {
+            for (var key in requiredTagColumnIndices){
+                $('#'+key.toLowerCase()+'-column').val(requiredTagColumnIndices[key].toString());
+            }
         }
 
         /**
@@ -476,6 +494,15 @@
                 return false;
             }
             return true;
+        }
+
+        /**
+         * Checks to see if a dictionary is empty
+         * @param {Array} dictionary - A dictionary
+         * @returns {boolean} - True if the dictionary is empty. False, if otherwise.
+         */
+        function dictionaryIsEmpty(dictionary) {
+            return Object.keys(dictionary).length == 0;
         }
 
         /**
