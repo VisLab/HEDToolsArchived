@@ -523,7 +523,7 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
     worksheets_info['spreadsheetHeaders'] = _get_worksheet_headers(spreadsheet_file_path,
                                                                    worksheets_info['worksheetNames'][0]);
     worksheets_info['spreadsheetTagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(worksheets_info['spreadsheetHeaders']);
+        _find_spreadsheet_tag_column_indices(worksheets_info['spreadsheetHeaders']);
     return worksheets_info;
 
 def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spreadsheet_file_path,
@@ -554,7 +554,7 @@ def _populate_spreadsheet_headers_info_dictionary(spreadsheet_headers_info, spre
         spreadsheet_headers_info['spreadsheetHeaders'] = get_text_file_headers(spreadsheet_file_path,
                                                                                column_delimiter);
     spreadsheet_headers_info['spreadsheetTagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheetHeaders']);
+        _find_spreadsheet_tag_column_indices(spreadsheet_headers_info['spreadsheetHeaders']);
     return spreadsheet_headers_info;
 
 def get_text_file_headers(text_file_path, column_delimiter):
@@ -651,27 +651,32 @@ def _get_excel_workbook_worksheet_names(workbook_file_path):
     worksheet_names = opened_workbook_file.sheet_names();
     return worksheet_names;
 
-def _get_spreadsheet_tag_column_indices(spreadsheet_headers):
-    """Get the tag column indices found in a list of spreadsheet headers.
+def _find_spreadsheet_tag_column_indices(column_names, tag_column_names, initialized_list_or_dictionary):
+    """Finds the tag column indices in a spreadsheet. The indices found will be one-based.
 
     Parameters
     ----------
-    spreadsheet_headers: list
-        A list containing the spreadsheet headers in a spreadsheet.
+    column_names: list
+        A list containing the column names in a spreadsheet.
+    tag_column_names: list
+        A list containing the column names that contain HED tags in a spreadsheet.
+    initialized_list_or_dictionary: list or dictionary
+        A initialized list or dictionary that will store the tag column indices in a spreadsheet. If a dictionary is
+        passed in the keys will be the tag column names and the values will be the indices.
 
     Returns
     -------
-    list
-        A list containing the tag column indices found in a list of spreadsheet headers.
+    list or dictionary
+        A list or dictionary containing the tag column indices found in a spreadsheet.
 
     """
-    tag_column_indices = [];
-    for tag_column_name in TAG_COLUMN_NAMES:
-        tag_column_index = _find_str_index_in_list(spreadsheet_headers, tag_column_name);
-        if tag_column_index != -1:
-            tag_column_indices.append(tag_column_index);
-    tag_column_indices.sort();
-    return tag_column_indices;
+    for tag_column_name in tag_column_names:
+        tag_column_index = _find_str_index_in_list(column_names, tag_column_name);
+        if isinstance(initialized_list_or_dictionary, list) and tag_column_index != -1:
+            initialized_list_or_dictionary.append(tag_column_index);
+        if isinstance(initialized_list_or_dictionary, dict) and tag_column_index != -1:
+            initialized_list_or_dictionary[tag_column_name] = tag_column_index;
+    return initialized_list_or_dictionary;
 
 def _find_str_index_in_list(list_of_strs, str_value):
     """Find the index of a string value in a list.
