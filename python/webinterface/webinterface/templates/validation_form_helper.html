@@ -33,7 +33,7 @@
                 <label for="description-column">Description</label>
                 <input type="text" name="description-column" id="description-column">
                 <label for="label-column">Label</label>
-                <input type="text" name="label-columns" id="label-column">
+                <input type="text" name="label-column" id="label-column">
             </div>
         </div>
 
@@ -214,7 +214,8 @@
         function checkRowIssueCount(rowIssueCount) {
             var issuesFound = false;
             if (rowIssueCount == 0) {
-                flashMessageOnScreen('No issues were found. Thank you!', 'success', 'submit-flash');
+                flashMessageOnScreen('No issues were found. Refreshing page in 5 seconds', 'success', 'submit-flash');
+                setTimeout("location.reload(true);", 5000);
             } else {
                 flashMessageOnScreen(rowIssueCount.toString() + ' rows have issues. Creating attachment ...', 'error',
                     'submit-flash');

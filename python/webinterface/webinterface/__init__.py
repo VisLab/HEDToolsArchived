@@ -15,6 +15,7 @@ TAG_COLUMN_NAMES = ['Event Details'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
+
 @app.route('/validation', strict_slashes=False, methods=['GET', 'POST'])
 def validate_spreadsheet_from_form():
     """Handles the site root and Validation tab functionality.
@@ -138,11 +139,11 @@ def _validate_spreadsheet_after_submission(validation_form_request_object):
             validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
                 spreadsheet_file.filename, validation_issues);
             validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
-            return json.dumps(validation_status);
         except:
             return abort(500);
         finally:
             _delete_file_if_it_exist(spreadsheet_file_path);
+    return json.dumps(validation_status);
 
 def _get_the_number_of_rows_with_validation_issues(validation_issues):
     """Gets the number of rows in the spreadsheet that has validation issues.
@@ -253,14 +254,36 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     validation_input_arguments['spreadsheet_path'] = workbook_file_path;
     if _worksheet_name_present_in_form(validation_form_request_object):
         validation_input_arguments['worksheet'] = validation_form_request_object.form['worksheet'];
-    validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag_columns'].split(','));
+    validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag-columns'].split(','));
     validation_input_arguments['has_column_names'] = _get_optional_validation_form_arguments(
-        validation_form_request_object.form, 'has_column_names');
-    validation_input_arguments['prefix_needed_tag_columns'] = _get_optional_validation_form_arguments(
-        validation_form_request_object.form, 'add_prefixes');
+        validation_form_request_object.form, 'has-column-names');
+    validation_input_arguments['required_tag_columns'] = \
+        get_required_tag_columns_from_validation_form(validation_form_request_object);
     validation_input_arguments['generate_warnings'] = _get_optional_validation_form_arguments(
-        validation_form_request_object.form, 'generate_warnings');
+        validation_form_request_object.form, 'generate-warnings');
     return validation_input_arguments;
+
+def get_required_tag_columns_from_validation_form(validation_form_request_object):
+    """Gets the validation function input arguments from a request object associated with the validation form.
+
+    Parameters
+    ----------
+    validation_form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    dictionary
+        A dictionary containing the required tag columns. The keys will be the column numbers and the values will be
+        the name of the column.
+    """
+    required_tag_columns = {};
+    for tag_column_name in REQUIRED_TAG_COLUMN_NAMES:
+        form_tag_column_name = tag_column_name.lower()+'-column';
+        if form_tag_column_name in validation_form_request_object.form:
+            tag_column_name_index = int(validation_form_request_object.form[form_tag_column_name]);
+            required_tag_columns[tag_column_name_index] = tag_column_name;
+    return required_tag_columns;
 
 def _get_optional_validation_form_arguments(validation_form_request_object, optional_argument_name):
     """Get optional validation form arguments if present in the form.
@@ -381,7 +404,9 @@ def _report_spreadsheet_validation_issues(validation_arguments):
     """
     hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
                                       tag_columns=validation_arguments['tag_columns'],
-                                      has_column_names=validation_arguments['has_column_names']);
+                                      has_column_names=validation_arguments['has_column_names'],
+                                      required_tag_columns=validation_arguments['required_tag_columns'],
+                                      worksheet=validation_arguments['worksheet']);
     return hed_input_reader.get_validation_issues();
 
 

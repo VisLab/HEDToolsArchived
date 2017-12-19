@@ -341,6 +341,10 @@ a:hover {
     border-top: solid 1px #eff0f1;
 }
 
+.site-footer p{
+    text-align: center;
+}
+
 .site-footer-owner {
     display: block;
     font-weight: bold;
