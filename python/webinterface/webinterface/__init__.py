@@ -31,7 +31,7 @@ def validate_spreadsheet_from_form():
     """
     form = ValidationForm();
     if request.method == 'POST':
-        return _validate_spreadsheet_in_form(request);
+        return _validate_spreadsheet_after_submission(request);
     return render_template('validation.html', form=form);
 
 @app.route('/', strict_slashes=False, methods=['GET'])
@@ -113,8 +113,8 @@ def _check_file_extension(filename, accepted_file_extensions):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in accepted_file_extensions;
 
-def _validate_spreadsheet_in_form(validation_form_request_object):
-    """Validate the spreadsheet in the form and return an attachment file containing the output.
+def _validate_spreadsheet_after_submission(validation_form_request_object):
+    """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
 
     Parameters
     ----------

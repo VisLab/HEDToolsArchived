@@ -1,3 +1,11 @@
+.form-group input[type="text"], .form-group input[type="file"], select, button {
+    height: 2.25em;
+}
+
+.textbox-group {
+    display:block;
+}
+
 .form-group {
     margin-bottom: 1em;
 }
@@ -7,9 +15,13 @@
     text-align: center;
 }
 
-.option-group input[type="text"]{
-    width: 3em;
-    margin-right: 2em;
+.textbox-group input[type="text"] {
+    width: 4em;
+    margin-left: auto;
+}
+
+.form-group input, .textbox-group label, .checkbox-group[type="checkbox"], #column-names, select, button {
+    margin-left:1.2em;
 }
 
 * {
@@ -324,8 +336,6 @@ a:hover {
 }
 
 .site-footer {
-    position: absolute;
-    bottom: 0px;
     padding-top: 2rem;
     margin-top: 2rem;
     border-top: solid 1px #eff0f1;

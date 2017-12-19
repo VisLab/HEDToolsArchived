@@ -15,7 +15,7 @@
         </div>
 
         <div class="form-group" id="column-names">
-            <label for="columns-names-table">Spreadsheet column names</label>
+            <label for="columns-names-table">Column names</label>
             <table id="columns-names-table"></table>
         </div>
 
@@ -27,7 +27,7 @@
 
         <div class="form-group">
             <label>4) Specify columns corresponding to required tags:</label><br>
-            <div class="option-group">
+            <div class="textbox-group">
                 <label for="category-column">Category</label>
                 <input type="text" name="category-column" id="category-column">
                 <label for="description-column">Description</label>
@@ -39,9 +39,11 @@
 
         <div class="form-group">
             <label>5) Specify additional options:</label><br>
-            <div class="option-group">
-                <input type="checkbox" name="has-column-names" id="has-column-names"> Spreadsheet has column names
-                <input type="checkbox" name="generate-warnings" id="generate-warnings"> Include warnings in output file
+            <div class="checkbox-group">
+                <input type="checkbox" name="has-column-names" id="has-column-names">
+                <label for="has-column-names">Spreadsheet has column names</label>
+                <input type="checkbox" name="generate-warnings" id="generate-warnings">
+                <label for="generate-warnings">Include warnings in output file</label>
             </div>
         </div>
 
@@ -108,7 +110,7 @@
          * Clears the required tag column text boxes.
          */
         function clearRequiredTagColumnTextboxes() {
-            $('.option-group input[type="text"]').val('');
+            $('.textbox-group input[type="text"]').val('');
         }
 
         /**
