@@ -195,11 +195,12 @@
                         else {
                             document.location = '/delete/' + validationStatus['downloadFile'];
                         }
-                        resetAndHideForm();
+                        setTimeout("location.reload(true);", 5000);
                     },
                     error: function () {
-                        flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
-                        resetAndHideForm();
+                        flashMessageOnScreen('Spreadsheet could not be processed. Refreshing page shortly...', 'error',
+                            'submit-flash');
+                        setTimeout("location.reload(true);", 5000);
                     }
                 }
             )
@@ -214,11 +215,10 @@
         function checkRowIssueCount(rowIssueCount) {
             var issuesFound = false;
             if (rowIssueCount == 0) {
-                flashMessageOnScreen('No issues were found. Refreshing page in 5 seconds', 'success', 'submit-flash');
-                setTimeout("location.reload(true);", 5000);
+                flashMessageOnScreen('No issues were found. Refreshing page shortly ...', 'success', 'submit-flash');
             } else {
-                flashMessageOnScreen(rowIssueCount.toString() + ' rows have issues. Creating attachment ...', 'error',
-                    'submit-flash');
+                flashMessageOnScreen(rowIssueCount.toString() + ' rows have issues. Creating attachment. ' +
+                    'Refreshing page shortly ...', 'error', 'submit-flash');
                 issuesFound = true;
             }
             return issuesFound;
