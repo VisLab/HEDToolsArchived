@@ -201,8 +201,9 @@
                     success: function (validationStatus) {
                         if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
                             document.location = '/download/' + validationStatus['downloadFile'];
+                        } else {
+                            document.location = '/delete/' + validationStatus['downloadFile'];
                         }
-                        document.location = '/delete/' + validationStatus['downloadFile'];
                         setTimeout("location.reload(true);", 5000);
                     },
                     error: function () {
