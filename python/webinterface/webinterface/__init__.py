@@ -250,17 +250,17 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     dictionary
         A dictionary containing input arguments for calling the underlying validation function.
     """
-    print(validation_form_request_object.form)
     validation_input_arguments = {};
     validation_input_arguments['spreadsheet_path'] = workbook_file_path;
     validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag-columns'].split(','));
     validation_input_arguments['required_tag_columns'] = \
         get_required_tag_columns_from_validation_form(validation_form_request_object);
-    validation_input_arguments['worksheet'] = _get_optional_validation_form_fields(
-        validation_form_request_object, 'worksheet', 'string')
-    validation_input_arguments['has_column_names'] = _get_optional_validation_form_fields(
+    validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
+        validation_form_request_object, 'worksheet', 'string');
+    print(validation_input_arguments)
+    validation_input_arguments['has_column_names'] = _get_optional_validation_form_field(
         validation_form_request_object, 'has-column-names', 'boolean');
-    validation_input_arguments['generate_warnings'] = _get_optional_validation_form_fields(
+    validation_input_arguments['generate_warnings'] = _get_optional_validation_form_field(
         validation_form_request_object, 'generate-warnings', 'boolean');
     return validation_input_arguments;
 
@@ -286,7 +286,7 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
             required_tag_columns[tag_column_name_index] = tag_column_name;
     return required_tag_columns;
 
-def _get_optional_validation_form_fields(validation_form_request_object, form_field_name, type=''):
+def _get_optional_validation_form_field(validation_form_request_object, form_field_name, type=''):
     """Gets the specified optional form field if present.
 
     Parameters
@@ -309,7 +309,7 @@ def _get_optional_validation_form_fields(validation_form_request_object, form_fi
     elif type == 'string':
         form_field_value = '';
         if form_field_name in validation_form_request_object.form:
-            form_field_value = validation_form_request_object.form[form_field_value];
+            form_field_value = validation_form_request_object.form[form_field_name];
     return form_field_value;
 
 def _delete_file_if_it_exist(file_path):
