@@ -250,6 +250,7 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     dictionary
         A dictionary containing input arguments for calling the underlying validation function.
     """
+    print(validation_form_request_object.form)
     validation_input_arguments = {};
     validation_input_arguments['spreadsheet_path'] = workbook_file_path;
     if _worksheet_name_present_in_form(validation_form_request_object):
@@ -643,7 +644,7 @@ def _worksheet_name_present_in_form(validation_form_request_object):
         True if a worksheet name is present in a request object from the validation form.
 
     """
-    return 'worksheet_name' in validation_form_request_object.form;
+    return 'worksheet' in validation_form_request_object.form;
 
 def _save_spreadsheet_file_to_upload_folder(spreadsheet_file_object):
     """Save an spreadsheet file to the upload folder.
