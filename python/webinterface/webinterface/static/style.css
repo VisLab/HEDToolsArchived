@@ -1,5 +1,6 @@
 .form-group input[type="text"], .form-group input[type="file"], select, button {
     height: 2.35rem;
+    font-size: 18px;
 }
 
 button {
