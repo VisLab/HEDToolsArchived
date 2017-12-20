@@ -90,6 +90,15 @@
         }
 
         /**
+         * Hides the flash messages that aren't related to the form submission.
+         */
+        function hideNonSubmitFlashMessages() {
+            $('#spreadsheet-flash').hide();
+            $('#worksheet-flash').hide();
+            $('#tag-columns-flash').hide();
+        }
+
+        /**
          * Gets the information associated with the Excel worksheet that was newly selected. This information contains
          * the names of the columns and column indices that contain HED tags.
          */
@@ -161,6 +170,7 @@
          * @param {Array} worksheetNames - An array containing the names of Excel workbook worksheets.
          */
         function flashSubmitMessages() {
+            hideNonSubmitFlashMessages();
             flashMessageOnScreen('Worksheet is being validated ...', 'success', 'submit-flash')
         }
 
