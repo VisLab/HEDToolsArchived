@@ -9,7 +9,7 @@ from hed_input_reader import HedInputReader;
 
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
-SECRET_KEY = 'fsdlkfjs#(*09dfdkn325489!*#&9309!(094'
+SECRET_KEY = os.urandom(24);
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 TAG_COLUMN_NAMES = ['Event Details', 'HED tags'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
