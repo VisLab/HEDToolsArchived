@@ -255,12 +255,11 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag-columns'].split(','))
     validation_input_arguments['required_tag_columns'] = \
         get_required_tag_columns_from_validation_form(validation_form_request_object);
-    print(validation_input_arguments)
     validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
         validation_form_request_object, 'worksheet', 'string');
     validation_input_arguments['has_column_names'] = _get_optional_validation_form_field(
         validation_form_request_object, 'has-column-names', 'boolean');
-    validation_input_arguments['generate_warnings'] = _get_optional_validation_form_field(
+    validation_input_arguments['check_for_warnings'] = _get_optional_validation_form_field(
         validation_form_request_object, 'generate-warnings', 'boolean');
     return validation_input_arguments;
 
@@ -410,11 +409,13 @@ def _report_spreadsheet_validation_issues(validation_arguments):
         row in the worksheet that generated issues.
 
     """
+    print(validation_arguments)
     hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
                                       tag_columns=validation_arguments['tag_columns'],
                                       has_column_names=validation_arguments['has_column_names'],
                                       required_tag_columns=validation_arguments['required_tag_columns'],
-                                      worksheet_name=validation_arguments['worksheet']);
+                                      worksheet_name=validation_arguments['worksheet'],
+                                      check_for_warnings=validation_arguments['check_for_warnings']);
     return hed_input_reader.get_validation_issues();
 
 
