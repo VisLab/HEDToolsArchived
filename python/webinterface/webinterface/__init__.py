@@ -11,7 +11,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = os.urandom(24);
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
-TAG_COLUMN_NAMES = ['Event Details', 'HED tags'];
+TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
