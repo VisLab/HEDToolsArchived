@@ -12,7 +12,7 @@ values.tsv2 = [values.testroot filesep values.Otherdir filesep ...
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test
 
-function testValidateEEG(values)  %#ok<DEFNU>
+function testValidateTSV(values)  %#ok<DEFNU>
 % Unit test for editmaps
 fprintf('\nUnit tests for validateeeg\n');
 
