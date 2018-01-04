@@ -69,13 +69,13 @@ issues = readStr(p);
             p.formattedCellTags);
     end % findWarnings
 
-    function p = parseArguments(hedMaps, str, extensionAllowed)
+    function p = parseArguments(hedMaps, hedString, extensionAllowed)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
-        parser.addRequired('hedStr', @ischar);
+        parser.addRequired('hedString', @ischar);
         parser.addRequired('generateWarnings', @islogical);
-        parser.parse(hedMaps, str, extensionAllowed);
+        parser.parse(hedMaps, hedString, extensionAllowed);
         p = parser.Results;
     end % parseArguments
 
