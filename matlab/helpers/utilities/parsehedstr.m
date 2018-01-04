@@ -4,7 +4,7 @@
 %
 % Usage:
 %
-%   >>  issues = parsehedstr(hedMaps, str, generateWarnings);
+%   >>  issues = parsehedstr(hedMaps, hedString, generateWarnings);
 %
 % Input:
 %
@@ -21,7 +21,7 @@
 %                   contains the tags that are extension allowed, and map
 %                   that contains the tags are are unique.
 %
-%   str
+%   hedString
 %                   A string containing HED tags.
 %
 %   generateWarnings
