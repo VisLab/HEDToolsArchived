@@ -4,13 +4,13 @@
 %
 % Usage:
 %
-%   >>  issues = validatehedstr(str);
+%   >>  issues = validatehedstr(hedString);
 %
-%   >>  issues = validatehedstr(str, varargin);
+%   >>  issues = validatehedstr(hedString, varargin);
 %
 % Input:
 %
-%   str
+%   hedString
 %                   A string containing HED tags that are validated.
 %
 %
@@ -48,14 +48,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function issues = validatehedstr(str, varargin)
-p = parseArguments(str, varargin{:});
+function issues = validatehedstr(hedString, varargin)
+p = parseArguments(hedString, varargin{:});
 issues = validate(p);
 
     function issues = validate(p)
         % Validates a cellstr
         p.hedMaps = getHEDMaps(p);
-        issues = parsehedstr(p.hedMaps, p.str, p.generateWarnings);
+        issues = parsehedstr(p.hedMaps, p.hedString, p.generateWarnings);
     end % validate
 
     function hedMaps = getHEDMaps(p)
@@ -79,7 +79,7 @@ issues = validate(p);
     function p = parseArguments(str, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
-        p.addRequired('str', @ischar);
+        p.addRequired('hedString', @ischar);
         p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
         p.addParamValue('hedXML', 'HED.xml', ...
