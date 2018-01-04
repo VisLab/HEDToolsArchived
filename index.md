@@ -588,6 +588,16 @@ functions also checks for and generate errors for the following issues:
 -   Tags in groups can have no more than 2 tildes. For example,
     *(/Participant \~ /Action/Type/Allow/Access \~
     /Item/Object/Person/ID Holder)* is a valid group containing tildes.
+    
+-   Missing commas before or after tag groups.  For example,
+    */Event/Label/StBaselineGuardDuty (/Participant ~ /Action/Type/Allow/Access
+    ~ /Item/Object/Person/ID Holder)* is invalid because the comma after
+    the required label tag is missing.
+    
+-   Unequal number of opening and closing parentheses in tag groups. For example, 
+    *(/Participant ~ /Action/Type/Allow/Access ~ 
+    /Item/Object/Person/ID Holder* is invalid because the closing tag group parenthesis
+    is missing.
 
 In addition to this, the validation generates warning for the following syntax issues:
 
