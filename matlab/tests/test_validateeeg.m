@@ -23,9 +23,9 @@ values.EEG4.event(1).usertags = ['(Participant ~ ' ...
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test
 
-function testCheckGroupBrackets(values)  %#ok<DEFNU>
+function testValidateEEG(values)  %#ok<DEFNU>
 % Unit test for editmaps
-fprintf('\nUnit tests for checkgroupbrackets\n');
+fprintf('\nUnit tests for validateeeg\n');
 
 fprintf('\nIt should return no errors when there is a empty HED string');
 errors = validateeeg(values.EEG1);
