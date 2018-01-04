@@ -23,7 +23,7 @@ values.HEDString3 = ['(Participant ~ ' ...
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test
 
-function testCheckGroupBrackets(values)  %#ok<DEFNU>
+function testValidateHedStr(values)  %#ok<DEFNU>
 % Unit test for editmaps
 fprintf('\nUnit tests for checkgroupbrackets\n');
 
