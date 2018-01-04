@@ -101,10 +101,12 @@ p = parseArguments(hedMaps, events, generateWarnings);
         try
             for a = 1:numberEvents
                 p.structNumber = a;
-                tags = concattags(p.events(a));
-                p.cellTags = hed2cell(tags, false);
-                p.formattedCellTags = hed2cell(tags, true);
-                p = validateStructTags(p);
+                p.hedString = concattags(p.events(a));
+                if ~isempty(p.hedString)
+                    p.cellTags = hed2cell(p.hedString, false);
+                    p.formattedCellTags = hed2cell(p.hedString, true);
+                    p = validateStructTags(p);
+                end
             end
             issues = p.issues;
             replaceTags = p.replaceTags;
@@ -114,13 +116,22 @@ p = parseArguments(hedMaps, events, generateWarnings);
         end
     end % readStructTags
 
+    function issues = validateHEDString(hedString)
+        % Validate the entire HED string
+        issues = checkgroupbrackets(hedString);
+        issues = [issues checkcommas(hedString)];
+    end % validateHEDString
+
     function p = validateStructTags(p)
         % Validates the HED tags in a structure
-        p = findErrors(p);
-        p.structIssues = p.structErrors;
-        if(p.generateWarnings)
-            p = findWarnings(p);
-            p.structIssues = [p.structErrors p.structWarnings];
+        p.structIssues = validateHEDString(p.hedString);
+        if isempty(p.structIssues)
+            p = findErrors(p);
+            p.structIssues = p.structErrors;
+            if(p.generateWarnings)
+                p = findWarnings(p);
+                p.structIssues = [p.structErrors p.structWarnings];
+            end
         end
         if ~isempty(p.structIssues)
             p.issues{p.issueCount} = ...

@@ -41,11 +41,14 @@
 
 function error = generateerror(type, line, tag, prefix, units)
 switch(type)
+    case 'bracket'
+        error = sprintf(['\tERROR: Number of opening and closing' ...
+            ' brackets are unequal. "%s" opening brackets. "%s" ' ...
+            'closing brackets\n'], num2str(line), num2str(tag));
+    case 'comma'
+        error = sprintf('\tERROR: Comma missing after - \"%s\"\n', tag);
     case 'cell'
         error = sprintf('Errors in cell %s:\n', num2str(line));
-    case 'comma'
-        error = sprintf(['\t"%s" may contain a comma when no commas' ...
-            ' are allowed in tags'], tag);
     case 'correct'
         error = sprintf('No errors were found.');
     case 'empty'

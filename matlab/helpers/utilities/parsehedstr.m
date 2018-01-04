@@ -4,7 +4,7 @@
 %
 % Usage:
 %
-%   >>  issues = parsehedstr(hedMaps, str, generateWarnings);
+%   >>  issues = parsehedstr(hedMaps, hedString, generateWarnings);
 %
 % Input:
 %
@@ -21,7 +21,7 @@
 %                   contains the tags that are extension allowed, and map
 %                   that contains the tags are are unique.
 %
-%   str
+%   hedString
 %                   A string containing HED tags.
 %
 %   generateWarnings
@@ -53,8 +53,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function issues = parsehedstr(hedMaps, str, generateWarnings)
-p = parseArguments(hedMaps, str, generateWarnings);
+function issues = parsehedstr(hedMaps, hedString, generateWarnings)
+p = parseArguments(hedMaps, hedString, generateWarnings);
 issues = readStr(p);
 
     function errors = findErrors(p)
@@ -69,22 +69,25 @@ issues = readStr(p);
             p.formattedCellTags);
     end % findWarnings
 
-    function p = parseArguments(hedMaps, str, extensionAllowed)
+    function p = parseArguments(hedMaps, hedString, extensionAllowed)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
-        parser.addRequired('str', @ischar);
+        parser.addRequired('hedString', @ischar);
         parser.addRequired('generateWarnings', @islogical);
-        parser.parse(hedMaps, str, extensionAllowed);
+        parser.parse(hedMaps, hedString, extensionAllowed);
         p = parser.Results;
     end % parseArguments
 
     function issues = readStr(p)
         % Read the tags in a string and validates them
         try
-            p.cellTags = hed2cell(p.str, false);
-            p.formattedCellTags = hed2cell(p.str, true);
-            issues = validateStrTags(p);
+            issues = validateHEDString(p.hedString);
+            if isempty(issues)
+                p.cellTags = hed2cell(p.hedString, false);
+                p.formattedCellTags = hed2cell(p.hedString, true);
+                issues = validateStrTags(p);
+            end
         catch
             warning(['Unable to parse string. Please check' ...
                 ' the format of it.']);
@@ -103,5 +106,11 @@ issues = readStr(p);
             end
         end
     end % validateStrTags
+
+    function issues = validateHEDString(hedString)
+        % Validate the entire HED string
+        issues = checkgroupbrackets(hedString);
+        issues = [issues checkcommas(hedString)];
+    end % validateHEDString
 
 end % parseCellTags

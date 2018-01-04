@@ -30,9 +30,9 @@
 %                   dataset validated.
 %
 %   'WriteOutputToFile'
-%                   If true (default), write the validation issues to a
-%                   log file in addition to the workspace. If false only
-%                   write the issues to the workspace. 
+%                   If true, write the validation issues to a
+%                   log file in addition to the workspace. If false,
+%                   (default) only write the issues to the workspace. 
 %
 % Output:
 %
@@ -109,7 +109,7 @@ issues = validate(p);
         p.addParamValue('HedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('OutputFileDirectory', pwd, @ischar);
-        p.addParamValue('WriteOutputToFile', true, @islogical);
+        p.addParamValue('WriteOutputToFile', false, @islogical);
         p.parse(EEG, varargin{:});
         p = p.Results;
     end % parseArguments

@@ -122,12 +122,12 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         p.issueCount = 1;
         try
             fileId = fopen(p.tsvFile);
-            [line, p.lineNumber] = checkFileHeader(p.hasHeader, fileId);
-            while ischar(line)
-                [p.cellTags, p.formattedCellTags] = getLineTags(line, ...
-                    p.tagColumns);
+            [p.line, p.lineNumber] = checkFileHeader(p.hasHeader, fileId);
+            while ischar(p.line)
+                [p.cellTags, p.formattedCellTags, p.hedString] = ...
+                    getLineTags(p.line, p.tagColumns);
                 p = validateLineTags(p);
-                line = fgetl(fileId);
+                p.line = fgetl(fileId);
                 p.lineNumber = p.lineNumber + 1;
             end
             fclose(fileId);
@@ -140,7 +140,8 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         end
     end % readLines
 
-    function [cellTags, formattedCellTags] = getLineTags(line, tagColumns)
+    function [cellTags, formattedCellTags, splitTags] = ...
+            getLineTags(line, tagColumns)
         % Reads the tag columns in a tab-delimited file and formats them
         cellTags = {};
         formattedCellTags = {};
@@ -162,14 +163,23 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         end
     end % getLineTags
 
+    function issues = validateHEDString(hedString)
+        % Validate the entire HED string
+        issues = checkgroupbrackets(hedString);
+        issues = [issues checkcommas(hedString)];
+    end % validateHEDString
+
     function p = validateLineTags(p)
         % This function validates the tags on a line in a tab-delimited
         % file
-        p = findErrors(p);
-        p.lineIssues = p.lineErrors;
-        if(p.generateWarnings)
-            p = findWarnings(p);
-            p.lineIssues = [p.lineErrors p.lineWarnings];
+        p.structIssues = validateHEDString(p.hedString);
+        if isempty(p.structIssues)
+            p = findErrors(p);
+            p.lineIssues = p.lineErrors;
+            if(p.generateWarnings)
+                p = findWarnings(p);
+                p.lineIssues = [p.lineErrors p.lineWarnings];
+            end
         end
         if ~isempty(p.lineIssues)
             p.issues{p.issueCount} = ...
