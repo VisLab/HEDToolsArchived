@@ -1,1 +1,0 @@
-Tags with the unique attribute can only have one descendant tag present in an event. For example, there cannot be two tags start with the prefix /Event/Label because this tag has the unique attribute.

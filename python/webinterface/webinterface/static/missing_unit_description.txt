@@ -1,1 +1,0 @@
-Numerical tags that have a unit class should have units specified. For example, /Attribute/Visual/Luminance/444 is discouraged and should have units specified: /Attribute/Visual/Luminance/444 candela.
