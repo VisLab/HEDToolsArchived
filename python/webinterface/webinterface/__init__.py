@@ -15,7 +15,7 @@ TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
 REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
-                                        'Label': ['Label', 'Event Label', 'Short Label']}
+                                        'Label': ['Label', 'Event Label', 'Short Label']};
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
 
