@@ -12,8 +12,7 @@ UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = os.urandom(24);
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
-FORM_REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
-REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Event Category', 'Event Description', 'Event Label'];
+REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
 REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
                                         'Label': ['Label', 'Event Label', 'Short Label']}
@@ -282,7 +281,7 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
         the name of the column.
     """
     required_tag_columns = {};
-    for tag_column_name in FORM_REQUIRED_TAG_COLUMN_NAMES:
+    for tag_column_name in REQUIRED_TAG_COLUMN_NAMES:
         form_tag_column_name = tag_column_name.lower()+'-column';
         if form_tag_column_name in validation_form_request_object.form:
             tag_column_name_index = validation_form_request_object.form[form_tag_column_name].strip();
@@ -731,7 +730,7 @@ def _get_spreadsheet_required_tag_column_indices(column_names):
     required_tag_column_indices = {};
     required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY.keys();
     for required_tag_column_name in required_tag_column_names:
-        alternative_required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES[required_tag_column_name];
+        alternative_required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY[required_tag_column_name];
         for alternative_required_tag_column_name in alternative_required_tag_column_names:
             required_tag_column_index = _find_str_index_in_list(column_names, alternative_required_tag_column_name);
             if required_tag_column_index != -1:
