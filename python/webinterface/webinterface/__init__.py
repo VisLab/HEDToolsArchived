@@ -12,7 +12,11 @@ UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
 SECRET_KEY = os.urandom(24);
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
-REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
+FORM_REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
+REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Event Category', 'Event Description', 'Event Label'];
+REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
+                                        'Description': ['Description', 'Description in text', 'Event Description'],
+                                        'Label': ['Label', 'Event Label', 'Short Label']}
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 
 
@@ -278,7 +282,7 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
         the name of the column.
     """
     required_tag_columns = {};
-    for tag_column_name in REQUIRED_TAG_COLUMN_NAMES:
+    for tag_column_name in FORM_REQUIRED_TAG_COLUMN_NAMES:
         form_tag_column_name = tag_column_name.lower()+'-column';
         if form_tag_column_name in validation_form_request_object.form:
             tag_column_name_index = validation_form_request_object.form[form_tag_column_name].strip();
@@ -560,7 +564,7 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
     worksheets_info['tagColumnIndices'] = \
         _get_spreadsheet_tag_column_indices(worksheets_info['columnNames'], TAG_COLUMN_NAMES, []);
     worksheets_info['requiredTagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(worksheets_info['columnNames'], REQUIRED_TAG_COLUMN_NAMES, {});
+        _get_spreadsheet_required_tag_column_indices(worksheets_info['columnNames']);
     return worksheets_info;
 
 def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
@@ -594,7 +598,7 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
     spreadsheet_columns_info['tagColumnIndices'] = \
         _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames'], TAG_COLUMN_NAMES, []);
     spreadsheet_columns_info['requiredTagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames'], REQUIRED_TAG_COLUMN_NAMES, {});
+        _get_spreadsheet_required_tag_column_indices(spreadsheet_columns_info['columnNames']);
     return spreadsheet_columns_info;
 
 def get_text_file_column_names(text_file_path, column_delimiter):
@@ -716,6 +720,30 @@ def _get_spreadsheet_tag_column_indices(column_names, tag_column_names, initiali
         if isinstance(initialized_list_or_dictionary, dict) and tag_column_index != -1:
             initialized_list_or_dictionary[tag_column_name] = tag_column_index;
     return initialized_list_or_dictionary;
+
+def _get_spreadsheet_required_tag_column_indices(column_names):
+    """Gets the required tag column indices in a spreadsheet. The indices found will be one-based.
+
+    Parameters
+    ----------
+    column_names: list
+        A list containing the column names in a spreadsheet.
+
+    Returns
+    -------
+    dictionary
+        A dictionary containing the required tag column indices found in a spreadsheet.
+
+    """
+    required_tag_column_indices = {};
+    required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY.keys();
+    for required_tag_column_name in required_tag_column_names:
+        alternative_required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES[required_tag_column_name];
+        for alternative_required_tag_column_name in alternative_required_tag_column_names:
+            required_tag_column_index = _find_str_index_in_list(column_names, alternative_required_tag_column_name);
+            if required_tag_column_index != -1:
+                required_tag_column_indices[required_tag_column_name] = required_tag_column_index;
+    return required_tag_column_indices;
 
 def _find_str_index_in_list(list_of_strs, str_value):
     """Find the index of a string value in a list.
