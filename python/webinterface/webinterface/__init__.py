@@ -561,8 +561,7 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
     worksheets_info['worksheetNames'] = _get_excel_workbook_worksheet_names(spreadsheet_file_path);
     worksheets_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
                                                                             worksheets_info['worksheetNames'][0]);
-    worksheets_info['tagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(worksheets_info['columnNames'], TAG_COLUMN_NAMES, []);
+    worksheets_info['tagColumnIndices'] = _get_spreadsheet_tag_column_indices(worksheets_info['columnNames']);
     worksheets_info['requiredTagColumnIndices'] = \
         _get_spreadsheet_required_tag_column_indices(worksheets_info['columnNames']);
     return worksheets_info;
@@ -596,7 +595,7 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
         spreadsheet_columns_info['columnNames'] = get_text_file_column_names(spreadsheet_file_path,
                                                                              column_delimiter);
     spreadsheet_columns_info['tagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames'], TAG_COLUMN_NAMES, []);
+        _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames']);
     spreadsheet_columns_info['requiredTagColumnIndices'] = \
         _get_spreadsheet_required_tag_column_indices(spreadsheet_columns_info['columnNames']);
     return spreadsheet_columns_info;
@@ -694,32 +693,26 @@ def _get_excel_workbook_worksheet_names(workbook_file_path):
     worksheet_names = opened_workbook_file.sheet_names();
     return worksheet_names;
 
-def _get_spreadsheet_tag_column_indices(column_names, tag_column_names, initialized_list_or_dictionary):
+def _get_spreadsheet_tag_column_indices(column_names):
     """Gets the tag column indices in a spreadsheet. The indices found will be one-based.
 
     Parameters
     ----------
     column_names: list
         A list containing the column names in a spreadsheet.
-    tag_column_names: list
-        A list containing the column names that contain HED tags in a spreadsheet.
-    initialized_list_or_dictionary: list or dictionary
-        A initialized list or dictionary that will store the tag column indices in a spreadsheet. If a dictionary is
-        passed in the keys will be the tag column names and the values will be the indices.
 
     Returns
     -------
-    list or dictionary
-        A list or dictionary containing the tag column indices found in a spreadsheet.
+    list
+        A list containing the tag column indices found in a spreadsheet.
 
     """
-    for tag_column_name in tag_column_names:
+    tag_column_indices = {};
+    for tag_column_name in TAG_COLUMN_NAMES:
         tag_column_index = _find_str_index_in_list(column_names, tag_column_name);
-        if isinstance(initialized_list_or_dictionary, list) and tag_column_index != -1:
-            initialized_list_or_dictionary.append(tag_column_index);
-        if isinstance(initialized_list_or_dictionary, dict) and tag_column_index != -1:
-            initialized_list_or_dictionary[tag_column_name] = tag_column_index;
-    return initialized_list_or_dictionary;
+        if tag_column_index != -1:
+            tag_column_indices.append(tag_column_index);
+    return tag_column_indices;
 
 def _get_spreadsheet_required_tag_column_indices(column_names):
     """Gets the required tag column indices in a spreadsheet. The indices found will be one-based.
