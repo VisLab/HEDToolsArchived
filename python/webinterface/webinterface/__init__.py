@@ -707,7 +707,7 @@ def _get_spreadsheet_tag_column_indices(column_names):
         A list containing the tag column indices found in a spreadsheet.
 
     """
-    tag_column_indices = {};
+    tag_column_indices = [];
     for tag_column_name in TAG_COLUMN_NAMES:
         tag_column_index = _find_str_index_in_list(column_names, tag_column_name);
         if tag_column_index != -1:
