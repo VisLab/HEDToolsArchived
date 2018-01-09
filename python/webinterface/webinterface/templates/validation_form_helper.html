@@ -200,9 +200,9 @@
                     dataType: 'json',
                     success: function (validationStatus) {
                         if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
-                            document.location = '/download/' + validationStatus['downloadFile'];
+                            window.location = '/download/' + validationStatus['downloadFile'];
                         } else {
-                            document.location = '/delete/' + validationStatus['downloadFile'];
+                            window.location = '/delete/' + validationStatus['downloadFile'];
                         }
                     },
                     error: function () {
