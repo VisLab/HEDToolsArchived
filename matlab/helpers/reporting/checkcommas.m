@@ -1,4 +1,4 @@
-% This function checks to see if commas are missing after tags and groups. 
+% This function checks to see if commas are missing after tags and groups.
 %
 % Usage:
 %
@@ -7,7 +7,7 @@
 % Input:
 %
 %   hedString
-%                   A HED string. 
+%                   A HED string.
 %
 % Output:
 %
@@ -33,8 +33,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function errors = checkcommas(hedString)
-OPENING_GROUP_BRACKET = '(';
-CLOSING_GROUP_BRACKET = ')';
 ERRORTYPE = 'comma';
 errors = '';
 currentTag = '';
@@ -47,16 +45,15 @@ for a = 1:hedStringLength
         if characterIsDelimiter(character)
             currentTag = '';
         end
-        if ~isempty(lastNonEmptyCharacter) && ...
-                ~characterIsDelimiter(lastNonEmptyCharacter) && ...
-                character == OPENING_GROUP_BRACKET
+        if commaMissingBeforeOpeningBracket(lastNonEmptyCharacter, ...
+                character) && ~isValidTagWithParentheses(...
+                hedString, currentTag, a);
             currentTag = strtrim(currentTag(1:end-1));
             errors = generateerror(ERRORTYPE, [], currentTag);
             break;
         end
-        if ~isempty(lastNonEmptyCharacter) && ...
-                lastNonEmptyCharacter == CLOSING_GROUP_BRACKET && ...
-                ~characterIsDelimiter(character)
+        if commaIsMissingAfterClosingBracket(lastNonEmptyCharacter, ...
+                character)
             currentTag = strtrim(currentTag(1:end-1));
             errors = generateerror(ERRORTYPE, [], currentTag);
             break;
@@ -64,17 +61,62 @@ for a = 1:hedStringLength
         lastNonEmptyCharacter = character;
     end
 end
+end
 
-    function isWhitespace = characterIsWhitespace(character)
-        % Checks to see if the specified character is whitespace. Tab and
-        % newline characters are considered whitespace. 
-        isWhitespace = ~isempty(regexp(character, '[\\n\\t ]', 'once'));
-    end % characterIsWhitespace
+function commaMissing = commaIsMissingAfterClosingBracket(...
+    lastNonEmptyCharacter, currentCharacter)
+% Returns true if a comma is missing after a closing bracket
+commaMissing = ~isempty(lastNonEmptyCharacter) && ...
+    lastNonEmptyCharacter == ')' && ...
+    ~characterIsDelimiter(currentCharacter);
+end % commaIsMissingAfterClosingBracket
 
-    function isDelimiter = characterIsDelimiter(character)
-        % Checks to see if the specified character is a delimiter. Comma
-        % and tildes are considered delimiters. 
-        isDelimiter = ~isempty(regexp(character, '[,~]', 'once'));
-    end % characterIsDelimiter
+function commaMissing = commaMissingBeforeOpeningBracket(...
+    lastNonEmptyCharacter, currentCharacter)
+% Returns true if a comma is missing before an opening bracket
+commaMissing = ~isempty(lastNonEmptyCharacter) && ...
+    ~characterIsDelimiter(lastNonEmptyCharacter) && ...
+    currentCharacter == '(';
+end % commaMissingBeforeOpeningBracket
 
-end % checkcommas
+function isWhitespace = characterIsWhitespace(character)
+% Checks to see if the specified character is whitespace. Tab and
+% newline characters are considered whitespace.
+isWhitespace = ~isempty(regexp(character, '[\\n\\t ]', 'once'));
+end % characterIsWhitespace
+
+function isDelimiter = characterIsDelimiter(character)
+% Checks to see if the specified character is a delimiter. Comma
+% and tildes are considered delimiters.
+isDelimiter = ~isempty(regexp(character, '[,~]', 'once'));
+end % characterIsDelimiter
+
+function setOfParentheses = getNextSetOfParenthesesInHedString(...
+    hedString)
+% Gets the next set of parentheses in the provided HED string.
+setOfParentheses = '';
+openingParenthesisFound = false;
+numberOfCharacters = length(hedString);
+for a = 1:numberOfCharacters
+    character = hedString(a);
+    setOfParentheses = [setOfParentheses hedString(a)]; %#ok<AGROW>
+    if character == '('
+        openingParenthesisFound = true;
+    elseif character == ')' && openingParenthesisFound
+        return;
+    end
+end
+end % getNextSetOfParenthesesInHedString
+
+function tagIsValid = isValidTagWithParentheses(hedString, ...
+    currentTag, characterIndex)
+% Checks to see if the current tag with the next set of parentheses
+% in the HED string is valid. Some tags have
+load(which('HEDMaps.mat'));
+currentTag = currentTag(1:end-1);
+restOfHedString = hedString(characterIndex:end);
+currentTagWithParentheses = getNextSetOfParenthesesInHedString(...
+    [currentTag restOfHedString]);
+currentTagWithParentheses = lower(currentTagWithParentheses);
+tagIsValid = hedMaps.tags.isKey(currentTagWithParentheses);
+end % isValidTagWithParentheses
