@@ -149,7 +149,8 @@ checkTakesValueTags(originalTags, formattedTags);
             generateWarnings(originalTag, unitIndex, 'unitClass', ...
                 unitClassDefault)
         end
-        if isempty(regexpi(tagName, unitsRegexp))
+        if isempty(regexpi(tagName, unitsRegexp)) && ...
+                ~isValidTimeString(tagName)
             generateErrors(originalTag, unitIndex, 'unitClass', ...
                 unitClassUnits);
         end
@@ -163,6 +164,17 @@ checkTakesValueTags(originalTags, formattedTags);
             unitClassUnits)];
         errorTags{end+1} = originalTag{valueIndex};
     end % generateErrors
+
+    function validTimeString = isValidTimeString(timeString)
+        % Returns true if the string is a valid time string. False, if
+        % otherwise.
+        timeExpression = '^([0-1]?[0-9]|2[0-3])(:[0-5][0-9])?$';
+        if ~isempty(regexp(timeString, timeExpression, 'once'))
+            validTimeString = true;
+        else
+            validTimeString = false;
+        end
+    end % isValidTimeString
 
     function generateWarnings(originalTag, valueIndex, warningType, ...
             unitClassUnits)
