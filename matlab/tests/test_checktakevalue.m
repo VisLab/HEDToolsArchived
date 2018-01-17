@@ -29,6 +29,8 @@ values.Tags10 = {'Event/Label/Test', ...
 values.Tags11 = {'/Event/Label/Test', ...
     {'Event/Duration/123', ...
     'Item/Symbolic/Sign/Traffic/Speed limit/456'}};
+values.Tags12 = {'Item/2D shape/Clock face/8:30'};
+values.Tags13 = {'Item/2D shape/Clock face/8:67'};
 load('HEDMaps.mat');
 values.hedMaps = hedMaps;
 
@@ -128,3 +130,18 @@ assertTrue(isempty(errorTags));
 assertFalse(isempty(warnings));
 assertFalse(isempty(warningTags));
 assertEqual(length(warningTags), 2);
+
+fprintf(['\nIt should return no errors when there is a unit class' ...
+    ' tag in time format\n']);
+[errors, errorTags, warnings, warningTags] = ...
+    checktakevalue(values.hedMaps, values.Tags12, values.Tags12);
+assertTrue(isempty(errors));
+assertTrue(isempty(errorTags));
+assertTrue(isempty(warnings));
+assertTrue(isempty(warningTags));
+
+fprintf(['\nIt should return errors when there is a unit class' ...
+    ' tag in a invalid time format\n']);
+[errors, errorTags, warnings, warningTags] = ...
+    checktakevalue(values.hedMaps, values.Tags13, values.Tags13);
+fprintf(errors)
