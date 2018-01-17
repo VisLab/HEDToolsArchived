@@ -12,6 +12,7 @@ values.HEDString2 = ['Event/Label/Test1 (Participant ~ ' ...
 values.HEDString3 = ['(Participant ~ ' ...
     'Action/Control vehicle/Drive/Collide ~ ' ...
     'Item/Object/Vehicle/Car) Event/Label/Test1'];
+values.HEDString4 = 'Paradigm/Reading (covert)';
 
 function teardown(values) %#ok<INUSD,DEFNU>
 % Function executed after each test
@@ -38,3 +39,8 @@ fprintf(['\nIt should return errors when there is a missing comma' ...
     ' after a group']);
 errors = checkcommas(values.HEDString3);
 assertFalse(isempty(errors));
+
+fprintf(['\nIt should not return errors when there is a valid tag' ...
+    ' present with parentheses']);
+errors = checkcommas(values.HEDString4);
+assertTrue(isempty(errors));
