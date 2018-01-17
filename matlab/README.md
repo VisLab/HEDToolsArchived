@@ -38,6 +38,10 @@ N. Bigdely-Shamlo, S. Makeig, and K. Robbins (2016). Preparing laboratory and re
 
 ### Releases
 
+Version 2.2.0 Released 1/17/2018
+* HEDTools validation functions accept time unit class tags.
+* Tags with parentheses no longer report a missing comma error.
+
 Version 2.1.0 Released 1/4/2018
 * HEDTools validation functions report missing commas and unequal number of tag group parentheses.
 
