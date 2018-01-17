@@ -61,7 +61,7 @@ for a = 1:hedStringLength
         lastNonEmptyCharacter = character;
     end
 end
-end
+end % checkcommas
 
 function commaMissing = commaIsMissingAfterClosingBracket(...
     lastNonEmptyCharacter, currentCharacter)
