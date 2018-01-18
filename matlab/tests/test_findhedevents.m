@@ -158,3 +158,15 @@ hedString = '(a/b, b/c), c/d';
 queryString = 'a/b';
 found = findhedevents(hedString, queryString, {'b/c'});
 assertFalse(found);
+
+fprintf('\n''action/button press'' should match ''(Participant ~ /Action/Button press/Keyboard ~ /Participant/Effect/Body part/Arm/Hand/Finger, Attribute/Object side/Right), Attribute/Action judgment/Correct'' when ''action/button press'' does not begin with a slash\n');
+hedString = '(Participant ~ /Action/Button press/Keyboard ~ /Participant/Effect/Body part/Arm/Hand/Finger, Attribute/Object side/Right), Attribute/Action judgment/Correct';
+queryString = 'action/button press';
+found = findhedevents('(Participant ~ /Action/Button press/Keyboard ~ /Participant/Effect/Body part/Arm/Hand/Finger, Attribute/Object side/Right), Attribute/Action judgment/Correct', 'action/button press');
+assertTrue(found);
+
+fprintf('\n''/action/button press'' should match ''(Participant ~ /Action/Button press/Keyboard ~ /Participant/Effect/Body part/Arm/Hand/Finger, Attribute/Object side/Right), Attribute/Action judgment/Correct'' when ''/action/button press'' begins with a slash\n');
+hedString = '(Participant ~ /Action/Button press/Keyboard ~ /Participant/Effect/Body part/Arm/Hand/Finger, Attribute/Object side/Right), Attribute/Action judgment/Correct';
+queryString = '/action/button press';
+found = findhedevents('(Participant ~ /Action/Button press/Keyboard ~ /Participant/Effect/Body part/Arm/Hand/Finger, Attribute/Object side/Right), Attribute/Action judgment/Correct', 'action/button press');
+assertTrue(found);
