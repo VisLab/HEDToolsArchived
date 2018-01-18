@@ -289,7 +289,7 @@ end
     function tags = splitHedTagsIntoCellArraysByLevel(tags, hedString)
         % Split the HED string tags into cell arrays containing the
         % top-level tags, group tags, and all the tags within a structure
-        tags.allTags = tagList.deStringify(lower(hedString));
+        tags.allTags = hed2cell(lower(hedString), true);
         tags.topLevelTags = tags.allTags(cellfun(@ischar, tags.allTags));
         tags.groupTags = tags.allTags(cellfun(@iscell, tags.allTags));
         if ~iscellstr(tags.allTags)
@@ -301,7 +301,7 @@ end
             queryString)
         % Put the query string tags inside cell arrays containing the
         % tags and the prefix version of them within a structure
-        tags.queryTags = tagList.deStringify(lower(queryString));
+        tags.queryTags = hed2cell(lower(queryString), true);
         tags.prefixQueryTags = strcat(tags.queryTags, '/');
     end % splitQueryTagsIntoCellArraysWithPrefix
 
