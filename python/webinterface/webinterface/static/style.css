@@ -1,18 +1,35 @@
-.form-group input[type="text"], .form-group input[type="file"], select, button {
+.form-group input[type="file"] {
+    margin-top: -2.35rem;
+    opacity: 0;
+}
+
+.form-group input[type="text"], .form-group input[type="file"], .form-group select, .form-group button,
+.form-group .btn {
     height: 2.35rem;
     font-size: 18px;
 }
 
-button {
-    width: 8rem;
+.form-group .btn {
+    background-color: gray;
+    opacity: .2;
+    border-type: solid;
+    border-color: black;
+}
+
+.form-group button, .form-group .btn, .form-group input[type="file"] {
+    width: 10rem;
 }
 
 .textbox-group {
     display: block;
 }
 
-.form-group {
+.form-group, #submit {
     margin-bottom: 1rem;
+}
+
+.form-group label {
+    font-weight: 400;
 }
 
 .form-group input[type="text"], select {
@@ -25,7 +42,8 @@ button {
     margin-left: auto;
 }
 
-.form-group input, .textbox-group label, .checkbox-group[type="checkbox"], #column-names, select, button {
+.form-group input, .form-group .btn, .textbox-group label, .checkbox-group[type="checkbox"], #column-names,
+#other-hed-version label, select, button {
     margin-left: 1.2rem;
 }
 
@@ -35,6 +53,8 @@ button {
 
 html, body {
     height: 100%;
+    font-size: 100%;
+    font-weight: 100;
 }
 
 body {
@@ -58,6 +78,7 @@ a:hover {
 }
 
 .btn {
+    font-size: 100%;
     display: inline-block;
     margin-bottom: 1rem;
     color: rgba(255, 255, 255, 0.7);
@@ -108,6 +129,7 @@ a:hover {
 }
 
 .page-header {
+    margin-top: auto;
     color: #fff;
     text-align: center;
     background-color: #159957;
@@ -181,7 +203,7 @@ a:hover {
 
 .main-content {
     flex: 1;
-    width:100%;
+    width: 100%;
 }
 
 .main-content :first-child {

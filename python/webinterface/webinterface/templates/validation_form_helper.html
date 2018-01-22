@@ -2,10 +2,15 @@
     {% from "formhelpers.html" import render_field %}
     <form id="validation-form" method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
+
         <div class="form-group">
             <p id="spreadsheet-flash"></p>
             <label for="spreadsheet">1) Select spreadsheet:</label><br>
-            <input type="file" name="spreadsheet" id="spreadsheet">
+            <label class="btn-group file-browse-group">
+                <button for="spreadsheet">Browse ...</button>
+                <label id="spreadsheet-filename"></label>
+                <input type="file" name="spreadsheet" id="spreadsheet"/>
+            </label>
         </div>
 
         <div class="form-group">
@@ -37,6 +42,16 @@
             </div>
         </div>
 
+        {#        <div class="form-group">#}
+        {#            <label for="hed-version">5) Choose HED version:</label><br>#}
+        {#            <select name="hed-version" id="hed-version"></select><br>#}
+        {#        </div>#}
+
+        {#        <div class="form-group" id="other-hed-version">#}
+        {#            <label for="spreadsheet">Other HED version</label><br>#}
+        {#            <input type="file" name="spreadsheet" id="spreadsheet">#}
+        {#        </div>#}
+
         <div class="form-group">
             <label>5) Specify additional options:</label><br>
             <div class="checkbox-group">
@@ -48,7 +63,7 @@
         </div>
 
         <div class="form-group">
-            <button id="validate" type="button">Submit</button>
+            <button id="submit" type="button">Submit</button>
             <p id="submit-flash"></p>
         </div>
     </form>
@@ -57,7 +72,27 @@
         const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
         const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
         $(document).ready(function () {
+            resetForm();
             hideSpreadsheetColumnNamesTable();
+            hideOtherHEDVersion();
+            populateHEDVersionsDropdown();
+        });
+
+
+        function populateHEDVersionsDropdown() {
+            var hedVersionDropdown = $('#hed-version');
+            hedVersionDropdown.append('<option value=6.0.5>6.0.5</option>');
+            hedVersionDropdown.append('<option value=5.2.3>5.2.3</option>');
+            hedVersionDropdown.append('<option value=4.0.5>4.0.5</option>');
+            hedVersionDropdown.append('<option value="Other">Other</option>');
+        }
+
+        $('#hed-version').change(function () {
+            if ($(this).val() == 'Other') {
+                $('#other-hed-version').show();
+            } else {
+                $('#other-hed-version').hide();
+            }
         });
 
         /**
@@ -67,35 +102,47 @@
             var spreadsheet = $('#spreadsheet');
             var spreadsheetPath = spreadsheet.val();
             var spreadsheetFile = spreadsheet[0].files[0];
+            resetFlashMessages(true);
             if (cancelWasPressedInChromeFileUpload(spreadsheetPath)) {
-                resetAndHideForm();
+                resetForm();
             }
             else if (fileHasValidExtension(spreadsheetPath, EXCEL_FILE_EXTENSIONS)) {
+                updateSpreadsheetFileLabel(spreadsheetPath);
                 getWorksheetsInfo(spreadsheetFile);
             }
             else if (fileHasValidExtension(spreadsheetPath, TEXT_FILE_EXTENSIONS)) {
+                updateSpreadsheetFileLabel(spreadsheetPath);
                 clearWorksheetSelectbox();
                 getSpreadsheetColumnsInfo(spreadsheetFile);
             } else {
-                resetAndHideForm();
+                resetForm();
                 flashInvalidExcelExtensionMessage();
             }
         });
+
+        function updateSpreadsheetFileLabel(spreadsheetPath) {
+            var spreadsheetFilename = spreadsheetPath.split('\\').pop();
+            $('#spreadsheet-filename').text(spreadsheetFilename);
+        }
 
         /**
          * Flash message when Excel workbook file extension is invalid.
          */
         function flashInvalidExcelExtensionMessage() {
-            flashMessageOnScreen('Please upload an Excel or Text spreadsheet (.xlsx, .xls, .tsv, .csv, .txt)', 'error');
+            flashMessageOnScreen('Please upload an excel or text spreadsheet (.xlsx, .xls, .tsv, .csv, .txt)',
+                'error', 'spreadsheet-flash');
         }
 
         /**
          * Hides the flash messages that aren't related to the form submission.
          */
-        function hideNonSubmitFlashMessages() {
-            $('#spreadsheet-flash').hide();
-            $('#worksheet-flash').hide();
-            $('#tag-columns-flash').hide();
+        function resetFlashMessages(hideSubmitFlash) {
+            flashMessageOnScreen('', 'success', 'spreadsheet-flash');
+            flashMessageOnScreen('', 'success', 'worksheet-flash');
+            flashMessageOnScreen('', 'success', 'tag-columns-flash');
+            if (hideSubmitFlash) {
+                flashMessageOnScreen('', 'success', 'submit-flash');
+            }
         }
 
         /**
@@ -158,26 +205,25 @@
         }
 
         /**
-         * Resets the fields in the form and hides the additional options.
+         * Resets the fields in the form.
          */
-        function resetAndHideForm() {
+        function resetForm() {
             $('#validation-form')[0].reset();
-            hideAdditionalOptions();
         }
 
         /**
          * Flash a submit message.
          * @param {Array} worksheetNames - An array containing the names of Excel workbook worksheets.
          */
-        function flashSubmitMessages() {
-            hideNonSubmitFlashMessages();
+        function flashSubmitMessage() {
+            resetFlashMessages(false);
             flashMessageOnScreen('Worksheet is being validated ...', 'success', 'submit-flash')
         }
 
         /**
          * Submits the form if the tag columns textbox is valid.
          */
-        $('#validate').click(function () {
+        $('#submit').click(function () {
             if (tagColumnsTextboxIsValid()) {
                 submitForm();
             }
@@ -190,7 +236,7 @@
         function submitForm() {
             var validationForm = document.getElementById("validation-form");
             var formData = new FormData(validationForm);
-            flashSubmitMessages();
+            flashSubmitMessage();
             $.ajax({
                     type: 'POST',
                     url: "{{url_for('validate_spreadsheet_from_form')}}",
@@ -344,9 +390,9 @@
          * contain tags.
          */
         function flashSpreadsheetTagColumnCountMessage(TagColumnIndices, requiredTagColumnIndices) {
-            var numberOfTagColumns = (TagColumnIndices.length+Object.keys(requiredTagColumnIndices).length).toString();
+            var numberOfTagColumns = (TagColumnIndices.length + Object.keys(requiredTagColumnIndices).length).toString();
             if (numberOfTagColumns == '0') {
-                flashMessageOnScreen('No tag columns found... Using the 2nd column', 'error', 'tag-columns-flash');
+                flashMessageOnScreen('No tag column(s) found... Using the 2nd column', 'error', 'tag-columns-flash');
             } else {
                 flashMessageOnScreen(numberOfTagColumns + ' tag column(s) found', 'success', 'tag-columns-flash');
             }
@@ -377,6 +423,10 @@
             $('#column-names').show();
         }
 
+        function hideOtherHEDVersion() {
+            $('#other-hed-version').hide();
+        }
+
         /**
          * Sets the components related to the Excel worksheet columns.
          * @param {JSON} spreadsheetColumnsInfo - A JSON object containing information related to the spreadsheet
@@ -393,7 +443,8 @@
                 setComponentsRelatedToEmptySpreadsheetTagColumnIndices();
             } else {
                 populateTagColumnsTextbox(spreadsheetColumnsInfo['tagColumnIndices']);
-            } if(dictionaryIsEmpty(spreadsheetColumnsInfo['requiredTagColumnIndices'])) {
+            }
+            if (dictionaryIsEmpty(spreadsheetColumnsInfo['requiredTagColumnIndices'])) {
                 clearRequiredTagColumnTextboxes();
             } else {
                 populateRequiredTagColumnTextboxes(spreadsheetColumnsInfo['requiredTagColumnIndices']);
@@ -472,8 +523,8 @@
          * in the spreadsheet. The keys are the column names and the values are the indices.
          */
         function populateRequiredTagColumnTextboxes(requiredTagColumnIndices) {
-            for (var key in requiredTagColumnIndices){
-                $('#'+key.toLowerCase()+'-column').val(requiredTagColumnIndices[key].toString());
+            for (var key in requiredTagColumnIndices) {
+                $('#' + key.toLowerCase() + '-column').val(requiredTagColumnIndices[key].toString());
             }
         }
 
