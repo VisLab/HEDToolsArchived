@@ -412,7 +412,6 @@ def _report_spreadsheet_validation_issues(validation_arguments):
         row in the worksheet that generated issues.
 
     """
-    print(validation_arguments)
     hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
                                       tag_columns=validation_arguments['tag_columns'],
                                       has_column_names=validation_arguments['has_column_names'],
