@@ -42,18 +42,18 @@
             </div>
         </div>
 
-        {#        <div class="form-group">#}
-        {#            <label for="hed-version">5) Choose HED version:</label><br>#}
-        {#            <select name="hed-version" id="hed-version"></select><br>#}
-        {#        </div>#}
+        <div class="form-group">
+            <label for="hed-version">5) Choose HED version:</label><br>
+            <select name="hed-version" id="hed-version"></select><br>
+        </div>
 
-        {#        <div class="form-group" id="other-hed-version">#}
-        {#            <label for="spreadsheet">Other HED version</label><br>#}
-        {#            <input type="file" name="spreadsheet" id="spreadsheet">#}
-        {#        </div>#}
+        <div class="form-group" id="other-hed-version">
+            <label for="spreadsheet">Other HED version</label><br>
+            <input type="file" name="spreadsheet" id="spreadsheet">
+        </div>
 
         <div class="form-group">
-            <label>5) Specify additional options:</label><br>
+            <label>6) Specify additional options:</label><br>
             <div class="checkbox-group">
                 <input type="checkbox" name="has-column-names" id="has-column-names">
                 <label for="has-column-names">Spreadsheet has column names</label>
@@ -71,12 +71,21 @@
     <script>
         const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
         const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
+        const OTHER_HED_VERSION_OPTION = 'Other';
         $(document).ready(function () {
+            prepareValidationForm();
+        });
+
+        /**
+         * Prepare the validation form after the page is ready. The form will be reset to handle page refresh and
+         * components will be hidden and populated.
+         */
+        function prepareValidationForm() {
             resetForm();
             hideSpreadsheetColumnNamesTable();
-            hideOtherHEDVersion();
+            hideOtherHEDVersionFileUpload();
             populateHEDVersionsDropdown();
-        });
+        }
 
 
         function populateHEDVersionsDropdown() {
@@ -88,7 +97,7 @@
         }
 
         $('#hed-version').change(function () {
-            if ($(this).val() == 'Other') {
+            if ($(this).val() == OTHER_HED_VERSION_OPTION) {
                 $('#other-hed-version').show();
             } else {
                 $('#other-hed-version').hide();
@@ -423,7 +432,7 @@
             $('#column-names').show();
         }
 
-        function hideOtherHEDVersion() {
+        function hideOtherHEDVersionFileUpload() {
             $('#other-hed-version').hide();
         }
 
