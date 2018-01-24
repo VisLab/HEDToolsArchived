@@ -555,7 +555,7 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
         A dictionary populated with information related to the Excel worksheets.
 
     """
-    worksheets_info['worksheetNames'] = _get_excel_workbook_worksheet_names(spreadsheet_file_path);
+    worksheets_info['worksheetNames'] = _get_excel_worksheet_names(spreadsheet_file_path);
     worksheets_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
                                                                             worksheets_info['worksheetNames'][0]);
     worksheets_info['tagColumnIndices'] = _get_spreadsheet_tag_column_indices(worksheets_info['columnNames']);
@@ -672,7 +672,7 @@ def _save_spreadsheet_file_to_upload_folder(spreadsheet_file_object):
     spreadsheet_file_path = _save_file_to_upload_folder(spreadsheet_file_object, spreadsheet_file_extension);
     return spreadsheet_file_path;
 
-def _get_excel_workbook_worksheet_names(workbook_file_path):
+def _get_excel_worksheet_names(workbook_file_path):
     """Gets the worksheet names in an Excel workbook.
 
     Parameters
@@ -779,5 +779,4 @@ def _get_worksheet_column_names(workbook_file_path, worksheet_name):
     return worksheet_column_names;
 
 if __name__ == '__main__':
-    app.config.update(TEMPLATES_AUTO_RELOAD=True);
-    app.run(debug=True);
+    app.run();
