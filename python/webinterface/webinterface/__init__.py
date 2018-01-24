@@ -134,7 +134,7 @@ def _validate_spreadsheet_after_submission(validation_form_request_object):
     spreadsheet_file = validation_form_request_object.files['spreadsheet'];
     if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
         try:
-            spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
+            spreadsheet_file_path = _save_spreadsheet_to_upload_folder(spreadsheet_file);
             validation_input_arguments = _get_validation_input_arguments_from_validation_form(
                 validation_form_request_object, spreadsheet_file_path);
             validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
@@ -441,7 +441,7 @@ def get_worksheets_info():
         worksheets_info = _initialize_worksheets_info_dictionary();
         if _spreadsheet_file_present_in_form(request):
             workbook_file = request.files['spreadsheet_file'];
-            workbook_file_path = _save_spreadsheet_file_to_upload_folder(workbook_file);
+            workbook_file_path = _save_spreadsheet_to_upload_folder(workbook_file);
             if workbook_file_path:
                 worksheets_info = _populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
     except:
@@ -486,7 +486,7 @@ def get_spreadsheet_columns_info():
         spreadsheet_columns_info = _initialize_spreadsheet_columns_info_dictionary();
         if _spreadsheet_file_present_in_form(request):
             spreadsheet_file = request.files['spreadsheet_file'];
-            spreadsheet_file_path = _save_spreadsheet_file_to_upload_folder(spreadsheet_file);
+            spreadsheet_file_path = _save_spreadsheet_to_upload_folder(spreadsheet_file);
             if spreadsheet_file_path and _worksheet_name_present_in_form(request):
                 worksheet_name = request.form['worksheet_name'];
                 spreadsheet_columns_info = _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, \
@@ -654,7 +654,7 @@ def _worksheet_name_present_in_form(validation_form_request_object):
     """
     return 'worksheet_name' in validation_form_request_object.form;
 
-def _save_spreadsheet_file_to_upload_folder(spreadsheet_file_object):
+def _save_spreadsheet_to_upload_folder(spreadsheet_file_object):
     """Save an spreadsheet file to the upload folder.
 
     Parameters
