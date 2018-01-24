@@ -7,9 +7,8 @@ from werkzeug.utils import secure_filename;
 from forms import ValidationForm;
 from hed_input_reader import HedInputReader;
 
-app = Flask(__name__)
-UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
-SECRET_KEY = os.urandom(24);
+app = Flask(__name__);
+app.config.from_object('config.Config');
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
@@ -781,6 +780,4 @@ def _get_worksheet_column_names(workbook_file_path, worksheet_name):
 
 if __name__ == '__main__':
     app.config.update(TEMPLATES_AUTO_RELOAD=True);
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER;
-    app.config['SECRET_KEY'] = SECRET_KEY;
     app.run(debug=True);
