@@ -1,15 +1,19 @@
 import json;
 import os;
 import tempfile;
+
 import xlrd;
 from flask import abort, Flask, render_template, request, Response;
 from werkzeug.utils import secure_filename;
+
 from forms import ValidationForm;
-from hed_input_reader import HedInputReader;
+from hedvalidation.hed_input_reader import HedInputReader;
+from hedvalidation.hed_dictionary import HedDictionary;
 
 app = Flask(__name__);
 app.config.from_object('config.Config');
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
+HED_FILE_EXTENSIONS = ['.xml'];
 TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
 REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
@@ -464,7 +468,23 @@ def _spreadsheet_file_present_in_form(validation_form_request_object):
         True if a spreadsheet file is present in a request object from the validation form.
 
     """
-    return 'spreadsheet_file' in validation_form_request_object.files
+    return 'spreadsheet_file' in validation_form_request_object.files;
+
+def _hed_file_present_in_form(validation_form_request_object):
+    """Checks to see if a HED XML file is present in a request object from validation form.
+
+    Parameters
+    ----------
+    validation_form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    boolean
+        True if a HED XML file is present in a request object from the validation form.
+
+    """
+    return 'hed_file' in validation_form_request_object.files;
 
 @app.route('/getspreadsheetcolumnsinfo', methods=['POST'])
 def get_spreadsheet_columns_info():
@@ -500,6 +520,55 @@ def get_spreadsheet_columns_info():
         return abort(500);
     finally:
         _delete_file_if_it_exist(spreadsheet_file_path);
+
+@app.route('/getmajorhedversions', methods=['GET'])
+def get_major_hed_versions():
+    """Gets information related to the spreadsheet columns.
+
+    This information contains the names of the spreadsheet columns and column indices that contain HED tags.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    string
+        A serialized JSON string containing information related to the spreadsheet columns.
+
+    """
+    hed_info = {};
+    try:
+        hed_info['major_versions'] = HedInputReader.get_all_hed_versions();
+        return json.dumps(hed_info);
+    except:
+        return abort(500);
+
+@app.route('/gethedversion', methods=['POST'])
+def get_hed_version_in_file():
+    """Gets information related to the spreadsheet columns.
+
+    This information contains the names of the spreadsheet columns and column indices that contain HED tags.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    string
+        A serialized JSON string containing information related to the spreadsheet columns.
+
+    """
+    hed_info = {};
+    try:
+        if _hed_file_present_in_form(request):
+            hed_file = request.files['hed_file'];
+            hed_file_path = _save_hed_to_upload_folder(hed_file);
+            hed_info['version'] = HedDictionary.get_hed_xml_version(hed_file_path);
+        return json.dumps(hed_info);
+    except:
+        return abort(500);
+
+
 
 def _initialize_worksheets_info_dictionary():
     """Initializes a dictionary that will hold information related to the Excel worksheets.
@@ -671,6 +740,24 @@ def _save_spreadsheet_to_upload_folder(spreadsheet_file_object):
     spreadsheet_file_extension = '.' + _get_file_extension(spreadsheet_file_object.filename);
     spreadsheet_file_path = _save_file_to_upload_folder(spreadsheet_file_object, spreadsheet_file_extension);
     return spreadsheet_file_path;
+
+def _save_hed_to_upload_folder(hed_file_object):
+    """Save an spreadsheet file to the upload folder.
+
+    Parameters
+    ----------
+    hed_file_object: File object
+        A file object that points to a HED XML file that was first saved in a temporary location.
+
+    Returns
+    -------
+    string
+        The path to the HED XML file that was saved to the upload folder.
+
+    """
+    hed_file_extension = '.' + _get_file_extension(hed_file_object.filename);
+    hed_file_path = _save_file_to_upload_folder(hed_file_object, hed_file_extension);
+    return hed_file_path;
 
 def _get_excel_worksheet_names(workbook_file_path):
     """Gets the worksheet names in an Excel workbook.

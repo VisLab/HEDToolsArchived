@@ -9,13 +9,6 @@
     font-size: 18px;
 }
 
-.form-group .btn {
-    background-color: gray;
-    opacity: .2;
-    border-type: solid;
-    border-color: black;
-}
-
 .form-group button, .form-group .btn, .form-group input[type="file"] {
     width: 10rem;
 }
@@ -42,8 +35,8 @@
     margin-left: auto;
 }
 
-.form-group input, .form-group .btn, .textbox-group label, .checkbox-group[type="checkbox"], #column-names,
-#other-hed-version label, select, button {
+.form-group input, .form-group, .textbox-group label, .checkbox-group[type="checkbox"], #column-names,
+#other-hed-version label, select, .spreadsheet-btn-group button, #submit {
     margin-left: 1.2rem;
 }
 
