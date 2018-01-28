@@ -27,7 +27,7 @@
         <div class="form-group">
             <p id="tag-columns-flash"></p>
             <label for="tag-columns">3) Select tag columns (comma-separated):</label><br>
-            <input type="text" name="tag-columns" id="tag-columns">
+            <input class="textbox-group" type="text" name="tag-columns" id="tag-columns">
         </div>
 
         <div class="form-group">
@@ -233,9 +233,9 @@
         }
 
         /**
-         * Clears the required tag column text boxes.
+         * Clears tag column text boxes.
          */
-        function clearRequiredTagColumnTextboxes() {
+        function clearTagColumnTextboxes() {
             $('.textbox-group input[type="text"]').val('');
         }
 
@@ -297,7 +297,7 @@
                 flashMessageOnScreen('Other HED version is not specified.', 'error', 'hed-flash');
                 return false;
             }
-                return true;
+            return true;
         }
 
         function spreadsheetIsSpecified() {
@@ -306,7 +306,7 @@
                 flashMessageOnScreen('Spreadsheet is not specified.', 'error', 'spreadsheet-flash');
                 return false;
             }
-                return true;
+            return true;
         }
 
         /**
@@ -547,6 +547,7 @@
          * This information contains the names of the columns and column indices that contain HED tags.
          */
         function setComponentsRelatedToSpreadsheetColumns(spreadsheetColumnsInfo) {
+            clearTagColumnTextboxes();
             if (spreadsheetColumnNamesAreEmpty(spreadsheetColumnsInfo['columnNames'])) {
                 setComponentsRelatedToEmptySpreadsheetColumnNames();
             } else {
@@ -557,11 +558,8 @@
             } else {
                 populateTagColumnsTextbox(spreadsheetColumnsInfo['tagColumnIndices']);
             }
-            if (dictionaryIsEmpty(spreadsheetColumnsInfo['requiredTagColumnIndices'])) {
-                clearRequiredTagColumnTextboxes();
-            } else {
+            if (!dictionaryIsEmpty(spreadsheetColumnsInfo['requiredTagColumnIndices'])) {
                 populateRequiredTagColumnTextboxes(spreadsheetColumnsInfo['requiredTagColumnIndices']);
-
             }
         }
 
@@ -589,7 +587,7 @@
          * Sets the components related to Excel worksheet columns when they are all empty.
          */
         function setComponentsRelatedToEmptySpreadsheetColumnNames() {
-            clearRequiredTagColumnTextboxes();
+            clearTagColumnTextboxes();
             setHasColumnNamesCheckboxToFalse();
             hideSpreadsheetColumnNamesTable();
         }
