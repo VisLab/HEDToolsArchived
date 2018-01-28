@@ -41,6 +41,7 @@ def validate_spreadsheet_from_form():
         return _validate_spreadsheet_after_submission(request);
     return render_template('validation.html', form=form);
 
+
 @app.route('/', strict_slashes=False, methods=['GET'])
 def render_main_page():
     """Handles the site root.
@@ -55,6 +56,7 @@ def render_main_page():
 
     """
     return render_template('hed.html')
+
 
 @app.route('/download/<filename>')
 def download_file_in_upload_directory(filename):
@@ -77,10 +79,12 @@ def download_file_in_upload_directory(filename):
                 for line in download_file:
                     yield line;
             _delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], filename));
+
         return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
-                                                                 filename});
+                                                                                           filename});
     except:
         abort(404);
+
 
 @app.route('/delete/<filename>')
 def delete_file_in_upload_directory(filename):
@@ -99,6 +103,7 @@ def delete_file_in_upload_directory(filename):
         return Response(status=204);
     else:
         abort(404);
+
 
 def _check_file_extension(filename, accepted_file_extensions):
     """Checks the file extension against a list of accepted ones.
@@ -120,6 +125,7 @@ def _check_file_extension(filename, accepted_file_extensions):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in accepted_file_extensions;
 
+
 def _validate_spreadsheet_after_submission(validation_form_request_object):
     """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
 
@@ -136,11 +142,13 @@ def _validate_spreadsheet_after_submission(validation_form_request_object):
     """
     validation_status = {};
     spreadsheet_file = validation_form_request_object.files['spreadsheet'];
+    hed_file = validation_form_request_object.files['hed'];
     if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
         try:
             spreadsheet_file_path = _save_spreadsheet_to_upload_folder(spreadsheet_file);
+            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
             validation_input_arguments = _get_validation_input_arguments_from_validation_form(
-                validation_form_request_object, spreadsheet_file_path);
+                validation_form_request_object, spreadsheet_file_path, hed_file_path);
             validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
             validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
                 spreadsheet_file.filename, validation_issues);
@@ -149,10 +157,34 @@ def _validate_spreadsheet_after_submission(validation_form_request_object):
             return abort(500);
         finally:
             _delete_file_if_it_exist(spreadsheet_file_path);
+            _delete_file_if_it_exist(hed_file_path);
     return json.dumps(validation_status);
 
+
+def _save_hed_to_upload_folder_if_present(hed_file_object):
+    """Save a HED XML file to the upload folder.
+
+    Parameters
+    ----------
+    hed_file_object: File object
+        A file object that points to a HED XML file that was first saved in a temporary location.
+
+    Returns
+    -------
+    string
+        The path to the HED XML file that was saved to the upload folder.
+
+    """
+    hed_file_path = '';
+    if hed_file_object.filename:
+        hed_file_extension = '.' + _get_file_extension(hed_file_object.filename);
+        hed_file_path = _save_file_to_upload_folder(hed_file_object, hed_file_extension);
+    return hed_file_path;
+
+
 def _get_the_number_of_rows_with_validation_issues(validation_issues):
-    """Gets the number of rows in the spreadsheet that has validation issues.
+    """Gets the number of rows in the spreadsheet that has val
+    idation issues.
 
     Parameters
     ----------
@@ -171,6 +203,7 @@ def _get_the_number_of_rows_with_validation_issues(validation_issues):
             if not validation_issue_line.startswith('\t'):
                 number_of_rows_with_issues += 1;
     return number_of_rows_with_issues;
+
 
 def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues):
     """Saves the validation issues found to a file in the upload folder.
@@ -194,6 +227,7 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, vali
         validation_issues_file.write(validation_issues);
     return validation_issues_filename;
 
+
 def _file_has_valid_extension(file_object, accepted_file_extensions):
     """Checks to see if a file has a valid file extension.
 
@@ -212,6 +246,7 @@ def _file_has_valid_extension(file_object, accepted_file_extensions):
     """
     return file_object and _check_file_extension(file_object.filename, accepted_file_extensions);
 
+
 def _generate_spreadsheet_validation_filename(spreadsheet_filename):
     """Generates a filename for the attachment that will contain the spreadsheet validation issues.
 
@@ -225,6 +260,7 @@ def _generate_spreadsheet_validation_filename(spreadsheet_filename):
         The name of the attachment file containing the validation issues.
     """
     return 'validated_' + secure_filename(spreadsheet_filename).rsplit('.')[0] + '.txt';
+
 
 def _get_file_extension(file_name_or_path):
     """Get the file extension from the specified filename. This can be the full path or just the name of the file.
@@ -241,14 +277,16 @@ def _get_file_extension(file_name_or_path):
        """
     return secure_filename(file_name_or_path).rsplit('.')[-1];
 
-def _get_validation_input_arguments_from_validation_form(validation_form_request_object, workbook_file_path):
+
+def _get_validation_input_arguments_from_validation_form(validation_form_request_object, spreadsheet_file_path,
+                                                         hed_file_path):
     """Gets the validation function input arguments from a request object associated with the validation form.
 
     Parameters
     ----------
     validation_form_request_object: Request object
         A Request object containing user data from the validation form.
-    workbook_file_path: string
+    spreadsheet_file_path: string
         The path to the workbook file.
 
     Returns
@@ -257,7 +295,10 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
         A dictionary containing input arguments for calling the underlying validation function.
     """
     validation_input_arguments = {};
-    validation_input_arguments['spreadsheet_path'] = workbook_file_path;
+    validation_input_arguments['spreadsheet_path'] = spreadsheet_file_path;
+    validation_input_arguments['hed_path'] = get_hed_path_from_validation_form(validation_form_request_object,
+                                                                               hed_file_path);
+    print(validation_input_arguments['hed_path']);
     validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag-columns'].split(','))
     validation_input_arguments['required_tag_columns'] = \
         get_required_tag_columns_from_validation_form(validation_form_request_object);
@@ -268,6 +309,12 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     validation_input_arguments['check_for_warnings'] = _get_optional_validation_form_field(
         validation_form_request_object, 'generate-warnings', 'boolean');
     return validation_input_arguments;
+
+def get_hed_path_from_validation_form(validation_form_request_object, hed_file_path):
+    if not hed_file_path:
+        return HedInputReader.get_path_from_hed_version(validation_form_request_object.form['hed-version']);
+    return hed_file_path;
+
 
 def get_required_tag_columns_from_validation_form(validation_form_request_object):
     """Gets the validation function input arguments from a request object associated with the validation form.
@@ -285,13 +332,14 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
     """
     required_tag_columns = {};
     for tag_column_name in REQUIRED_TAG_COLUMN_NAMES:
-        form_tag_column_name = tag_column_name.lower()+'-column';
+        form_tag_column_name = tag_column_name.lower() + '-column';
         if form_tag_column_name in validation_form_request_object.form:
             tag_column_name_index = validation_form_request_object.form[form_tag_column_name].strip();
             if tag_column_name_index:
                 tag_column_name_index = int(tag_column_name_index);
                 required_tag_columns[tag_column_name_index] = tag_column_name;
     return required_tag_columns;
+
 
 def _get_optional_validation_form_field(validation_form_request_object, form_field_name, type=''):
     """Gets the specified optional form field if present.
@@ -319,6 +367,7 @@ def _get_optional_validation_form_field(validation_form_request_object, form_fie
             form_field_value = validation_form_request_object.form[form_field_name];
     return form_field_value;
 
+
 def _delete_file_if_it_exist(file_path):
     """Deletes a file if it exist.
 
@@ -336,6 +385,7 @@ def _delete_file_if_it_exist(file_path):
         os.remove(file_path);
         return True;
     return False;
+
 
 def _create_upload_folder_if_needed():
     """Checks to see if the upload folder exist. If it doesn't then it creates it.
@@ -373,6 +423,7 @@ def _save_file_to_upload_folder(file_object, file_suffix=""):
     _copy_file_line_by_line(file_object, temporary_upload_file);
     return temporary_upload_file.name;
 
+
 def _copy_file_line_by_line(file_object_1, file_object_2):
     """Copy the contents of one file to the other file.
 
@@ -395,6 +446,7 @@ def _copy_file_line_by_line(file_object_1, file_object_2):
         return True;
     except:
         return False;
+
 
 def _report_spreadsheet_validation_issues(validation_arguments):
     """Validates the HED tags in a worksheet by calling the validateworksheethedtags() function using the MATLAB engine.
@@ -420,7 +472,8 @@ def _report_spreadsheet_validation_issues(validation_arguments):
                                       has_column_names=validation_arguments['has_column_names'],
                                       required_tag_columns=validation_arguments['required_tag_columns'],
                                       worksheet_name=validation_arguments['worksheet'],
-                                      check_for_warnings=validation_arguments['check_for_warnings']);
+                                      check_for_warnings=validation_arguments['check_for_warnings'],
+                                      hed_xml_file=validation_arguments['hed_path']);
     return hed_input_reader.get_validation_issues();
 
 
@@ -454,6 +507,7 @@ def get_worksheets_info():
         _delete_file_if_it_exist(workbook_file_path);
     return json.dumps(worksheets_info);
 
+
 def _spreadsheet_file_present_in_form(validation_form_request_object):
     """Checks to see if a spreadsheet file is present in a request object from validation form.
 
@@ -470,6 +524,7 @@ def _spreadsheet_file_present_in_form(validation_form_request_object):
     """
     return 'spreadsheet_file' in validation_form_request_object.files;
 
+
 def _hed_file_present_in_form(validation_form_request_object):
     """Checks to see if a HED XML file is present in a request object from validation form.
 
@@ -485,6 +540,7 @@ def _hed_file_present_in_form(validation_form_request_object):
 
     """
     return 'hed_file' in validation_form_request_object.files;
+
 
 @app.route('/getspreadsheetcolumnsinfo', methods=['POST'])
 def get_spreadsheet_columns_info():
@@ -521,6 +577,7 @@ def get_spreadsheet_columns_info():
     finally:
         _delete_file_if_it_exist(spreadsheet_file_path);
 
+
 @app.route('/getmajorhedversions', methods=['GET'])
 def get_major_hed_versions():
     """Gets information related to the spreadsheet columns.
@@ -542,6 +599,7 @@ def get_major_hed_versions():
         return json.dumps(hed_info);
     except:
         return abort(500);
+
 
 @app.route('/gethedversion', methods=['POST'])
 def get_hed_version_in_file():
@@ -569,7 +627,6 @@ def get_hed_version_in_file():
         return abort(500);
 
 
-
 def _initialize_worksheets_info_dictionary():
     """Initializes a dictionary that will hold information related to the Excel worksheets.
 
@@ -588,6 +645,7 @@ def _initialize_worksheets_info_dictionary():
     worksheets_info = {'worksheetNames': [], 'columnNames': [], 'tagColumnIndices': []};
     return worksheets_info;
 
+
 def _initialize_spreadsheet_columns_info_dictionary():
     """Initializes a dictionary that will hold information related to the spreadsheet columns.
 
@@ -604,6 +662,7 @@ def _initialize_spreadsheet_columns_info_dictionary():
     """
     worksheet_columns_info = {'columnNames': [], 'tagColumnIndices': []};
     return worksheet_columns_info;
+
 
 def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
     """Populate dictionary with information related to the Excel worksheets.
@@ -626,11 +685,12 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
     """
     worksheets_info['worksheetNames'] = _get_excel_worksheet_names(spreadsheet_file_path);
     worksheets_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
-                                                                            worksheets_info['worksheetNames'][0]);
+                                                                 worksheets_info['worksheetNames'][0]);
     worksheets_info['tagColumnIndices'] = _get_spreadsheet_tag_column_indices(worksheets_info['columnNames']);
     worksheets_info['requiredTagColumnIndices'] = \
         _get_spreadsheet_required_tag_column_indices(worksheets_info['columnNames']);
     return worksheets_info;
+
 
 def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
                                                   worksheet_name=''):
@@ -666,6 +726,7 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
         _get_spreadsheet_required_tag_column_indices(spreadsheet_columns_info['columnNames']);
     return spreadsheet_columns_info;
 
+
 def get_text_file_column_names(text_file_path, column_delimiter):
     """Gets the text spreadsheet column names.
 
@@ -687,6 +748,7 @@ def get_text_file_column_names(text_file_path, column_delimiter):
         text_file_columns = first_line.split(column_delimiter);
     return text_file_columns;
 
+
 def get_column_delimiter_based_on_file_extension(file_name_or_path):
     """Gets the spreadsheet column delimiter based on the file extension.
 
@@ -707,6 +769,7 @@ def get_column_delimiter_based_on_file_extension(file_name_or_path):
         column_delimiter = SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY.get(file_extension);
     return column_delimiter;
 
+
 def _worksheet_name_present_in_form(validation_form_request_object):
     """Checks to see if a worksheet name is present in a request object from the validation form.
 
@@ -722,6 +785,7 @@ def _worksheet_name_present_in_form(validation_form_request_object):
 
     """
     return 'worksheet_name' in validation_form_request_object.form;
+
 
 def _save_spreadsheet_to_upload_folder(spreadsheet_file_object):
     """Save an spreadsheet file to the upload folder.
@@ -741,6 +805,7 @@ def _save_spreadsheet_to_upload_folder(spreadsheet_file_object):
     spreadsheet_file_path = _save_file_to_upload_folder(spreadsheet_file_object, spreadsheet_file_extension);
     return spreadsheet_file_path;
 
+
 def _save_hed_to_upload_folder(hed_file_object):
     """Save an spreadsheet file to the upload folder.
 
@@ -759,6 +824,7 @@ def _save_hed_to_upload_folder(hed_file_object):
     hed_file_path = _save_file_to_upload_folder(hed_file_object, hed_file_extension);
     return hed_file_path;
 
+
 def _get_excel_worksheet_names(workbook_file_path):
     """Gets the worksheet names in an Excel workbook.
 
@@ -776,6 +842,7 @@ def _get_excel_worksheet_names(workbook_file_path):
     opened_workbook_file = xlrd.open_workbook(workbook_file_path);
     worksheet_names = opened_workbook_file.sheet_names();
     return worksheet_names;
+
 
 def _get_spreadsheet_tag_column_indices(column_names):
     """Gets the tag column indices in a spreadsheet. The indices found will be one-based.
@@ -797,6 +864,7 @@ def _get_spreadsheet_tag_column_indices(column_names):
         if tag_column_index != -1:
             tag_column_indices.append(tag_column_index);
     return tag_column_indices;
+
 
 def _get_spreadsheet_required_tag_column_indices(column_names):
     """Gets the required tag column indices in a spreadsheet. The indices found will be one-based.
@@ -822,6 +890,7 @@ def _get_spreadsheet_required_tag_column_indices(column_names):
                 required_tag_column_indices[required_tag_column_name] = required_tag_column_index;
     return required_tag_column_indices;
 
+
 def _find_str_index_in_list(list_of_strs, str_value):
     """Find the index of a string value in a list.
 
@@ -844,6 +913,7 @@ def _find_str_index_in_list(list_of_strs, str_value):
     except ValueError:
         return -1;
 
+
 def _get_worksheet_column_names(workbook_file_path, worksheet_name):
     """Get the worksheet columns in a Excel workbook.
 
@@ -862,8 +932,10 @@ def _get_worksheet_column_names(workbook_file_path, worksheet_name):
     """
     opened_workbook_file = xlrd.open_workbook(workbook_file_path);
     opened_worksheet = opened_workbook_file.sheet_by_name(worksheet_name);
-    worksheet_column_names = [opened_worksheet.cell(0, col_index).value for col_index in xrange(opened_worksheet.ncols)];
+    worksheet_column_names = [opened_worksheet.cell(0, col_index).value for col_index in
+                              xrange(opened_worksheet.ncols)];
     return worksheet_column_names;
+
 
 if __name__ == '__main__':
     app.run();
