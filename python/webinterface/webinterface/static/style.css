@@ -17,8 +17,12 @@
     display: block;
 }
 
-.form-group, #submit {
+.form-group, .flash {
     margin-bottom: 1rem;
+}
+
+.flash {
+    margin-top: 1rem;
 }
 
 .form-group label {

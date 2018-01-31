@@ -20,6 +20,7 @@ REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category
                                         'Description': ['Description', 'Description in text', 'Event Description'],
                                         'Label': ['Label', 'Event Label', 'Short Label']};
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
+OTHER_HED_VERSION_OPTION = 'Other';
 
 
 @app.route('/validation', strict_slashes=False, methods=['GET', 'POST'])
@@ -151,7 +152,7 @@ def _validate_spreadsheet_after_submission(validation_form_request_object):
                 validation_form_request_object, spreadsheet_file_path, hed_file_path);
             validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
             validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
-                spreadsheet_file.filename, validation_issues);
+                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
             validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
         except:
             return abort(500);
@@ -205,13 +206,15 @@ def _get_the_number_of_rows_with_validation_issues(validation_issues):
     return number_of_rows_with_issues;
 
 
-def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues):
+def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues, worksheet_name=''):
     """Saves the validation issues found to a file in the upload folder.
 
     Parameters
     ----------
     spreadsheet_file_name: string
         The name of the spreadsheet.
+    worksheet_name: string
+        The name of the spreadsheet worksheet.
     validation_issues: string
         A string containing the validation issues.
 
@@ -221,7 +224,8 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, vali
         The name of the validation output file.
 
     """
-    validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_file_name);
+
+    validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_file_name, worksheet_name);
     validation_issues_file_path = os.path.join(app.config['UPLOAD_FOLDER'], validation_issues_filename);
     with open(validation_issues_file_path, 'w') as validation_issues_file:
         validation_issues_file.write(validation_issues);
@@ -247,18 +251,24 @@ def _file_has_valid_extension(file_object, accepted_file_extensions):
     return file_object and _check_file_extension(file_object.filename, accepted_file_extensions);
 
 
-def _generate_spreadsheet_validation_filename(spreadsheet_filename):
+def _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name=''):
     """Generates a filename for the attachment that will contain the spreadsheet validation issues.
 
     Parameters
     ----------
     spreadsheet_filename: string
         The name of the spreadsheet file.
+    worksheet_name: string
+        The name of the spreadsheet worksheet.
     Returns
     -------
     string
         The name of the attachment file containing the validation issues.
     """
+    print(worksheet_name)
+    if worksheet_name:
+        return 'validated_' + secure_filename(spreadsheet_filename).rsplit('.')[0] + '_' + \
+               secure_filename(worksheet_name) + '.txt';
     return 'validated_' + secure_filename(spreadsheet_filename).rsplit('.')[0] + '.txt';
 
 
@@ -311,7 +321,7 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     return validation_input_arguments;
 
 def get_hed_path_from_validation_form(validation_form_request_object, hed_file_path):
-    if not hed_file_path:
+    if validation_form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path:
         return HedInputReader.get_path_from_hed_version(validation_form_request_object.form['hed-version']);
     return hed_file_path;
 
