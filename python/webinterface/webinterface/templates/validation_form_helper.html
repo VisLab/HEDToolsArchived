@@ -94,20 +94,31 @@
             populateHEDVersionsDropdown();
         }
 
+        /**
+         * Gets the static data that the form uses.
+         */
         function getStaticFormData() {
             getHEDVersions();
         }
 
 
+        /**
+         * Populates the HED version drop-down menu.
+         * @param {Array} hedVersions - An array containing the HED versions.
+         */
         function populateHEDVersionsDropdown(hedVersions) {
             var hedVersionDropdown = $('#hed-version');
             hedVersionDropdown.append('<option value=' + hedVersions[0] + '>' + hedVersions[0] + ' (Latest)</option>');
             for (var i = 1; i < hedVersions.length; i++) {
                 hedVersionDropdown.append('<option value=' + hedVersions[i] + '>' + hedVersions[i] + '</option>');
             }
-            hedVersionDropdown.append('<option value=' + OTHER_HED_VERSION_OPTION + '>' + OTHER_HED_VERSION_OPTION + '</option>');
+            hedVersionDropdown.append('<option value=' + OTHER_HED_VERSION_OPTION + '>' + OTHER_HED_VERSION_OPTION +
+                '</option>');
         }
 
+        /**
+         * Gets the HED versions that are in the HED version drop-down menu.
+         */
         function getHEDVersions() {
             $.ajax({
                     type: 'GET',
@@ -127,6 +138,10 @@
             );
         }
 
+        /**
+         * Event handler function when the HED version drop-down menu changes. If Other is selected the file browser
+         * underneath it will appear. If another option is selected then it will disappear.
+         */
         $('#hed-version').change(function () {
             if ($(this).val() === OTHER_HED_VERSION_OPTION) {
                 $('#other-hed-version').show();
@@ -152,7 +167,7 @@
         });
 
         /**
-         * Checks if the file uploaded has a valid spreadsheet extension.
+         * Spreadsheet event handler function. Checks if the file uploaded has a valid spreadsheet extension.
          */
         $('#spreadsheet').change(function () {
             var spreadsheet = $('#spreadsheet');
@@ -176,11 +191,20 @@
             }
         });
 
+
+        /**
+         * Updates the spreadsheet file label.
+         * @param {String} spreadsheetPath - The path to the spreadsheet.
+         */
         function updateSpreadsheetFileLabel(spreadsheetPath) {
             var spreadsheetFilename = spreadsheetPath.split('\\').pop();
             $('#spreadsheet-filename').text(spreadsheetFilename);
         }
 
+        /**
+         * Updates the HED file label.
+         * @param {String} hedPath - The path to the HED XML file.
+         */
         function updateHEDFileLabel(hedPath) {
             var hedFilename = hedPath.split('\\').pop();
             $('#hed-filename').text(hedFilename);
@@ -202,14 +226,15 @@
         }
 
         /**
-         * Hides the flash messages that aren't related to the form submission.
+         * Resets the flash messages that aren't related to the form submission.
+         * @param {String} message - If true, reset the flash message related to the submit button.
          */
-        function resetFlashMessages(hideSubmitFlash) {
+        function resetFlashMessages(resetSubmitFlash) {
             flashMessageOnScreen('', 'success', 'spreadsheet-flash');
             flashMessageOnScreen('', 'success', 'worksheet-flash');
             flashMessageOnScreen('', 'success', 'tag-columns-flash');
             flashMessageOnScreen('', 'success', 'hed-flash');
-            if (hideSubmitFlash) {
+            if (resetSubmitFlash) {
                 flashMessageOnScreen('', 'success', 'submit-flash');
             }
         }
@@ -289,7 +314,10 @@
             flashMessageOnScreen('Worksheet is being validated ...', 'success', 'submit-flash')
         }
 
-        function otherHEDVersionIsSpecified() {
+        /**
+         * Checks to see if a HED XML file is specified when the HED drop-down is set to "Other".
+         */
+        function hedSpecifiedWhenOtherIsSelected() {
             var hedFile = $('#hed');
             var hedFileIsEmpty = hedFile[0].files.length === 0;
             if ($('#hed-version').val() === OTHER_HED_VERSION_OPTION && hedFileIsEmpty) {
@@ -299,6 +327,9 @@
             return true;
         }
 
+        /**
+         * Checks to see if a spreadsheet has been specified.
+         */
         function spreadsheetIsSpecified() {
             var spreadsheetFile = $('#spreadsheet');
             if (spreadsheetFile[0].files.length === 0) {
@@ -312,7 +343,7 @@
          * Submits the form if the tag columns textbox is valid.
          */
         $('#submit').click(function () {
-            if (spreadsheetIsSpecified() && tagColumnsTextboxIsValid() && otherHEDVersionIsSpecified()) {
+            if (spreadsheetIsSpecified() && tagColumnsTextboxIsValid() && hedSpecifiedWhenOtherIsSelected()) {
                 submitForm();
             }
         });
@@ -535,6 +566,9 @@
             $('#column-names').show();
         }
 
+        /**
+         * Hides the HED XML file upload.
+         */
         function hideOtherHEDVersionFileUpload() {
             $('#other-hed-version').hide();
         }
@@ -565,8 +599,6 @@
         /**
          * Sets the components related to the spreadsheet columns when they are not empty.
          * @param {Array} columnNames - An array containing the spreadsheet column names.
-         * @param {Array} spreadsheetTagColumnIndices - An integer array of tag column indices found in the spreadsheet
-         * columns.
          */
         function setComponentsRelatedToNonEmptySpreadsheetColumnNames(columnNames) {
             populateSpreadsheetColumnNamesTable(columnNames);
