@@ -3,13 +3,12 @@
     opacity: 0;
 }
 
-.form-group input[type="text"], .form-group input[type="file"], .form-group select, .form-group button,
-.form-group .btn {
+.form-group input[type="text"], .form-group input[type="file"], .form-group select, .form-group button {
     height: 2.35rem;
     font-size: 18px;
 }
 
-.form-group button, .form-group .btn, .form-group input[type="file"] {
+.form-group button, .form-group input[type="file"] {
     width: 10rem;
 }
 
@@ -42,7 +41,7 @@
     margin-left: 1.2rem;
 }
 
-.textbox-group, .checkbox-group, .secondary-label, button, select, table {
+.textbox-group, .checkbox-group, .secondary-label, .form-group button, .form-group select, .form-group table {
     margin-left: 1.2rem;
 }
 
