@@ -14,7 +14,7 @@ app = Flask(__name__);
 app.config.from_object('config.Config');
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
-TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
+TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag'];
 REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
 REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
@@ -58,6 +58,22 @@ def render_main_page():
 
     """
     return render_template('hed.html')
+
+
+@app.route('/doc', strict_slashes=False, methods=['GET'])
+def render_doc_page():
+    """Handles the site root.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Rendered template
+        A rendered template for the main page.
+
+    """
+    return render_template('doc.html')
 
 
 @app.route('/download/<filename>')
@@ -920,7 +936,7 @@ def _find_str_index_in_list(list_of_strs, str_value):
 
     """
     try:
-        return [s.lower() for s in list_of_strs].index(str_value.lower()) + 1;
+        return [s.lower().strip() for s in list_of_strs].index(str_value.lower()) + 1;
     except ValueError:
         return -1;
 
