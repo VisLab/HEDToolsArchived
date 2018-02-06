@@ -4,7 +4,7 @@
         {{ form.csrf_token }}
 
         <div class="form-group">
-            <label for="spreadsheet">1) Select spreadsheet:</label><br>
+            <label for="spreadsheet">1) Select spreadsheet (excel or text):</label><br>
             <label class="btn-group file-browse-group spreadsheet-btn-group">
                 <button for="spreadsheet">Browse ...</button>
                 <label id="spreadsheet-filename"></label>
@@ -33,8 +33,8 @@
                 <input type="text" name="description-column" id="description-column">
                 <label for="label-column">Label</label>
                 <input type="text" name="label-column" id="label-column">
-                <label for="longname-column">Long name</label>
-                <input type="text" name="longname-column" id="longname-column">
+                <label for="long-column">Long name</label>
+                <input type="text" name="long-column" id="long-column">
             </div>
             <label class="secondary-label" for="tag-columns">Other columns containing tags
                 (comma-separated):</label><br>

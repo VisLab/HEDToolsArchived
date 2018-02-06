@@ -15,10 +15,11 @@ app.config.from_object('config.Config');
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
 TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags'];
-REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label'];
+REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
 REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
-                                        'Label': ['Label', 'Event Label', 'Short Label']};
+                                        'Label': ['Label', 'Event Label', 'Short Label'],
+                                        'Long': ['Long name']};
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 OTHER_HED_VERSION_OPTION = 'Other';
 
