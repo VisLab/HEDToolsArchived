@@ -17,7 +17,7 @@
     display: block;
 }
 
-.form-group, .flash {
+.form-group, .textbox-group, .flash {
     margin-bottom: 1rem;
 }
 
@@ -36,11 +36,13 @@
 
 .textbox-group input[type="text"] {
     width: 4rem;
-    margin-left: auto;
 }
 
-.form-group input, .form-group, .textbox-group label, .checkbox-group[type="checkbox"], #column-names,
-#other-hed-version label, select, .spreadsheet-btn-group button, #submit {
+.textbox-group label:not(:first-child), .checkbox-group input[type="checkbox"]:not(:first-child){
+    margin-left: 1.2rem;
+}
+
+.textbox-group, .checkbox-group, .secondary-label, button, select, table {
     margin-left: 1.2rem;
 }
 

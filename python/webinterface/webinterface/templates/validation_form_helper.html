@@ -20,17 +20,12 @@
         </div>
 
         <div class="form-group" id="column-names">
-            <label for="columns-names-table">Spreadsheet columns</label>
+            <label class="secondary-label" for="columns-names-table">Spreadsheet columns</label>
             <table id="columns-names-table"></table>
         </div>
 
         <div class="form-group">
-            <label for="tag-columns">3) Select tag columns (comma-separated):</label><br>
-            <input class="textbox-group" type="text" name="tag-columns" id="tag-columns">
-        </div>
-
-        <div class="form-group">
-            <label>4) Specify columns corresponding to required tags:</label><br>
+            <label>3) Columns corresponding to specific tags (if available):</label><br>
             <div class="textbox-group">
                 <label for="category-column">Category</label>
                 <input type="text" name="category-column" id="category-column">
@@ -38,7 +33,12 @@
                 <input type="text" name="description-column" id="description-column">
                 <label for="label-column">Label</label>
                 <input type="text" name="label-column" id="label-column">
+                <label for="longname-column">Long name</label>
+                <input type="text" name="longname-column" id="longname-column">
             </div>
+            <label class="secondary-label" for="tag-columns">Other columns containing tags
+                (comma-separated):</label><br>
+            <input class="textbox-group" type="text" name="tag-columns" id="tag-columns">
             <p class="flash" id="tag-columns-flash"></p>
         </div>
 
@@ -48,7 +48,7 @@
         </div>
 
         <div class="form-group" id="other-hed-version">
-            <label for="hed">Upload HED version:</label>
+            <label class="secondary-label" for="hed">Upload HED version:</label>
             <label class="btn-group file-browse-group">
                 <button for="hed">Browse ...</button>
                 <label id="hed-filename"></label>
@@ -481,7 +481,7 @@
                 processData: false,
                 dataType: 'json',
                 success: function (hedInfo) {
-                    flashMessageOnScreen('Using HED Version ' + hedInfo['version'] + '.', 'success', 'hed-flash');
+                    flashMessageOnScreen('Using HED version ' + hedInfo['version'] + '.', 'success', 'hed-flash');
                 },
                 error: function () {
                     flashMessageOnScreen('Could not get version number from HED XML file.', 'error', 'hed-flash');
