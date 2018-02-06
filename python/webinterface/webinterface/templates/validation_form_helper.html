@@ -284,6 +284,8 @@
                 flashMessage.style.backgroundColor = 'lightcoral';
             } else if ("success" == category) {
                 flashMessage.style.backgroundColor = 'palegreen';
+            } else if ("warning" == category) {
+                flashMessage.style.backgroundColor = 'darkorange';
             } else {
                 flashMessage.style.backgroundColor = '#f0f0f5';
             }
@@ -535,7 +537,7 @@
         function flashSpreadsheetTagColumnCountMessage(TagColumnIndices, requiredTagColumnIndices) {
             var numberOfTagColumns = (TagColumnIndices.length + Object.keys(requiredTagColumnIndices).length).toString();
             if (numberOfTagColumns == '0') {
-                flashMessageOnScreen('No tag column(s) found... Using the 2nd column', 'error', 'tag-columns-flash');
+                flashMessageOnScreen('No tag column(s) found... Using the 2nd column', 'warning', 'tag-columns-flash');
             } else {
                 flashMessageOnScreen(numberOfTagColumns + ' tag column(s) found', 'success', 'tag-columns-flash');
             }
