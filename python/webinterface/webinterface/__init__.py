@@ -60,7 +60,7 @@ def render_main_page():
     return render_template('hed.html')
 
 
-@app.route('/doc', strict_slashes=False, methods=['GET'])
+@app.route('/help', strict_slashes=False, methods=['GET'])
 def render_doc_page():
     """Handles the site root.
 
@@ -73,7 +73,7 @@ def render_doc_page():
         A rendered template for the main page.
 
     """
-    return render_template('doc.html')
+    return render_template('help.html')
 
 
 @app.route('/download/<filename>')
