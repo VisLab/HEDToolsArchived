@@ -375,6 +375,7 @@ a:hover {
     padding-top: 2rem;
     margin-top: 2rem;
     border-top: solid 1px #eff0f1;
+    width: 100%;
 }
 
 .site-footer p {
