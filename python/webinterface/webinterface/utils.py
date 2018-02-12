@@ -6,6 +6,8 @@ from flask import abort;
 from werkzeug.utils import secure_filename;
 from hedvalidation.hed_input_reader import HedInputReader;
 from webinterface import app;
+from logging.handlers import RotatingFileHandler;
+from logging import ERROR;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
@@ -18,6 +20,21 @@ REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 OTHER_HED_VERSION_OPTION = 'Other';
 
+
+def setup_logging():
+    """Sets up the application logging. If the log directory does not exist then there will be no logging.
+
+    """
+    if not app.debug and os.path.exists(app.config['LOG_DIRECTORY']):
+        file_handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=10*1024*1024, backupCount=5);
+        file_handler.setLevel(ERROR);
+        app.logger.addHandler(file_handler);
+
+def setup_upload_directory():
+    """Sets up upload directory.
+
+    """
+    _create_folder_if_needed(app.config['UPLOAD_FOLDER']);
 
 def _check_file_extension(filename, accepted_file_extensions):
     """Checks the file extension against a list of accepted ones.
@@ -178,7 +195,6 @@ def _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_na
     string
         The name of the attachment file containing the validation issues.
     """
-    print(worksheet_name)
     if worksheet_name:
         return 'validated_' + secure_filename(spreadsheet_filename).rsplit('.')[0] + '_' + \
                secure_filename(worksheet_name) + '.txt';
@@ -221,7 +237,6 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     validation_input_arguments['spreadsheet_path'] = spreadsheet_file_path;
     validation_input_arguments['hed_path'] = get_hed_path_from_validation_form(validation_form_request_object,
                                                                                hed_file_path);
-    print(validation_input_arguments['hed_path']);
     validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag-columns'].split(','))
     validation_input_arguments['required_tag_columns'] = \
         get_required_tag_columns_from_validation_form(validation_form_request_object);
@@ -345,7 +360,6 @@ def _save_file_to_upload_folder(file_object, file_suffix=""):
         The path to the file that was saved to the temporary folder.
 
     """
-    _create_folder_if_needed(app.config['UPLOAD_FOLDER']);
     temporary_upload_file = tempfile.NamedTemporaryFile(suffix=file_suffix, delete=False, \
                                                         dir=app.config['UPLOAD_FOLDER']);
     _copy_file_line_by_line(file_object, temporary_upload_file);
@@ -749,9 +763,3 @@ def _get_worksheet_column_names(workbook_file_path, worksheet_name):
     worksheet_column_names = [opened_worksheet.cell(0, col_index).value for col_index in
                               xrange(opened_worksheet.ncols)];
     return worksheet_column_names;
-
-# if not app.debug:
-#     _create_folder_if_needed(app.config['LOG_FILE'])
-#     file_handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=10000, backupCount=1);
-#     file_handler.setLevel(ERROR);
-#     app.logger.addHandler(file_handler);
