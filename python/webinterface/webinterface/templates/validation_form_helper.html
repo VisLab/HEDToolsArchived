@@ -246,6 +246,7 @@
         $('#worksheet').change(function () {
             var spreadsheetFile = $('#spreadsheet')[0].files[0];
             var worksheetName = $('#worksheet option:selected').text();
+            resetFlashMessages(true);
             getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName);
         });
 
