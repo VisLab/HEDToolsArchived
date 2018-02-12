@@ -16,7 +16,7 @@
                 crossorigin="anonymous"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="shortcut icon" href="static/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="static/style.css">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
         <title>
             {% block title %}
             {% endblock %}
