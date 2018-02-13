@@ -15,6 +15,16 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
                 crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            var csrf_token = "{{ csrf_token() }}";
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+        </script>
         <link rel="shortcut icon" href="static/favicon.ico">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
         <title>
@@ -29,7 +39,7 @@
     <h1 class="project-name">Hierarchical Event Descriptor (HED) Validator</h1>
     <h2 class="project-tagline">Validating HED tags in spreadsheets</h2>
     <a href="{{ url_for('render_main_page') }}" class="btn">What is HED?</a>
-    <a href="{{ url_for('validate_spreadsheet_from_form') }}" class="btn">Validate HED</a>
+    <a href="{{ url_for('render_validation_form') }}" class="btn">Validate HED</a>
     <a href="{{ url_for('render_help_page') }}" class="btn">HED validator help</a>
     <a href="http://www.hedtags.org/" class="btn">HED documentation</a>
     <a href="http://visual.cs.utsa.edu/contact-info" class="btn">Contact us</a>

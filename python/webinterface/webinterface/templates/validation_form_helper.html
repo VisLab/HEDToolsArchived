@@ -1,7 +1,6 @@
-{% macro create_validation_form(form) %}
-    {% from "formhelpers.html" import render_field %}
+{% macro create_validation_form() %}
     <form id="validation-form" method="POST" enctype="multipart/form-data">
-        {{ form.csrf_token }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
         <div class="form-group">
             <label for="spreadsheet">1) Select spreadsheet (excel or text):</label><br>
@@ -360,13 +359,14 @@
             flashSubmitMessage();
             $.ajax({
                     type: 'POST',
-                    url: "{{url_for('validate_spreadsheet_from_form')}}",
+                    url: "{{url_for('validate_spreadsheet_after_submission')}}",
                     data: formData,
                     contentType: false,
                     processData: false,
                     dataType: 'json',
                     success: function (validationStatus) {
                         if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
+                            console.log(validationStatus['downloadFile']);
                             window.location = '/download/' + validationStatus['downloadFile'];
                         } else {
                             window.location = '/delete/' + validationStatus['downloadFile'];
