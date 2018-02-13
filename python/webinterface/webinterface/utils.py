@@ -57,41 +57,6 @@ def _check_file_extension(filename, accepted_file_extensions):
            filename.rsplit('.', 1)[1].lower() in accepted_file_extensions;
 
 
-def validate_spreadsheet_after_submission(validation_form_request_object):
-    """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
-
-    Parameters
-    ----------
-    validation_form_request_object: Request object
-        A Request object containing user data from the validation form.
-
-    Returns
-    -------
-        string
-        A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
-        500 error message is returned.
-    """
-    validation_status = {};
-    spreadsheet_file = validation_form_request_object.files['spreadsheet'];
-    hed_file = validation_form_request_object.files['hed'];
-    if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
-        try:
-            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
-            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
-            validation_input_arguments = _get_validation_input_arguments_from_validation_form(
-                validation_form_request_object, spreadsheet_file_path, hed_file_path);
-            validation_issues = _report_spreadsheet_validation_issues(validation_input_arguments);
-            validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
-                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
-            validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
-        except:
-            return abort(500);
-        finally:
-            delete_file_if_it_exist(spreadsheet_file_path);
-            delete_file_if_it_exist(hed_file_path);
-    return json.dumps(validation_status);
-
-
 def _save_hed_to_upload_folder_if_present(hed_file_object):
     """Save a HED XML file to the upload folder.
 
