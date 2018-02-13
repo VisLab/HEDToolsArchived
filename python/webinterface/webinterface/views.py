@@ -1,4 +1,3 @@
-from forms import ValidationForm;
 from flask import render_template, Response, abort, request;
 from hedvalidation.hed_dictionary import HedDictionary;
 from hedvalidation.hed_input_reader import HedInputReader;
@@ -204,9 +203,42 @@ def render_help_page():
     """
     return render_template('help.html')
 
+@app.route('/submit', strict_slashes=False, methods=['POST'])
+def validate_spreadsheet_after_submission():
+    """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
 
-@app.route('/validation', strict_slashes=False, methods=['GET', 'POST'])
-def validate_spreadsheet_from_form():
+    Parameters
+    ----------
+
+    Returns
+    -------
+        string
+        A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
+        500 error message is returned.
+    """
+    validation_status = {};
+    spreadsheet_file = request.files['spreadsheet'];
+    hed_file = request.files['hed'];
+    if utils._file_has_valid_extension(spreadsheet_file, utils.SPREADSHEET_FILE_EXTENSIONS):
+        try:
+            spreadsheet_file_path = utils.save_spreadsheet_to_upload_folder(spreadsheet_file);
+            hed_file_path = utils._save_hed_to_upload_folder_if_present(hed_file);
+            validation_input_arguments = utils._get_validation_input_arguments_from_validation_form(
+                request, spreadsheet_file_path, hed_file_path);
+            validation_issues = utils._report_spreadsheet_validation_issues(validation_input_arguments);
+            validation_status['downloadFile'] = utils._save_validation_issues_to_file_in_upload_folder(
+                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
+            validation_status['rowIssueCount'] = utils._get_the_number_of_rows_with_validation_issues(validation_issues);
+        except:
+            return abort(500);
+        finally:
+            utils.delete_file_if_it_exist(spreadsheet_file_path);
+            utils.delete_file_if_it_exist(hed_file_path);
+    return json.dumps(validation_status);
+
+
+@app.route('/validation', strict_slashes=False, methods=['GET'])
+def render_validation_form():
     """Handles the site root and Validation tab functionality.
 
     Parameters
@@ -219,7 +251,4 @@ def validate_spreadsheet_from_form():
         displayed. If the HTTP method is a POST then the validation form is submitted.
 
     """
-    form = ValidationForm();
-    if request.method == 'POST':
-        return utils.validate_spreadsheet_after_submission(request);
-    return render_template('validation.html', form=form);
+    return render_template('validation.html');
