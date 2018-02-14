@@ -77,6 +77,7 @@
         const XML_FILE_EXTENSIONS = ['xml'];
         const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
         const OTHER_HED_VERSION_OPTION = 'Other';
+
         $(document).ready(function () {
             prepareValidationForm();
         });
@@ -98,7 +99,6 @@
         function getStaticFormData() {
             getHEDVersions();
         }
-
 
         /**
          * Populates the HED version drop-down menu.
@@ -130,7 +130,6 @@
                     error: function () {
                         flashMessageOnScreen('Major HED versions could not be retrieved. Please provide your own.',
                             'error', 'spreadsheet-flash');
-
                     }
                 }
             );
@@ -148,7 +147,6 @@
             }
             flashMessageOnScreen('', 'success', 'hed-flash');
         });
-
         /**
          * Checks if the HED file uploaded has a valid extension.
          */
@@ -163,7 +161,6 @@
                 flashInvalidHEDExtensionMessage();
             }
         });
-
         /**
          * Spreadsheet event handler function. Checks if the file uploaded has a valid spreadsheet extension.
          */
@@ -188,7 +185,6 @@
                 flashInvalidExcelExtensionMessage();
             }
         });
-
 
         /**
          * Updates the spreadsheet file label.
@@ -366,7 +362,6 @@
                     dataType: 'json',
                     success: function (validationStatus) {
                         if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
-                            console.log(validationStatus['downloadFile']);
                             window.location = '/download/' + validationStatus['downloadFile'];
                         } else {
                             window.location = '/delete/' + validationStatus['downloadFile'];
@@ -467,7 +462,6 @@
             });
         }
 
-
         /**
          * Gets the version from the HED file that the user uploaded.
          * @param {Object} hedXMLFile - A HED XML file.
@@ -477,7 +471,7 @@
             formData.append('hed_file', hedXMLFile);
             $.ajax({
                 type: 'POST',
-                url: "{{url_for('get_hed_version_in_file')}}",
+                url: constants.GET_MAJOR_HED_VERSIONS_URL,
                 data: formData,
                 contentType: false,
                 processData: false,
@@ -609,7 +603,6 @@
             showSpreadsheetColumnNamesTable();
         }
 
-
         /**
          * Sets the components related to the spreadsheet tag column indices when they are empty.
          */
@@ -725,6 +718,5 @@
             }
             columnNamesTable.append(columnNamesRow);
         }
-
     </script>
 {% endmacro %}
