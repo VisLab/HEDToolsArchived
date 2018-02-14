@@ -471,13 +471,13 @@
             formData.append('hed_file', hedXMLFile);
             $.ajax({
                 type: 'POST',
-                url: constants.GET_MAJOR_HED_VERSIONS_URL,
+                url: "{{ url_for('get_hed_version_in_file')}} ",
                 data: formData,
                 contentType: false,
                 processData: false,
                 dataType: 'json',
                 success: function (hedInfo) {
-                    flashMessageOnScreen('Using HED version ' + hedInfo['version'] + '.', 'success', 'hed-flash');
+                    flashMessageOnScreen('Using HED version ' + hedInfo['version'], 'success', 'hed-flash');
                 },
                 error: function () {
                     flashMessageOnScreen('Could not get version number from HED XML file.', 'error', 'hed-flash');
