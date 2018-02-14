@@ -63,7 +63,6 @@ def download_file_in_upload_directory(filename):
                 for line in download_file:
                     yield line;
             utils.delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], filename));
-
         return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
                                                                                            filename});
     except:
