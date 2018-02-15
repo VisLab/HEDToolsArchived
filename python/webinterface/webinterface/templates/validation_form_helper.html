@@ -3,7 +3,7 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
         <div class="form-group">
-            <label for="spreadsheet">1) Select spreadsheet (Excel or text):</label><br>
+            <label for="spreadsheet">1) Select spreadsheet (Excel and tab-separated):</label><br>
             <label class="btn-group file-browse-group spreadsheet-btn-group">
                 <button for="spreadsheet">Browse ...</button>
                 <label id="spreadsheet-filename"></label>
@@ -71,6 +71,10 @@
             <p class="flash" id="submit-flash"></p>
         </div>
     </form>
+
+    <div class="notes">
+    <p>* Validator currently works with Google Chrome and Mozilla Firefox. Microsoft Internet Explorer/Edge compatibility coming soon.</p>
+    </div>
 
     <script>
         const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
