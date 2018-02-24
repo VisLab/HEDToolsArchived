@@ -73,7 +73,8 @@
     </form>
 
     <div class="notes">
-    <p>* Validator currently works with Google Chrome and Mozilla Firefox. Microsoft Internet Explorer/Edge compatibility coming soon.</p>
+        <p>* Validator currently works with Google Chrome and Mozilla Firefox. Microsoft Internet Explorer/Edge
+            compatibility coming soon.</p>
     </div>
 
     <script>
@@ -131,7 +132,8 @@
                     success: function (hedInfo) {
                         populateHEDVersionsDropdown(hedInfo['major_versions']);
                     },
-                    error: function () {
+                    error: function (jqXHR) {
+                        console.log(jqXHR.responseJSON.message);
                         flashMessageOnScreen('Major HED versions could not be retrieved. Please provide your own.',
                             'error', 'spreadsheet-flash');
                     }
@@ -359,19 +361,21 @@
             flashSubmitMessage();
             $.ajax({
                     type: 'POST',
-                    url: "{{url_for('validate_spreadsheet_after_submission')}}",
+                    url: "{{url_for('get_validation_results')}}",
                     data: formData,
                     contentType: false,
                     processData: false,
                     dataType: 'json',
                     success: function (validationStatus) {
+                        console.log(validationStatus)
                         if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
                             window.location = '/download/' + validationStatus['downloadFile'];
                         } else {
                             window.location = '/delete/' + validationStatus['downloadFile'];
                         }
                     },
-                    error: function () {
+                    error: function (jqXHR) {
+                        console.log(jqXHR.responseJSON.message);
                         flashMessageOnScreen('Spreadsheet could not be processed', 'error',
                             'submit-flash');
                     }
@@ -403,11 +407,15 @@
          * @returns {boolean} - True if the tags columns textbox is valid.
          */
         function tagColumnsTextboxIsValid() {
-            var pattern = new RegExp('^([ \\d]+,)*[ \\d]+$');
-            var valid = pattern.test($('#tag-columns').val());
-            if (!valid) {
-                flashMessageOnScreen('Tag column(s) must be a number or a comma-separated list of numbers', 'error',
-                    'tag-columns-flash')
+            var otherTagColumns = $('#tag-columns').val().trim();
+            valid = true;
+            if (!isEmptyStr(otherTagColumns)) {
+                var pattern = new RegExp('^([ \\d]+,)*[ \\d]+$');
+                var valid = pattern.test(otherTagColumns);
+                if (!valid) {
+                    flashMessageOnScreen('Tag column(s) must be a number or a comma-separated list of numbers', 'error',
+                        'tag-columns-flash')
+                }
             }
             return valid;
         }
@@ -460,7 +468,8 @@
                     flashSpreadsheetTagColumnCountMessage(worksheetsInfo['tagColumnIndices'],
                         worksheetsInfo['requiredTagColumnIndices']);
                 },
-                error: function () {
+                error: function (jqXHR) {
+                    console.log(jqXHR.responseJSON.message);
                     flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
                 }
             });
@@ -483,7 +492,8 @@
                 success: function (hedInfo) {
                     flashMessageOnScreen('Using HED version ' + hedInfo['version'], 'success', 'hed-flash');
                 },
-                error: function () {
+                error: function (jqXHR) {
+                    console.log(jqXHR.responseJSON.message);
                     flashMessageOnScreen('Could not get version number from HED XML file.', 'error', 'hed-flash');
                 }
             });
@@ -521,7 +531,8 @@
                     flashSpreadsheetTagColumnCountMessage(spreadsheetColumnsInfo['tagColumnIndices'],
                         spreadsheetColumnsInfo['requiredTagColumnIndices']);
                 },
-                error: function () {
+                error: function (jqXHR) {
+                    console.log(jqXHR.responseJSON.message);
                     flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'spreadsheet-flash');
                 }
             });
