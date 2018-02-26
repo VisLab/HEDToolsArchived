@@ -25,7 +25,7 @@ def render_main_page():
     return render_template('hed.html');
 
 
-@app.route('/delete/<filename>')
+@app.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
 def delete_file_in_upload_directory(filename):
     """Deletes the specified file from the upload file.
 
@@ -44,7 +44,7 @@ def delete_file_in_upload_directory(filename):
         return utils.handle_http_error(NOT_FOUND_ERROR, "File doesn't exist");
 
 
-@app.route('/download/<filename>')
+@app.route('/download/<filename>', strict_slashes=False, methods=['GET'])
 def download_file_in_upload_directory(filename):
     """Downloads the specified file from the upload file.
 
