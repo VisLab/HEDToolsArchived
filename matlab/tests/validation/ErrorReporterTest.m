@@ -21,7 +21,6 @@ classdef ErrorReporterTest < matlab.unittest.TestCase
             errors = ErrorConstants.ErrorMessages;
             numberOfErrors = length(errors);
             for a = 1:numberOfErrors
-                fprintf(errors{a})
                 placeHolderCount = ...
                     errorReporter.countPlaceHoldersInError(errors{a});
                 testCase.assertInstanceOf(placeHolderCount, 'double');
