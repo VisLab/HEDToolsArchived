@@ -1,10 +1,12 @@
-from flask import render_template, Response, abort, request;
-from hedvalidation.hed_dictionary import HedDictionary;
-from hedvalidation.hed_input_reader import HedInputReader;
-import json;
+from flask import render_template, Response, request;
 import os;
+import json;
 from webinterface import utils;
 from webinterface import app;
+
+INTERNAL_SERVER_ERROR = 500;
+NOT_FOUND_ERROR = 404;
+NO_CONTENT_SUCCESS = 204;
 
 
 @app.route('/', strict_slashes=False, methods=['GET'])
@@ -20,10 +22,10 @@ def render_main_page():
         A rendered template for the main page.
 
     """
-    return render_template('hed.html')
+    return render_template('hed.html');
 
 
-@app.route('/delete/<filename>')
+@app.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
 def delete_file_in_upload_directory(filename):
     """Deletes the specified file from the upload file.
 
@@ -37,12 +39,12 @@ def delete_file_in_upload_directory(filename):
 
     """
     if utils.delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
-        return Response(status=204);
+        return Response(status=NO_CONTENT_SUCCESS);
     else:
-        abort(404);
+        return utils.handle_http_error(NOT_FOUND_ERROR, "File doesn't exist");
 
 
-@app.route('/download/<filename>')
+@app.route('/download/<filename>', strict_slashes=False, methods=['GET'])
 def download_file_in_upload_directory(filename):
     """Downloads the specified file from the upload file.
 
@@ -57,16 +59,10 @@ def download_file_in_upload_directory(filename):
         The contents of a file in the upload directory to send to the client.
 
     """
-    try:
-        def generate():
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as download_file:
-                for line in download_file:
-                    yield line;
-            utils.delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], filename));
-        return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
-                                                                                           filename});
-    except:
-        abort(404);
+    download_response = utils.generate_download_file_response(filename);
+    if isinstance(download_response, basestring):
+        utils.handle_http_error(NOT_FOUND_ERROR, download_response);
+    return download_response;
 
 
 @app.route('/gethedversion', methods=['POST'])
@@ -84,15 +80,10 @@ def get_hed_version_in_file():
         A serialized JSON string containing information related to the spreadsheet columns.
 
     """
-    hed_info = {};
-    try:
-        if utils.hed_file_present_in_form(request):
-            hed_file = request.files['hed_file'];
-            hed_file_path = utils.save_hed_to_upload_folder(hed_file);
-            hed_info['version'] = HedDictionary.get_hed_xml_version(hed_file_path);
-        return json.dumps(hed_info);
-    except:
-        return abort(500);
+    hed_info = utils.find_hed_version_in_file(request);
+    if 'error' in hed_info:
+        return utils.handle_http_error(INTERNAL_SERVER_ERROR, hed_info['error']);
+    return json.dumps(hed_info);
 
 
 @app.route('/getmajorhedversions', methods=['GET'])
@@ -110,12 +101,10 @@ def get_major_hed_versions():
         A serialized JSON string containing information related to the spreadsheet columns.
 
     """
-    hed_info = {};
-    try:
-        hed_info['major_versions'] = HedInputReader.get_all_hed_versions();
-        return json.dumps(hed_info);
-    except:
-        return abort(500);
+    hed_info = utils.find_major_hed_versions();
+    if 'error' in hed_info:
+        return utils.handle_http_error(INTERNAL_SERVER_ERROR, hed_info['error']);
+    return json.dumps(hed_info);
 
 
 @app.route('/getspreadsheetcolumnsinfo', methods=['POST'])
@@ -133,27 +122,10 @@ def get_spreadsheet_columns_info():
         A serialized JSON string containing information related to the spreadsheet columns.
 
     """
-    spreadsheet_file_path = '';
-    try:
-        spreadsheet_columns_info = utils.initialize_spreadsheet_columns_info_dictionary();
-        if utils.spreadsheet_file_present_in_form(request):
-            spreadsheet_file = request.files['spreadsheet_file'];
-            spreadsheet_file_path = utils.save_spreadsheet_to_upload_folder(spreadsheet_file);
-            if spreadsheet_file_path and utils.worksheet_name_present_in_form(request):
-                worksheet_name = request.form['worksheet_name'];
-                spreadsheet_columns_info = utils.populate_spreadsheet_columns_info_dictionary(
-                    spreadsheet_columns_info, \
-                    spreadsheet_file_path, \
-                    worksheet_name);
-            else:
-                spreadsheet_columns_info = utils.populate_spreadsheet_columns_info_dictionary(
-                    spreadsheet_columns_info, \
-                    spreadsheet_file_path);
-        return json.dumps(spreadsheet_columns_info);
-    except:
-        return abort(500);
-    finally:
-        utils.delete_file_if_it_exist(spreadsheet_file_path);
+    spreadsheet_columns_info = utils.find_spreadsheet_columns_info(request);
+    if 'error' in spreadsheet_columns_info:
+        return utils.handle_http_error(INTERNAL_SERVER_ERROR, spreadsheet_columns_info['error']);
+    return json.dumps(spreadsheet_columns_info);
 
 
 @app.route('/getworksheetsinfo', methods=['POST'])
@@ -172,18 +144,9 @@ def get_worksheets_info():
         A serialized JSON string containing information related to the Excel worksheets.
 
     """
-    workbook_file_path = '';
-    try:
-        worksheets_info = utils.initialize_worksheets_info_dictionary();
-        if utils.spreadsheet_file_present_in_form(request):
-            workbook_file = request.files['spreadsheet_file'];
-            workbook_file_path = utils.save_spreadsheet_to_upload_folder(workbook_file);
-            if workbook_file_path:
-                worksheets_info = utils.populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
-    except:
-        return abort(500);
-    finally:
-        utils.delete_file_if_it_exist(workbook_file_path);
+    worksheets_info = utils.find_worksheets_info(request);
+    if 'error' in worksheets_info:
+        return utils.handle_http_error(INTERNAL_SERVER_ERROR, worksheets_info['error']);
     return json.dumps(worksheets_info);
 
 
@@ -202,8 +165,9 @@ def render_help_page():
     """
     return render_template('help.html')
 
+
 @app.route('/submit', strict_slashes=False, methods=['POST'])
-def validate_spreadsheet_after_submission():
+def get_validation_results():
     """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
 
     Parameters
@@ -215,24 +179,9 @@ def validate_spreadsheet_after_submission():
         A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
         500 error message is returned.
     """
-    validation_status = {};
-    spreadsheet_file = request.files['spreadsheet'];
-    hed_file = request.files['hed'];
-    if utils._file_has_valid_extension(spreadsheet_file, utils.SPREADSHEET_FILE_EXTENSIONS):
-        try:
-            spreadsheet_file_path = utils.save_spreadsheet_to_upload_folder(spreadsheet_file);
-            hed_file_path = utils._save_hed_to_upload_folder_if_present(hed_file);
-            validation_input_arguments = utils._get_validation_input_arguments_from_validation_form(
-                request, spreadsheet_file_path, hed_file_path);
-            validation_issues = utils._report_spreadsheet_validation_issues(validation_input_arguments);
-            validation_status['downloadFile'] = utils._save_validation_issues_to_file_in_upload_folder(
-                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
-            validation_status['rowIssueCount'] = utils._get_the_number_of_rows_with_validation_issues(validation_issues);
-        except:
-            return abort(500);
-        finally:
-            utils.delete_file_if_it_exist(spreadsheet_file_path);
-            utils.delete_file_if_it_exist(hed_file_path);
+    validation_status = utils.report_spreadsheet_validation_status(request);
+    if 'error' in validation_status:
+        return utils.handle_http_error(INTERNAL_SERVER_ERROR, validation_status['error']);
     return json.dumps(validation_status);
 
 

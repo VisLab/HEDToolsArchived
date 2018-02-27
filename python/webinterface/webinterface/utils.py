@@ -1,13 +1,14 @@
-import json;
 import os;
 import tempfile;
 import xlrd;
-from flask import abort;
+import traceback;
+from flask import jsonify, Response;
 from werkzeug.utils import secure_filename;
 from hedvalidation.hed_input_reader import HedInputReader;
 from webinterface import app;
 from logging.handlers import RotatingFileHandler;
 from logging import ERROR;
+from hedvalidation.hed_dictionary import HedDictionary;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
@@ -21,20 +22,225 @@ SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 
 OTHER_HED_VERSION_OPTION = 'Other';
 
 
+def find_hed_version_in_file(form_request_object):
+    """Finds the version number in a HED XML file.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    string
+        A serialized JSON string containing the version number information.
+
+    """
+    hed_info = {};
+    try:
+        if hed_file_present_in_form(form_request_object):
+            hed_file = form_request_object.files['hed_file'];
+            hed_file_path = save_hed_to_upload_folder(hed_file);
+            hed_info['version'] = HedDictionary.get_hed_xml_version(hed_file_path);
+    except:
+        hed_info['error'] = traceback.format_exc();
+    return hed_info;
+
+
+def find_major_hed_versions():
+    """Finds the major HED versions that are kept on the server.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    string
+        A serialized JSON string containing inforamtion about the major HED versions.
+
+    """
+    hed_info = {};
+    try:
+        hed_info['major_versions'] = HedInputReader.get_all_hed_versions();
+    except:
+        hed_info['error'] = traceback.format_exc();
+    return hed_info;
+
+
+def find_worksheets_info(form_request_object):
+    """Finds the info related to the Excel worksheets.
+
+    This information contains the names of the worksheets in a workbook, the names of the columns in the first
+    worksheet, and column indices that contain HED tags in the first worksheet.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    string
+        A serialized JSON string containing information related to the Excel worksheets.
+
+    """
+    workbook_file_path = '';
+    worksheets_info = {};
+    try:
+        worksheets_info = initialize_worksheets_info_dictionary();
+        if spreadsheet_file_present_in_form(form_request_object):
+            workbook_file = form_request_object.files['spreadsheet_file'];
+            workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
+            if workbook_file_path:
+                worksheets_info = populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
+    except:
+        worksheets_info['error'] = traceback.format_exc();
+    finally:
+        delete_file_if_it_exist(workbook_file_path);
+    return worksheets_info;
+
+
+def find_spreadsheet_columns_info(form_request_object):
+    """Finds the info associated with the spreadsheet columns.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    dictionary
+        A dictionary populated with information related to the spreadsheet columns.
+    """
+    spreadsheet_file_path = '';
+    try:
+        spreadsheet_columns_info = initialize_spreadsheet_columns_info_dictionary();
+        if spreadsheet_file_present_in_form(form_request_object):
+            spreadsheet_file = form_request_object.files['spreadsheet_file'];
+            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
+            if spreadsheet_file_path and worksheet_name_present_in_form(form_request_object):
+                worksheet_name = form_request_object.form['worksheet_name'];
+                spreadsheet_columns_info = populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info,
+                                                                                        spreadsheet_file_path,
+                                                                                        worksheet_name);
+            else:
+                spreadsheet_columns_info = populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info,
+                                                                                        spreadsheet_file_path);
+    except:
+        spreadsheet_columns_info['error'] = traceback.format_exc();
+    finally:
+        delete_file_if_it_exist(spreadsheet_file_path);
+    return spreadsheet_columns_info;
+
+
+def report_spreadsheet_validation_status(form_request_object):
+    """Reports the spreadsheet validation status.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+        string
+        A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
+        500 error message is returned.
+    """
+    validation_status = {};
+    spreadsheet_file_path = '';
+    hed_file_path = '';
+    try:
+        spreadsheet_file = form_request_object.files['spreadsheet'];
+        hed_file = form_request_object.files['hed'];
+        if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
+            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
+            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
+            validation_input_arguments = _get_validation_input_arguments_from_validation_form(
+                form_request_object, spreadsheet_file_path, hed_file_path);
+            validation_issues = validate_spreadsheet(validation_input_arguments);
+            validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
+                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
+            validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
+    except:
+        validation_status['error'] = traceback.format_exc();
+    finally:
+        delete_file_if_it_exist(spreadsheet_file_path);
+        delete_file_if_it_exist(hed_file_path);
+    return validation_status;
+
+
+def generate_download_file_response(download_file_name):
+    """Generates a download file response.
+
+    Parameters
+    ----------
+    download_file_name: string
+        The download file name.
+
+    Returns
+    -------
+    response object
+        A response object containing the download file.
+
+    """
+    try:
+        def generate():
+            with open(os.path.join(app.config['UPLOAD_FOLDER'], download_file_name)) as download_file:
+                for line in download_file:
+                    yield line;
+            delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], download_file_name));
+        return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
+                                                                                           download_file_name});
+    except:
+        return traceback.format_exc();
+
+
+def populate_worksheet_info(request_object):
+    worksheets_info = initialize_worksheets_info_dictionary();
+    if spreadsheet_file_present_in_form(request_object):
+        workbook_file = request_object.files['spreadsheet_file'];
+        workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
+        if workbook_file_path:
+            worksheets_info = populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
+    return worksheets_info;
+
+
+def handle_http_error(error_code, error_message):
+    """Handles an http error.
+
+    Parameters
+    ----------
+    error_code: string
+        The code associated with the error.
+    error_message: string
+        The message associated with the error.
+
+    Returns
+    -------
+    boolean
+        A tuple containing a HTTP response object and a code.
+
+    """
+    app.logger.error(error_message);
+    return jsonify(message=error_message), error_code;
+
+
 def setup_logging():
     """Sets up the application logging. If the log directory does not exist then there will be no logging.
 
     """
     if not app.debug and os.path.exists(app.config['LOG_DIRECTORY']):
-        file_handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=10*1024*1024, backupCount=5);
+        file_handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=10 * 1024 * 1024, backupCount=5);
         file_handler.setLevel(ERROR);
         app.logger.addHandler(file_handler);
+
 
 def setup_upload_directory():
     """Sets up upload directory.
 
     """
     _create_folder_if_needed(app.config['UPLOAD_FOLDER']);
+
 
 def _check_file_extension(filename, accepted_file_extensions):
     """Checks the file extension against a list of accepted ones.
@@ -202,7 +408,8 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
     validation_input_arguments['spreadsheet_path'] = spreadsheet_file_path;
     validation_input_arguments['hed_path'] = get_hed_path_from_validation_form(validation_form_request_object,
                                                                                hed_file_path);
-    validation_input_arguments['tag_columns'] = map(int, validation_form_request_object.form['tag-columns'].split(','))
+    validation_input_arguments['tag_columns'] = \
+        get_other_tag_columns_from_validation_form(validation_form_request_object.form['tag-columns'])
     validation_input_arguments['required_tag_columns'] = \
         get_required_tag_columns_from_validation_form(validation_form_request_object);
     validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
@@ -213,10 +420,28 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
         validation_form_request_object, 'generate-warnings', 'boolean');
     return validation_input_arguments;
 
+
 def get_hed_path_from_validation_form(validation_form_request_object, hed_file_path):
     if validation_form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path:
         return HedInputReader.get_path_from_hed_version(validation_form_request_object.form['hed-version']);
     return hed_file_path;
+
+def get_other_tag_columns_from_validation_form(other_tag_columns):
+    """Gets the validation function input arguments from a request object associated with the validation form.
+
+    Parameters
+    ----------
+    validation_form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    list
+        A list containing the other tag columns.
+    """
+    if other_tag_columns:
+        return map(int, other_tag_columns.split(','));
+    return [];
 
 
 def get_required_tag_columns_from_validation_form(validation_form_request_object):
@@ -355,7 +580,7 @@ def _copy_file_line_by_line(file_object_1, file_object_2):
         return False;
 
 
-def _report_spreadsheet_validation_issues(validation_arguments):
+def validate_spreadsheet(validation_arguments):
     """Validates the HED tags in a worksheet by calling the validateworksheethedtags() function using the MATLAB engine.
 
     The underlying validateworksheethedtags() MATLAB function is called to do the validation.
@@ -382,9 +607,6 @@ def _report_spreadsheet_validation_issues(validation_arguments):
                                       check_for_warnings=validation_arguments['check_for_warnings'],
                                       hed_xml_file=validation_arguments['hed_path']);
     return hed_input_reader.get_validation_issues();
-
-
-
 
 
 def spreadsheet_file_present_in_form(validation_form_request_object):
@@ -419,6 +641,7 @@ def hed_file_present_in_form(validation_form_request_object):
 
     """
     return 'hed_file' in validation_form_request_object.files;
+
 
 def initialize_worksheets_info_dictionary():
     """Initializes a dictionary that will hold information related to the Excel worksheets.
