@@ -1,22 +1,30 @@
 classdef ErrorReporter
-    %ERRORREPORTER Summary of this class goes here
-    %   Detailed explanation goes here
+    % This class is used to report the validation errors.
     
-    properties
-        ErrorTypeMap = containers('KeyType', 'char', 'ValueType', 'char');
-        
+    properties(Access = private)
+        ErrorTypeMap = containers.Map('KeyType', 'char', ...
+            'ValueType', 'char');
     end % properties
     
     methods
         
         function obj = ErrorReporter()
-            % ErrorReporter constructor. 
+            % ErrorReporter constructor.
             %
             % Returns
             % obj - A ErrorReporter object.
             %
-            obj = populateErrorTypeMap(obj);
+            obj.ErrorTypeMap = ErrorReporter.populateErrorTypeMap();
         end % ErrorReporter
+        
+        function errorTypeMap = getErrorTypeMap(obj)
+            % Gets the ErrorTypeMap property.
+            %
+            % Returns
+            % errorTypeMap - The ErrorTypeMap property.
+            %
+            errorTypeMap = obj.ErrorTypeMap;
+        end % getErrorTypeMap
         
         function error = reportError(obj, errorType)
             % Reports the error associated with the error type. If the
@@ -35,7 +43,7 @@ classdef ErrorReporter
             errorMessage = obj.ErrorTypeMap(errorType);
         end % reportError
         
-        function placeHolderCount = countPlaceHoldersInError(error)
+        function placeHolderCount = countPlaceHoldersInError(obj, error)
             % Counts the number of place holders in the error message.
             %
             % Parameters
@@ -49,7 +57,11 @@ classdef ErrorReporter
                 ErrorConstants.PlaceHolderString));
         end % countPlaceHoldersInError
         
-        function obj = populateErrorTypeMap(obj)
+    end % public methods
+    
+    
+    methods(Static)
+        function errorTypeMap = populateErrorTypeMap()
             % Populates the ErrorTypeMap property.
             %
             % Parameters
@@ -58,11 +70,10 @@ classdef ErrorReporter
             % Returns
             % obj - A ErrorReporter object.
             %
-            obj.ErrorTypeMap = containers.Map(...
+            errorTypeMap = containers.Map(...
                 ErrorConstants.ErrorTypes, ErrorConstants.ErrorMessages);
         end % populateErrorTypeMap
-        
-    end % methods
+    end % static methods
     
-end
+end % ErrorReporter
 
