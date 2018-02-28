@@ -88,8 +88,8 @@ def find_worksheets_info(form_request_object):
     worksheets_info = {};
     try:
         worksheets_info = initialize_worksheets_info_dictionary();
-        if spreadsheet_file_present_in_form(form_request_object):
-            workbook_file = form_request_object.files['spreadsheet_file'];
+        if spreadsheet_present_in_form(form_request_object):
+            workbook_file = form_request_object.files['spreadsheet'];
             workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
             if workbook_file_path:
                 worksheets_info = populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
@@ -116,8 +116,8 @@ def find_spreadsheet_columns_info(form_request_object):
     spreadsheet_file_path = '';
     try:
         spreadsheet_columns_info = initialize_spreadsheet_columns_info_dictionary();
-        if spreadsheet_file_present_in_form(form_request_object):
-            spreadsheet_file = form_request_object.files['spreadsheet_file'];
+        if spreadsheet_present_in_form(form_request_object):
+            spreadsheet_file = form_request_object.files['spreadsheet'];
             spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
             if spreadsheet_file_path and worksheet_name_present_in_form(form_request_object):
                 worksheet_name = form_request_object.form['worksheet_name'];
@@ -139,34 +139,53 @@ def report_spreadsheet_validation_status(form_request_object):
 
     Parameters
     ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
 
     Returns
     -------
-        string
+    string
         A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
         500 error message is returned.
     """
     validation_status = {};
-    spreadsheet_file_path = '';
-    hed_file_path = '';
     try:
-        spreadsheet_file = form_request_object.files['spreadsheet'];
-        hed_file = form_request_object.files['hed'];
-        if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
-            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
-            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
-            validation_input_arguments = _get_validation_input_arguments_from_validation_form(
-                form_request_object, spreadsheet_file_path, hed_file_path);
-            validation_issues = validate_spreadsheet(validation_input_arguments);
-            validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
-                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
-            validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
+        spreadsheet_file_path, hed_file_path = _get_uploaded_file_paths_from_forms(form_request_object)
+        validation_input_arguments = _generate_input_arguments_from_validation_form(
+            form_request_object, spreadsheet_file_path, hed_file_path);
+        validation_issues = validate_spreadsheet(validation_input_arguments);
+        validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
+            spreadsheet_file_path, validation_issues, validation_input_arguments['worksheet']);
+        validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
     except:
         validation_status['error'] = traceback.format_exc();
     finally:
         delete_file_if_it_exist(spreadsheet_file_path);
         delete_file_if_it_exist(hed_file_path);
     return validation_status;
+
+
+def _get_uploaded_file_paths_from_forms(form_request_object):
+    """Gets the file paths of the uploaded files in the form.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    tuple
+        A tuple containing the file paths. The two file paths are for the spreadsheet and a optional HED XML file.
+    """
+    spreadsheet_file_path = '';
+    hed_file_path = '';
+    if spreadsheet_present_in_form(form_request_object):
+        spreadsheet_file_pointer = form_request_object.files['spreadsheet'];
+        if hed_present_in_form(form_request_object):
+            hed_file = form_request_object.files['hed'];
+        if _file_has_valid_extension(spreadsheet_file_pointer, SPREADSHEET_FILE_EXTENSIONS):
+            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file_pointer);
+            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
+    return spreadsheet_file_path, hed_file_path;
 
 
 def generate_download_file_response(download_file_name):
@@ -189,6 +208,7 @@ def generate_download_file_response(download_file_name):
                 for line in download_file:
                     yield line;
             delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], download_file_name));
+
         return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
                                                                                            download_file_name});
     except:
@@ -197,7 +217,7 @@ def generate_download_file_response(download_file_name):
 
 def populate_worksheet_info(request_object):
     worksheets_info = initialize_worksheets_info_dictionary();
-    if spreadsheet_file_present_in_form(request_object):
+    if spreadsheet_present_in_form(request_object):
         workbook_file = request_object.files['spreadsheet_file'];
         workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
         if workbook_file_path:
@@ -307,13 +327,13 @@ def _get_the_number_of_rows_with_validation_issues(validation_issues):
     return number_of_rows_with_issues;
 
 
-def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues, worksheet_name=''):
+def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_path, validation_issues, worksheet_name=''):
     """Saves the validation issues found to a file in the upload folder.
 
     Parameters
     ----------
-    spreadsheet_file_name: string
-        The name of the spreadsheet.
+    spreadsheet_file_path: string
+        The path to the spreadsheet.
     worksheet_name: string
         The name of the spreadsheet worksheet.
     validation_issues: string
@@ -325,8 +345,8 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, vali
         The name of the validation output file.
 
     """
-
-    validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_file_name, worksheet_name);
+    spreadsheet_filename = os.path.basename(spreadsheet_file_path);
+    validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
     validation_issues_file_path = os.path.join(app.config['UPLOAD_FOLDER'], validation_issues_filename);
     with open(validation_issues_file_path, 'w') as validation_issues_file:
         validation_issues_file.write(validation_issues);
@@ -388,8 +408,8 @@ def _get_file_extension(file_name_or_path):
     return secure_filename(file_name_or_path).rsplit('.')[-1];
 
 
-def _get_validation_input_arguments_from_validation_form(validation_form_request_object, spreadsheet_file_path,
-                                                         hed_file_path):
+def _generate_input_arguments_from_validation_form(validation_form_request_object, spreadsheet_file_path,
+                                                   hed_file_path):
     """Gets the validation function input arguments from a request object associated with the validation form.
 
     Parameters
@@ -425,6 +445,7 @@ def get_hed_path_from_validation_form(validation_form_request_object, hed_file_p
     if validation_form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path:
         return HedInputReader.get_path_from_hed_version(validation_form_request_object.form['hed-version']);
     return hed_file_path;
+
 
 def get_other_tag_columns_from_validation_form(other_tag_columns):
     """Gets the validation function input arguments from a request object associated with the validation form.
@@ -609,7 +630,7 @@ def validate_spreadsheet(validation_arguments):
     return hed_input_reader.get_validation_issues();
 
 
-def spreadsheet_file_present_in_form(validation_form_request_object):
+def spreadsheet_present_in_form(validation_form_request_object):
     """Checks to see if a spreadsheet file is present in a request object from validation form.
 
     Parameters
@@ -623,7 +644,24 @@ def spreadsheet_file_present_in_form(validation_form_request_object):
         True if a spreadsheet file is present in a request object from the validation form.
 
     """
-    return 'spreadsheet_file' in validation_form_request_object.files;
+    return 'spreadsheet' in validation_form_request_object.files;
+
+
+def hed_present_in_form(validation_form_request_object):
+    """Checks to see if a HED XML file is present in a request object from validation form.
+
+    Parameters
+    ----------
+    validation_form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    boolean
+        True if a HED XML file is present in a request object from the validation form.
+
+    """
+    return 'hed' in validation_form_request_object.files;
 
 
 def hed_file_present_in_form(validation_form_request_object):
