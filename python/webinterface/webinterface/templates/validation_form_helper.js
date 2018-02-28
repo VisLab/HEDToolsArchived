@@ -405,7 +405,7 @@ function fileHasValidExtension(filePath, acceptedFileExtensions) {
  */
 function getWorksheetsInfo(workbookFile) {
     var formData = new FormData();
-    formData.append('spreadsheet_file', workbookFile);
+    formData.append('spreadsheet', workbookFile);
     $.ajax({
         type: 'POST',
         url: "{{url_for('get_worksheets_info')}}",
@@ -441,6 +441,7 @@ function getVersionFromHEDFile(hedXMLFile) {
         processData: false,
         dataType: 'json',
         success: function (hedInfo) {
+            resetFlashMessages(true);
             flashMessageOnScreen('Using HED version ' + hedInfo['version'], 'success', 'hed-flash');
         },
         error: function (jqXHR) {
@@ -466,7 +467,7 @@ function flashWorksheetNumberMessage(worksheetNames) {
  */
 function getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName) {
     var formData = new FormData();
-    formData.append('spreadsheet_file', spreadsheetFile);
+    formData.append('spreadsheet', spreadsheetFile);
     if (typeof worksheetName !== 'undefined') {
         formData.append('worksheet_name', worksheetName);
     }
