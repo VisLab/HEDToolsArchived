@@ -447,6 +447,7 @@ def _generate_input_arguments_from_validation_form(form_request_object, spreadsh
         A dictionary containing input arguments for calling the underlying validation function.
     """
     validation_input_arguments = {};
+    print(form_request_object.form)
     validation_input_arguments['spreadsheet_path'] = spreadsheet_file_path;
     validation_input_arguments['hed_path'] = _get_hed_path_from_validation_form(form_request_object,
                                                                                 hed_file_path);
