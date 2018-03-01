@@ -7,7 +7,9 @@
 % Input:
 %
 %   errorType
-%         The type of abc error.
+%         The type of warning error.
+%
+% Input (Optional):
 %
 %   errorRow
 %         The row number that the error occurred on.
