@@ -21,7 +21,7 @@ classdef HedDictionary
     end
     
     methods
-        function obj = HedDictionary(obj, hed_xml_file_path)
+        function obj = HedDictionary(hed_xml_file_path)
             %         Constructor for the Hed_Dictionary class.
             %         Parameters
             %         ----------
@@ -31,10 +31,26 @@ classdef HedDictionary
             %         -------
             %         HedDictionary
             %             A Hed_Dictionary object.
-            
-            obj.root_element = obj.findRootElement(hed_xml_file_path);
-            obj.dictionaries = obj.populateDictionaries();
+            obj.root_element = findRootElement(hed_xml_file_path);
+            obj.dictionaries = populateDictionaries();
         end % HedDictionary
         
-    end
+    end % public methods
     
+    methods(Static)
+        function rootElement = findRootElement(hed_xml_file_path)
+            %         Parses a XML file and returns the root element.
+            %         Parameters
+            %         ----------
+            %         hed_xml_file_path: string
+            %         The path to a HED XML file.
+            %         Returns
+            %         -------
+            %         RestrictedElement
+            %         The root element of the HED XML file.
+            tree = xmlread(hed_xml_file_path);
+            rootElement = tree.getDocumentElement;
+        end
+    end % static methods
+    
+end % HedDictionery
