@@ -65,30 +65,30 @@ switch(errorType)
             'closing brackets\n'], num2str(p.openingBracketCount), ...
             num2str(p.closingBracketCount));
     case 'comma'
-        error = sprintf('\tERRORComma missing after - \"%s\"\n', p.tag);
+        error = sprintf('\tERRORComma missing after - "%s"\n', p.tag);
     case 'duplicate'
-        error = sprintf('\tERRORDuplicate tag - \"%s\"\n', p.tag);
+        error = sprintf('\tERRORDuplicate tag - "%s"\n', p.tag);
     case 'isNumeric'
-        error = sprintf('\tERRORInvalid numeric tag - \"%s\"\n', p.tag);
+        error = sprintf('\tERRORInvalid numeric tag - "%s"\n', p.tag);
     case 'row'
         error = sprintf('Issues in row %s:\n', num2str(p.errorRow));
     case 'column'
         error = sprintf('Issues in row %s column %s:\n', ...
             num2str(p.errorRow), num2str(p.errorColumn));
     case 'requireChild'
-        error = sprintf('\tERRORDescendant tag required - \"%s\"\n', ...
+        error = sprintf('\tERRORDescendant tag required - "%s"\n', ...
             p.tag);
     case 'tilde'
-        error = sprintf('\tERRORToo many tildes - group \"%s\"\n', ...
+        error = sprintf('\tERRORToo many tildes - group "%s"\n', ...
             p.tag);
     case 'unique'
         error = sprintf(['\tERRORMultiple unique tags with prefix' ...
-            ' - \"%s\"\n'], p.tagPrefix);
+            ' - "%s"\n'], p.tagPrefix);
     case 'unitClass'
-        error = sprintf(['\tERRORInvalid unit - \"%s\" valid units are' ...
+        error = sprintf(['\tERRORInvalid unit - "%s" valid units are' ...
             ' "%s"\n'], p.tag, p.unitClassUnits);
     case 'valid'
-        error = sprintf('\tERRORInvalid HED tag - \"%s\"\n', p.tag);
+        error = sprintf('\tERRORInvalid HED tag - "%s"\n', p.tag);
 end
 
     function p = parseArguments(errorType, varargin)
