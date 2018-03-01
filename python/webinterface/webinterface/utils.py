@@ -475,8 +475,8 @@ def _get_hed_path_from_validation_form(form_request_object, hed_file_path):
 
     Returns
     -------
-    dictionary
-        A dictionary containing input arguments for calling the underlying validation function.
+    string
+        The HED XML file path.
     """
     if _hed_version_in_form(form_request_object) and\
             (form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path):
