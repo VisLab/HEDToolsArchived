@@ -430,13 +430,13 @@ def _get_file_extension(file_name_or_path):
     return secure_filename(file_name_or_path).rsplit('.')[-1];
 
 
-def _generate_input_arguments_from_validation_form(validation_form_request_object, spreadsheet_file_path,
+def _generate_input_arguments_from_validation_form(form_request_object, spreadsheet_file_path,
                                                    hed_file_path):
     """Gets the validation function input arguments from a request object associated with the validation form.
 
     Parameters
     ----------
-    validation_form_request_object: Request object
+    form_request_object: Request object
         A Request object containing user data from the validation form.
     spreadsheet_file_path: string
         The path to the workbook file.
@@ -448,25 +448,56 @@ def _generate_input_arguments_from_validation_form(validation_form_request_objec
     """
     validation_input_arguments = {};
     validation_input_arguments['spreadsheet_path'] = spreadsheet_file_path;
-    validation_input_arguments['hed_path'] = get_hed_path_from_validation_form(validation_form_request_object,
-                                                                               hed_file_path);
+    validation_input_arguments['hed_path'] = _get_hed_path_from_validation_form(form_request_object,
+                                                                                hed_file_path);
     validation_input_arguments['tag_columns'] = \
-        get_other_tag_columns_from_validation_form(validation_form_request_object.form['tag-columns'])
+        get_other_tag_columns_from_validation_form(form_request_object.form['tag-columns'])
     validation_input_arguments['required_tag_columns'] = \
-        get_required_tag_columns_from_validation_form(validation_form_request_object);
+        get_specific_tag_columns_from_validation_form(form_request_object);
     validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
-        validation_form_request_object, 'worksheet', 'string');
+        form_request_object, 'worksheet', 'string');
     validation_input_arguments['has_column_names'] = _get_optional_validation_form_field(
-        validation_form_request_object, 'has-column-names', 'boolean');
+        form_request_object, 'has-column-names', 'boolean');
     validation_input_arguments['check_for_warnings'] = _get_optional_validation_form_field(
-        validation_form_request_object, 'generate-warnings', 'boolean');
+        form_request_object, 'generate-warnings', 'boolean');
     return validation_input_arguments;
 
 
-def get_hed_path_from_validation_form(validation_form_request_object, hed_file_path):
-    if validation_form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path:
-        return HedInputReader.get_path_from_hed_version(validation_form_request_object.form['hed-version']);
+def _get_hed_path_from_validation_form(form_request_object, hed_file_path):
+    """Gets the validation function input arguments from a request object associated with the validation form.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+    hed_file_path: string
+        The path to the HED XML file.
+
+    Returns
+    -------
+    dictionary
+        A dictionary containing input arguments for calling the underlying validation function.
+    """
+    if _hed_version_in_form(form_request_object) and\
+            (form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path):
+        return HedInputReader.get_path_from_hed_version(form_request_object.form['hed-version']);
     return hed_file_path;
+
+
+def _hed_version_in_form(form_request_object):
+    """Checks to see if the hed version is in the validation form.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    boolean
+        True if the hed version is in the validation form. False, if otherwise.
+    """
+    return 'hed-version' in form_request_object.form;
 
 
 def get_other_tag_columns_from_validation_form(other_tag_columns):
@@ -487,12 +518,12 @@ def get_other_tag_columns_from_validation_form(other_tag_columns):
     return [];
 
 
-def get_required_tag_columns_from_validation_form(validation_form_request_object):
-    """Gets the validation function input arguments from a request object associated with the validation form.
+def get_specific_tag_columns_from_validation_form(form_request_object):
+    """Gets the specific tag columns from the validation form.
 
     Parameters
     ----------
-    validation_form_request_object: Request object
+    form_request_object: Request object
         A Request object containing user data from the validation form.
 
     Returns
@@ -504,8 +535,8 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
     required_tag_columns = {};
     for tag_column_name in SPECIFIC_TAG_COLUMN_NAMES:
         form_tag_column_name = tag_column_name.lower() + '-column';
-        if form_tag_column_name in validation_form_request_object.form:
-            tag_column_name_index = validation_form_request_object.form[form_tag_column_name].strip();
+        if form_tag_column_name in form_request_object.form:
+            tag_column_name_index = form_request_object.form[form_tag_column_name].strip();
             if tag_column_name_index:
                 tag_column_name_index = int(tag_column_name_index);
                 required_tag_columns[tag_column_name_index] = tag_column_name;
