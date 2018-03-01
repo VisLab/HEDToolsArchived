@@ -147,7 +147,7 @@ function flashInvalidHEDExtensionMessage() {
 
 /**
  * Resets the flash messages that aren't related to the form submission.
- * @param {String} message - If true, reset the flash message related to the submit button.
+A * @param {String} message - If true, reset the flash message related to the submit button.
  */
 function resetFlashMessages(resetSubmitFlash) {
     flashMessageOnScreen('', 'success', 'spreadsheet-flash');
@@ -287,7 +287,7 @@ function submitForm() {
             processData: false,
             dataType: 'json',
             success: function (validationStatus) {
-                if (checkRowIssueCount(validationStatus['rowIssueCount'])) {
+                if (checkIssueCount(validationStatus['issueCount'])) {
                     downloadValidationOutputFile(validationStatus['downloadFile']);
                 } else {
                     deleteUploadedSpreadsheet(validationStatus['downloadFile']);
@@ -336,17 +336,16 @@ function deleteUploadedSpreadsheet(uploadedSpreadsheetFile) {
 
 
 /**
- * Check the number of row issues and flash it.
- * @param {Number} rowIssueCount - Number of row issues.
- * @returns {boolean} - True if there issues found. Number of row issues are greater than 0.
+ * Check the number of validation issues and flash it.
+ * @param {Number} rowIssueCount - Number of issues.
+ * @returns {boolean} - True if there are issues found. False, if otherwise.
  */
-function checkRowIssueCount(rowIssueCount) {
+function checkIssueCount(rowIssueCount) {
     var issuesFound = false;
     if (rowIssueCount == 0) {
         flashMessageOnScreen('No issues were found.', 'success', 'submit-flash');
     } else {
-        flashMessageOnScreen(rowIssueCount.toString() + ' rows have issues. Creating attachment.', 'error',
-            'submit-flash');
+        flashMessageOnScreen(rowIssueCount.toString() + ' issues found. Creating attachment.', 'error', 'submit-flash');
         issuesFound = true;
     }
     return issuesFound;
@@ -405,7 +404,7 @@ function fileHasValidExtension(filePath, acceptedFileExtensions) {
  */
 function getWorksheetsInfo(workbookFile) {
     var formData = new FormData();
-    formData.append('spreadsheet_file', workbookFile);
+    formData.append('spreadsheet', workbookFile);
     $.ajax({
         type: 'POST',
         url: "{{url_for('get_worksheets_info')}}",
@@ -441,6 +440,7 @@ function getVersionFromHEDFile(hedXMLFile) {
         processData: false,
         dataType: 'json',
         success: function (hedInfo) {
+            resetFlashMessages(true);
             flashMessageOnScreen('Using HED version ' + hedInfo['version'], 'success', 'hed-flash');
         },
         error: function (jqXHR) {
@@ -466,7 +466,7 @@ function flashWorksheetNumberMessage(worksheetNames) {
  */
 function getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName) {
     var formData = new FormData();
-    formData.append('spreadsheet_file', spreadsheetFile);
+    formData.append('spreadsheet', spreadsheetFile);
     if (typeof worksheetName !== 'undefined') {
         formData.append('worksheet_name', worksheetName);
     }

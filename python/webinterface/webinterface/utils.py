@@ -12,9 +12,9 @@ from hedvalidation.hed_dictionary import HedDictionary;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
-TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag'];
-REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
-REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
+OTHER_TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag', 'Attribute'];
+SPECIFIC_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
+SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
                                         'Label': ['Label', 'Event Label', 'Short Label'],
                                         'Long': ['Long name']};
@@ -88,8 +88,8 @@ def find_worksheets_info(form_request_object):
     worksheets_info = {};
     try:
         worksheets_info = initialize_worksheets_info_dictionary();
-        if spreadsheet_file_present_in_form(form_request_object):
-            workbook_file = form_request_object.files['spreadsheet_file'];
+        if spreadsheet_present_in_form(form_request_object):
+            workbook_file = form_request_object.files['spreadsheet'];
             workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
             if workbook_file_path:
                 worksheets_info = populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
@@ -116,8 +116,8 @@ def find_spreadsheet_columns_info(form_request_object):
     spreadsheet_file_path = '';
     try:
         spreadsheet_columns_info = initialize_spreadsheet_columns_info_dictionary();
-        if spreadsheet_file_present_in_form(form_request_object):
-            spreadsheet_file = form_request_object.files['spreadsheet_file'];
+        if spreadsheet_present_in_form(form_request_object):
+            spreadsheet_file = form_request_object.files['spreadsheet'];
             spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
             if spreadsheet_file_path and worksheet_name_present_in_form(form_request_object):
                 worksheet_name = form_request_object.form['worksheet_name'];
@@ -139,10 +139,12 @@ def report_spreadsheet_validation_status(form_request_object):
 
     Parameters
     ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
 
     Returns
     -------
-        string
+    string
         A serialized JSON string containing information related to the worksheet columns. If the validation fails then a
         500 error message is returned.
     """
@@ -150,23 +152,64 @@ def report_spreadsheet_validation_status(form_request_object):
     spreadsheet_file_path = '';
     hed_file_path = '';
     try:
-        spreadsheet_file = form_request_object.files['spreadsheet'];
-        hed_file = form_request_object.files['hed'];
-        if _file_has_valid_extension(spreadsheet_file, SPREADSHEET_FILE_EXTENSIONS):
-            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
-            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
-            validation_input_arguments = _get_validation_input_arguments_from_validation_form(
-                form_request_object, spreadsheet_file_path, hed_file_path);
-            validation_issues = validate_spreadsheet(validation_input_arguments);
-            validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
-                spreadsheet_file.filename, validation_issues, validation_input_arguments['worksheet']);
-            validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
+        spreadsheet_file_path, hed_file_path = _get_uploaded_file_paths_from_forms(form_request_object);
+        original_spreadsheet_filename = _get_original_spreadsheet_filename(form_request_object);
+        validation_input_arguments = _generate_input_arguments_from_validation_form(
+            form_request_object, spreadsheet_file_path, hed_file_path);
+        validation_issues = validate_spreadsheet(validation_input_arguments);
+        validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
+            original_spreadsheet_filename, validation_issues, validation_input_arguments['worksheet']);
+        validation_status['issueCount'] = _get_validation_issue_count(validation_issues);
     except:
         validation_status['error'] = traceback.format_exc();
     finally:
         delete_file_if_it_exist(spreadsheet_file_path);
         delete_file_if_it_exist(hed_file_path);
     return validation_status;
+
+
+def _get_uploaded_file_paths_from_forms(form_request_object):
+    """Gets the file paths of the uploaded files in the form.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the file paths. The two file paths are for the spreadsheet and a optional HED XML file.
+    """
+    spreadsheet_file_path = '';
+    hed_file_path = '';
+    if spreadsheet_present_in_form(form_request_object) and _file_has_valid_extension(
+            form_request_object.files['spreadsheet'], SPREADSHEET_FILE_EXTENSIONS):
+        spreadsheet_file_path = save_spreadsheet_to_upload_folder(form_request_object.files['spreadsheet']);
+    if hed_present_in_form(form_request_object) and _file_has_valid_extension(
+            form_request_object.files['hed'], HED_FILE_EXTENSIONS):
+        hed_file_path = _save_hed_to_upload_folder_if_present(form_request_object.files['hed']);
+    return spreadsheet_file_path, hed_file_path;
+
+
+def _get_original_spreadsheet_filename(form_request_object):
+    """Gets the original name of the spreadsheet.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    string
+        The name of the spreadsheet.
+    """
+    if spreadsheet_present_in_form(form_request_object) and _file_has_valid_extension(
+            form_request_object.files['spreadsheet'], SPREADSHEET_FILE_EXTENSIONS):
+        return form_request_object.files['spreadsheet'].filename;
+    return '';
+
 
 
 def generate_download_file_response(download_file_name):
@@ -189,6 +232,7 @@ def generate_download_file_response(download_file_name):
                 for line in download_file:
                     yield line;
             delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], download_file_name));
+
         return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
                                                                                            download_file_name});
     except:
@@ -197,7 +241,7 @@ def generate_download_file_response(download_file_name):
 
 def populate_worksheet_info(request_object):
     worksheets_info = initialize_worksheets_info_dictionary();
-    if spreadsheet_file_present_in_form(request_object):
+    if spreadsheet_present_in_form(request_object):
         workbook_file = request_object.files['spreadsheet_file'];
         workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
         if workbook_file_path:
@@ -284,9 +328,8 @@ def _save_hed_to_upload_folder_if_present(hed_file_object):
     return hed_file_path;
 
 
-def _get_the_number_of_rows_with_validation_issues(validation_issues):
-    """Gets the number of rows in the spreadsheet that has val
-    idation issues.
+def _get_validation_issue_count(validation_issues):
+    """Gets the number of validation issues in the spreadsheet.
 
     Parameters
     ----------
@@ -296,24 +339,24 @@ def _get_the_number_of_rows_with_validation_issues(validation_issues):
     Returns
     -------
         integer
-        A integer representing the number of spreadsheet rows that had validation issues.
+        A integer representing the number of validation issues.
     """
-    number_of_rows_with_issues = 0;
+    number_of_issues = 0;
     split_validation_issues = validation_issues.split('\n');
     if split_validation_issues != ['']:
         for validation_issue_line in split_validation_issues:
-            if not validation_issue_line.startswith('\t'):
-                number_of_rows_with_issues += 1;
-    return number_of_rows_with_issues;
+            if validation_issue_line.startswith('\t'):
+                number_of_issues += 1;
+    return number_of_issues;
 
 
-def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, validation_issues, worksheet_name=''):
+def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, validation_issues, worksheet_name=''):
     """Saves the validation issues found to a file in the upload folder.
 
     Parameters
     ----------
-    spreadsheet_file_name: string
-        The name of the spreadsheet.
+    spreadsheet_filename: string
+        The name to the spreadsheet.
     worksheet_name: string
         The name of the spreadsheet worksheet.
     validation_issues: string
@@ -325,8 +368,7 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_name, vali
         The name of the validation output file.
 
     """
-
-    validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_file_name, worksheet_name);
+    validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
     validation_issues_file_path = os.path.join(app.config['UPLOAD_FOLDER'], validation_issues_filename);
     with open(validation_issues_file_path, 'w') as validation_issues_file:
         validation_issues_file.write(validation_issues);
@@ -388,13 +430,13 @@ def _get_file_extension(file_name_or_path):
     return secure_filename(file_name_or_path).rsplit('.')[-1];
 
 
-def _get_validation_input_arguments_from_validation_form(validation_form_request_object, spreadsheet_file_path,
-                                                         hed_file_path):
+def _generate_input_arguments_from_validation_form(form_request_object, spreadsheet_file_path,
+                                                   hed_file_path):
     """Gets the validation function input arguments from a request object associated with the validation form.
 
     Parameters
     ----------
-    validation_form_request_object: Request object
+    form_request_object: Request object
         A Request object containing user data from the validation form.
     spreadsheet_file_path: string
         The path to the workbook file.
@@ -405,26 +447,59 @@ def _get_validation_input_arguments_from_validation_form(validation_form_request
         A dictionary containing input arguments for calling the underlying validation function.
     """
     validation_input_arguments = {};
+    print(form_request_object.form)
     validation_input_arguments['spreadsheet_path'] = spreadsheet_file_path;
-    validation_input_arguments['hed_path'] = get_hed_path_from_validation_form(validation_form_request_object,
-                                                                               hed_file_path);
+    validation_input_arguments['hed_path'] = _get_hed_path_from_validation_form(form_request_object,
+                                                                                hed_file_path);
     validation_input_arguments['tag_columns'] = \
-        get_other_tag_columns_from_validation_form(validation_form_request_object.form['tag-columns'])
+        get_other_tag_columns_from_validation_form(form_request_object.form['tag-columns'])
     validation_input_arguments['required_tag_columns'] = \
-        get_required_tag_columns_from_validation_form(validation_form_request_object);
+        get_specific_tag_columns_from_validation_form(form_request_object);
     validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
-        validation_form_request_object, 'worksheet', 'string');
+        form_request_object, 'worksheet', 'string');
     validation_input_arguments['has_column_names'] = _get_optional_validation_form_field(
-        validation_form_request_object, 'has-column-names', 'boolean');
+        form_request_object, 'has-column-names', 'boolean');
     validation_input_arguments['check_for_warnings'] = _get_optional_validation_form_field(
-        validation_form_request_object, 'generate-warnings', 'boolean');
+        form_request_object, 'generate-warnings', 'boolean');
     return validation_input_arguments;
 
 
-def get_hed_path_from_validation_form(validation_form_request_object, hed_file_path):
-    if validation_form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path:
-        return HedInputReader.get_path_from_hed_version(validation_form_request_object.form['hed-version']);
+def _get_hed_path_from_validation_form(form_request_object, hed_file_path):
+    """Gets the validation function input arguments from a request object associated with the validation form.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+    hed_file_path: string
+        The path to the HED XML file.
+
+    Returns
+    -------
+    string
+        The HED XML file path.
+    """
+    if _hed_version_in_form(form_request_object) and\
+            (form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path):
+        return HedInputReader.get_path_from_hed_version(form_request_object.form['hed-version']);
     return hed_file_path;
+
+
+def _hed_version_in_form(form_request_object):
+    """Checks to see if the hed version is in the validation form.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    boolean
+        True if the hed version is in the validation form. False, if otherwise.
+    """
+    return 'hed-version' in form_request_object.form;
+
 
 def get_other_tag_columns_from_validation_form(other_tag_columns):
     """Gets the validation function input arguments from a request object associated with the validation form.
@@ -444,12 +519,12 @@ def get_other_tag_columns_from_validation_form(other_tag_columns):
     return [];
 
 
-def get_required_tag_columns_from_validation_form(validation_form_request_object):
-    """Gets the validation function input arguments from a request object associated with the validation form.
+def get_specific_tag_columns_from_validation_form(form_request_object):
+    """Gets the specific tag columns from the validation form.
 
     Parameters
     ----------
-    validation_form_request_object: Request object
+    form_request_object: Request object
         A Request object containing user data from the validation form.
 
     Returns
@@ -459,10 +534,10 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
         the name of the column.
     """
     required_tag_columns = {};
-    for tag_column_name in REQUIRED_TAG_COLUMN_NAMES:
+    for tag_column_name in SPECIFIC_TAG_COLUMN_NAMES:
         form_tag_column_name = tag_column_name.lower() + '-column';
-        if form_tag_column_name in validation_form_request_object.form:
-            tag_column_name_index = validation_form_request_object.form[form_tag_column_name].strip();
+        if form_tag_column_name in form_request_object.form:
+            tag_column_name_index = form_request_object.form[form_tag_column_name].strip();
             if tag_column_name_index:
                 tag_column_name_index = int(tag_column_name_index);
                 required_tag_columns[tag_column_name_index] = tag_column_name;
@@ -609,7 +684,7 @@ def validate_spreadsheet(validation_arguments):
     return hed_input_reader.get_validation_issues();
 
 
-def spreadsheet_file_present_in_form(validation_form_request_object):
+def spreadsheet_present_in_form(validation_form_request_object):
     """Checks to see if a spreadsheet file is present in a request object from validation form.
 
     Parameters
@@ -623,7 +698,24 @@ def spreadsheet_file_present_in_form(validation_form_request_object):
         True if a spreadsheet file is present in a request object from the validation form.
 
     """
-    return 'spreadsheet_file' in validation_form_request_object.files;
+    return 'spreadsheet' in validation_form_request_object.files;
+
+
+def hed_present_in_form(validation_form_request_object):
+    """Checks to see if a HED XML file is present in a request object from validation form.
+
+    Parameters
+    ----------
+    validation_form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    boolean
+        True if a HED XML file is present in a request object from the validation form.
+
+    """
+    return 'hed' in validation_form_request_object.files;
 
 
 def hed_file_present_in_form(validation_form_request_object):
@@ -875,7 +967,7 @@ def _get_spreadsheet_tag_column_indices(column_names):
 
     """
     tag_column_indices = [];
-    for tag_column_name in TAG_COLUMN_NAMES:
+    for tag_column_name in OTHER_TAG_COLUMN_NAMES:
         tag_column_index = _find_str_index_in_list(column_names, tag_column_name);
         if tag_column_index != -1:
             tag_column_indices.append(tag_column_index);
@@ -897,9 +989,9 @@ def _get_spreadsheet_required_tag_column_indices(column_names):
 
     """
     required_tag_column_indices = {};
-    required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY.keys();
+    required_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY.keys();
     for required_tag_column_name in required_tag_column_names:
-        alternative_required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY[required_tag_column_name];
+        alternative_required_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY[required_tag_column_name];
         for alternative_required_tag_column_name in alternative_required_tag_column_names:
             required_tag_column_index = _find_str_index_in_list(column_names, alternative_required_tag_column_name);
             if required_tag_column_index != -1:
