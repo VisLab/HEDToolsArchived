@@ -2,14 +2,17 @@
 %
 % Usage:
 %
-%   >>  error = warningReporter(warningType, varargin);
+%   >>  warning = warningReporter(warningType, varargin);
 %
 % Input:
 %
-%    default_unit
-%         The default unit class unit associated with the warning.
+%   warningType
+%         The type of warnings.
 %
 % Input (Optional):
+%
+%   defaultUnit
+%         The default unit class unit associated with the warning.
 %
 %   tag
 %         The tag that generated the error. The original tag not the
@@ -18,8 +21,7 @@
 %   tagPrefix
 %         The tag prefix that generated the error.
 %
-%   warningType
-%         The type of warnings.
+
 %
 % Output:
 %
@@ -46,25 +48,26 @@
 
 function warning = warningReporter(warningType, varargin)
 p = parseArguments(warningType, varargin{:});
+
 switch(warningType)
     case 'cap'
-        warning = sprintf(['[\tWARNING: First word not capitalized or camel case - "%s"\n]' ...
-            'closing brackets\n'], p.tag);
+        warning = sprintf(['\tWARNING: First word not capitalized or' ...
+            ' camel case - "%s"'], p.tag);
     case 'required'
-        warning = sprintf(['\tWARNING: Tag with prefix \"%s\" is' ...
+        warning = sprintf(['\tWARNING: Tag with prefix "%s" is' ...
             ' required\n'], p.tagPrefix);
     case 'unitClass'
         warning = sprintf(['\tWARNING: No unit specified. Using "%s" as' ...
-            ' the default - "%s"\n'], defaultUnit, tag);
+            ' the default - "%s"\n'], p.defaultUnit, p.tag);
 end
 
     function p = parseArguments(warningType, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('warningType',  @(x) ~isempty(x) && ischar(x));
+        p.addParamValue('defaultUnit', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('tag', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('tagPrefix', '', @(x)  ~isempty(x) && ischar(x));
-        p.addParamValue('warningType', '', @(x)  ~isempty(x) && ischar(x));
         p.parse(warningType, varargin{:});
         p = p.Results;
     end % parseArguments
