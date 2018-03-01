@@ -1,33 +1,18 @@
-classdef ErrorReporterTest < matlab.unittest.TestCase
-    
-    methods (Test)
-        
-        function testGetErrorTypeMap(testCase)
-            % Unit test for getErrorTypeMap function
-            errorReporter = ErrorReporter();
-            errorTypeMap = errorReporter.getErrorTypeMap();
-            testCase.assertInstanceOf(errorTypeMap, 'containers.Map');
-        end % testGetErrorTypeMap
-        
-        function testPopulateErrorTypeMap(testCase)
-            % Unit test for populateErrorTypeMap function
-            errorTypeMap = ErrorReporter.populateErrorTypeMap();
-            testCase.assertInstanceOf(errorTypeMap, 'containers.Map');
-        end % testPopulateErrorTypeMap
-        
-        function testCountPlaceHoldersInError(testCase)
-            % Unit test for countPlaceHoldersInError function
-            errorReporter = ErrorReporter();
-            errors = ErrorConstants.ErrorMessages;
-            numberOfErrors = length(errors);
-            for a = 1:numberOfErrors
-                placeHolderCount = ...
-                    errorReporter.countPlaceHoldersInError(errors{a});
-                testCase.assertInstanceOf(placeHolderCount, 'double');
-            end
-        end % testCountPlaceHoldersInError
-        
-    end % test functions
-    
-end % ErrorReporterTest
+function tests = errorReporterTest
+tests = functiontests(localfunctions);
+end % errorReporterTest
 
+function setupOnce(testCase)
+testCase.TestData.errorTypes = {'bracket', 'row', 'isNumeric', 'requireChild', ...
+    'tilde', 'unique', 'unitClass', 'valid'};
+end % setupOnce
+
+
+%% Test Functions
+function testErrorReporter(testCase)
+numberOfErrorTypes = length(testCase.TestData.errorTypes);
+for a = 1:numberOfErrorTypes
+    errorReport = errorReporter(testCase.TestData.errorTypes{a});
+    testCase.verifyClass(errorReport, 'char');
+end
+end % testErrorReporter
