@@ -2,7 +2,7 @@
 %
 % Usage:
 %
-%   >>  error = generateerror(type, line, tag, prefix, units);
+%   >>  error = errorReporter(errorType, varargin);
 %
 % Input:
 %
