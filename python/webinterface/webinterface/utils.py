@@ -153,11 +153,12 @@ def report_spreadsheet_validation_status(form_request_object):
     hed_file_path = '';
     try:
         spreadsheet_file_path, hed_file_path = _get_uploaded_file_paths_from_forms(form_request_object);
+        original_spreadsheet_filename = _get_original_spreadsheet_filename(form_request_object);
         validation_input_arguments = _generate_input_arguments_from_validation_form(
             form_request_object, spreadsheet_file_path, hed_file_path);
         validation_issues = validate_spreadsheet(validation_input_arguments);
         validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
-            spreadsheet_file_path, validation_issues, validation_input_arguments['worksheet']);
+            original_spreadsheet_filename, validation_issues, validation_input_arguments['worksheet']);
         validation_status['issueCount'] = _get_validation_issue_count(validation_issues);
     except:
         validation_status['error'] = traceback.format_exc();
@@ -189,6 +190,26 @@ def _get_uploaded_file_paths_from_forms(form_request_object):
             form_request_object.files['hed'], HED_FILE_EXTENSIONS):
         hed_file_path = _save_hed_to_upload_folder_if_present(form_request_object.files['hed']);
     return spreadsheet_file_path, hed_file_path;
+
+
+def _get_original_spreadsheet_filename(form_request_object):
+    """Gets the original name of the spreadsheet.
+
+    Parameters
+    ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
+
+    Returns
+    -------
+    string
+        The name of the spreadsheet.
+    """
+    if spreadsheet_present_in_form(form_request_object) and _file_has_valid_extension(
+            form_request_object.files['spreadsheet'], SPREADSHEET_FILE_EXTENSIONS):
+        return form_request_object.files['spreadsheet'].filename;
+    return '';
+
 
 
 def generate_download_file_response(download_file_name):
@@ -329,13 +350,13 @@ def _get_validation_issue_count(validation_issues):
     return number_of_issues;
 
 
-def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_path, validation_issues, worksheet_name=''):
+def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, validation_issues, worksheet_name=''):
     """Saves the validation issues found to a file in the upload folder.
 
     Parameters
     ----------
-    spreadsheet_file_path: string
-        The path to the spreadsheet.
+    spreadsheet_filename: string
+        The name to the spreadsheet.
     worksheet_name: string
         The name of the spreadsheet worksheet.
     validation_issues: string
@@ -347,7 +368,6 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_path, vali
         The name of the validation output file.
 
     """
-    spreadsheet_filename = os.path.basename(spreadsheet_file_path);
     validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
     validation_issues_file_path = os.path.join(app.config['UPLOAD_FOLDER'], validation_issues_filename);
     with open(validation_issues_file_path, 'w') as validation_issues_file:
