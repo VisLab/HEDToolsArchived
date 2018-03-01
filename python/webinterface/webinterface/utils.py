@@ -12,9 +12,9 @@ from hedvalidation.hed_dictionary import HedDictionary;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
-TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag'];
-REQUIRED_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
-REQUIRED_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
+OTHER_TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag', 'Attribute'];
+SPECIFIC_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
+SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
                                         'Label': ['Label', 'Event Label', 'Short Label'],
                                         'Long': ['Long name']};
@@ -158,7 +158,7 @@ def report_spreadsheet_validation_status(form_request_object):
         validation_issues = validate_spreadsheet(validation_input_arguments);
         validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
             spreadsheet_file_path, validation_issues, validation_input_arguments['worksheet']);
-        validation_status['rowIssueCount'] = _get_the_number_of_rows_with_validation_issues(validation_issues);
+        validation_status['issueCount'] = _get_validation_issue_count(validation_issues);
     except:
         validation_status['error'] = traceback.format_exc();
     finally:
@@ -307,9 +307,8 @@ def _save_hed_to_upload_folder_if_present(hed_file_object):
     return hed_file_path;
 
 
-def _get_the_number_of_rows_with_validation_issues(validation_issues):
-    """Gets the number of rows in the spreadsheet that has val
-    idation issues.
+def _get_validation_issue_count(validation_issues):
+    """Gets the number of validation issues in the spreadsheet.
 
     Parameters
     ----------
@@ -319,15 +318,15 @@ def _get_the_number_of_rows_with_validation_issues(validation_issues):
     Returns
     -------
         integer
-        A integer representing the number of spreadsheet rows that had validation issues.
+        A integer representing the number of validation issues.
     """
-    number_of_rows_with_issues = 0;
+    number_of_issues = 0;
     split_validation_issues = validation_issues.split('\n');
     if split_validation_issues != ['']:
         for validation_issue_line in split_validation_issues:
-            if not validation_issue_line.startswith('\t'):
-                number_of_rows_with_issues += 1;
-    return number_of_rows_with_issues;
+            if validation_issue_line.startswith('\t'):
+                number_of_issues += 1;
+    return number_of_issues;
 
 
 def _save_validation_issues_to_file_in_upload_folder(spreadsheet_file_path, validation_issues, worksheet_name=''):
@@ -483,7 +482,7 @@ def get_required_tag_columns_from_validation_form(validation_form_request_object
         the name of the column.
     """
     required_tag_columns = {};
-    for tag_column_name in REQUIRED_TAG_COLUMN_NAMES:
+    for tag_column_name in SPECIFIC_TAG_COLUMN_NAMES:
         form_tag_column_name = tag_column_name.lower() + '-column';
         if form_tag_column_name in validation_form_request_object.form:
             tag_column_name_index = validation_form_request_object.form[form_tag_column_name].strip();
@@ -916,7 +915,7 @@ def _get_spreadsheet_tag_column_indices(column_names):
 
     """
     tag_column_indices = [];
-    for tag_column_name in TAG_COLUMN_NAMES:
+    for tag_column_name in OTHER_TAG_COLUMN_NAMES:
         tag_column_index = _find_str_index_in_list(column_names, tag_column_name);
         if tag_column_index != -1:
             tag_column_indices.append(tag_column_index);
@@ -938,9 +937,9 @@ def _get_spreadsheet_required_tag_column_indices(column_names):
 
     """
     required_tag_column_indices = {};
-    required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY.keys();
+    required_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY.keys();
     for required_tag_column_name in required_tag_column_names:
-        alternative_required_tag_column_names = REQUIRED_TAG_COLUMN_NAMES_DICTIONARY[required_tag_column_name];
+        alternative_required_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY[required_tag_column_name];
         for alternative_required_tag_column_name in alternative_required_tag_column_names:
             required_tag_column_index = _find_str_index_in_list(column_names, alternative_required_tag_column_name);
             if required_tag_column_index != -1:
