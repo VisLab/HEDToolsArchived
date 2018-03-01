@@ -152,7 +152,7 @@ def report_spreadsheet_validation_status(form_request_object):
     spreadsheet_file_path = '';
     hed_file_path = '';
     try:
-        spreadsheet_file_path, hed_file_path = _get_uploaded_file_paths_from_forms(form_request_object)
+        spreadsheet_file_path, hed_file_path = _get_uploaded_file_paths_from_forms(form_request_object);
         validation_input_arguments = _generate_input_arguments_from_validation_form(
             form_request_object, spreadsheet_file_path, hed_file_path);
         validation_issues = validate_spreadsheet(validation_input_arguments);
@@ -182,13 +182,12 @@ def _get_uploaded_file_paths_from_forms(form_request_object):
     """
     spreadsheet_file_path = '';
     hed_file_path = '';
-    if spreadsheet_present_in_form(form_request_object):
-        spreadsheet_file_pointer = form_request_object.files['spreadsheet'];
-        if hed_present_in_form(form_request_object):
-            hed_file = form_request_object.files['hed'];
-        if _file_has_valid_extension(spreadsheet_file_pointer, SPREADSHEET_FILE_EXTENSIONS):
-            spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file_pointer);
-            hed_file_path = _save_hed_to_upload_folder_if_present(hed_file);
+    if spreadsheet_present_in_form(form_request_object) and _file_has_valid_extension(
+            form_request_object.files['spreadsheet'], SPREADSHEET_FILE_EXTENSIONS):
+        spreadsheet_file_path = save_spreadsheet_to_upload_folder(form_request_object.files['spreadsheet']);
+    if hed_present_in_form(form_request_object) and _file_has_valid_extension(
+            form_request_object.files['hed'], HED_FILE_EXTENSIONS):
+        hed_file_path = _save_hed_to_upload_folder_if_present(form_request_object.files['hed']);
     return spreadsheet_file_path, hed_file_path;
 
 
