@@ -149,6 +149,8 @@ def report_spreadsheet_validation_status(form_request_object):
         500 error message is returned.
     """
     validation_status = {};
+    spreadsheet_file_path = '';
+    hed_file_path = '';
     try:
         spreadsheet_file_path, hed_file_path = _get_uploaded_file_paths_from_forms(form_request_object)
         validation_input_arguments = _generate_input_arguments_from_validation_form(
@@ -170,6 +172,8 @@ def _get_uploaded_file_paths_from_forms(form_request_object):
 
     Parameters
     ----------
+    form_request_object: Request object
+        A Request object containing user data from the validation form.
 
     Returns
     -------
