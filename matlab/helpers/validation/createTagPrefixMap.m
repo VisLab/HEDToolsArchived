@@ -3,7 +3,7 @@
 %
 % Usage:
 %
-%   >>  issues = validateworksheethedtags(workbook)
+%   >>  tagPrefixMap = createTagPrefixMap(specificColumns)
 
 % Input:
 %
