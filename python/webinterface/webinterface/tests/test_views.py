@@ -19,5 +19,12 @@ class Test(unittest.TestCase):
         response = self.app.get('/delete/file_that_does_not_exist');
         self.assertEqual(response.status_code, 404)
 
+
+    def test_get_hed_version_in_file(self):
+        response = self.app.post('/gethedversion');
+        self.assertEqual(response.status_code, 400)
+
+
+
 if __name__ == '__main__':
     unittest.main();
