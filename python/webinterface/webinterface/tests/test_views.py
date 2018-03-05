@@ -27,6 +27,9 @@ class Test(unittest.TestCase):
         response = self.app.post('/getmajorhedversions');
         self.assertEqual(response.status_code, 405);
 
+    def test_get_spreadsheet_columns_info(self):
+        response = self.app.post('/getspreadsheetcolumnsinfo');
+        self.assertEqual(response.status_code, 400);
 
 
 if __name__ == '__main__':
