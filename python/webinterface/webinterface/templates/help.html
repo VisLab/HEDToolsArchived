@@ -6,13 +6,13 @@
         are ready to begin the validation.</p>
     <h3>Step 1: Specify the file to be validated</h3>
     <p>Indicate the name of the file to validate, using the Browse button to navigate in your file system:</p>
-    <img src="{{ url_for('static', filename='select_spreadsheet.png') }}">
+    <img class="border border-primary" src="{{ url_for('static', filename='select_spreadsheet.png') }}">
     <h3>Step 2: Define the locations of the HED tags in your file.</h3>
     <p>After you have selected a file, HED Validator will try to automatically fill in the remaining information into
         its form based on the contents of your file. In the following example, the file EmotionEventInformation.xlsx was
         selected. If a spreadsheet has multiple worksheets, HED Validator selects the first one by default
         (ImaginedEmotion), but provides a drop down for you to select a different one. </p>
-    <img src="{{ url_for('static', filename='define_hed_tags.png') }}">
+    <img class="border border-primary" src="{{ url_for('static', filename='define_hed_tags.png') }}">
     <p>By default, HED Validator assumes that the first row gives the names of the columns and uses these names to guess
         which columns correspond to special tags such as Event/Category or Event/Label. In the above example the HED
         Validator has guessed that the the second column (entitled Category) holds the Event/Category tag. The Validator
