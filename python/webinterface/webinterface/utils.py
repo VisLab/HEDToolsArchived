@@ -795,7 +795,7 @@ def populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
                                                                  worksheets_info['worksheetNames'][0]);
     worksheets_info['tagColumnIndices'] = _get_spreadsheet_tag_column_indices(worksheets_info['columnNames']);
     worksheets_info['requiredTagColumnIndices'] = \
-        _get_spreadsheet_required_tag_column_indices(worksheets_info['columnNames']);
+        _get_spreadsheet_specific_tag_column_indices(worksheets_info['columnNames']);
     return worksheets_info;
 
 
@@ -830,7 +830,7 @@ def populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, sprea
     spreadsheet_columns_info['tagColumnIndices'] = \
         _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames']);
     spreadsheet_columns_info['requiredTagColumnIndices'] = \
-        _get_spreadsheet_required_tag_column_indices(spreadsheet_columns_info['columnNames']);
+        _get_spreadsheet_specific_tag_column_indices(spreadsheet_columns_info['columnNames']);
     return spreadsheet_columns_info;
 
 
@@ -973,7 +973,7 @@ def _get_spreadsheet_tag_column_indices(column_names):
     return tag_column_indices;
 
 
-def _get_spreadsheet_required_tag_column_indices(column_names):
+def _get_spreadsheet_specific_tag_column_indices(column_names):
     """Gets the required tag column indices in a spreadsheet. The indices found will be one-based.
 
     Parameters
@@ -987,15 +987,15 @@ def _get_spreadsheet_required_tag_column_indices(column_names):
         A dictionary containing the required tag column indices found in a spreadsheet.
 
     """
-    required_tag_column_indices = {};
-    required_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY.keys();
-    for required_tag_column_name in required_tag_column_names:
-        alternative_required_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY[required_tag_column_name];
-        for alternative_required_tag_column_name in alternative_required_tag_column_names:
-            required_tag_column_index = _find_str_index_in_list(column_names, alternative_required_tag_column_name);
-            if required_tag_column_index != -1:
-                required_tag_column_indices[required_tag_column_name] = required_tag_column_index;
-    return required_tag_column_indices;
+    specific_tag_column_indices = {};
+    specific_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY.keys();
+    for specific_tag_column_name in specific_tag_column_names:
+        alternative_specific_tag_column_names = SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY[specific_tag_column_name];
+        for alternative_specific_tag_column_name in alternative_specific_tag_column_names:
+            specific_tag_column_index = _find_str_index_in_list(column_names, alternative_specific_tag_column_name);
+            if specific_tag_column_index != -1:
+                specific_tag_column_indices[specific_tag_column_name] = specific_tag_column_index;
+    return specific_tag_column_indices;
 
 
 def find_all_str_indices_in_list(list_of_strs, str_value):
@@ -1036,7 +1036,7 @@ def _find_str_index_in_list(list_of_strs, str_value):
 
     """
     try:
-        return [s.lower().strip() for s in list_of_strs].index(str_value.lower()) + 1;
+        return [s.lower().strip() for s in list_of_strs].index(str_value.lower().strip()) + 1;
     except ValueError:
         return -1;
 
