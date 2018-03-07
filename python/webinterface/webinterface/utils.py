@@ -12,7 +12,8 @@ from hedvalidation.hed_dictionary import HedDictionary;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
-OTHER_TAG_COLUMN_NAMES = ['Event Details', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag', 'Attribute'];
+OTHER_TAG_COLUMN_NAMES = ['Event Details', 'Multiple Tags', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag',
+                          'Attribute'];
 SPECIFIC_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
 SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
                                         'Description': ['Description', 'Description in text', 'Event Description'],
@@ -209,7 +210,6 @@ def _get_original_spreadsheet_filename(form_request_object):
             form_request_object.files['spreadsheet'], SPREADSHEET_FILE_EXTENSIONS):
         return form_request_object.files['spreadsheet'].filename;
     return '';
-
 
 
 def generate_download_file_response(download_file_name):
@@ -478,7 +478,7 @@ def _get_hed_path_from_validation_form(form_request_object, hed_file_path):
     string
         The HED XML file path.
     """
-    if _hed_version_in_form(form_request_object) and\
+    if _hed_version_in_form(form_request_object) and \
             (form_request_object.form['hed-version'] != OTHER_HED_VERSION_OPTION or not hed_file_path):
         return HedInputReader.get_path_from_hed_version(form_request_object.form['hed-version']);
     return hed_file_path;
