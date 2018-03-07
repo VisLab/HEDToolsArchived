@@ -10,8 +10,8 @@ NO_CONTENT_SUCCESS = 204;
 
 
 @app.route('/', strict_slashes=False, methods=['GET'])
-def render_main_page():
-    """Handles the site root.
+def render_home_page():
+    """Handles the home page.
 
     Parameters
     ----------
@@ -19,10 +19,10 @@ def render_main_page():
     Returns
     -------
     Rendered template
-        A rendered template for the main page.
+        A rendered template for the home page.
 
     """
-    return render_template('hed.html');
+    return render_template('home.html');
 
 
 @app.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
