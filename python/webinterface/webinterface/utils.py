@@ -793,7 +793,7 @@ def populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
     worksheets_info['worksheetNames'] = _get_excel_worksheet_names(spreadsheet_file_path);
     worksheets_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
                                                                  worksheets_info['worksheetNames'][0]);
-    worksheets_info['tagColumnIndices'] = _get_spreadsheet_tag_column_indices(worksheets_info['columnNames']);
+    worksheets_info['tagColumnIndices'] = _get_spreadsheet_other_tag_column_indices(worksheets_info['columnNames']);
     worksheets_info['requiredTagColumnIndices'] = \
         _get_spreadsheet_specific_tag_column_indices(worksheets_info['columnNames']);
     return worksheets_info;
@@ -828,7 +828,7 @@ def populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, sprea
         spreadsheet_columns_info['columnNames'] = get_text_file_column_names(spreadsheet_file_path,
                                                                              column_delimiter);
     spreadsheet_columns_info['tagColumnIndices'] = \
-        _get_spreadsheet_tag_column_indices(spreadsheet_columns_info['columnNames']);
+        _get_spreadsheet_other_tag_column_indices(spreadsheet_columns_info['columnNames']);
     spreadsheet_columns_info['requiredTagColumnIndices'] = \
         _get_spreadsheet_specific_tag_column_indices(spreadsheet_columns_info['columnNames']);
     return spreadsheet_columns_info;
@@ -951,8 +951,8 @@ def _get_excel_worksheet_names(workbook_file_path):
     return worksheet_names;
 
 
-def _get_spreadsheet_tag_column_indices(column_names):
-    """Gets the tag column indices in a spreadsheet. The indices found will be one-based.
+def _get_spreadsheet_other_tag_column_indices(column_names):
+    """Gets the other tag column indices in a spreadsheet. The indices found will be one-based.
 
     Parameters
     ----------
@@ -968,8 +968,8 @@ def _get_spreadsheet_tag_column_indices(column_names):
     tag_column_indices = [];
     for tag_column_name in OTHER_TAG_COLUMN_NAMES:
         found_indices = find_all_str_indices_in_list(column_names, tag_column_name);
-        if not tag_column_indices:
-            tag_column_indices += found_indices;
+        if found_indices:
+            tag_column_indices.extend(found_indices);
     return tag_column_indices;
 
 
