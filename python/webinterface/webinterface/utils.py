@@ -12,13 +12,14 @@ from hedvalidation.hed_dictionary import HedDictionary;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
-OTHER_TAG_COLUMN_NAMES = ['Event Details', 'Multiple Tags', 'HED tags', 'Tag', 'Tags', 'Column2: Combined tag',
-                          'Attribute'];
+OTHER_TAG_COLUMN_NAMES = ['Event Details', 'Multiple Tags', 'HED tag', 'HED tags', 'Tag', 'Tags'];
 SPECIFIC_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
-SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Category', 'Event Category'],
-                                        'Description': ['Description', 'Description in text', 'Event Description'],
-                                        'Label': ['Label', 'Event Label', 'Short Label'],
-                                        'Long': ['Long name']};
+SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY = {'Category': ['Categories', 'Category', 'Event Categories', 'Event Category'],
+                                        'Description': ['Description', 'Descriptions', 'Description in text',
+                                                        'Event Description', 'Event Descriptions'],
+                                        'Label': ['Event Label', 'Event Labels', 'Label', 'Labels', 'Short',
+                                                  'Short Label', 'Short Labels'],
+                                        'Long': ['Long', 'Long name', 'Long names']};
 SPREADSHEET_FILE_EXTENSION_TO_DELIMITER_DICTIONARY = {'txt': '\t', 'tsv': '\t', 'csv': ','};
 OTHER_HED_VERSION_OPTION = 'Other';
 
@@ -1015,7 +1016,7 @@ def find_all_str_indices_in_list(list_of_strs, str_value):
 
     """
     return [index + 1 for index, value in enumerate(list_of_strs) if
-            value.lower().strip() == str_value.lower().strip()];
+            value.lower().replace(' ', '') == str_value.lower().replace(' ', '')];
 
 
 def _find_str_index_in_list(list_of_strs, str_value):
@@ -1036,7 +1037,7 @@ def _find_str_index_in_list(list_of_strs, str_value):
 
     """
     try:
-        return [s.lower().strip() for s in list_of_strs].index(str_value.lower().strip()) + 1;
+        return [s.lower().replace(' ', '') for s in list_of_strs].index(str_value.lower().replace(' ', '')) + 1;
     except ValueError:
         return -1;
 
