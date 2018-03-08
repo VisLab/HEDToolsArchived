@@ -286,7 +286,7 @@ def setup_upload_directory():
     _create_folder_if_needed(app.config['UPLOAD_FOLDER']);
 
 
-def _check_file_extension(filename, accepted_file_extensions):
+def _file_extension_is_valid(filename, accepted_file_extensions):
     """Checks the file extension against a list of accepted ones.
 
     Parameters
@@ -391,7 +391,7 @@ def _file_has_valid_extension(file_object, accepted_file_extensions):
         True if the file has a valid file extension.
 
     """
-    return file_object and _check_file_extension(file_object.filename, accepted_file_extensions);
+    return file_object and _file_extension_is_valid(file_object.filename, accepted_file_extensions);
 
 
 def _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name=''):
