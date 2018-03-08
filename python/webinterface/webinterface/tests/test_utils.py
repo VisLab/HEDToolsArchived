@@ -20,6 +20,8 @@ class Test(unittest.TestCase):
     def test_get_validation_issue_count(self):
         issue_count = utils._get_validation_issue_count('');
         self.assertEqual(issue_count, 0);
+        issue_count = utils._get_validation_issue_count('\t');
+        self.assertEqual(issue_count, 1);
 
 if __name__ == '__main__':
     unittest.main();
