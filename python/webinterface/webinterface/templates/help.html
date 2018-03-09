@@ -1,23 +1,151 @@
 {% extends "layout.html" %}
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/help.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/help.css') }}">
 {% endblock %}
 {% block content %}
-    <h2>Validator Help</h2>
-    <p>The HED Validator is an online-tool designed to make validation of HED tags easy. To start, put your HED tags in
-        either an Excel file or a tab-separated text file. (Example files can be found here.) Once you have a file, you
-        are ready to begin the validation.</p>
-    <h3>Step 1: Specify the file to be validated</h3>
+    <h2>Contents</h2>
+    <ul id="outer_ul">
+        <li><a href="#using_validator">Using the validator</a></li>
+        <ul>
+            <li><a href="#specify_file">Specify the file to be validated</a></li>
+            <li><a href="#specify_columns">Specify which columns of your file contain HED tags</a></li>
+            <li><a href="#select_other_options">Select the other options</a></li>
+            <li><a href="#click_submit">Click the submit button to process the file</a></li>
+        </ul>
+        <li><a href="#notes_examples">Notes and examples</a></li>
+        <ul>
+            <li><a href="#specify_file">Specify the file to be validated</a></li>
+            <li><a href="#setup_excel">How to set up your spreadsheet in Excel</a></li>
+            <li><a href="#setup_tsv">How to set up your spreadsheet as a tab-separated text file</a></li>
+        </ul>
+    </ul>
+    <h2 id="using_validator">Using the validator</h2>
+    <p>The HED Validator is an online-tool designed to make validation of HED tags easy. To start, put your HED tags
+        in
+        either an Excel file or a tab-separated text file. (Example files can be found <span
+                style="text-decoration: underline">in the Notes and Examples
+            section</span>.) Once you have a file, you are ready to begin the validation.</p>
+    <h3 id="specify_file">Step 1: Specify the file to be validated.</h3>
     <p>Indicate the name of the file to validate, using the Browse button to navigate in your file system:</p>
-    <img src="{{ url_for('static', filename='img/select_spreadsheet.png') }}">
-    <h3>Step 2: Define the locations of the HED tags in your file.</h3>
-    <p>After you have selected a file, HED Validator will try to automatically fill in the remaining information into
-        its form based on the contents of your file. In the following example, the file EmotionEventInformation.xlsx was
+    <img src="{{ url_for('static', filename='img/specify_file.png') }}">
+    <h3 id="specify_columns">Step 2: Specify which columns of your file contain HED tags.</h3>
+    <p>After you have selected a file, HED Validator will try to automatically fill in the remaining information
+        into
+        its form based on the contents of your file. In the following example, the file EmotionEventInformation.xlsx
+        was
         selected. If a spreadsheet has multiple worksheets, HED Validator selects the first one by default
-        (ImaginedEmotion), but provides a drop down for you to select a different one. </p>
-    <img src="{{ url_for('static', filename='img/define_hed_tags.png') }}">
-    <p>By default, HED Validator assumes that the first row gives the names of the columns and uses these names to guess
-        which columns correspond to special tags such as Event/Category or Event/Label. In the above example the HED
-        Validator has guessed that the the second column (entitled Category) holds the Event/Category tag. The Validator
-        was also able to correctly guess the Event/Label and Event/Description columns.</p>
+        (ImaginedEmotion), but provides a drop down for you to select a different one:</p>
+    <img src="{{ url_for('static', filename='img/specify_columns.png') }}">
+    <p>By default, the HED Validator assumes that the first row of the spreadsheet contains the names of the columns
+        and
+        uses these names to guess which columns correspond to special tags such as Event/Category or Event/Label. In
+        the
+        above example, the HED Validator guessed that the second column (entitled Category) holds the Event/Category
+        tag. The Validator was also able to correctly guess the Event/Label and Event/Description columns. The
+        Validator
+        was not able to correctly able to identify LongName with Event/Long name, so we need to put 4 in the empty
+        field
+        next to it so that it gets the proper values for Long Name. In addition, the Validator also missed that
+        column 8
+        (called Other) also contained HED tags. After correcting we have:</p>
+    <img src="{{ url_for('static', filename='img/correct_columns.png') }}">
+    <h3 id="select_other_options">Step 3: Select the other options.</h3>
+    <p>You can validate your file against any valid HED schema. The Validator automatically retrieves the latest HED
+        version and also has copies of each of the previous major HED versions available through the HED version
+        pull-down in the options section. You can also upload one of your own HED versions by selecting the Other
+        option
+        in the pull-down:</p>
+    <img src="{{ url_for('static', filename='img/select_other_options.png') }}">
+    <p>HED uses semantic versioning (X.Y.Z) where X denotes a major, backwards-incompatible change, Y denotes a
+        major
+        addition of functionality that is backwards-compatible, and Z denotes a minor backwards-compatible
+        update.</p>
+    <p>If your spreadsheet does not have column names, you should uncheck the Spreadsheet has column names box. All
+        errors in your HED tag spreadsheet must be corrected, or downstream tools relying on HED might not work
+        properly. However, when you first validate, you might want to ignore warnings until you have corrected all
+        errors. Once you have the errors out, you should probably run again and take a look at the warnings.
+        Warnings
+        often help you detect faulty tagging that might not be syntactically incorrect.</p>
+    <h3 id="click_submit">Step 4: Click the submit button to process the file.</h3>
+    <p>On submission, the HED Validator processes the file and outputs a message indicating the number of errors and
+        warnings that it found:</p>
+    <img src="{{ url_for('static', filename='img/validation_issues.png') }}">
+    <p>The HED Validator also writes error and warning messages to a text file for download and examination. Each
+        message contains the type of error or warning as well as the row and column number in the input file where
+        the
+        issue occurred. If the HED validator detected no issues, you will see the following message. You should now
+        be
+        ready to use them to tag your study.</p>
+    <img src="{{ url_for('static', filename='img/no_validation_issues.png') }}">
+    <h2 id="notes_examples">Notes and examples</h2>
+    <h3 id="setup_excel">How to set up your spreadsheet in Excel:</h3>
+    <img src="{{ url_for('static', filename='img/setup_excel_spreadsheet.png') }}">
+    <p>Above is an example of a functional and validated spreadsheet. Each tag follows a tiered format.</p>
+    <p>Notes Column by Column:</p>
+    <p>A-<span style="text-decoration: underline">Event code</span>: These are set by the experimenter and they can
+        be
+        any number, letter, or combination of the two.
+        (Examples: 1, A, Jump, leftclick01)</p>
+    <p>B-<span style="text-decoration: underline">Category</span>: Specifies what type of event this signifies.
+        (Examples: Participant response, Experimental
+        stimulus/Instruction/Rest, Miscellaneous)</p>
+    <p>C-<span style="text-decoration: underline">Label</span>: This says what it is. (Examples: Button press,
+        Calibration pulse, or any other meaningful short
+        identifier for this event.)</p>
+    <p>D-<span style="text-decoration: underline">LongName</span>: The LongName allows you to give a more detailed
+        label
+        for an event. (Example: Introduction to
+        experimental procedure)</p>
+    <p>E-<span style="text-decoration: underline">Description</span>: Elaborate on what this event is. Do not use
+        commas
+        in the description since this will cause an
+        error. (Example: This indicates when the participant was exposed to the stimuli.)</p>
+    <p>F and G-Tags: These are where the stimuli, actions performed, and other important information is documented
+        that
+        occurred in the event and can be grouped using parenthesis ( (A/B, C/D/E) ), sequenced (A/B~C/D/E), or both
+        (
+        (A/B,C/D)~(E/F/G) ). (Examples: Action/Button press, (Attribute/Onset, Sensory presentation/Visual/Rendering
+        type/Screen/Movie, Item/Film clip/Animation), (Sensory
+        presentation/Auditory/Bang)~(Action/Involuntary/Fall))</p>
+    <p><span style="text-decoration: underline">Required columns are underlined.</span></p>
+    <p>The Tags Columns can be separated into different columns as shown to better specify what the event is for,
+        but a
+        single column containing them works as well.</p>
+    <h3 id="setup_tsv">How to set up your spreadsheet as a tab-separated text file:</h3>
+    <img src="{{ url_for('static', filename='img/setup_tsv_spreadsheet.png') }}">
+    <p>Above is an example of a functional and validated tab-separated text file of tags. The data shown here is
+        separated by a tab between each columns value. In this case there are 6 tabs for each line. The columns do
+        not
+        line up visually, but the program only accesses the next column</p>
+    <p>Notes Column by Column:</p>
+    <p><span style="text-decoration: underline">Event code</span>: These are set by the experimenter and they can be
+        any
+        number, letter, or combination of the two.
+        (Examples: 1, A, Jump, leftclick01)</p>
+    <p><span style="text-decoration: underline">Category</span>: Specifies what type of event this signifies.
+        (Examples:
+        Participant response, Experimental
+        stimulus/Instruction/Rest, Miscellaneous)</p>
+    <p><span style="text-decoration: underline">Label</span>: This says what it is. (Examples: Button press,
+        Calibration
+        pulse, or any other meaningful short identifier
+        for this event.)</p>
+    <p><span style="text-decoration: underline">LongName</span>: The LongName allows you to give a more detailed
+        label
+        for an event. (Example: Introduction to
+        experimental procedure)</p>
+    <p><span style="text-decoration: underline">Description</span>: Elaborate on what this event is. Do not use
+        commas
+        or tabs in the description since this will cause
+        an error. (Example: This indicates when the participant was exposed to the stimuli.)</p>
+    <p>Tags: These are where the stimuli, actions performed, and other important information is documented that
+        occurred
+        in the event and can be grouped using parenthesis ( (A/B, C/D/E) ), sequenced (A/B~C/D/E), or both (
+        (A/B,C/D)~(E/F/G) ). (Examples: Action/Button press, (Attribute/Onset, Sensory presentation/Visual/Rendering
+        type/Screen/Movie, Item/Film clip/Animation), (Sensory
+        presentation/Auditory/Bang)~(Action/Involuntary/Fall))</p>
+    <p><span style="text-decoration: underline">Required columns are underlined.</span></p>
+    <p>The Tags Columns can be separated into different columns as shown to better specify what the event is for,
+        but a
+        single column containing them works as well.</p>
 {% endblock %}
