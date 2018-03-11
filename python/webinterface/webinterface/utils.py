@@ -1061,5 +1061,5 @@ def _get_worksheet_column_names(workbook_file_path, worksheet_name):
     opened_workbook_file = xlrd.open_workbook(workbook_file_path);
     opened_worksheet = opened_workbook_file.sheet_by_name(worksheet_name);
     worksheet_column_names = [opened_worksheet.cell(0, col_index).value for col_index in
-                              xrange(opened_worksheet.ncols)];
+                              range(opened_worksheet.ncols)];
     return worksheet_column_names;

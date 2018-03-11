@@ -60,7 +60,7 @@ def download_file_in_upload_directory(filename):
 
     """
     download_response = utils.generate_download_file_response(filename);
-    if isinstance(download_response, basestring):
+    if isinstance(download_response, str):
         utils.handle_http_error(NOT_FOUND_ERROR, download_response);
     return download_response;
 
