@@ -502,12 +502,12 @@ def _hed_version_in_form(form_request_object):
 
 
 def get_other_tag_columns_from_validation_form(other_tag_columns):
-    """Gets the validation function input arguments from a request object associated with the validation form.
+    """Gets the other tag columns from the validation form.
 
     Parameters
     ----------
-    validation_form_request_object: Request object
-        A Request object containing user data from the validation form.
+    other_tag_columns: str
+        A string containing the other tag columns.
 
     Returns
     -------
