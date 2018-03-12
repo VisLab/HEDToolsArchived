@@ -515,7 +515,7 @@ def _convert_other_tag_columns_to_list(other_tag_columns):
         A list containing the other tag columns.
     """
     if other_tag_columns:
-        return map(int, other_tag_columns.split(','));
+        return list(map(int, other_tag_columns.split(',')));
     return [];
 
 
