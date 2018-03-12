@@ -101,12 +101,22 @@ class Test(unittest.TestCase):
 
     def test_find_all_str_indices_in_list(self):
         list_1 = ['a','a','c','d'];
-        list_2 = 'a';
+        search_str = 'a';
         expected_indices = [1,2];
-        indices = utils._find_all_str_indices_in_list(list_1, list_2);
+        indices = utils._find_all_str_indices_in_list(list_1, search_str);
         self.assertTrue(indices);
         self.assertIsInstance(indices, list);
-        self.assertEqual(expected_indices, indices)
+        self.assertEqual(expected_indices, indices);
+
+    def test_find_str_index_in_list(self):
+        list_1 = ['a','a','c','d'];
+        search_str = 'a';
+        expected_indices = 1;
+        indices = utils._find_str_index_in_list(list_1, search_str);
+        self.assertTrue(indices);
+        self.assertIsInstance(indices, int);
+        self.assertEqual(expected_indices, indices);
+
 
 if __name__ == '__main__':
     unittest.main();
