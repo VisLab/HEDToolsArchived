@@ -49,5 +49,11 @@ class Test(unittest.TestCase):
         deleted = utils.delete_file_if_it_exist(some_file);
         self.assertFalse(deleted);
 
+    def test_create_folder_if_needed(self):
+        some_folder = '3k32j23kj';
+        created = utils._create_folder_if_needed(some_folder);
+        self.assertTrue(created);
+        os.rmdir(some_folder);
+
 if __name__ == '__main__':
     unittest.main();
