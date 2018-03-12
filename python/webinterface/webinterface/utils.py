@@ -454,7 +454,7 @@ def _generate_input_arguments_from_validation_form(form_request_object, spreadsh
     validation_input_arguments['tag_columns'] = \
         _get_other_tag_columns_from_validation_form(form_request_object.form['tag-columns'])
     validation_input_arguments['required_tag_columns'] = \
-        get_specific_tag_columns_from_validation_form(form_request_object);
+        _get_specific_tag_columns_from_validation_form(form_request_object);
     validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
         form_request_object, 'worksheet', 'string');
     validation_input_arguments['has_column_names'] = _get_optional_validation_form_field(
@@ -519,7 +519,7 @@ def _get_other_tag_columns_from_validation_form(other_tag_columns):
     return [];
 
 
-def get_specific_tag_columns_from_validation_form(form_request_object):
+def _get_specific_tag_columns_from_validation_form(form_request_object):
     """Gets the specific tag columns from the validation form.
 
     Parameters
