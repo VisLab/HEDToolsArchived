@@ -826,8 +826,8 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
                                                                               worksheet_name);
     else:
         column_delimiter = get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
-        spreadsheet_columns_info['columnNames'] = get_text_file_column_names(spreadsheet_file_path,
-                                                                             column_delimiter);
+        spreadsheet_columns_info['columnNames'] = _get_text_file_column_names(spreadsheet_file_path,
+                                                                              column_delimiter);
     spreadsheet_columns_info['tagColumnIndices'] = \
         _get_spreadsheet_other_tag_column_indices(spreadsheet_columns_info['columnNames']);
     spreadsheet_columns_info['requiredTagColumnIndices'] = \
@@ -835,7 +835,7 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
     return spreadsheet_columns_info;
 
 
-def get_text_file_column_names(text_file_path, column_delimiter):
+def _get_text_file_column_names(text_file_path, column_delimiter):
     """Gets the text spreadsheet column names.
 
     Parameters
