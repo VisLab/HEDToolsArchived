@@ -23,5 +23,13 @@ class Test(unittest.TestCase):
         issue_count = utils._get_validation_issue_count('\t');
         self.assertEqual(issue_count, 1);
 
+    def test_generate_spreadsheet_validation_filename(self):
+        spreadsheet_filename = 'abc.xls';
+        expected_spreadsheet_filename = 'validated_' + spreadsheet_filename.rsplit('.')[0] + '.txt';
+        validation_file_name = utils._generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name='');
+        self.assertTrue(validation_file_name);
+        self.assertEqual(expected_spreadsheet_filename, validation_file_name);
+
+
 if __name__ == '__main__':
     unittest.main();
