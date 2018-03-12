@@ -89,7 +89,7 @@ def find_worksheets_info(form_request_object):
     workbook_file_path = '';
     worksheets_info = {};
     try:
-        worksheets_info = initialize_worksheets_info_dictionary();
+        worksheets_info = _initialize_worksheets_info_dictionary();
         if spreadsheet_present_in_form(form_request_object):
             workbook_file = form_request_object.files['spreadsheet'];
             workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
@@ -241,7 +241,7 @@ def generate_download_file_response(download_file_name):
 
 
 def populate_worksheet_info(request_object):
-    worksheets_info = initialize_worksheets_info_dictionary();
+    worksheets_info = _initialize_worksheets_info_dictionary();
     if spreadsheet_present_in_form(request_object):
         workbook_file = request_object.files['spreadsheet_file'];
         workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
@@ -735,7 +735,7 @@ def hed_file_present_in_form(validation_form_request_object):
     return 'hed_file' in validation_form_request_object.files;
 
 
-def initialize_worksheets_info_dictionary():
+def _initialize_worksheets_info_dictionary():
     """Initializes a dictionary that will hold information related to the Excel worksheets.
 
     This information contains the names of the worksheets in a workbook, the names of the columns in the first
