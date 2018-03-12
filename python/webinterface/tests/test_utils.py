@@ -37,6 +37,13 @@ class Test(unittest.TestCase):
         self.assertTrue(file_extension);
         self.assertEqual(expected_extension, file_extension);
 
+    def test_convert_other_tag_columns_to_list(self):
+        other_tag_columns_str = '1,2,3';
+        expected_other_columns = [1,2,3];
+        other_tag_columns = utils._convert_other_tag_columns_to_list(other_tag_columns_str);
+        self.assertTrue(other_tag_columns);
+        self.assertEqual(expected_other_columns, other_tag_columns);
+
 
 if __name__ == '__main__':
     unittest.main();
