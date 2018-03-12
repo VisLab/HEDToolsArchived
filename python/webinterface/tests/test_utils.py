@@ -92,5 +92,13 @@ class Test(unittest.TestCase):
         self.assertIsInstance(indices, list);
         self.assertEqual(indices, expected_indices);
 
+    def test_get_spreadsheet_specific_tag_column_indices(self):
+        column_names = ['a,', utils.SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY[utils.SPECIFIC_TAG_COLUMN_NAMES[0]][0]];
+        print(column_names)
+        expected_indices = [2];
+        indices = utils._get_spreadsheet_specific_tag_column_indices(column_names);
+        self.assertTrue(indices);
+        self.assertIsInstance(indices, dict);
+
 if __name__ == '__main__':
     unittest.main();
