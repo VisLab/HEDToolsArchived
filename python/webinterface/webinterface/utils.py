@@ -825,7 +825,7 @@ def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spre
         spreadsheet_columns_info['columnNames'] = _get_worksheet_column_names(spreadsheet_file_path,
                                                                               worksheet_name);
     else:
-        column_delimiter = get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
+        column_delimiter = _get_column_delimiter_based_on_file_extension(spreadsheet_file_path);
         spreadsheet_columns_info['columnNames'] = _get_text_file_column_names(spreadsheet_file_path,
                                                                               column_delimiter);
     spreadsheet_columns_info['tagColumnIndices'] = \
@@ -857,7 +857,7 @@ def _get_text_file_column_names(text_file_path, column_delimiter):
     return text_file_columns;
 
 
-def get_column_delimiter_based_on_file_extension(file_name_or_path):
+def _get_column_delimiter_based_on_file_extension(file_name_or_path):
     """Gets the spreadsheet column delimiter based on the file extension.
 
     Parameters
