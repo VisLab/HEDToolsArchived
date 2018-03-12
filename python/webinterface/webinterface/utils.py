@@ -117,7 +117,7 @@ def find_spreadsheet_columns_info(form_request_object):
     """
     spreadsheet_file_path = '';
     try:
-        spreadsheet_columns_info = initialize_spreadsheet_columns_info_dictionary();
+        spreadsheet_columns_info = _initialize_spreadsheet_columns_info_dictionary();
         if spreadsheet_present_in_form(form_request_object):
             spreadsheet_file = form_request_object.files['spreadsheet'];
             spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
@@ -754,7 +754,7 @@ def _initialize_worksheets_info_dictionary():
     return worksheets_info;
 
 
-def initialize_spreadsheet_columns_info_dictionary():
+def _initialize_spreadsheet_columns_info_dictionary():
     """Initializes a dictionary that will hold information related to the spreadsheet columns.
 
     This information contains the names of the spreadsheet columns and column indices that contain HED tags.
