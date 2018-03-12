@@ -452,7 +452,7 @@ def _generate_input_arguments_from_validation_form(form_request_object, spreadsh
     validation_input_arguments['hed_path'] = _get_hed_path_from_validation_form(form_request_object,
                                                                                 hed_file_path);
     validation_input_arguments['tag_columns'] = \
-        _get_other_tag_columns_from_validation_form(form_request_object.form['tag-columns'])
+        _convert_other_tag_columns_to_list(form_request_object.form['tag-columns'])
     validation_input_arguments['required_tag_columns'] = \
         _get_specific_tag_columns_from_validation_form(form_request_object);
     validation_input_arguments['worksheet'] = _get_optional_validation_form_field(
@@ -501,7 +501,7 @@ def _hed_version_in_form(form_request_object):
     return 'hed-version' in form_request_object.form;
 
 
-def _get_other_tag_columns_from_validation_form(other_tag_columns):
+def _convert_other_tag_columns_to_list(other_tag_columns):
     """Gets the other tag columns from the validation form.
 
     Parameters
