@@ -7,6 +7,7 @@ class Test(unittest.TestCase):
     def setUp(self):
         self.major_version_key = 'major_versions';
         self.hed_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/HED.xml');
+        self.tsv_file1 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/tsv_file1.txt');
 
     def test_find_major_hed_versions(self):
         hed_info = utils.find_major_hed_versions();
@@ -70,6 +71,11 @@ class Test(unittest.TestCase):
         worksheets_info_dictionary = utils._initialize_spreadsheet_columns_info_dictionary();
         self.assertTrue(worksheets_info_dictionary);
         self.assertIsInstance(worksheets_info_dictionary, dict);
+
+    def test_get_text_file_column_names(self):
+        column_names = utils._get_text_file_column_names(self.tsv_file1, '\t');
+        self.assertTrue(column_names);
+        self.assertIsInstance(column_names, list)
 
 
 if __name__ == '__main__':
