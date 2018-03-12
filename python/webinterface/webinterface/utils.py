@@ -94,7 +94,7 @@ def find_worksheets_info(form_request_object):
             workbook_file = form_request_object.files['spreadsheet'];
             workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
             if workbook_file_path:
-                worksheets_info = populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
+                worksheets_info = _populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
     except:
         worksheets_info['error'] = traceback.format_exc();
     finally:
@@ -246,7 +246,7 @@ def populate_worksheet_info(request_object):
         workbook_file = request_object.files['spreadsheet_file'];
         workbook_file_path = save_spreadsheet_to_upload_folder(workbook_file);
         if workbook_file_path:
-            worksheets_info = populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
+            worksheets_info = _populate_worksheets_info_dictionary(worksheets_info, workbook_file_path);
     return worksheets_info;
 
 
@@ -772,7 +772,7 @@ def _initialize_spreadsheet_columns_info_dictionary():
     return worksheet_columns_info;
 
 
-def populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
+def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path):
     """Populate dictionary with information related to the Excel worksheets.
 
     This information contains the names of the worksheets in a workbook, the names of the columns in the first
