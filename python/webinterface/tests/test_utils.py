@@ -75,7 +75,14 @@ class Test(unittest.TestCase):
     def test_get_text_file_column_names(self):
         column_names = utils._get_text_file_column_names(self.tsv_file1, '\t');
         self.assertTrue(column_names);
-        self.assertIsInstance(column_names, list)
+        self.assertIsInstance(column_names, list);
+
+    def test_get_column_delimiter_based_on_file_extension(self):
+        delimiter = utils._get_column_delimiter_based_on_file_extension(self.tsv_file1);
+        tab_delimiter = '\t';
+        self.assertTrue(delimiter);
+        self.assertIsInstance(delimiter, str);
+        self.assertEqual(tab_delimiter, delimiter);
 
 
 if __name__ == '__main__':
