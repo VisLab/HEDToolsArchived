@@ -123,12 +123,12 @@ def find_spreadsheet_columns_info(form_request_object):
             spreadsheet_file_path = save_spreadsheet_to_upload_folder(spreadsheet_file);
             if spreadsheet_file_path and worksheet_name_present_in_form(form_request_object):
                 worksheet_name = form_request_object.form['worksheet_name'];
-                spreadsheet_columns_info = populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info,
-                                                                                        spreadsheet_file_path,
-                                                                                        worksheet_name);
+                spreadsheet_columns_info = _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info,
+                                                                                         spreadsheet_file_path,
+                                                                                         worksheet_name);
             else:
-                spreadsheet_columns_info = populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info,
-                                                                                        spreadsheet_file_path);
+                spreadsheet_columns_info = _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info,
+                                                                                         spreadsheet_file_path);
     except:
         spreadsheet_columns_info['error'] = traceback.format_exc();
     finally:
@@ -800,8 +800,8 @@ def _populate_worksheets_info_dictionary(worksheets_info, spreadsheet_file_path)
     return worksheets_info;
 
 
-def populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
-                                                 worksheet_name=''):
+def _populate_spreadsheet_columns_info_dictionary(spreadsheet_columns_info, spreadsheet_file_path,
+                                                  worksheet_name=''):
     """Populate dictionary with information related to the spreadsheet columns.
 
     This information contains the names of the spreadsheet columns and column indices that contain HED tags.
