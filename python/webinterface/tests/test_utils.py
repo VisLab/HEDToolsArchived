@@ -66,5 +66,11 @@ class Test(unittest.TestCase):
         self.assertTrue(worksheets_info_dictionary);
         self.assertIsInstance(worksheets_info_dictionary, dict);
 
+    def test_initialize_spreadsheet_columns_info_dictionary(self):
+        worksheets_info_dictionary = utils._initialize_spreadsheet_columns_info_dictionary();
+        self.assertTrue(worksheets_info_dictionary);
+        self.assertIsInstance(worksheets_info_dictionary, dict);
+
+
 if __name__ == '__main__':
     unittest.main();
