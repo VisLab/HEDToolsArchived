@@ -30,6 +30,13 @@ class Test(unittest.TestCase):
         self.assertTrue(validation_file_name);
         self.assertEqual(expected_spreadsheet_filename, validation_file_name);
 
+    def test_get_file_extension(self):
+        spreadsheet_filename = 'abc.xls';
+        expected_extension = 'xls';
+        file_extension = utils._get_file_extension(spreadsheet_filename);
+        self.assertTrue(file_extension);
+        self.assertEqual(expected_extension, file_extension);
+
 
 if __name__ == '__main__':
     unittest.main();
