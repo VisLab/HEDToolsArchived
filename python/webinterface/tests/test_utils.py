@@ -95,10 +95,18 @@ class Test(unittest.TestCase):
     def test_get_spreadsheet_specific_tag_column_indices(self):
         column_names = ['a,', utils.SPECIFIC_TAG_COLUMN_NAMES_DICTIONARY[utils.SPECIFIC_TAG_COLUMN_NAMES[0]][0]];
         print(column_names)
-        expected_indices = [2];
         indices = utils._get_spreadsheet_specific_tag_column_indices(column_names);
         self.assertTrue(indices);
         self.assertIsInstance(indices, dict);
+
+    def test_find_all_str_indices_in_list(self):
+        list_1 = ['a','a','c','d'];
+        list_2 = 'a';
+        expected_indices = [1,2];
+        indices = utils._find_all_str_indices_in_list(list_1, list_2);
+        self.assertTrue(indices);
+        self.assertIsInstance(indices, list);
+        self.assertEqual(expected_indices, indices)
 
 if __name__ == '__main__':
     unittest.main();
