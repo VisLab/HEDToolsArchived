@@ -61,5 +61,10 @@ class Test(unittest.TestCase):
         success = utils._copy_file_line_by_line(some_file1, some_file2);
         self.assertFalse(success);
 
+    def test_initialize_worksheets_info_dictionary(self):
+        worksheets_info_dictionary = utils._initialize_worksheets_info_dictionary();
+        self.assertTrue(worksheets_info_dictionary);
+        self.assertIsInstance(worksheets_info_dictionary, dict);
+
 if __name__ == '__main__':
     unittest.main();
