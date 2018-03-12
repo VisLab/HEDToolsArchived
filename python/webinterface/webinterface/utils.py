@@ -968,7 +968,7 @@ def _get_spreadsheet_other_tag_column_indices(column_names):
     """
     tag_column_indices = [];
     for tag_column_name in OTHER_TAG_COLUMN_NAMES:
-        found_indices = find_all_str_indices_in_list(column_names, tag_column_name);
+        found_indices = _find_all_str_indices_in_list(column_names, tag_column_name);
         if found_indices:
             tag_column_indices.extend(found_indices);
     return tag_column_indices;
@@ -999,7 +999,7 @@ def _get_spreadsheet_specific_tag_column_indices(column_names):
     return specific_tag_column_indices;
 
 
-def find_all_str_indices_in_list(list_of_strs, str_value):
+def _find_all_str_indices_in_list(list_of_strs, str_value):
     """Find the indices of a string value in a list.
 
     Parameters
