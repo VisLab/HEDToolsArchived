@@ -44,6 +44,10 @@ class Test(unittest.TestCase):
         self.assertTrue(other_tag_columns);
         self.assertEqual(expected_other_columns, other_tag_columns);
 
+    def test_delete_file_if_it_exist(self):
+        some_file = '3k32j23kj.txt';
+        deleted = utils.delete_file_if_it_exist(some_file);
+        self.assertFalse(deleted);
 
 if __name__ == '__main__':
     unittest.main();
