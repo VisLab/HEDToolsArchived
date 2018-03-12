@@ -55,5 +55,11 @@ class Test(unittest.TestCase):
         self.assertTrue(created);
         os.rmdir(some_folder);
 
+    def test_copy_file_line_by_line(self):
+        some_file1 = '3k32j23kj1.txt';
+        some_file2 = '3k32j23kj2.txt';
+        success = utils._copy_file_line_by_line(some_file1, some_file2);
+        self.assertFalse(success);
+
 if __name__ == '__main__':
     unittest.main();
