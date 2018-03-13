@@ -2,7 +2,7 @@ from flask import render_template, Response, request;
 import os;
 import json;
 from webinterface import utils;
-from webinterface import app;
+from webinterface.runserver import app;
 
 INTERNAL_SERVER_ERROR = 500;
 NOT_FOUND_ERROR = 404;

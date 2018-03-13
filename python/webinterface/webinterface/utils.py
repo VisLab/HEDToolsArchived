@@ -5,7 +5,7 @@ import traceback;
 from flask import jsonify, Response;
 from werkzeug.utils import secure_filename;
 from hedvalidation.hed_input_reader import HedInputReader;
-from webinterface import app;
+from webinterface.runserver import app;
 from logging.handlers import RotatingFileHandler;
 from logging import ERROR;
 from hedvalidation.hed_dictionary import HedDictionary;
