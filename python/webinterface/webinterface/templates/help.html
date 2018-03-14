@@ -88,32 +88,40 @@
         meanings of the columns before validation.</p>
     <img src="{{ url_for('static', filename='img/setup_excel_spreadsheet.png') }}">
     <p>The above example has 8 columns that are named in a typical manner.</p>
-    <p>Event code: Usually researchers identify types of events by lab or study specific labels, sometimes referred to
+    <p><span style="font-weight: bold">Event code</span>: Usually researchers identify types of events by lab or study
+        specific labels, sometimes referred to
         as event codes. These event codes can be any numbers, letters, or combinations (e.g., 1, A, Jump, leftclick01)
         and are not validated.</p>
-    <p>Category: Specifies what type of event this signifies. (e.g., Participant response, Experimental
+    <p><span style="font-weight: bold">Category</span>: Specifies what type of event this signifies. (e.g., Participant
+        response, Experimental
         stimulus/Instruction/Rest, Miscellaneous). The Event/Category tag is required for downstream processing. If you
         designate a column as the Category column, then HED will prepend the string “Event/Category/” to items in this
         column if these items don’t already start with them.</p>
-    <p>Label: Provides a short descriptive label for the event type (e.g., Button press, Calibration pulse, or any other
+    <p><span style="font-weight: bold">Label</span>: Provides a short descriptive label for the event type (e.g., Button
+        press, Calibration pulse, or any other
         meaningful short identifier for this event.) The Event/Label tag is required for downstream processing. If you
         designate a column as the Label column, then HED will prepend the string “Event/Label/” to items in this column
         if these items don’t already start with this string. Labels should not contain commas, tildas (~), forward or
         backward slashes, or parentheses.</p>
-    <p>Longer label: Provides a concise description of the event that provides more detail than the Label column. HED
+    <p><span style="font-weight: bold">Longer label</span>: Provides a concise description of the event that provides
+        more detail than the Label column. HED
         did not initially associate this column with a particular HED tag as illustrated by the top screenshot in Step 2
         above. In the example session, we designated this column as the Long name column. Long names are designed to
         provide more detail about event types, but are not required by HED in downstream processing. If you designate a
         column as the Long name column, HED will prepend the string “Event/Long name/” to items in this column if these
         items don’t already start with this string. Long names should not contain commas, tildas (~), forward or
         backward slashes, or parentheses.</p>
-    <p>Description: Elaborates in detail on what this event is. The Event/Description tag is required for downstream
+    <p><span style="font-weight: bold">Description</span>: Elaborates in detail on what this event is. The
+        Event/Description tag is required for downstream
         processing. If you designate a column as the Description column, then HED will prepend the string
         “Event/Description/” to items in this column if these items don’t already start with this string. Descriptions
         should not contain commas, tildas (~), forward or backward slashes, or parentheses.</p>
-    <p>Tags: Provides descriptions of the event using HED tag strings. You may include as many tag columns in your
+    <p><span style="font-weight: bold">Tags</span>: Provides descriptions of the event using HED tag strings. You may
+        include as many tag columns in your
         spreadsheet as you wish. The HED validator will check each of these columns for validity. HED tag strings
-        correspond to valid paths in the HED Schema (www.hedtags.org/schema). Three examples of HED tag strings are:
+        correspond to valid paths in the HED Schema (<a
+                href="https://github.com/BigEEGConsortium/HED-schema/wiki/HED-Schema">www.hedtags.org/schema</a>). Three
+        examples of HED tag strings are:
         Participant/Effect/Auditory, Sensory presentation/Auditory, and Attribute/Onset. The individual HED tag strings
         can be combined by separating the individual valid strings by commas. Strings can also be parenthesized as in
         ((A/B, C/D/E), F ), sequenced (A/B~C/D/E), or both ((A/B, C/D)~(E/F/G) ).</p>
