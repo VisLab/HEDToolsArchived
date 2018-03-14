@@ -82,73 +82,48 @@
     <img src="{{ url_for('static', filename='img/no_validation_issues.png') }}">
     <h2 id="notes_examples">Notes and examples</h2>
     <h3 id="setup_excel">How to set up your spreadsheet in Excel:</h3>
+    <p>The following screenshot shows part of an Excel spreadsheet containing HED tags to be validated. The first row of
+        the spreadsheet can contain column names. If you choose to have column names, HED uses these to try to guess the
+        meaning of the columns. If HED guesses wrong or you aren’t using column names, you will need to specify the
+        meanings of the columns before validation.</p>
     <img src="{{ url_for('static', filename='img/setup_excel_spreadsheet.png') }}">
-    <p>Above is an example of a functional and validated spreadsheet. Each tag follows a tiered format.</p>
-    <p>Notes Column by Column:</p>
-    <p>A-Event code: These are set by the experimenter and they can
-        be
-        any number, letter, or combination of the two.
-        (Examples: 1, A, Jump, leftclick01)</p>
-    <p>B-Category: Specifies what type of event this signifies.
-        (Examples: Participant response, Experimental
-        stimulus/Instruction/Rest, Miscellaneous)</p>
-    <p>C-Label: This says what it is. (Examples: Button press,
-        Calibration pulse, or any other meaningful short
-        identifier for this event.)</p>
-    <p>D-LongName: The LongName allows you to give a more detailed
-        label
-        for an event. (Example: Introduction to
-        experimental procedure)</p>
-    <p>E-Description: Elaborate on what this event is. Do not use
-        commas
-        in the description since this will cause an
-        error. (Example: This indicates when the participant was exposed to the stimuli.)</p>
-    <p>F and G-Tags: These are where the stimuli, actions performed, and other important information is documented
-        that
-        occurred in the event and can be grouped using parenthesis ( (A/B, C/D/E) ), sequenced (A/B~C/D/E), or both
-        (
-        (A/B,C/D)~(E/F/G) ). (Examples: Action/Button press, (Attribute/Onset, Sensory presentation/Visual/Rendering
-        type/Screen/Movie, Item/Film clip/Animation), (Sensory
-        presentation/Auditory/Bang)~(Action/Involuntary/Fall))</p>
-    <p>Required columns are underlined.</p>
-    <p>The Tags Columns can be separated into different columns as shown to better specify what the event is for,
-        but a
-        single column containing them works as well.</p>
+    <p>The above example has 8 columns that are named in a typical manner.</p>
+    <p>Event code: Usually researchers identify types of events by lab or study specific labels, sometimes referred to
+        as event codes. These event codes can be any numbers, letters, or combinations (e.g., 1, A, Jump, leftclick01)
+        and are not validated.</p>
+    <p>Category: Specifies what type of event this signifies. (e.g., Participant response, Experimental
+        stimulus/Instruction/Rest, Miscellaneous). The Event/Category tag is required for downstream processing. If you
+        designate a column as the Category column, then HED will prepend the string “Event/Category/” to items in this
+        column if these items don’t already start with them.</p>
+    <p>Label: Provides a short descriptive label for the event type (e.g., Button press, Calibration pulse, or any other
+        meaningful short identifier for this event.) The Event/Label tag is required for downstream processing. If you
+        designate a column as the Label column, then HED will prepend the string “Event/Label/” to items in this column
+        if these items don’t already start with this string. Labels should not contain commas, tildas (~), forward or
+        backward slashes, or parentheses.</p>
+    <p>Longer label: Provides a concise description of the event that provides more detail than the Label column. HED
+        did not initially associate this column with a particular HED tag as illustrated by the top screenshot in Step 2
+        above. In the example session, we designated this column as the Long name column. Long names are designed to
+        provide more detail about event types, but are not required by HED in downstream processing. If you designate a
+        column as the Long name column, HED will prepend the string “Event/Long name/” to items in this column if these
+        items don’t already start with this string. Long names should not contain commas, tildas (~), forward or
+        backward slashes, or parentheses.</p>
+    <p>Description: Elaborates in detail on what this event is. The Event/Description tag is required for downstream
+        processing. If you designate a column as the Description column, then HED will prepend the string
+        “Event/Description/” to items in this column if these items don’t already start with this string. Descriptions
+        should not contain commas, tildas (~), forward or backward slashes, or parentheses.</p>
+    <p>Tags: Provides descriptions of the event using HED tag strings. You may include as many tag columns in your
+        spreadsheet as you wish. The HED validator will check each of these columns for validity. HED tag strings
+        correspond to valid paths in the HED Schema (www.hedtags.org/schema). Three examples of HED tag strings are:
+        Participant/Effect/Auditory, Sensory presentation/Auditory, and Attribute/Onset. The individual HED tag strings
+        can be combined by separating the individual valid strings by commas. Strings can also be parenthesized as in
+        ((A/B, C/D/E), F ), sequenced (A/B~C/D/E), or both ((A/B, C/D)~(E/F/G) ).</p>
+    <hr>
     <h3 id="setup_tsv">How to set up your spreadsheet as a tab-separated text file:</h3>
+    <p>In tab-separated text file spreadsheets, each line in the file corresponds to a row and the columns are text
+        fields separated from each other by tabs. If a column field in a particular row is empty, the file should have
+        two tabs in a row. The following example shows how such a tab-separated file might appear when you edit it using
+        a text editor. The columns do not line up visually, but the HED validator uses the tabs and not alignment to
+        determine columns:</p>
     <img src="{{ url_for('static', filename='img/setup_tsv_spreadsheet.png') }}">
-    <p>Above is an example of a functional and validated tab-separated text file of tags. The data shown here is
-        separated by a tab between each columns value. In this case there are 6 tabs for each line. The columns do
-        not
-        line up visually, but the program only accesses the next column</p>
-    <p>Notes Column by Column:</p>
-    <p>Event code: These are set by the experimenter and they can be
-        any
-        number, letter, or combination of the two.
-        (Examples: 1, A, Jump, leftclick01)</p>
-    <p>Category: Specifies what type of event this signifies.
-        (Examples:
-        Participant response, Experimental
-        stimulus/Instruction/Rest, Miscellaneous)</p>
-    <p>Label: This says what it is. (Examples: Button press,
-        Calibration
-        pulse, or any other meaningful short identifier
-        for this event.)</p>
-    <p>LongName: The LongName allows you to give a more detailed
-        label
-        for an event. (Example: Introduction to
-        experimental procedure)</p>
-    <p>Description: Elaborate on what this event is. Do not use
-        commas
-        or tabs in the description since this will cause
-        an error. (Example: This indicates when the participant was exposed to the stimuli.)</p>
-    <p>Tags: These are where the stimuli, actions performed, and other important information is documented that
-        occurred
-        in the event and can be grouped using parenthesis ( (A/B, C/D/E) ), sequenced (A/B~C/D/E), or both (
-        (A/B,C/D)~(E/F/G) ). (Examples: Action/Button press, (Attribute/Onset, Sensory presentation/Visual/Rendering
-        type/Screen/Movie, Item/Film clip/Animation), (Sensory
-        presentation/Auditory/Bang)~(Action/Involuntary/Fall))</p>
-    <p>Required columns are underlined.</p>
-    <p>The Tags Columns can be separated into different columns as shown to better specify what the event is for,
-        but a
-        single column containing them works as well.</p>
+    <p>The meanings of the columns are the same as for Excel spreadsheets.</p>
 {% endblock %}
