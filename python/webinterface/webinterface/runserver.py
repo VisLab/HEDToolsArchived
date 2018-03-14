@@ -1,7 +1,7 @@
 from webinterface.app_factory import AppFactory;
 from flask_wtf.csrf import CSRFProtect;
 
-app = AppFactory.create_app();
+app = AppFactory.create_app('config.ProductionConfig');
 CSRFProtect(app);
 from webinterface.views import *;
 
