@@ -1,7 +1,8 @@
 from flask import render_template, Response, request, Blueprint, current_app;
 import os;
 import json;
-from webinterface import utils;
+from webinterface import utils
+from config import ProductionConfig;
 
 INTERNAL_SERVER_ERROR = 500;
 NOT_FOUND_ERROR = 404;
@@ -40,7 +41,8 @@ def delete_file_in_upload_directory(filename):
     -------
 
     """
-    if utils.delete_file_if_it_exist(os.path.join(current_app.config['UPLOAD_FOLDER'], filename)):
+    # if utils.delete_file_if_it_exist(os.path.join(current_app.config['UPLOAD_FOLDER'], filename)):
+    if utils.delete_file_if_it_exist(os.path.join(ProductionConfig.UPLOAD_FOLDER, filename)):
         return Response(status=NO_CONTENT_SUCCESS);
     else:
         return utils.handle_http_error(NOT_FOUND_ERROR, "File doesn't exist");
