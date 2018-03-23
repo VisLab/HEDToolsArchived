@@ -45,7 +45,7 @@ function populateHEDVersionsDropdown(hedVersions) {
 function getHEDVersions() {
     $.ajax({
             type: 'GET',
-            url: "{{url_for('get_major_hed_versions')}}",
+            url: "{{url_for('view_routes.get_major_hed_versions')}}",
             contentType: false,
             processData: false,
             dataType: 'json',
@@ -281,7 +281,7 @@ function submitForm() {
     flashSubmitMessage();
     $.ajax({
             type: 'POST',
-            url: "{{url_for('get_validation_results')}}",
+            url: "{{url_for('view_routes.get_validation_results')}}",
             data: formData,
             contentType: false,
             processData: false,
@@ -308,7 +308,7 @@ function submitForm() {
  * @param {string} downloadFile - The name of the download file.
  */
 function downloadValidationOutputFile(downloadFile) {
-    window.location = "{{url_for('download_file_in_upload_directory', filename='')}}" + downloadFile;
+    window.location = "{{url_for('view_routes.download_file_in_upload_directory', filename='')}}" + downloadFile;
 }
 
 
@@ -319,7 +319,7 @@ function downloadValidationOutputFile(downloadFile) {
 function deleteUploadedSpreadsheet(uploadedSpreadsheetFile) {
     $.ajax({
             type: 'GET',
-            url: "{{url_for('delete_file_in_upload_directory', filename='')}}" + uploadedSpreadsheetFile,
+            url: "{{url_for('view_routes.delete_file_in_upload_directory', filename='')}}" + uploadedSpreadsheetFile,
             data: {},
             contentType: false,
             processData: false,
@@ -407,7 +407,7 @@ function getWorksheetsInfo(workbookFile) {
     formData.append('spreadsheet', workbookFile);
     $.ajax({
         type: 'POST',
-        url: "{{url_for('get_worksheets_info')}}",
+        url: "{{url_for('view_routes.get_worksheets_info')}}",
         data: formData,
         contentType: false,
         processData: false,
@@ -434,7 +434,7 @@ function getVersionFromHEDFile(hedXMLFile) {
     formData.append('hed_file', hedXMLFile);
     $.ajax({
         type: 'POST',
-        url: "{{ url_for('get_hed_version_in_file')}}",
+        url: "{{ url_for('view_routes.get_hed_version_in_file')}}",
         data: formData,
         contentType: false,
         processData: false,
@@ -472,7 +472,7 @@ function getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName) {
     }
     $.ajax({
         type: 'POST',
-        url: "{{url_for('get_spreadsheet_columns_info')}}",
+        url: "{{url_for('view_routes.get_spreadsheet_columns_info')}}",
         data: formData,
         contentType: false,
         processData: false,
