@@ -5,7 +5,7 @@ import traceback;
 from flask import jsonify, Response;
 from werkzeug.utils import secure_filename;
 from hedvalidation.hed_input_reader import HedInputReader;
-from webinterface.runserver import app;
+from flask import current_app;
 from logging.handlers import RotatingFileHandler;
 from logging import ERROR;
 from hedvalidation.hed_dictionary import HedDictionary;
@@ -229,10 +229,10 @@ def generate_download_file_response(download_file_name):
     """
     try:
         def generate():
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], download_file_name)) as download_file:
+            with open(os.path.join(current_app.config['UPLOAD_FOLDER'], download_file_name)) as download_file:
                 for line in download_file:
                     yield line;
-            delete_file_if_it_exist(os.path.join(app.config['UPLOAD_FOLDER'], download_file_name));
+            delete_file_if_it_exist(os.path.join(current_app.config['UPLOAD_FOLDER'], download_file_name));
 
         return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
                                                                                            download_file_name});
@@ -266,25 +266,25 @@ def handle_http_error(error_code, error_message):
         A tuple containing a HTTP response object and a code.
 
     """
-    app.logger.error(error_message);
+    current_app.logger.error(error_message);
     return jsonify(message=error_message), error_code;
 
 
 def setup_logging():
-    """Sets up the application logging. If the log directory does not exist then there will be no logging.
+    """Sets up the current_application logging. If the log directory does not exist then there will be no logging.
 
     """
-    if not app.debug and os.path.exists(app.config['LOG_DIRECTORY']):
-        file_handler = RotatingFileHandler(app.config['LOG_FILE'], maxBytes=10 * 1024 * 1024, backupCount=5);
+    if not current_app.debug and os.path.exists(current_app.config['LOG_DIRECTORY']):
+        file_handler = RotatingFileHandler(current_app.config['LOG_FILE'], maxBytes=10 * 1024 * 1024, backupCount=5);
         file_handler.setLevel(ERROR);
-        app.logger.addHandler(file_handler);
+        current_app.logger.addHandler(file_handler);
 
 
-def setup_upload_directory():
-    """Sets up upload directory.
+def create_upload_directory(upload_directory):
+    """Creates the upload directory.
 
     """
-    _create_folder_if_needed(app.config['UPLOAD_FOLDER']);
+    _create_folder_if_needed(upload_directory);
 
 
 def _file_extension_is_valid(filename, accepted_file_extensions):
@@ -370,9 +370,9 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, valid
 
     """
     validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
-    validation_issues_file_path = os.path.join(app.config['UPLOAD_FOLDER'], validation_issues_filename);
+    validation_issues_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], validation_issues_filename);
     with open(validation_issues_file_path, 'w') as validation_issues_file:
-        validation_issues_file.write(validation_issues);
+        validation_issues_file.write(validation_issues + '\r\n');
     return validation_issues_filename;
 
 
@@ -626,7 +626,7 @@ def _save_file_to_upload_folder(file_object, file_suffix=""):
 
     """
     temporary_upload_file = tempfile.NamedTemporaryFile(suffix=file_suffix, delete=False, \
-                                                        dir=app.config['UPLOAD_FOLDER']);
+                                                        dir=current_app.config['UPLOAD_FOLDER']);
     _copy_file_line_by_line(file_object, temporary_upload_file);
     return temporary_upload_file.name;
 
