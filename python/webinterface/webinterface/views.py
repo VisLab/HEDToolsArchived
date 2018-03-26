@@ -8,8 +8,8 @@ INTERNAL_SERVER_ERROR = 500;
 NOT_FOUND_ERROR = 404;
 NO_CONTENT_SUCCESS = 204;
 
+app_config = current_app.config;
 view_routes = Blueprint('view_routes', __name__);
-
 
 
 @view_routes.route('/', strict_slashes=False, methods=['GET'])
@@ -41,8 +41,7 @@ def delete_file_in_upload_directory(filename):
     -------
 
     """
-    # if utils.delete_file_if_it_exist(os.path.join(current_app.config['UPLOAD_FOLDER'], filename)):
-    if utils.delete_file_if_it_exist(os.path.join(ProductionConfig.UPLOAD_FOLDER, filename)):
+    if utils.delete_file_if_it_exist(os.path.join(app_config['UPLOAD_FOLDER'], filename)):
         return Response(status=NO_CONTENT_SUCCESS);
     else:
         return utils.handle_http_error(NOT_FOUND_ERROR, "File doesn't exist");
