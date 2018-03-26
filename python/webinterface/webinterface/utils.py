@@ -9,7 +9,8 @@ from flask import current_app;
 from logging.handlers import RotatingFileHandler;
 from logging import ERROR;
 from hedvalidation.hed_dictionary import HedDictionary;
-from config import ProductionConfig;
+
+app_config = current_app.config;
 
 SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
 HED_FILE_EXTENSIONS = ['.xml'];
@@ -230,11 +231,10 @@ def generate_download_file_response(download_file_name):
     """
     try:
         def generate():
-            # with open(os.path.join(current_app.config['UPLOAD_FOLDER'], download_file_name)) as download_file:
-            with open(os.path.join(ProductionConfig.UPLOAD_FOLDER, download_file_name)) as download_file:
+            with open(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name)) as download_file:
                 for line in download_file:
                     yield line;
-            delete_file_if_it_exist(os.path.join(current_app.config['UPLOAD_FOLDER'], download_file_name));
+            delete_file_if_it_exist(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name));
 
         return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
                                                                                            download_file_name});
