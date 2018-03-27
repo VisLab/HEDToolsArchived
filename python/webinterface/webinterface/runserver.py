@@ -1,6 +1,5 @@
 import os;
 from webinterface.app_factory import AppFactory;
-from flask_wtf.csrf import CSRFProtect;
 from logging.handlers import RotatingFileHandler;
 from logging import ERROR;
 
@@ -19,7 +18,6 @@ app = AppFactory.create_app('config.ProductionConfig');
 with app.app_context():
     from webinterface import utils;
     from webinterface.views import view_routes;
-    CSRFProtect(app);
     app.register_blueprint(view_routes);
     utils.create_upload_directory(app.config['UPLOAD_FOLDER']);
     setup_logging();
