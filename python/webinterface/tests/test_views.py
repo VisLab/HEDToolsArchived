@@ -1,13 +1,19 @@
 import unittest;
+import os;
 from webinterface.app_factory import AppFactory;
 
 
 class Test(unittest.TestCase):
-
     def setUp(self):
+        upload_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/HED.xml');
         app = AppFactory.create_app('config.TestConfig');
-        from webinterface.views import *;
-        self.app = app.test_client();
+        with app.app_context():
+            from webinterface import utils;
+            from webinterface.views import view_routes;
+            app.register_blueprint(view_routes);
+            utils.create_upload_directory(upload_directory);
+            app.config['UPLOAD_FOLDER'] = upload_directory;
+            self.app = app.test_client();
 
     def test_render_home_page(self):
         response = self.app.get('/');
