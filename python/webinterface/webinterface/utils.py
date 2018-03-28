@@ -373,8 +373,8 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, valid
     """
     validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
     validation_issues_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], validation_issues_filename);
-    with open(validation_issues_file_path, 'wb') as validation_issues_file:
-        validation_issues_file.write(validation_issues.encode('utf-8'));
+    with open(validation_issues_file_path, 'w') as validation_issues_file:
+        validation_issues_file.write(validation_issues);
     return validation_issues_filename;
 
 
