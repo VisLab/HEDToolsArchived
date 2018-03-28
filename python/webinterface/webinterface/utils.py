@@ -235,9 +235,8 @@ def generate_download_file_response(download_file_name):
                 for line in download_file:
                     yield line;
             delete_file_if_it_exist(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name));
-
-        return Response(generate(), mimetype='text/plain', headers={'Content-Disposition': "attachment; filename=%s" % \
-                                                                                           download_file_name});
+        return Response(generate(), mimetype='text/plain; charset=UTF-8',
+                        headers={'Content-Disposition': "attachment; filename=%s" % download_file_name});
     except:
         return traceback.format_exc();
 
