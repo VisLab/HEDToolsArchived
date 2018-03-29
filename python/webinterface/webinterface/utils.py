@@ -231,11 +231,11 @@ def generate_download_file_response(download_file_name):
     """
     try:
         def generate():
-            with open(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name)) as download_file:
+            with open(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name), encoding='utf-8') as download_file:
                 for line in download_file:
                     yield line;
             delete_file_if_it_exist(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name));
-        return Response(generate(), mimetype='text/plain; charset=UTF-8',
+        return Response(generate(), mimetype='text/plain; charset=utf-8',
                         headers={'Content-Disposition': "attachment; filename=%s" % download_file_name});
     except:
         return traceback.format_exc();
@@ -372,8 +372,8 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, valid
     """
     validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
     validation_issues_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], validation_issues_filename);
-    with open(validation_issues_file_path, 'wb') as validation_issues_file:
-        validation_issues_file.write(validation_issues.encode('utf-8'));
+    with open(validation_issues_file_path, 'w') as validation_issues_file:
+        validation_issues_file.write(validation_issues);
     return validation_issues_filename;
 
 
