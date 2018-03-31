@@ -18,7 +18,7 @@ app = AppFactory.create_app('config.ProductionConfig');
 with app.app_context():
     from webinterface import utils;
     from webinterface.views import view_routes;
-    app.register_blueprint(view_routes, url_prefix=app.config['URL_PREFIX');
+    app.register_blueprint(view_routes, url_prefix=app.config['URL_PREFIX']);
     utils.create_upload_directory(app.config['UPLOAD_FOLDER']);
     setup_logging();
 
