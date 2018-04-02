@@ -1,4 +1,6 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.6
+RUN adduser appuser
+USER appuser
 COPY ./app /app
 COPY ./requirements.txt /app/
 RUN pip install --upgrade pip
