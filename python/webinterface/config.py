@@ -17,6 +17,7 @@ class ProductionConfig(object):
     TESTING = False;
     DEBUG = False;
     URL_PREFIX = '/hed';
+    STATIC_URL = '/hed/static';
 
 
 class TestConfig(object):
