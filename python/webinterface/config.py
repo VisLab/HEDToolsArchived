@@ -24,8 +24,10 @@ class TestConfig(object):
     SECRET_KEY = os.urandom(24);
     TESTING = True;
     DEBUG = False;
+    STATIC_URL = '/static';
 
 class DebugConfig(object):
     SECRET_KEY = os.urandom(24);
     TESTING = False;
     DEBUG = True;
+    STATIC_URL = '/static';
