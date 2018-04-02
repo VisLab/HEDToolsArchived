@@ -17,17 +17,26 @@ class ProductionConfig(object):
     TESTING = False;
     DEBUG = False;
     URL_PREFIX = '/hed';
-    STATIC_URL = '/hed/static';
+    STATIC_URL_PATH = '/hed/static';
+
+class LocalConfig(object):
+    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
+    SECRET_KEY = os.urandom(24);
+    LOG_DIRECTORY = '/var/log/hedtools';
+    LOG_FILE = os.path.join(LOG_DIRECTORY, 'error.log');
+    TESTING = False;
+    DEBUG = False;
+    URL_PREFIX = None;
+    STATIC_URL_PATH = None;
 
 
 class TestConfig(object):
     SECRET_KEY = os.urandom(24);
     TESTING = True;
     DEBUG = False;
-    STATIC_URL = '/static';
+
 
 class DebugConfig(object):
     SECRET_KEY = os.urandom(24);
     TESTING = False;
     DEBUG = True;
-    STATIC_URL = '/static';
