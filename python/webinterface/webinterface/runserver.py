@@ -14,7 +14,7 @@ def setup_logging():
         app.logger.addHandler(file_handler);
 
 
-app = AppFactory.create_app('config.LocalConfig');
+app = AppFactory.create_app('config.ProductionConfig');
 with app.app_context():
     from webinterface import utils;
     from webinterface.views import view_routes;
