@@ -19,6 +19,7 @@ with app.app_context():
     from webinterface import utils;
     from webinterface.views import view_routes;
     app.register_blueprint(view_routes, url_prefix=app.config['URL_PREFIX']);
+    app.static_url_path = app.config['STATIC_URL'];
     utils.create_upload_directory(app.config['UPLOAD_FOLDER']);
     setup_logging();
 
