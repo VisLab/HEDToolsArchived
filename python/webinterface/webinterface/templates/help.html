@@ -67,8 +67,7 @@
         errors in your HED tag spreadsheet must be corrected, or downstream tools relying on HED might not work
         properly. However, when you first validate, you might want to ignore warnings until you have corrected all
         errors. Once you have the errors out, you should probably run again and take a look at the warnings.
-        Warnings
-        often help you detect faulty tagging that might not be syntactically incorrect.</p>
+        Warnings often help you detect faulty tagging that might not be syntactically incorrect.</p>
     <h3 id="click_submit">Step 4: Click the submit button to process the file.</h3>
     <p>On submission, the HED Validator processes the file and outputs a message indicating the number of errors and
         warnings that it found:</p>
@@ -76,10 +75,11 @@
     <p>The HED Validator also writes error and warning messages to a text file for download and examination. For the
         best formatting experience open this text file in a editor such as WordPad or Notepad++. Each
         message contains the type of error or warning as well as the row and column number in the input file where
-        the
-        issue occurred. If the HED validator detected no issues, you will see the following message. You should now
-        be
-        ready to use them to tag your study.</p>
+        the issue occurred.</p>
+    <h3 id="correct_errors">Step 5: Correct errors in spreadsheet and retry until no more errors</h3>
+    <p>The last step before you can tag your study is correcting any errors that are found in your
+        spreadsheet. Once corrected run the validator again. If the HED validator detected no issues, you will see the
+        following message. You should now be ready to use them to tag your study.</p>
     <img src="{{ url_for('static', filename='img/no_validation_issues.png') }}">
     <h2 id="notes_examples">Notes and examples</h2>
     <h3 id="setup_excel">How to set up your spreadsheet in Excel:</h3>
