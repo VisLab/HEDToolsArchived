@@ -13,11 +13,11 @@
                 <li><a href="#specify_columns">Step 2: Specify which columns of your file contain HED tags</a></li>
                 <li><a href="#select_other_options">Step 3: Select the other options</a></li>
                 <li><a href="#click_submit">Step 4: Click the submit button to process the file</a></li>
-                <li><a href="#correct_errors">Step 5: Correct errors in spreadsheet and retry until no more errors</a></li>
+                <li><a href="#correct_errors">Step 5: Correct errors in spreadsheet and retry until no more errors</a>
+                </li>
             </ul>
             <li><a href="#notes_examples">Notes and examples</a></li>
             <ul>
-                <li><a href="#specify_file">Specify the file to be validated</a></li>
                 <li><a href="#setup_excel">How to set up your spreadsheet in Excel</a></li>
                 <li><a href="#setup_tsv">How to set up your spreadsheet as a tab-separated text file</a></li>
             </ul>
@@ -127,7 +127,6 @@
         Participant/Effect/Auditory, Sensory presentation/Auditory, and Attribute/Onset. The individual HED tag strings
         can be combined by separating the individual valid strings by commas. Strings can also be parenthesized as in
         ((A/B, C/D/E), F), sequenced (A/B~C/D/E), or both ((A/B, C/D)~(E/F/G)).</p>
-    <hr>
     <h3 id="setup_tsv">How to set up your spreadsheet as a tab-separated text file:</h3>
     <p>In tab-separated text file spreadsheets, each line in the file corresponds to a row and the columns are text
         fields separated from each other by tabs. If a column field in a particular row is empty, the file should have
@@ -136,4 +135,7 @@
         determine columns:</p>
     <img src="{{ url_for('static', filename='img/setup_tsv_spreadsheet.png') }}">
     <p>The meanings of the columns are the same as for Excel spreadsheets.</p>
+    <p>For more information and examples on how to tag your study, visit <a
+            href="{{ url_for('view_routes.render_additional_examples_page') }}">here</a>
+    </p>
 {% endblock %}
