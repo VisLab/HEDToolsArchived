@@ -155,7 +155,7 @@ def get_worksheets_info():
 
 @view_routes.route('/help', strict_slashes=False, methods=['GET'])
 def render_help_page():
-    """Handles the site root.
+    """Handles the site help page.
 
     Parameters
     ----------
@@ -163,10 +163,26 @@ def render_help_page():
     Returns
     -------
     Rendered template
-        A rendered template for the main page.
+        A rendered template for the help page.
 
     """
-    return render_template('help.html')
+    return render_template('help.html');
+
+
+@view_routes.route('/additional_examples', strict_slashes=False, methods=['GET'])
+def render_additional_examples_page():
+    """Handles the site additional examples page.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Rendered template
+        A rendered template for the additional examples page.
+
+    """
+    return render_template('additional_examples.html');
 
 
 @view_routes.route('/submit', strict_slashes=False, methods=['POST'])
