@@ -657,23 +657,17 @@ def _copy_file_line_by_line(file_object_1, file_object_2):
 
 
 def validate_spreadsheet(validation_arguments):
-    """Validates the HED tags in a worksheet by calling the validateworksheethedtags() function using the MATLAB engine.
-
-    The underlying validateworksheethedtags() MATLAB function is called to do the validation.
+    """Validates the spreadsheet.
 
     Parameters
     ----------
     validation_arguments: dictionary
         A dictionary containing the arguments for the validation function.
-    matlab_engine: Object
-        A MATLAB engine object.
 
     Returns
     -------
-    list
-        A list of strings containing the validation issues that were found. Each list element pertains to a particular
-        row in the worksheet that generated issues.
-
+    HedInputReader object
+        A HedInputReader object containing the validation results.
     """
     hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
                                       tag_columns=validation_arguments['tag_columns'],
@@ -682,7 +676,6 @@ def validate_spreadsheet(validation_arguments):
                                       worksheet_name=validation_arguments['worksheet'],
                                       check_for_warnings=validation_arguments['check_for_warnings'],
                                       hed_xml_file=validation_arguments['hed_path']);
-    return hed_input_reader.get_validation_issues();
 
 
 def spreadsheet_present_in_form(validation_form_request_object):
