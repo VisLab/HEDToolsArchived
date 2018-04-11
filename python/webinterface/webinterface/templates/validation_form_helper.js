@@ -1,6 +1,6 @@
 const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
 const XML_FILE_EXTENSIONS = ['xml'];
-const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
+const TEXT_FILE_EXTENSIONS = ['tsv', 'txt'];
 const OTHER_HED_VERSION_OPTION = 'Other';
 
 $(document).ready(function () {
@@ -134,7 +134,7 @@ function updateHEDFileLabel(hedPath) {
  * Flash message when Excel workbook file extension is invalid.
  */
 function flashInvalidExcelExtensionMessage() {
-    flashMessageOnScreen('Please upload a excel or text spreadsheet (.xlsx, .xls, .tsv, .csv, .txt)',
+    flashMessageOnScreen('Please upload a excel or text spreadsheet (.xlsx, .xls, .tsv, .txt)',
         'error', 'spreadsheet-flash');
 }
 

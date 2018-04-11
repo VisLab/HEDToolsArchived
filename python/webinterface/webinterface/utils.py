@@ -12,7 +12,7 @@ from hedvalidation.hed_dictionary import HedDictionary;
 
 app_config = current_app.config;
 
-SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv', 'csv'];
+SPREADSHEET_FILE_EXTENSIONS = ['xls', 'xlsx', 'txt', 'tsv'];
 HED_FILE_EXTENSIONS = ['.xml'];
 OTHER_TAG_COLUMN_NAMES = ['Event Details', 'Multiple Tags', 'HED tag', 'HED tags', 'Tag', 'Tags'];
 SPECIFIC_TAG_COLUMN_NAMES = ['Category', 'Description', 'Label', 'Long'];
