@@ -147,7 +147,7 @@ function flashInvalidHEDExtensionMessage() {
 
 /**
  * Resets the flash messages that aren't related to the form submission.
-A * @param {String} message - If true, reset the flash message related to the submit button.
+ A * @param {String} message - If true, reset the flash message related to the submit button.
  */
 function resetFlashMessages(resetSubmitFlash) {
     flashMessageOnScreen('', 'success', 'spreadsheet-flash');
@@ -201,11 +201,11 @@ function flashMessageOnScreen(message, category, flashMessageElementId) {
  * @param {String} category - The category of the message. The categories are 'error', 'success', and 'other'.
  */
 function setFlashMessageCategory(flashMessage, category) {
-    if ("error" == category) {
+    if ("error" === category) {
         flashMessage.style.backgroundColor = 'lightcoral';
-    } else if ("success" == category) {
+    } else if ("success" === category) {
         flashMessage.style.backgroundColor = 'palegreen';
-    } else if ("warning" == category) {
+    } else if ("warning" === category) {
         flashMessage.style.backgroundColor = 'darkorange';
     } else {
         flashMessage.style.backgroundColor = '#f0f0f5';
@@ -287,7 +287,8 @@ function submitForm() {
             processData: false,
             dataType: 'json',
             success: function (validationStatus) {
-                if (checkIssueCount(validationStatus['issueCount'])) {
+                if (checkIssueCount(validationStatus['issueCount'], validationStatus['errorCount'],
+                    validationStatus['warningCount'])) {
                     downloadValidationOutputFile(validationStatus['downloadFile']);
                 } else {
                     deleteUploadedSpreadsheet(validationStatus['downloadFile']);
@@ -338,14 +339,20 @@ function deleteUploadedSpreadsheet(uploadedSpreadsheetFile) {
 /**
  * Check the number of validation issues and flash it.
  * @param {Number} rowIssueCount - Number of issues.
+ * @param {Number} rowErrorCount - Number of errors.
+ * @param {Number} rowWarningCount - Number of warnings.
  * @returns {boolean} - True if there are issues found. False, if otherwise.
  */
-function checkIssueCount(rowIssueCount) {
+function checkIssueCount(rowIssueCount, rowErrorCount, rowWarningCount) {
     var issuesFound = false;
-    if (rowIssueCount == 0) {
+    if (rowIssueCount === 0) {
         flashMessageOnScreen('No issues were found.', 'success', 'submit-flash');
+    } else if (generateWarningsIsChecked()) {
+        flashMessageOnScreen(rowIssueCount.toString() + ' issues found. ' + rowErrorCount.toString() + ' errors, '
+            + rowWarningCount.toString() + ' warnings. Creating attachment.', 'error', 'submit-flash');
+        issuesFound = true;
     } else {
-        flashMessageOnScreen(rowIssueCount.toString() + ' issues found. Creating attachment.', 'error', 'submit-flash');
+        flashMessageOnScreen(rowIssueCount.toString() + ' errors found. Creating attachment.', 'error', 'submit-flash');
         issuesFound = true;
     }
     return issuesFound;
@@ -376,7 +383,7 @@ function tagColumnsTextboxIsValid() {
  * @returns {boolean} - True if the string is null or its length is 0.
  */
 function isEmptyStr(str) {
-    if (str == null || str.length == 0) {
+    if (str === null || str.length === 0) {
         return true;
     }
     return false;
@@ -496,7 +503,7 @@ function getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName) {
  */
 function flashSpreadsheetTagColumnCountMessage(TagColumnIndices, requiredTagColumnIndices) {
     var numberOfTagColumns = (TagColumnIndices.length + Object.keys(requiredTagColumnIndices).length).toString();
-    if (numberOfTagColumns == '0') {
+    if (numberOfTagColumns === '0') {
         flashMessageOnScreen('Warning: No tag column(s) found... Using the 2nd column', 'warning',
             'tag-columns-flash');
     } else {
@@ -667,7 +674,15 @@ function spreadsheetTagColumnsIndicesAreEmpty(tagColumnsIndices) {
  * @returns {boolean} - True if the dictionary is empty. False, if otherwise.
  */
 function dictionaryIsEmpty(dictionary) {
-    return Object.keys(dictionary).length == 0;
+    return Object.keys(dictionary).length === 0;
+}
+
+/**
+ * Checks to see if warnings are being generated through checkbox.
+ * @returns {boolean} - True if warnings are generated. False if otherwise.
+ */
+function generateWarningsIsChecked() {
+    return $('#generate-warnings').prop('checked') === true;
 }
 
 /**

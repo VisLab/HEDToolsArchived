@@ -161,10 +161,13 @@ def report_spreadsheet_validation_status(form_request_object):
         validation_input_arguments = _generate_input_arguments_from_validation_form(
             form_request_object, spreadsheet_file_path, hed_file_path);
         hed_input_reader = validate_spreadsheet(validation_input_arguments);
-        validation_issues = hed_input_reader.get_
+        tag_validator = hed_input_reader.get_tag_validator();
+        validation_issues = hed_input_reader.get_validation_issues();
         validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
             original_spreadsheet_filename, validation_issues, validation_input_arguments['worksheet']);
-        validation_status['issueCount'] = _get_validation_issue_count(validation_issues);
+        validation_status['issueCount'] = tag_validator.get_issue_count();
+        validation_status['errorCount'] = tag_validator.get_error_count();
+        validation_status['warningCount'] = tag_validator.get_warning_count();
     except:
         validation_status['error'] = traceback.format_exc();
     finally:
@@ -236,6 +239,7 @@ def generate_download_file_response(download_file_name):
                 for line in download_file:
                     yield line;
             delete_file_if_it_exist(os.path.join(app_config['UPLOAD_FOLDER'], download_file_name));
+
         return Response(generate(), mimetype='text/plain; charset=utf-8',
                         headers={'Content-Disposition': "attachment; filename=%s" % download_file_name});
     except:
@@ -329,28 +333,6 @@ def _save_hed_to_upload_folder_if_present(hed_file_object):
         hed_file_extension = '.' + _get_file_extension(hed_file_object.filename);
         hed_file_path = _save_file_to_upload_folder(hed_file_object, hed_file_extension);
     return hed_file_path;
-
-
-def _get_validation_issue_count(validation_issues):
-    """Gets the number of validation issues in the spreadsheet.
-
-    Parameters
-    ----------
-    validation_issues: string
-        A string containing the validation issues found in the spreadsheet.
-
-    Returns
-    -------
-        integer
-        A integer representing the number of validation issues.
-    """
-    number_of_issues = 0;
-    split_validation_issues = validation_issues.split('\n');
-    if split_validation_issues != ['']:
-        for validation_issue_line in split_validation_issues:
-            if validation_issue_line.startswith('\t'):
-                number_of_issues += 1;
-    return number_of_issues;
 
 
 def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, validation_issues, worksheet_name=''):
@@ -671,12 +653,12 @@ def validate_spreadsheet(validation_arguments):
         A HedInputReader object containing the validation results.
     """
     return HedInputReader(validation_arguments['spreadsheet_path'],
-                                      tag_columns=validation_arguments['tag_columns'],
-                                      has_column_names=validation_arguments['has_column_names'],
-                                      required_tag_columns=validation_arguments['required_tag_columns'],
-                                      worksheet_name=validation_arguments['worksheet'],
-                                      check_for_warnings=validation_arguments['check_for_warnings'],
-                                      hed_xml_file=validation_arguments['hed_path']);
+                          tag_columns=validation_arguments['tag_columns'],
+                          has_column_names=validation_arguments['has_column_names'],
+                          required_tag_columns=validation_arguments['required_tag_columns'],
+                          worksheet_name=validation_arguments['worksheet'],
+                          check_for_warnings=validation_arguments['check_for_warnings'],
+                          hed_xml_file=validation_arguments['hed_path']);
 
 
 def spreadsheet_present_in_form(validation_form_request_object):
