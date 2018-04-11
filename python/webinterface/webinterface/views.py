@@ -9,10 +9,10 @@ NOT_FOUND_ERROR = 404;
 NO_CONTENT_SUCCESS = 204;
 
 app_config = current_app.config;
-blueprint_routes = Blueprint('blueprint_routes', __name__);
+route_blueprint = Blueprint('route_blueprint', __name__);
 
 
-@blueprint_routes.route('/', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/', strict_slashes=False, methods=['GET'])
 def render_home_page():
     """Handles the home page.
 
@@ -28,7 +28,7 @@ def render_home_page():
     return render_template('home.html');
 
 
-@blueprint_routes.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
 def delete_file_in_upload_directory(filename):
     """Deletes the specified file from the upload file.
 
@@ -47,7 +47,7 @@ def delete_file_in_upload_directory(filename):
         return utils.handle_http_error(NOT_FOUND_ERROR, "File doesn't exist");
 
 
-@blueprint_routes.route('/download/<filename>', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/download/<filename>', strict_slashes=False, methods=['GET'])
 def download_file_in_upload_directory(filename):
     """Downloads the specified file from the upload file.
 
@@ -68,7 +68,7 @@ def download_file_in_upload_directory(filename):
     return download_response;
 
 
-@blueprint_routes.route('/gethedversion', methods=['POST'])
+@route_blueprint.route('/gethedversion', methods=['POST'])
 def get_hed_version_in_file():
     """Gets information related to the spreadsheet columns.
 
@@ -89,7 +89,7 @@ def get_hed_version_in_file():
     return json.dumps(hed_info);
 
 
-@blueprint_routes.route('/getmajorhedversions', methods=['GET'])
+@route_blueprint.route('/getmajorhedversions', methods=['GET'])
 def get_major_hed_versions():
     """Gets information related to the spreadsheet columns.
 
@@ -110,7 +110,7 @@ def get_major_hed_versions():
     return json.dumps(hed_info);
 
 
-@blueprint_routes.route('/getspreadsheetcolumnsinfo', methods=['POST'])
+@route_blueprint.route('/getspreadsheetcolumnsinfo', methods=['POST'])
 def get_spreadsheet_columns_info():
     """Gets information related to the spreadsheet columns.
 
@@ -131,7 +131,7 @@ def get_spreadsheet_columns_info():
     return json.dumps(spreadsheet_columns_info);
 
 
-@blueprint_routes.route('/getworksheetsinfo', methods=['POST'])
+@route_blueprint.route('/getworksheetsinfo', methods=['POST'])
 def get_worksheets_info():
     """Gets information related to the Excel worksheets.
 
@@ -153,7 +153,7 @@ def get_worksheets_info():
     return json.dumps(worksheets_info);
 
 
-@blueprint_routes.route('/help', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/help', strict_slashes=False, methods=['GET'])
 def render_help_page():
     """Handles the site root.
 
@@ -169,7 +169,7 @@ def render_help_page():
     return render_template('help.html')
 
 
-@blueprint_routes.route('/submit', strict_slashes=False, methods=['POST'])
+@route_blueprint.route('/submit', strict_slashes=False, methods=['POST'])
 def get_validation_results():
     """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
 
@@ -188,7 +188,7 @@ def get_validation_results():
     return json.dumps(validation_status);
 
 
-@blueprint_routes.route('/validation', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/validation', strict_slashes=False, methods=['GET'])
 def render_validation_form():
     """Handles the site root and Validation tab functionality.
 
