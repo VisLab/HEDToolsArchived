@@ -160,7 +160,8 @@ def report_spreadsheet_validation_status(form_request_object):
         original_spreadsheet_filename = _get_original_spreadsheet_filename(form_request_object);
         validation_input_arguments = _generate_input_arguments_from_validation_form(
             form_request_object, spreadsheet_file_path, hed_file_path);
-        validation_issues = validate_spreadsheet(validation_input_arguments);
+        hed_input_reader = validate_spreadsheet(validation_input_arguments);
+        validation_issues = hed_input_reader.get_
         validation_status['downloadFile'] = _save_validation_issues_to_file_in_upload_folder(
             original_spreadsheet_filename, validation_issues, validation_input_arguments['worksheet']);
         validation_status['issueCount'] = _get_validation_issue_count(validation_issues);
@@ -669,7 +670,7 @@ def validate_spreadsheet(validation_arguments):
     HedInputReader object
         A HedInputReader object containing the validation results.
     """
-    hed_input_reader = HedInputReader(validation_arguments['spreadsheet_path'],
+    return HedInputReader(validation_arguments['spreadsheet_path'],
                                       tag_columns=validation_arguments['tag_columns'],
                                       has_column_names=validation_arguments['has_column_names'],
                                       required_tag_columns=validation_arguments['required_tag_columns'],
