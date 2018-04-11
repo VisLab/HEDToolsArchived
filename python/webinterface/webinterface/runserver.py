@@ -17,7 +17,7 @@ def setup_logging():
 app = AppFactory.create_app('config.ProductionConfig');
 with app.app_context():
     from webinterface import utils;
-    from webinterface.views import route_blueprint;
+    from webinterface.routes import route_blueprint;
     app.register_blueprint(route_blueprint, url_prefix=app.config['URL_PREFIX']);
     utils.create_upload_directory(app.config['UPLOAD_FOLDER']);
     setup_logging();
