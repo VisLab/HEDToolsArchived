@@ -13,10 +13,11 @@
                 <li><a href="#specify_columns">Step 2: Specify which columns of your file contain HED tags</a></li>
                 <li><a href="#select_other_options">Step 3: Select the other options</a></li>
                 <li><a href="#click_submit">Step 4: Click the submit button to process the file</a></li>
+                <li><a href="#correct_errors">Step 5: Correct errors in spreadsheet and retry until no more errors</a>
+                </li>
             </ul>
             <li><a href="#notes_examples">Notes and examples</a></li>
             <ul>
-                <li><a href="#specify_file">Specify the file to be validated</a></li>
                 <li><a href="#setup_excel">How to set up your spreadsheet in Excel</a></li>
                 <li><a href="#setup_tsv">How to set up your spreadsheet as a tab-separated text file</a></li>
             </ul>
@@ -67,18 +68,19 @@
         errors in your HED tag spreadsheet must be corrected, or downstream tools relying on HED might not work
         properly. However, when you first validate, you might want to ignore warnings until you have corrected all
         errors. Once you have the errors out, you should probably run again and take a look at the warnings.
-        Warnings
-        often help you detect faulty tagging that might not be syntactically incorrect.</p>
+        Warnings often help you detect faulty tagging that might not be syntactically incorrect.</p>
     <h3 id="click_submit">Step 4: Click the submit button to process the file.</h3>
     <p>On submission, the HED Validator processes the file and outputs a message indicating the number of errors and
         warnings that it found:</p>
     <img src="{{ url_for('static', filename='img/validation_issues.png') }}">
-    <p>The HED Validator also writes error and warning messages to a text file for download and examination. Each
+    <p>The HED Validator also writes error and warning messages to a text file for download and examination. For the
+        best formatting experience open this text file in a editor such as WordPad or Notepad++. Each
         message contains the type of error or warning as well as the row and column number in the input file where
-        the
-        issue occurred. If the HED validator detected no issues, you will see the following message. You should now
-        be
-        ready to use them to tag your study.</p>
+        the issue occurred.</p>
+    <h3 id="correct_errors">Step 5: Correct errors in spreadsheet and retry until no more errors.</h3>
+    <p>The last step before you can tag your study is correcting any errors that are found in your
+        spreadsheet. Once corrected run the validator again. If the HED validator detected no issues, you will see the
+        following message. You should now be ready to use them to tag your study.</p>
     <img src="{{ url_for('static', filename='img/no_validation_issues.png') }}">
     <h2 id="notes_examples">Notes and examples</h2>
     <h3 id="setup_excel">How to set up your spreadsheet in Excel:</h3>
@@ -124,8 +126,7 @@
         examples of HED tag strings are:
         Participant/Effect/Auditory, Sensory presentation/Auditory, and Attribute/Onset. The individual HED tag strings
         can be combined by separating the individual valid strings by commas. Strings can also be parenthesized as in
-        ((A/B, C/D/E), F ), sequenced (A/B~C/D/E), or both ((A/B, C/D)~(E/F/G) ).</p>
-    <hr>
+        ((A/B, C/D/E), F), sequenced (A/B~C/D/E), or both ((A/B, C/D)~(E/F/G)).</p>
     <h3 id="setup_tsv">How to set up your spreadsheet as a tab-separated text file:</h3>
     <p>In tab-separated text file spreadsheets, each line in the file corresponds to a row and the columns are text
         fields separated from each other by tabs. If a column field in a particular row is empty, the file should have
@@ -134,4 +135,7 @@
         determine columns:</p>
     <img src="{{ url_for('static', filename='img/setup_tsv_spreadsheet.png') }}">
     <p>The meanings of the columns are the same as for Excel spreadsheets.</p>
+    <p>For more information and examples on how to tag your study, visit <a
+            href="{{ url_for('view_routes.render_additional_examples_page') }}">here</a>
+    </p>
 {% endblock %}
