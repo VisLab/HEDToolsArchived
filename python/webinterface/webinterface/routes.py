@@ -169,7 +169,7 @@ def render_help_page():
     return render_template('help.html');
 
 
-@view_routes.route('/additional_examples', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/additional_examples', strict_slashes=False, methods=['GET'])
 def render_additional_examples_page():
     """Handles the site additional examples page.
 
