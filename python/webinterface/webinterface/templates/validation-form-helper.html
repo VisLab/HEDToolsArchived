@@ -1,5 +1,5 @@
 {% macro create_validation_form() %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/validation_form_helper.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/validation-form-helper.css') }}">
     <form id="validation-form" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
@@ -73,6 +73,6 @@
         </div>
     </form>
     <script>
-        {%  include 'validation_form_helper.js' %}
+        {%  include 'validation-form-helper.js' %}
     </script>
 {% endmacro %}
