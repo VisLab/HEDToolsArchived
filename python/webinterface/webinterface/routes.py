@@ -27,6 +27,21 @@ def render_home_page():
     """
     return render_template('home.html');
 
+@route_blueprint.route('/common-errors', strict_slashes=False, methods=['GET'])
+def render_common_error_page():
+    """Handles the common errors page.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Rendered template
+        A rendered template for the home page.
+
+    """
+    return render_template('common-errors.html');
+
 
 @route_blueprint.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
 def delete_file_in_upload_directory(filename):
@@ -68,7 +83,7 @@ def download_file_in_upload_directory(filename):
     return download_response;
 
 
-@route_blueprint.route('/gethedversion', methods=['POST'])
+@route_blueprint.route('/get-hed-version', methods=['POST'])
 def get_hed_version_in_file():
     """Gets information related to the spreadsheet columns.
 
@@ -89,7 +104,7 @@ def get_hed_version_in_file():
     return json.dumps(hed_info);
 
 
-@route_blueprint.route('/getmajorhedversions', methods=['GET'])
+@route_blueprint.route('/get-major-hedversions', methods=['GET'])
 def get_major_hed_versions():
     """Gets information related to the spreadsheet columns.
 
@@ -110,7 +125,7 @@ def get_major_hed_versions():
     return json.dumps(hed_info);
 
 
-@route_blueprint.route('/getspreadsheetcolumnsinfo', methods=['POST'])
+@route_blueprint.route('/get-spreadsheet-columns-info', methods=['POST'])
 def get_spreadsheet_columns_info():
     """Gets information related to the spreadsheet columns.
 
@@ -131,7 +146,7 @@ def get_spreadsheet_columns_info():
     return json.dumps(spreadsheet_columns_info);
 
 
-@route_blueprint.route('/getworksheetsinfo', methods=['POST'])
+@route_blueprint.route('/get-worksheets-info', methods=['POST'])
 def get_worksheets_info():
     """Gets information related to the Excel worksheets.
 
@@ -169,7 +184,7 @@ def render_help_page():
     return render_template('help.html');
 
 
-@route_blueprint.route('/additional_examples', strict_slashes=False, methods=['GET'])
+@route_blueprint.route('/additional-examples', strict_slashes=False, methods=['GET'])
 def render_additional_examples_page():
     """Handles the site additional examples page.
 
@@ -182,7 +197,7 @@ def render_additional_examples_page():
         A rendered template for the additional examples page.
 
     """
-    return render_template('additional_examples.html');
+    return render_template('additional-examples.html');
 
 
 @route_blueprint.route('/submit', strict_slashes=False, methods=['POST'])
