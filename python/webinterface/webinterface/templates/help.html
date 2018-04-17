@@ -31,7 +31,7 @@
         section.) Once you have a file, you are ready to begin the validation.</p>
     <h3 id="specify_file">Step 1: Specify the file to be validated.</h3>
     <p>Indicate the name of the file to validate, using the Browse button to navigate in your file system:</p>
-    <img src="{{ url_for('static', filename='img/specify_file.png') }}">
+    <img src="{{ url_for('static', filename='img/specify-file.png') }}">
     <h3 id="specify_columns">Step 2: Specify which columns of your file contain HED tags.</h3>
     <p>After you have selected a file, HED Validator will try to automatically fill in the remaining information
         into
@@ -39,7 +39,7 @@
         was
         selected. If a spreadsheet has multiple worksheets, HED Validator selects the first one by default
         (ImaginedEmotion), but provides a drop down for you to select a different one:</p>
-    <img src="{{ url_for('static', filename='img/specify_columns.png') }}">
+    <img src="{{ url_for('static', filename='img/specify-columns.png') }}">
     <p>By default, the HED Validator assumes that the first row of the spreadsheet contains the names of the columns
         and
         uses these names to guess which columns correspond to special tags such as Event/Category or Event/Label. In
@@ -52,14 +52,14 @@
         next to it so that it gets the proper values for Long Name. In addition, the Validator also missed that
         column 8
         (called Other) also contained HED tags. After correcting we have:</p>
-    <img src="{{ url_for('static', filename='img/correct_columns.png') }}">
+    <img src="{{ url_for('static', filename='img/correct-columns.png') }}">
     <h3 id="select_other_options">Step 3: Select the other options.</h3>
     <p>You can validate your file against any valid HED schema. The Validator automatically retrieves the latest HED
         version and also has copies of each of the previous major HED versions available through the HED version
         pull-down in the options section. You can also upload one of your own HED versions by selecting the Other
         option
         in the pull-down:</p>
-    <img src="{{ url_for('static', filename='img/select_other_options.png') }}">
+    <img src="{{ url_for('static', filename='img/select-other-options.png') }}">
     <p>HED uses semantic versioning (X.Y.Z) where X denotes a major, backwards-incompatible change, Y denotes a
         major
         addition of functionality that is backwards-compatible, and Z denotes a minor backwards-compatible
@@ -72,7 +72,7 @@
     <h3 id="click_submit">Step 4: Click the submit button to process the file.</h3>
     <p>On submission, the HED Validator processes the file and outputs a message indicating the number of errors and
         warnings that it found:</p>
-    <img src="{{ url_for('static', filename='img/validation_issues.png') }}">
+    <img src="{{ url_for('static', filename='img/validation-issues.png') }}">
     <p>The HED Validator also writes error and warning messages to a text file for download and examination. For the
         best formatting experience open this text file in a editor such as WordPad or Notepad++. Each
         message contains the type of error or warning as well as the row and column number in the input file where
@@ -81,14 +81,14 @@
     <p>The last step before you can tag your study is correcting any errors that are found in your
         spreadsheet. Once corrected run the validator again. If the HED validator detected no issues, you will see the
         following message. You should now be ready to use them to tag your study.</p>
-    <img src="{{ url_for('static', filename='img/no_validation_issues.png') }}">
+    <img src="{{ url_for('static', filename='img/no-validation-issues.png') }}">
     <h2 id="notes_examples">Notes and examples</h2>
     <h3 id="setup_excel">How to set up your spreadsheet in Excel:</h3>
     <p>The following screenshot shows part of an Excel spreadsheet containing HED tags to be validated. The first row of
         the spreadsheet can contain column names. If you choose to have column names, HED uses these to try to guess the
         meaning of the columns. If HED guesses wrong or you aren’t using column names, you will need to specify the
         meanings of the columns before validation.</p>
-    <img src="{{ url_for('static', filename='img/setup_excel_spreadsheet.png') }}">
+    <img src="{{ url_for('static', filename='img/setup-excel-spreadsheet.png') }}">
     <p>The above example has 8 columns that are named in a typical manner.</p>
     <p><span style="font-weight: bold">Event code</span>: Usually researchers identify types of events by lab or study
         specific labels, sometimes referred to
@@ -133,7 +133,7 @@
         two tabs in a row. The following example shows how such a tab-separated file might appear when you edit it using
         a text editor. The columns do not line up visually, but the HED validator uses the tabs and not alignment to
         determine columns:</p>
-    <img src="{{ url_for('static', filename='img/setup_tsv_spreadsheet.png') }}">
+    <img src="{{ url_for('static', filename='img/setup-tsv-spreadsheet.png') }}">
     <p>The meanings of the columns are the same as for Excel spreadsheets.</p>
     <p>For examples of how to tag your study, visit <a
             href="{{ url_for('route_blueprint.render_additional_examples_page') }}">here</a>

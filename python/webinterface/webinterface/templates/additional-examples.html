@@ -10,7 +10,7 @@
     <p>Tags help us identify different aspects of a certain event code and allow anyone to understand the meaning of the
         event.</p>
     <h3>HED Schema on site</h3>
-    <img src="{{ url_for('static', filename='img/hed_schema.png') }}">
+    <img src="{{ url_for('static', filename='img/hed-schema.png') }}">
     <h3>Basics</h3>
     <p>Note the indentation pattern of each tag on the schema. This is the tiered format for tags. The main items to pay
         close attention to are the tags with {extensionAllowed} and {takesValue} parameters since these tags can contain
@@ -29,7 +29,7 @@
         code, except those for the type of tags they are discussing.</p>
     <h3>Required Tags</h3>
     <p>The following tag types are the required bare minimum for each event code.</p>
-    <img src="{{ url_for('static', filename='img/required_tags.png') }}">
+    <img src="{{ url_for('static', filename='img/required-tags.png') }}">
     <p><span style="font-weight: bold">Category</span>: These tags define what area this event code falls under as well
         as who or where it is coming from. Tags range from Participant failure to Experiment control to Technical Error.
         These tags give context for the rest of the tags for this event code and should be done first.</p>
@@ -82,17 +82,17 @@
         input device as well as what the input device is. A Risk-Reward Task with an option for each button is a good
         example of where these tags would be a good fit. It also gives you room for a good in-between Tag versus short
         Label Tags and long Description Tags. An example of this is below:</p>
-    <img src="{{ url_for('static', filename='img/long_name.png') }}">
+    <img src="{{ url_for('static', filename='img/long-name.png') }}">
     <h3>The Differences between Onsets and Offsets versus Duration</h3>
     <p>While either method will work for specifying how long an event lasts, using the Onset and Offset tags requires
         that you maintain the same Label Tag and Description Tag for both event codes, though you could designate which
         code is which in the Long name Tag. The Duration is for events that have a known amount of time something is
         present before disappearing. The key differences to note are that Onset and Offset can have a variation in the
         time between them, while Duration is fixed. Here are some examples:</p>
-    <img src="{{ url_for('static', filename='img/duration_tags.png') }}">
+    <img src="{{ url_for('static', filename='img/duration-tags.png') }}">
     <p>Note that for certain events, in this case walking, the event onset and offset events would be tagged differently
         since your stride starts with you toe leaving last and your heel striking first. An example of this is below</p>
-    <img src="{{ url_for('static', filename='img/attribute_tags.png') }}">
+    <img src="{{ url_for('static', filename='img/attribute-tags.png') }}">
     <h3>The Differences of Sensory presentation Tags versus Participant/Effect Tags</h3>
     <p>The Sensory presentation tags are used when an intended Stimulus is presented to the participant in a particular
         manner. While the Participant/Effect tags show that the participant perceived the Stimulus through their senses
@@ -105,7 +105,7 @@
         can be interacting with multiple participants, by using IDs you can keep track of things as they progress.
         Global IDs are used to identify the same participant or object throughout the entire study, while Local IDs only
         pertain to a particular event. Here are some examples:</p>
-    <img src="{{ url_for('static', filename='img/id_tags.png') }}">
+    <img src="{{ url_for('static', filename='img/id-tags.png') }}">
     <h3>More Details on HED Clauses or using the tilde (~)</h3>
     <p>HED allows you describe a more complicated event structure using the tilde. For example, a car has its path
         perturbed, or say a participant notices a red bicycle that is presented on the second time its presentation is
@@ -113,9 +113,9 @@
         (Subject~Verb), and transitive being (Subject~Verb~Object). Here are a couple examples for each of the forms
         below:</p>
     <p><span style="font-weight: bold">Simple</span>:</p>
-    <img src="{{ url_for('static', filename='img/simple_tilde.png') }}">
+    <img src="{{ url_for('static', filename='img/simple-tilde.png') }}">
     <p><span style="font-weight: bold">Transitive</span>:</p>
-    <img src="{{ url_for('static', filename='img/transitive_tilde.png') }}">
+    <img src="{{ url_for('static', filename='img/transitive-tilde.png') }}">
     <h3>Some information on Custom Tags</h3>
     <p>HED does allow Custom tags and they are extensible under Custom. For example, if your study involves tags that
         are going to be used in only your study on interpretive ballroom dancing and not likely to be used by the
