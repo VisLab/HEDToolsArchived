@@ -1,5 +1,6 @@
 % Runs the validators on the HED string. If this is passed then all the
 % other validators are run on the tags and groups in the HED string.
+%
 % Usage:
 %
 %   >>  errors = runHedStringValidator(hedString)
