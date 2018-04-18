@@ -38,27 +38,33 @@ errors = '';
 currentTag = '';
 lastNonEmptyCharacter = '';
 hedStringLength = length(hedString);
-for a = 1:hedStringLength
-    character = hedString(a);
+characterIndex = 0;
+while characterIndex > hedStringLength
+    % for characterIndex = 1:hedStringLength
+    character = hedString(characterIndex);
     currentTag = [currentTag character]; %#ok<AGROW>
     if ~characterIsWhitespace(character)
         if characterIsDelimiter(character)
             currentTag = '';
         end
-        if commaMissingBeforeOpeningBracket(lastNonEmptyCharacter, ...
-                character) && ~isValidTagWithParentheses(...
-                hedString, currentTag, a);
+        if  character == '(' && ~isValidTagWithParentheses(...
+                hedString, currentTag, characterIndex)
+            characterIndex = getIndexAtEndOfParentheses(...
+                hedString, currentTag, characterIndex);
+            currentTag = '';
+        elseif commaMissingBeforeOpeningBracket(lastNonEmptyCharacter, ...
+                character)
             currentTag = strtrim(currentTag(1:end-1));
             errors = generateerror(ERRORTYPE, [], currentTag);
             break;
-        end
-        if commaIsMissingAfterClosingBracket(lastNonEmptyCharacter, ...
+        elseif commaIsMissingAfterClosingBracket(lastNonEmptyCharacter, ...
                 character)
             currentTag = strtrim(currentTag(1:end-1));
             errors = generateerror(ERRORTYPE, [], currentTag);
             break;
         end
         lastNonEmptyCharacter = character;
+        characterIndex = characterIndex + 1;
     end
 end
 end % checkcommas
@@ -91,15 +97,16 @@ function isDelimiter = characterIsDelimiter(character)
 isDelimiter = ~isempty(regexp(character, '[,~]', 'once'));
 end % characterIsDelimiter
 
-function setOfParentheses = getNextSetOfParenthesesInHedString(...
-    hedString)
+function [setOfParentheses, parenthesesLength] = ...
+    getNextSetOfParenthesesInHedString(hedString)
 % Gets the next set of parentheses in the provided HED string.
 setOfParentheses = '';
 openingParenthesisFound = false;
 numberOfCharacters = length(hedString);
-for a = 1:numberOfCharacters
-    character = hedString(a);
-    setOfParentheses = [setOfParentheses hedString(a)]; %#ok<AGROW>
+parenthesesLength = 0;
+for parenthesesLength = 1:numberOfCharacters
+    character = hedString(parenthesesLength);
+    setOfParentheses = [setOfParentheses hedString(parenthesesLength)]; %#ok<AGROW>
     if character == '('
         openingParenthesisFound = true;
     elseif character == ')' && openingParenthesisFound
@@ -107,6 +114,17 @@ for a = 1:numberOfCharacters
     end
 end
 end % getNextSetOfParenthesesInHedString
+
+function parenthesesLength = getIndexAtEndOfParentheses(hedString, ...
+    currentTag, characterIndex)
+% Checks to see if the current tag with the next set of parentheses in the
+% HED string is valid. Some tags have parentheses and this function is
+% implemented to avoid reporting a missing comma error
+currentTag = currentTag(1:end-1);
+restOfHedString = hedString(characterIndex:end);
+[~, parenthesesLength] = getNextSetOfParenthesesInHedString(...
+    [currentTag restOfHedString]);
+end % getIndexAtEndOfParentheses
 
 function tagIsValid = isValidTagWithParentheses(hedString, ...
     currentTag, characterIndex)
