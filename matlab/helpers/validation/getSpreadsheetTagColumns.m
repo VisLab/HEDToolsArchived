@@ -100,11 +100,11 @@ end
             inputArguments)
         % Get specific indices from tag columns input argument.
         specificColumnNames = fieldnames(inputArguments.specificColumns);
-        numberOfSepecificColumns = length(otherColumnNames);
+        numberOfSepecificColumns = length(specificColumnNames);
         specificColumns = zeros(1, numberOfSepecificColumns);
         for a = 1:numberOfSepecificColumns
             specificColumns(a) = ...
-                inputArguments.specificColumns(specificColumnNames{a});
+                inputArguments.specificColumns.(specificColumnNames{a});
         end
     end % getSpecificColumnsFromInputArguments
 
