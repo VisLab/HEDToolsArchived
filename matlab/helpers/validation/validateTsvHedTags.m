@@ -5,7 +5,7 @@
 %
 % Usage:
 %
-%   >>  [issues, replaceTags] = parsetsv(hedMaps, tsvFile, ...
+%   >>  issues, replaceTags = validateTsvHedTags(hedMaps, tsvFile, ...
 %       tagColumns, hasHeader, generateWarnings)
 %
 % Input:
@@ -71,11 +71,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function issues = parsetsv(hedMaps, tsvFile, tagColumns, hasHeader, ...
-    generateWarnings)
-p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
-    generateWarnings);
-issues = readLines(p);
+function issues = validateTsvHedTags(tsvFile, varargin)
+p = parseInputArguments(tsvFile, varargin{:});
+issues = validateTags(p);
 
     function [line, lineNumber] = checkFileHeader(hasHeader, fileId)
         % Checks to see if the file has a header line
@@ -87,104 +85,62 @@ issues = readLines(p);
         end
     end % checkFileHeader
 
-    function p = findErrors(p)
-        % Errors will be generated for the line if found
-        p.lineErrors = checkerrors(p.hedMaps, p.cellTags, ...
-            p.formattedCellTags);
-    end % findErrors
+    function inputArguments = parseInputArguments(tsvFile, varargin)
+        % Parses the input arguments and returns them in a structure
+        parser = inputParser();
+        parser.addRequired('tsvFile', @ischar);
+        parser.addParamValue('generateWarnings', false, @islogical);
+        parser.addParamValue('hasHeaders', true, @islogical);
+        parser.addParamValue('otherColumns', [], @isnumeric);
+        parser.addParamValue('specificColumns', [], @isstruct);
+        parser.parse(tsvFile, varargin{:});
+        inputArguments = parser.Results;
+    end % parseInputArguments
 
-    function p = findWarnings(p)
-        % Warnings will be generated for the line if found
-        p.lineWarnings = checkwarnings(p.hedMaps, p.cellTags, ...
-            p.formattedCellTags);
-    end % findWarnings
-
-    function p = parseArguments(hedMaps, file, tagColumns, hasHeader, ...
-            generateWarnings)
-        % Parses the arguements passed in and returns the results
-        parser = inputParser;
-        parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
-        parser.addRequired('tsvFile', @(x) (~isempty(x) && ischar(x)));
-        parser.addRequired('tagColumns', @(x) (~isempty(x) && ...
-            isa(x,'double') && length(x) >= 1));
-        parser.addRequired('hasHeader', @islogical);
-        parser.addRequired('generateWarnings', @islogical);
-        parser.parse(hedMaps, file, tagColumns, hasHeader, ...
-            generateWarnings);
-        p = parser.Results;
-    end % parseArguments
-
-    function issues = readLines(p)
+    function issues = validateTags(p)
         % Reads the tab-delimited file line by line and validates the tags
-        p.issues = {};
-        p.replaceTags = {};
-        p.issueCount = 1;
+        issues = {};
         try
             fileId = fopen(p.tsvFile);
-            [p.line, p.lineNumber] = checkFileHeader(p.hasHeader, fileId);
-            while ischar(p.line)
-                [p.cellTags, p.formattedCellTags, p.hedString] = ...
-                    getLineTags(p.line, p.tagColumns);
-                p = validateLineTags(p);
-                p.line = fgetl(fileId);
-                p.lineNumber = p.lineNumber + 1;
+            tsvrow, rowNumber = checkFileHeader(p.hasHeader, fileId);
+            while ischar(line)
+                rowNumber = rowNumber + 1;
+                row = getNextRow(); 
+                numberOfRows = size(row, 1);
+                for a = rowNumber:numberOfRows
+                    if ~isempty(inputArguments.specificColumns)
+                        row = appendTagPrefixes(row, specificColumns);
+                    end
+                end
             end
             fclose(fileId);
-            issues = p.issues;
         catch
             fclose(fileId);
-            throw(MException('parsetsv:cannotRead', ...
-                'Unable to read TSV file on line %d', p.lineNumber));
+            throw(MException('validateTsvHedTags:cannotRead', ...
+                'Unable to read TSV file on line %d', rowNumber));
         end
     end % readLines
 
-    function [cellTags, formattedCellTags, splitTags] = ...
-            getLineTags(line, tagColumns)
+    function rowTags = getNextRow(fileId)
+        % Gets the next row
+        line = fgetl(fileId);
+        rowTags = textscan(line, '%q', 'delimiter', '\t')';
+    end
+
+    function combinedTags = combineRowTags(row, tagColumns)
         % Reads the tag columns in a tab-delimited file and formats them
-        cellTags = {};
-        formattedCellTags = {};
-        delimitedLine = textscan(line, '%q', 'delimiter', '\t')';
-        numLineCols = size(delimitedLine{1},1);
+        numberOfRowColumns = size(row{1},1);
         numCols = size(tagColumns, 2);
         % clean this up later
         if ~all(cellfun(@isempty, strtrim(delimitedLine))) && ...
-                tagColumns(1) <= numLineCols
+                tagColumns(1) <= numberOfRowColumns
             splitTags = delimitedLine{1}{tagColumns(1)};
             for a = 2:numCols
-                if tagColumns(a) <= numLineCols
+                if tagColumns(a) <= numberOfRowColumns
                     splitTags = [splitTags, ',', ...
                         delimitedLine{1}{tagColumns(a)}]; %#ok<AGROW>
                 end
             end
-            cellTags = hed2cell(splitTags, false);
-            formattedCellTags = hed2cell(splitTags, true);
         end
     end % getLineTags
-
-    function issues = validateHEDString(hedString)
-        % Validate the entire HED string
-        issues = checkgroupbrackets(hedString);
-        issues = [issues checkcommas(hedString)];
-    end % validateHEDString
-
-    function p = validateLineTags(p)
-        % This function validates the tags on a line in a tab-delimited
-        % file
-        p.structIssues = validateHEDString(p.hedString);
-        if isempty(p.structIssues)
-            p = findErrors(p);
-            p.lineIssues = p.lineErrors;
-            if(p.generateWarnings)
-                p = findWarnings(p);
-                p.lineIssues = [p.lineErrors p.lineWarnings];
-            end
-        end
-        if ~isempty(p.lineIssues)
-            p.issues{p.issueCount} = ...
-                [sprintf('Issues on line %d:\n', p.lineNumber), ...
-                p.lineIssues];
-            p.issueCount = p.issueCount + 1;
-        end
-    end % validateLineTags
-
 end % parsetags

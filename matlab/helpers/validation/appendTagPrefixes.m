@@ -1,14 +1,14 @@
-% Appends tag prefixes to HED tags in a row. 
+% Appends tag prefixes to HED tags in a spreadsheet row. 
 %
 % Usage:
 %
-%   >>  tagPrefixMap = createTagPrefixMap(specificColumns)
+%   >>  tagPrefixMap = appendTagPrefixes(specificColumns)
 
 % Input:
 %
 %   Required:
 %
-%   rowTags
+%   spreadsheetRow
 %                   A cell array containing the HED tags in a given row.
 %
 %   specificColumns
@@ -27,9 +27,8 @@
 %
 % Output:
 %
-%   tagPrefixMap
-%                   A dictionary containing a mapping of specific tag
-%                   column indices to tag prefixes. 
+%   spreadsheetRow
+%                   The spreadsheet row with the append tag prefixes.
 %
 % Copyright (C) 2017
 % Jeremy Cockfield jeremy.cockfield@gmail.com
@@ -49,12 +48,13 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function rowTags = appendTagPrefixes(rowTags, specificColumns)
+function spreadsheetRow = appendTagPrefixes(spreadsheetRow, ...
+    specificColumns)
 tagPrefixMap = createTagPrefixMap(specificColumns);
-numberOfColumns = length(rowTags);
+numberOfColumns = length(spreadsheetRow);
 for a = 1:numberOfColumns
     if isKey(tagPrefixMap, a)
-        columnTags = rowTags{a};
+        columnTags = spreadsheetRow{a};
         if ~isempty(columnTags)
             splitColumnTags = strsplit(columnTags, ',');
             numberOfColumnTags = length(splitColumnTags);
@@ -65,7 +65,7 @@ for a = 1:numberOfColumns
                     splitColumnTags{b} = [prefix, columnTag]; 
                 end
             end
-            rowTags{a} = strjoin(splitColumnTags, ',');
+            spreadsheetRow{a} = strjoin(splitColumnTags, ',');
         end
     end
 end

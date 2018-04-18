@@ -81,10 +81,18 @@ function worksheetTags = validateworksheethedtags(workbook, varargin)
 inputArguments = parseInputArguments(workbook, varargin{:});
 worksheetTags = reportValidationIssues(inputArguments);
 
-    function worksheetTags = reportValidationIssues(inputArguments)
+    function worksheetRows = reportValidationIssues(inputArguments)
         % Validate the HED tags in the file and report any issues
         hedMaps = loadHedTagMaps();
-        worksheetTags = getWorksheetTagsForEachRow(inputArguments);
+        inputArguments.tagColumns = getTagColumns(inputArguments);
+        worksheetRows = getWorksheetRows(inputArguments);
+        numberOfWorksheetRows = size(worksheetRows, 1);
+        for a = rowNumber:numberOfWorksheetRows
+            if ~isempty(inputArguments.specificColumns)
+        worksheetRows = appendTagPrefixes(worksheetRows{a}, ...
+            specificColumns);
+            end
+        end
 %         numberOfWorksheetRows = size(worksheetTags, 1);
 %         issues = cell(1, numberOfWorksheetRows);
 %         rowNumber = getFirstRowNumberForValidation(inputArguments);
@@ -112,55 +120,20 @@ worksheetTags = reportValidationIssues(inputArguments);
         end
     end % getFirstRowNumberForValidation
     
-    function worksheetTags = getWorksheetTagsForEachRow(inputArguments)
-        % Gets hed tags in excel worksheet for each row
+    function worksheetRows = getWorksheetRows(inputArguments)
+        % Gets the worksheet rows
 %         inputArguments.worksheetData = putWorksheetDataInCellArray(...
 %             inputArguments);
-        inputArguments.tagColumns = getTagColumns(inputArguments);
-        worksheetTags = putWorksheetDataInCellArray(inputArguments);
+        worksheetRows = putWorksheetDataInCellArray(inputArguments);
 %         if ~isempty(inputArguments.specificColumns)
 %             inputArguments = addTagPrefixesToColumns(inputArguments);
 %         end
 %         worksheetTags = appendTagsTogetherInEachRow(inputArguments);
     end % getWorksheetTagsForEachRow
 
-    function tagColumns = getTagColumns(inputArguments)
-        % Gets the tag columns. Other columns and 
-        tagColumns = 2;
-        if tagColumnsAreSpecified(inputArguments)
-            tagColumns = getTagColumnsFromInputArguments(inputArguments);
-        end
-    end % getTagColumns
 
-    function tagColumnIndices = getTagColumnsFromInputArguments(...
-            inputArguments)
-        % Get tag indices from tag columns input argument. Any column
-        % indices greater than the number of actual columns in the
-        % worksheet will be removed.
-        specificColumnIndices = ...
-            getSpecificColumnsFromInputArguments(inputArguments);
-        tagColumnIndices = ...
-            find(ismember(1:size(inputArguments.worksheetData, 2), ...
-            [inputArguments.otherColumns specificColumnIndices]));
-    end % getTagColumnIndicesFromInputArgument
 
-    function specificColumns = getSpecificColumnsFromInputArguments(...
-            inputArguments)
-        % Get specific indices from tag columns input argument. 
-        specificColumnNames = fieldnames(inputArguments.specificColumns);
-        numberOfSepecificColumns = length(otherColumnNames);
-        specificColumns = zeros(1, numberOfSepecificColumns);
-        for a = 1:numberOfSepecificColumns
-            specificColumns(a) = ...
-                inputArguments.specificColumns(specificColumnNames{a});
-        end
-    end % getSpecificColumnsFromInputArguments
 
-    function specified = tagColumnsAreSpecified(inputArguments)
-        % Returns true if no columns are specified
-        specified = ~isempty(inputArguments.otherColumns) || ...
-            ~isempty(inputArguments.specificColumns);
-    end % tagColumnsAreSpecified
 
     function worksheetData = putWorksheetDataInCellArray(inputArguments)
         % Read workbook worksheet and put the data into a cell array.
