@@ -1,4 +1,4 @@
-% Appends tag prefixes to HED tags in a spreadsheet row. 
+% Appends tag prefixes to HED tags in a spreadsheet row.
 %
 % Usage:
 %
@@ -14,11 +14,11 @@
 %   specificColumns
 %                   A scalar structure used to specify the specific tag
 %                   columns. The fieldnames need to be category
-%                   corresponding to Event/Category, description 
+%                   corresponding to Event/Category, description
 %                   corresponding to Event/Description, label corresponding
 %                   to Event/Label, long corresponding to Event/ Long name.
 %                   The field values are the column indices that contain
-%                   the specific tags. 
+%                   the specific tags.
 %
 %                   Example:
 %                   specificColumns.long = 2;
@@ -50,6 +50,7 @@
 
 function spreadsheetRow = appendTagPrefixes(spreadsheetRow, ...
     specificColumns)
+parseInputArguments(spreadsheetRow, specificColumns);
 tagPrefixMap = createTagPrefixMap(specificColumns);
 numberOfColumns = length(spreadsheetRow);
 for a = 1:numberOfColumns
@@ -62,12 +63,21 @@ for a = 1:numberOfColumns
                 columnTag = splitColumnTags{b};
                 prefix = tagPrefixMap(a);
                 if ~strncmpi(columnTag, prefix, length(columnTag))
-                    splitColumnTags{b} = [prefix, columnTag]; 
+                    splitColumnTags{b} = [prefix, columnTag];
                 end
             end
             spreadsheetRow{a} = strjoin(splitColumnTags, ',');
         end
     end
 end
-end % appendTagPrefixes
 
+    function inputArguments = parseInputArguments(spreadsheetRow, ...
+    specificColumns)
+        % Parses the input arguments and returns them in a structure
+        parser = inputParser();
+        parser.addRequired('spreadsheetRow', @iscell);
+        parser.addRequired('specificColumns', @isnumeric);
+        parser.parse(spreadsheetRow, specificColumns);
+        inputArguments = parser.Results;
+    end % parseInputArguments
+end % appendTagPrefixes
