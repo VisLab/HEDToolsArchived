@@ -21,11 +21,11 @@
 %   'specificColumns'
 %                   A scalar structure used to specify the specific tag
 %                   columns. The fieldnames need to be category
-%                   corresponding to Event/Category, description 
+%                   corresponding to Event/Category, description
 %                   corresponding to Event/Description, label corresponding
 %                   to Event/Label, long corresponding to Event/ Long name.
 %                   The field values are the column indices that contain
-%                   the specific tags. 
+%                   the specific tags.
 %
 %                   Example:
 %                   specificColumns.long = 2;
@@ -49,7 +49,7 @@
 %   'worksheet'
 %                   The name of the workbook worksheet that you want to
 %                   validate. If no worksheet is specified then the first
-%                   workbook worksheet will be validated. 
+%                   workbook worksheet will be validated.
 %
 % Output:
 %
@@ -78,57 +78,62 @@
 
 function worksheetTags = validateworksheethedtags(workbook, varargin)
 
-inputArguments = parseInputArguments(workbook, varargin{:});
-worksheetTags = reportValidationIssues(inputArguments);
+inputArgs = parseInputArguments(workbook, varargin{:});
+worksheetTags = reportValidationIssues(inputArgs);
 
-    function worksheetRows = reportValidationIssues(inputArguments)
+    function worksheetRows = reportValidationIssues(inputArgs)
         % Validate the HED tags in the file and report any issues
-        hedMaps = loadHedTagMaps();
-        inputArguments.tagColumns = getTagColumns(inputArguments);
-        worksheetRows = getWorksheetRows(inputArguments);
+        %         hedMaps = loadHedTagMaps();
+        
+        %         inputArgs.tagColumns = getTagColumns(inputArgs);
+        worksheetRows = getWorksheetRows(inputArgs);
+        numberOfColumns = size(worksheetRows, 2);
+        tagColumns = getSpreadsheetTagColumns(inputArgs.otherColumns, ...
+            inputArgs.specificColumns, numberOfColumns);
         numberOfWorksheetRows = size(worksheetRows, 1);
+        rowNumber = getFirstRowNumberForValidation(inputArgs.hasHeaders);
         for a = rowNumber:numberOfWorksheetRows
-            if ~isempty(inputArguments.specificColumns)
-        worksheetRows = appendTagPrefixes(worksheetRows{a}, ...
-            specificColumns);
+            if ~isempty(inputArgs.specificColumns)
+                worksheetRows(a,:) = appendTagPrefixes(worksheetRows(a,:), ...
+                    inputArgs.specificColumns);
             end
         end
-%         numberOfWorksheetRows = size(worksheetTags, 1);
-%         issues = cell(1, numberOfWorksheetRows);
-%         rowNumber = getFirstRowNumberForValidation(inputArguments);
-%         for a = rowNumber:numberOfWorksheetRows
-%             issue = parsehedstr(hedMaps, worksheetTags{a}, ...
-%                 inputArguments.generateWarnings);
-%             if ~isempty(issue)
-%                 issues{a} = sprintf('Issues in row %d:\n%s', a, issue);
-%             end
-%         end
-%         issues = removeEmptyCellsInIssuesArray(issues);
+        %         numberOfWorksheetRows = size(worksheetTags, 1);
+        %         issues = cell(1, numberOfWorksheetRows);
+        %         rowNumber = getFirstRowNumberForValidation(inputArguments);
+        %         for a = rowNumber:numberOfWorksheetRows
+        %             issue = parsehedstr(hedMaps, worksheetTags{a}, ...
+        %                 inputArguments.generateWarnings);
+        %             if ~isempty(issue)
+        %                 issues{a} = sprintf('Issues in row %d:\n%s', a, issue);
+        %             end
+        %         end
+        %         issues = removeEmptyCellsInIssuesArray(issues);
     end % reportValidationIssues
+
+    function rowNumber = getFirstRowNumberForValidation(hasHeaders)
+        % Gets the first validation row number. If there are headers this
+        % row will be skipped.
+        rowNumber = 1;
+        if hasHeaders
+            rowNumber = 2;
+        end
+    end % checkFileHeader
 
     function issues = removeEmptyCellsInIssuesArray(issues)
         % Remove empty cells in issues cell array
         issues = issues(~cellfun(@isempty, issues));
     end % removeEmptyCellsInIssuesArray
 
-    function rowNumber = getFirstRowNumberForValidation(inputArguments)
-        % Gets the first row number for validation based on the file having
-        % a header or not
-        rowNumber = 1;
-        if inputArguments.hasHeaders
-            rowNumber = 2;
-        end
-    end % getFirstRowNumberForValidation
-    
     function worksheetRows = getWorksheetRows(inputArguments)
         % Gets the worksheet rows
-%         inputArguments.worksheetData = putWorksheetDataInCellArray(...
-%             inputArguments);
+        %         inputArguments.worksheetData = putWorksheetDataInCellArray(...
+        %             inputArguments);
         worksheetRows = putWorksheetDataInCellArray(inputArguments);
-%         if ~isempty(inputArguments.specificColumns)
-%             inputArguments = addTagPrefixesToColumns(inputArguments);
-%         end
-%         worksheetTags = appendTagsTogetherInEachRow(inputArguments);
+        %         if ~isempty(inputArguments.specificColumns)
+        %             inputArguments = addTagPrefixesToColumns(inputArguments);
+        %         end
+        %         worksheetTags = appendTagsTogetherInEachRow(inputArguments);
     end % getWorksheetTagsForEachRow
 
 
@@ -198,7 +203,7 @@ worksheetTags = reportValidationIssues(inputArguments);
 
     function inputArguments = ...
             findTagPrefixIndicesInWorksheet(inputArguments)
-        % Find tag prefix column indices in a workseet and in tag prefix 
+        % Find tag prefix column indices in a workseet and in tag prefix
         % Map
         [inputArguments.prefixTagColumnIndices, ...
             inputArguments.prefixMapKeyIndices] = ...
