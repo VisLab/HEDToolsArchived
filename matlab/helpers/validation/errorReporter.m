@@ -17,6 +17,10 @@
 %   errorColumn
 %         The column number that the error occurred on.
 %
+%   previousTag
+%         The previous tag that potentially generated the error. The
+%         previous tag not the formatted one.
+%
 %   tag
 %         The tag that generated the error. The original tag not the
 %         formatted one.
@@ -60,35 +64,39 @@ function error = errorReporter(errorType, varargin)
 p = parseArguments(errorType, varargin{:});
 switch(errorType)
     case 'bracket'
-        error = sprintf(['\tERRORNumber of opening and closing' ...
+        error = sprintf(['\tERROR: Number of opening and closing' ...
             ' brackets are unequal. %s opening brackets. %s ' ...
             'closing brackets\n'], num2str(p.openingBracketCount), ...
             num2str(p.closingBracketCount));
     case 'comma'
-        error = sprintf('\tERRORComma missing after - "%s"\n', p.tag);
+        error = sprintf('\tERROR: Comma missing after - "%s"\n', p.tag);
+    case 'commaValid'
+        error = sprintf(['\tERROR: Either \"%s\" contains a comma when' ...
+            ' it should not or \"%s\" is not a valid tag\n'], ...
+            p.previousTag, p.tag);
     case 'duplicate'
-        error = sprintf('\tERRORDuplicate tag - "%s"\n', p.tag);
+        error = sprintf('\tERROR: Duplicate tag - "%s"\n', p.tag);
     case 'isNumeric'
-        error = sprintf('\tERRORInvalid numeric tag - "%s"\n', p.tag);
+        error = sprintf('\tERROR: Invalid numeric tag - "%s"\n', p.tag);
     case 'row'
         error = sprintf('Issues in row %s:\n', num2str(p.errorRow));
     case 'column'
         error = sprintf('Issues in row %s column %s:\n', ...
             num2str(p.errorRow), num2str(p.errorColumn));
     case 'requireChild'
-        error = sprintf('\tERRORDescendant tag required - "%s"\n', ...
+        error = sprintf('\tERROR: Descendant tag required - "%s"\n', ...
             p.tag);
     case 'tilde'
-        error = sprintf('\tERRORToo many tildes - group "%s"\n', ...
+        error = sprintf('\tERROR: Too many tildes - group "%s"\n', ...
             p.tag);
     case 'unique'
-        error = sprintf(['\tERRORMultiple unique tags with prefix' ...
+        error = sprintf(['\tERROR: Multiple unique tags with prefix' ...
             ' - "%s"\n'], p.tagPrefix);
     case 'unitClass'
-        error = sprintf(['\tERRORInvalid unit - "%s" valid units are' ...
+        error = sprintf(['\tERROR: Invalid unit - "%s" valid units are' ...
             ' "%s"\n'], p.tag, p.unitClassUnits);
     case 'valid'
-        error = sprintf('\tERRORInvalid HED tag - "%s"\n', p.tag);
+        error = sprintf('\tERROR: Invalid HED tag - "%s"\n', p.tag);
 end
 
     function p = parseArguments(errorType, varargin)
@@ -97,10 +105,9 @@ end
         p.addRequired('errorType',  @(x) ~isempty(x) && ischar(x));
         p.addParamValue('errorRow', 1, @(x) ~isempty(x) && isdouble(x));
         p.addParamValue('error_column', 1, @(x) ~isempty(x) && isdouble(x));
-        p.addParamValue('tag', '', @(x)  ~isempty(x) && ...
-            ischar(x));
-        p.addParamValue('tagPrefix', '', @(x)  ~isempty(x) && ...
-            ischar(x));
+        p.addParamValue('previousTag', '', @(x)  ~isempty(x) && ischar(x));
+        p.addParamValue('tag', '', @(x)  ~isempty(x) && ischar(x));
+        p.addParamValue('tagPrefix', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('unitClassUnits', '', @(x)  ~isempty(x) && ...
             ischar(x));
         p.addParamValue('openingBracketCount', 1, @(x) ~isempty(x) && ...
