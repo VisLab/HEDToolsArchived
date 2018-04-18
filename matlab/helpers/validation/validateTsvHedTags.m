@@ -72,15 +72,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function issues = validateTsvHedTags(tsvFile, varargin)
-p = parseInputArguments(tsvFile, varargin{:});
-issues = validateTags(p);
+inputArgs = parseInputArguments(tsvFile, varargin{:});
+issues = validateTags(inputArgs);
 
-    function [line, lineNumber] = checkFileHeader(hasHeader, fileId)
-        % Checks to see if the file has a header line
+    function [tsvRow, lineNumber] = getFirstRowForValidation(hasHeader, ...
+            fileId)
+        % Gets the first validation row. If there are headers this row will
+        % be skipped.
         lineNumber = 1;
-        line = fgetl(fileId);
+        tsvRow = getNextRow(fileId);
         if hasHeader
-            line = fgetl(fileId);
+            tsvRow = getNextRow(fileId);
             lineNumber = 2;
         end
     end % checkFileHeader
@@ -97,34 +99,39 @@ issues = validateTags(p);
         inputArguments = parser.Results;
     end % parseInputArguments
 
-    function issues = validateTags(p)
+    function issues = validateTags(inputArgs)
         % Reads the tab-delimited file line by line and validates the tags
         issues = {};
-        try
-            fileId = fopen(p.tsvFile);
-            tsvrow, rowNumber = checkFileHeader(p.hasHeader, fileId);
-            while ischar(line)
-                rowNumber = rowNumber + 1;
-                row = getNextRow(); 
-                numberOfRows = size(row, 1);
-                for a = rowNumber:numberOfRows
-                    if ~isempty(inputArguments.specificColumns)
-                        row = appendTagPrefixes(row, specificColumns);
-                    end
-                end
+        rowNumber = 1;
+        %         try
+        fileId = fopen(inputArgs.tsvFile);
+        [tsvRow, rowNumber] = getFirstRowForValidation(...
+            inputArgs.hasHeaders, fileId);
+        while ~isempty(tsvRow)
+            if ~isempty(inputArgs.specificColumns)
+                tsvRow = appendTagPrefixes(tsvRow, ...
+                    inputArgs.specificColumns);
             end
-            fclose(fileId);
-        catch
-            fclose(fileId);
-            throw(MException('validateTsvHedTags:cannotRead', ...
-                'Unable to read TSV file on line %d', rowNumber));
+            tsvRow = getNextRow(fileId);
+            rowNumber = rowNumber + 1;
         end
+        fclose(fileId);
+        %         catch
+        %             fclose(fileId);
+        %             throw(MException('validateTsvHedTags:cannotRead', ...
+        %                 'Unable to read TSV file on line %d', rowNumber));
+        %         end
     end % readLines
 
     function rowTags = getNextRow(fileId)
         % Gets the next row
-        line = fgetl(fileId);
-        rowTags = textscan(line, '%q', 'delimiter', '\t')';
+        row = fgetl(fileId);
+        fprintf([row '\n']);
+        rowTags = {};
+        if ischar(row)
+            rowTags = textscan(row, '%q', 'delimiter', '\t');
+            rowTags = rowTags{:};
+        end
     end
 
     function combinedTags = combineRowTags(row, tagColumns)
