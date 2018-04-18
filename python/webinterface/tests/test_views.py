@@ -9,8 +9,8 @@ class Test(unittest.TestCase):
         app = AppFactory.create_app('config.TestConfig');
         with app.app_context():
             from webinterface import utils;
-            from webinterface.views import view_routes;
-            app.register_blueprint(view_routes);
+            from webinterface.routes import route_blueprint;
+            app.register_blueprint(route_blueprint);
             utils.create_upload_directory(upload_directory);
             app.config['UPLOAD_FOLDER'] = upload_directory;
             self.app = app.test_client();

@@ -1,6 +1,6 @@
 const EXCEL_FILE_EXTENSIONS = ['xlsx', 'xls'];
 const XML_FILE_EXTENSIONS = ['xml'];
-const TEXT_FILE_EXTENSIONS = ['tsv', 'csv', 'txt'];
+const TEXT_FILE_EXTENSIONS = ['tsv', 'txt'];
 const OTHER_HED_VERSION_OPTION = 'Other';
 
 $(document).ready(function () {
@@ -45,7 +45,7 @@ function populateHEDVersionsDropdown(hedVersions) {
 function getHEDVersions() {
     $.ajax({
             type: 'GET',
-            url: "{{url_for('view_routes.get_major_hed_versions')}}",
+            url: "{{url_for('route_blueprint.get_major_hed_versions')}}",
             contentType: false,
             processData: false,
             dataType: 'json',
@@ -134,7 +134,7 @@ function updateHEDFileLabel(hedPath) {
  * Flash message when Excel workbook file extension is invalid.
  */
 function flashInvalidExcelExtensionMessage() {
-    flashMessageOnScreen('Please upload a excel or text spreadsheet (.xlsx, .xls, .tsv, .csv, .txt)',
+    flashMessageOnScreen('Please upload a excel or text spreadsheet (.xlsx, .xls, .tsv, .txt)',
         'error', 'spreadsheet-flash');
 }
 
@@ -147,7 +147,7 @@ function flashInvalidHEDExtensionMessage() {
 
 /**
  * Resets the flash messages that aren't related to the form submission.
-A * @param {String} message - If true, reset the flash message related to the submit button.
+ A * @param {String} message - If true, reset the flash message related to the submit button.
  */
 function resetFlashMessages(resetSubmitFlash) {
     flashMessageOnScreen('', 'success', 'spreadsheet-flash');
@@ -201,11 +201,11 @@ function flashMessageOnScreen(message, category, flashMessageElementId) {
  * @param {String} category - The category of the message. The categories are 'error', 'success', and 'other'.
  */
 function setFlashMessageCategory(flashMessage, category) {
-    if ("error" == category) {
+    if ("error" === category) {
         flashMessage.style.backgroundColor = 'lightcoral';
-    } else if ("success" == category) {
+    } else if ("success" === category) {
         flashMessage.style.backgroundColor = 'palegreen';
-    } else if ("warning" == category) {
+    } else if ("warning" === category) {
         flashMessage.style.backgroundColor = 'darkorange';
     } else {
         flashMessage.style.backgroundColor = '#f0f0f5';
@@ -281,13 +281,14 @@ function submitForm() {
     flashSubmitMessage();
     $.ajax({
             type: 'POST',
-            url: "{{url_for('view_routes.get_validation_results')}}",
+            url: "{{url_for('route_blueprint.get_validation_results')}}",
             data: formData,
             contentType: false,
             processData: false,
             dataType: 'json',
             success: function (validationStatus) {
-                if (checkIssueCount(validationStatus['issueCount'])) {
+                if (checkIssueCount(validationStatus['issueCount'], validationStatus['errorCount'],
+                    validationStatus['warningCount'])) {
                     downloadValidationOutputFile(validationStatus['downloadFile']);
                 } else {
                     deleteUploadedSpreadsheet(validationStatus['downloadFile']);
@@ -308,7 +309,7 @@ function submitForm() {
  * @param {string} downloadFile - The name of the download file.
  */
 function downloadValidationOutputFile(downloadFile) {
-    window.location = "{{url_for('view_routes.download_file_in_upload_directory', filename='')}}" + downloadFile;
+    window.location = "{{url_for('route_blueprint.download_file_in_upload_directory', filename='')}}" + downloadFile;
 }
 
 
@@ -319,7 +320,7 @@ function downloadValidationOutputFile(downloadFile) {
 function deleteUploadedSpreadsheet(uploadedSpreadsheetFile) {
     $.ajax({
             type: 'GET',
-            url: "{{url_for('view_routes.delete_file_in_upload_directory', filename='')}}" + uploadedSpreadsheetFile,
+            url: "{{url_for('route_blueprint.delete_file_in_upload_directory', filename='')}}" + uploadedSpreadsheetFile,
             data: {},
             contentType: false,
             processData: false,
@@ -338,14 +339,20 @@ function deleteUploadedSpreadsheet(uploadedSpreadsheetFile) {
 /**
  * Check the number of validation issues and flash it.
  * @param {Number} rowIssueCount - Number of issues.
+ * @param {Number} rowErrorCount - Number of errors.
+ * @param {Number} rowWarningCount - Number of warnings.
  * @returns {boolean} - True if there are issues found. False, if otherwise.
  */
-function checkIssueCount(rowIssueCount) {
+function checkIssueCount(rowIssueCount, rowErrorCount, rowWarningCount) {
     var issuesFound = false;
-    if (rowIssueCount == 0) {
+    if (rowIssueCount === 0) {
         flashMessageOnScreen('No issues were found.', 'success', 'submit-flash');
+    } else if (generateWarningsIsChecked()) {
+        flashMessageOnScreen(rowIssueCount.toString() + ' issues found. ' + rowErrorCount.toString() + ' errors, '
+            + rowWarningCount.toString() + ' warnings. Creating attachment.', 'error', 'submit-flash');
+        issuesFound = true;
     } else {
-        flashMessageOnScreen(rowIssueCount.toString() + ' issues found. Creating attachment.', 'error', 'submit-flash');
+        flashMessageOnScreen(rowIssueCount.toString() + ' errors found. Creating attachment.', 'error', 'submit-flash');
         issuesFound = true;
     }
     return issuesFound;
@@ -376,7 +383,7 @@ function tagColumnsTextboxIsValid() {
  * @returns {boolean} - True if the string is null or its length is 0.
  */
 function isEmptyStr(str) {
-    if (str == null || str.length == 0) {
+    if (str === null || str.length === 0) {
         return true;
     }
     return false;
@@ -407,7 +414,7 @@ function getWorksheetsInfo(workbookFile) {
     formData.append('spreadsheet', workbookFile);
     $.ajax({
         type: 'POST',
-        url: "{{url_for('view_routes.get_worksheets_info')}}",
+        url: "{{url_for('route_blueprint.get_worksheets_info')}}",
         data: formData,
         contentType: false,
         processData: false,
@@ -434,7 +441,7 @@ function getVersionFromHEDFile(hedXMLFile) {
     formData.append('hed_file', hedXMLFile);
     $.ajax({
         type: 'POST',
-        url: "{{ url_for('view_routes.get_hed_version_in_file')}}",
+        url: "{{ url_for('route_blueprint.get_hed_version_in_file')}}",
         data: formData,
         contentType: false,
         processData: false,
@@ -472,7 +479,7 @@ function getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName) {
     }
     $.ajax({
         type: 'POST',
-        url: "{{url_for('view_routes.get_spreadsheet_columns_info')}}",
+        url: "{{url_for('route_blueprint.get_spreadsheet_columns_info')}}",
         data: formData,
         contentType: false,
         processData: false,
@@ -496,7 +503,7 @@ function getSpreadsheetColumnsInfo(spreadsheetFile, worksheetName) {
  */
 function flashSpreadsheetTagColumnCountMessage(TagColumnIndices, requiredTagColumnIndices) {
     var numberOfTagColumns = (TagColumnIndices.length + Object.keys(requiredTagColumnIndices).length).toString();
-    if (numberOfTagColumns == '0') {
+    if (numberOfTagColumns === '0') {
         flashMessageOnScreen('Warning: No tag column(s) found... Using the 2nd column', 'warning',
             'tag-columns-flash');
     } else {
@@ -667,7 +674,15 @@ function spreadsheetTagColumnsIndicesAreEmpty(tagColumnsIndices) {
  * @returns {boolean} - True if the dictionary is empty. False, if otherwise.
  */
 function dictionaryIsEmpty(dictionary) {
-    return Object.keys(dictionary).length == 0;
+    return Object.keys(dictionary).length === 0;
+}
+
+/**
+ * Checks to see if warnings are being generated through checkbox.
+ * @returns {boolean} - True if warnings are generated. False if otherwise.
+ */
+function generateWarningsIsChecked() {
+    return $('#generate-warnings').prop('checked') === true;
 }
 
 /**

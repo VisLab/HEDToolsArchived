@@ -80,6 +80,12 @@ class Test(unittest.TestCase):
         validation_error = self.tag_validator.check_if_tag_is_valid(self.valid_original_tag, self.valid_formatted_tag);
         self.assertIsInstance(validation_error, str);
         self.assertFalse(validation_error);
+        validation_error = self.tag_validator.check_if_tag_is_valid(
+            self.invalid_original_tag, self.invalid_formatted_tag, previous_original_tag=self.valid_takes_value_tag,
+            previous_formatted_tag=self.valid_takes_value_tag);
+        print(validation_error)
+        self.assertIsInstance(validation_error, str);
+        self.assertTrue(validation_error);
 
     def test_check_if_tag_requires_child(self):
         validation_error = self.tag_validator.check_if_tag_requires_child(self.required_child_tag,
@@ -116,6 +122,21 @@ class Test(unittest.TestCase):
     def test_get_tag_slash_indices(self):
         tag_slash_indices = self.tag_validator.get_tag_slash_indices(self.valid_formatted_tag);
         self.assertIsInstance(tag_slash_indices, list);
+
+    def test_get_error_count(self):
+        tag_validator = TagValidator(self.hed_dictionary);
+        error_count = tag_validator.get_error_count();
+        self.assertEqual(error_count, 0);
+
+    def test_get_warning_count(self):
+        tag_validator = TagValidator(self.hed_dictionary);
+        warning_count = tag_validator.get_warning_count();
+        self.assertEqual(warning_count, 0);
+
+    def test_get_issue_count(self):
+        tag_validator = TagValidator(self.hed_dictionary);
+        issue_count = tag_validator.get_issue_count();
+        self.assertEqual(issue_count, 0);
 
     def test_get_tag_substring_by_end_index(self):
         tag_slash_indices = self.tag_validator.get_tag_slash_indices(self.valid_formatted_tag);
@@ -220,26 +241,26 @@ class Test(unittest.TestCase):
         self.assertIsInstance(validation_error, str);
 
     def test_count_tag_group_brackets(self):
-        validation_error = TagValidator.count_tag_group_brackets(self.valid_hed_string);
+        validation_error = self.tag_validator.count_tag_group_brackets(self.valid_hed_string);
         self.assertFalse(validation_error);
         self.assertIsInstance(validation_error, str);
-        validation_error = TagValidator.count_tag_group_brackets(self.invalid_hed_string);
+        validation_error = self.tag_validator.count_tag_group_brackets(self.invalid_hed_string);
         self.assertTrue(validation_error);
         self.assertIsInstance(validation_error, str);
 
     def test_find_missing_commas_in_hed_string(self):
-        validation_error = self.tag_validator.find_missing_commas_in_hed_string(self.valid_hed_string);
+        validation_error = self.tag_validator.find_comma_issues_in_hed_string(self.valid_hed_string);
         self.assertFalse(validation_error);
         self.assertIsInstance(validation_error, str);
-        validation_error = self.tag_validator.find_missing_commas_in_hed_string(self.missing_comma_hed_string);
+        validation_error = self.tag_validator.find_comma_issues_in_hed_string(self.missing_comma_hed_string);
         self.assertTrue(validation_error);
         self.assertIsInstance(validation_error, str);
         validation_error = \
-            self.tag_validator.find_missing_commas_in_hed_string(self.valid_formatted_tag_with_parentheses);
+            self.tag_validator.find_comma_issues_in_hed_string(self.valid_formatted_tag_with_parentheses);
         self.assertFalse(validation_error);
         self.assertIsInstance(validation_error, str);
         validation_error = \
-            self.tag_validator.find_missing_commas_in_hed_string(self.hed_string_ending_with_parentheses);
+            self.tag_validator.find_comma_issues_in_hed_string(self.hed_string_ending_with_parentheses);
         self.assertFalse(validation_error);
         self.assertIsInstance(validation_error, str);
 
