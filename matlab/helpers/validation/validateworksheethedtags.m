@@ -3,9 +3,9 @@
 %
 % Usage:
 %
-%   >>  issues = validateworksheethedtags(workbook)
+%   >>  issues = validateWorksheetHedTags(workbook)
 %
-%   >>  issues = validateworksheethedtags(workbook, varargin)
+%   >>  issues = validateWorksheetHedTags(workbook, varargin)
 %
 % Input:
 %
@@ -76,7 +76,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function worksheetTags = validateworksheethedtags(workbook, varargin)
+function worksheetTags = validateWorksheetHedTags(workbook, varargin)
 
 inputArgs = parseInputArguments(workbook, varargin{:});
 worksheetTags = reportValidationIssues(inputArgs);
