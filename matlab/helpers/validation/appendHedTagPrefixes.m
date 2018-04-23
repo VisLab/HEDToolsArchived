@@ -113,4 +113,4 @@ hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, ...
         parsedArguments = parser.Results;
     end % parseInputArguments
 
-end % appendTagPrefixes
+end % appendHedTagPrefixes
