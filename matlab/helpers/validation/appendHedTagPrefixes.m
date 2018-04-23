@@ -29,8 +29,10 @@
 %
 % Output:
 %
-%   spreadsheetRow
-%                   The spreadsheet row with the append tag prefixes.
+%   hedTagArray
+%                   A cell array of character vectors containing HED tags
+%                   with prefixes prepended to them if needed.
+%
 %
 % Copyright (C) 2017
 % Jeremy Cockfield jeremy.cockfield@gmail.com
