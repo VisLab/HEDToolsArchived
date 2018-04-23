@@ -58,8 +58,7 @@ SPECIFIC_COLUMN_PREFIXES = {'Event/Long name/','Event/Description/', ...
     'Event/Label/','Event/Category/'};
 parseInputArguments(hedTagArray, specificColumns);
 tagPrefixMap = createTagPrefixMap(specificColumns);
-hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, ...
-    tagPrefixMap);
+hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, tagPrefixMap);
 
     function hedTagArray = appendPrefixesToSpecificColumns(...
             hedTagArray, tagPrefixMap)
@@ -90,7 +89,6 @@ hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, ...
         % indices to tag prefixes.
         tagPrefixMap = containers.Map('KeyType', 'double', ...
             'ValueType', 'char');
-        parseInputArguments(specificColumns);
         specificColumnNames = fieldnames(specificColumns);
         numberOfSepecificColumns = length(specificColumnNames);
         for a = 1:numberOfSepecificColumns
@@ -103,13 +101,13 @@ hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, ...
         end
     end % createTagPrefixMap
 
-    function parsedArguments = parseInputArguments(spreadsheetRow, ...
+    function parsedArguments = parseInputArguments(hedTagArray, ...
             specificColumns)
         % Parses the input arguments and returns them in a structure
         parser = inputParser();
         parser.addRequired('hedTagArray', @iscell);
         parser.addRequired('specificColumns', @isstruct);
-        parser.parse(spreadsheetRow, specificColumns);
+        parser.parse(hedTagArray, specificColumns);
         parsedArguments = parser.Results;
     end % parseInputArguments
 
