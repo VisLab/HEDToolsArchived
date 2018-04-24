@@ -14,5 +14,4 @@ apache2-dev && \
 pip3 install --no-cache-dir --upgrade pip && \
 pip3 install --no-cache-dir -r requirements.txt && \
 mkdir -p /run/apache2
-#CMD ["httpd", "-D", "FOREGROUND", "-e", "info"]
 ENTRYPOINT /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
