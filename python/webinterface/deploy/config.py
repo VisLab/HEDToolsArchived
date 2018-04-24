@@ -12,7 +12,7 @@ import tempfile;
 class ProductionConfig(object):
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
     SECRET_KEY = os.urandom(24);
-    LOG_DIRECTORY = '/var/log/hedtools';
+    LOG_DIRECTORY = '/dev/stdout';
     LOG_FILE = os.path.join(LOG_DIRECTORY, 'error.log');
     TESTING = False;
     DEBUG = False;
