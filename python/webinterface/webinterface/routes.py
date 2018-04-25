@@ -2,7 +2,6 @@ from flask import render_template, Response, request, Blueprint, current_app;
 import os;
 import json;
 from webinterface import utils
-from config import ProductionConfig;
 
 INTERNAL_SERVER_ERROR = 500;
 NOT_FOUND_ERROR = 404;
