@@ -1,7 +1,8 @@
 from flask import render_template, Response, request, Blueprint, current_app;
 import os;
 import json;
-from webinterface import utils
+from webinterface import utils;
+import traceback;
 
 INTERNAL_SERVER_ERROR = 500;
 NOT_FOUND_ERROR = 404;
@@ -161,9 +162,13 @@ def get_worksheets_info():
         A serialized JSON string containing information related to the Excel worksheets.
 
     """
-    worksheets_info = utils.find_worksheets_info(request);
-    if 'error' in worksheets_info:
-        return utils.handle_http_error(INTERNAL_SERVER_ERROR, worksheets_info['error']);
+    worksheets_info = {};
+    try:
+        worksheets_info = utils.find_worksheets_info(request);
+        if 'error' in worksheets_info:
+            return utils.handle_http_error(INTERNAL_SERVER_ERROR, worksheets_info['error']);
+    except:
+        worksheets_info['error'] = traceback.format_exc();
     return json.dumps(worksheets_info);
 
 
