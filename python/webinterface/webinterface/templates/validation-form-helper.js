@@ -226,6 +226,17 @@ function cancelWasPressedInChromeFileUpload(filePath) {
  */
 function resetForm() {
     $('#validation-form')[0].reset();
+    clearSpreadsheetFileLabel();
+    clearWorksheetSelectbox();
+    hideSpreadsheetColumnNamesTable();
+    hideOtherHEDVersionFileUpload();
+}
+
+/**
+ * Clears the spreadsheet file label.
+ */
+function clearSpreadsheetFileLabel() {
+    $('#spreadsheet-filename').text('');
 }
 
 /**
