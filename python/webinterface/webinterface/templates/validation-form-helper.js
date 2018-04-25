@@ -426,7 +426,8 @@ function getWorksheetsInfo(workbookFile) {
                 worksheetsInfo['requiredTagColumnIndices']);
         },
         error: function (jqXHR) {
-            console.log(jqXHR.responseJSON.message);
+            console.log(jqXHR);
+            // console.log(jqXHR.responseJSON.message);
             flashMessageOnScreen('Spreadsheet could not be processed.', 'error', 'submit-flash');
         }
     });
