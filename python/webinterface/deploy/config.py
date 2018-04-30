@@ -13,11 +13,11 @@ class Config(object):
     SECRET_KEY = os.urandom(24);
     URL_PREFIX = None;
     STATIC_URL_PATH = None;
+    LOG_DIRECTORY = '/var/log/hedtools';
+    LOG_FILE = os.path.join(LOG_DIRECTORY, 'error.log');
     
     
 class DevelopmentConfig(Config):
-    LOG_DIRECTORY = '/var/log/hedtools';
-    LOG_FILE = os.path.join(LOG_DIRECTORY, 'error.log');
     TESTING = False;
     DEBUG = False;
 
