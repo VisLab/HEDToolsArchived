@@ -1,4 +1,5 @@
 #!/bin/bash
+ROOT_DIR=${PWD}
 GIT_DIR="${PWD}/HEDTools"
 IMAGE_NAME="hedtools-validation:latest"
 CONTAINER_NAME="hedtools-validation"
@@ -8,7 +9,7 @@ HOST_PORT=33000;
 CONTAINER_PORT=80;
 DEPLOY_DIR="HEDTools/python/webinterface/deploy"
 CODE_DEPLOY_DIR="${DEPLOY_DIR}/hedtools"
-CONFIG_FILE="${DEPLOY_DIR}/config.py"
+CONFIG_FILE="${ROOT_DIR}/config.py"
 WSGI_FILE="${DEPLOY_DIR}/webinterface.wsgi"
 WEBINTERFACE_CODE_DIR="HEDTools/python/webinterface/webinterface/"
 VALIDATOR_CODE_DIR="HEDTools/python/hedvalidation/hedvalidation/"
