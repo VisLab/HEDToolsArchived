@@ -17,3 +17,4 @@ mkdir -p /run/apache2 && \
 mkdir -p /var/log/hedtools && \
 chown -R apache:apache /var/log/hedtools
 ENTRYPOINT /usr/sbin/httpd -D FOREGROUND -f /etc/apache2/httpd.conf
+ENV SECRET_KEY=$(date +%s | sha256sum | base64 | head -c 32)
