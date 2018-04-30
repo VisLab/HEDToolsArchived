@@ -23,4 +23,4 @@ with app.app_context():
     setup_logging();
 
 if __name__ == '__main__':
-    app.run(threaded=True);
+    app.run();
