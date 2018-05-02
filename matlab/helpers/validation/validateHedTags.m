@@ -45,7 +45,7 @@
 %                   The other column indices where the HED tags are in the
 %                   workbook worksheet.
 %
-%   'worksheet'
+%   'worksheetName'
 %                   The name of the workbook worksheet that you want to
 %                   validate. If no worksheet is specified then the first
 %                   workbook worksheet will be validated.
@@ -75,41 +75,24 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function issues = validateHedTags(hedTagsInput, varargin)
-SPREADSHEET_FILE_EXTENSIONS = {'tsv', 'txt', 'xls', 'xlsx'};
-EXCEL_FILE_EXTENSIONS = {'xls', 'xlsx'};
-TSV_FILE_EXTENSIONS = {'tsv', 'txt'};
 inputArgs = parseInputArguments(hedTagsInput, varargin{:});
-[isValidSpreadsheet, extension] = isASpreadsheetWithValidExtension(...
-    hedTagsInput, SPREADSHEET_FILE_EXTENSIONS);
-if isValidSpreadsheet
+hedFileExtension = HedFileExtension(inputArgs.spreadsheetPath);
+if hedFileExtension.hasSpreadsheetExtension
     issues = validateHedTagsInSpreadsheet();
 else
     issues = validateHedTagsInString();
 end
 hedTags = reportValidationIssues(inputArgs);
 
-    function issues = validateHedTagsInSpreadsheet()
+    function issues = validateHedTagsInSpreadsheet(inputArgs)
         % Validates the HED tags in a spreadsheet
+        rowsArray = putSpreadSheetRowsInCellArray(inputArgs.hedTagsInput, ...
+            inputArgs.worksheet)
     end % validateHedTagsInSpreadsheet
-
-    function issues = getHedTagsBasedOnFileExtension(extension)
-        % Gets the HED tags based on the spreadsheet file extension
-        extension = isASpreadsheetWithValidExtension(...
-    hedTagsInput, SPREADSHEET_FILE_EXTENSIONS);
-    end % getHedTagsBasedOnFileExtensions
 
     function issues = validateHedTagsInString()
         % Validates the HED tags in a string
     end % validateHedTagsInString
-
-    function [isValid, extension] = isASpreadsheetWithValidExtension(...
-            hedTagsInput, validExtensions)
-        % Returns true if the input is a spreadsheet with a valid
-        % extension. False, if otherwise.
-        splitInput = strsplit(hedTagsInput, '.');
-        extension = lower(splitInput{end});
-        isValid = ismember(extension, lower(validExtensions));
-    end % isASpreadsheetWithValidExtension
 
     function inputArguments = parseInputArguments(hedtags, varargin)
         % Parses the input arguments and returns them in a structure
@@ -119,7 +102,7 @@ hedTags = reportValidationIssues(inputArgs);
         parser.addParamValue('hasHeaders', true, @islogical);
         parser.addParamValue('otherColumns', [], @isnumeric);
         parser.addParamValue('specificColumns', [], @isstruct);
-        parser.addParamValue('worksheet', '', @ischar);
+        parser.addParamValue('worksheetName', '', @ischar);
         parser.parse(hedtags, varargin{:});
         inputArguments = parser.Results;
     end % parseInputArguments
