@@ -1,5 +1,5 @@
 % This class contains utility functions that retrieve information related
-% to file extensions.
+% to HED spreadsheet file extensions.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -21,34 +21,41 @@
 classdef HedFileExtension
     
     properties
+        filePath;
+    end % Instance properties
+    
+    properties(Constant)
         EXCEL_FILE_EXTENSIONS = {'xls', 'xlsx'};
         TSV_FILE_EXTENSIONS = {'tsv', 'txt'};
-    end
+    end % Constant properties 
     
-    methods(Static)
-        function extension = getCanonicalFileExtension(filePath)
+    methods
+        function obj = HedFileExtension(filePath)
+            obj.filePath = filePath;
+        end
+        function extension = getCanonicalFileExtension(obj)
             % Gets the canonical file extension of the specified file path.
-            [~,~,extension] = fileparts(filePath);
+            [~,~,extension] = fileparts(obj.filePath);
             extension = lower(strrep(extension, '.', ''));
         end % getFileExtension
         
-        function isValid = fileHasValidExtension(filePath, validExtensions)
+        function isValid = fileHasValidExtension(obj, validExtensions)
             % Returns true if the file path is a valid extension
-            extension = getCanonicalFileExtension(filePath);
+            extension = getCanonicalFileExtension(obj.filePath);
             isValid = ismember(extension, lower(validExtensions));
         end % fileHasValidExtension
         
-        function isExtension = hasExcelExtension(filePath)
+        function isExtension = hasExcelExtension(obj)
             % Returns true if the file path has a Excel extension
-            isExtension = fileHasValidExtension(filePath, ...
-                EXCEL_FILE_EXTENSIONS);
+            isExtension = fileHasValidExtension(obj.filePath, ...
+                obj.EXCEL_FILE_EXTENSIONS);
         end % hasExcelExtension
         
         function isExtension = hasTsvExtension(filePath)
             % Returns true if the file path has a TSV extension
             isExtension = fileHasValidExtension(filePath, ...
-                TSV_FILE_EXTENSIONS);
+                obj.TSV_FILE_EXTENSIONS);
         end % hasTsvExtension
-    end
+    end % Public methods
     
 end % HedFileExtension
