@@ -41,19 +41,19 @@ classdef HedFileExtension
         
         function isValid = fileHasValidExtension(obj, validExtensions)
             % Returns true if the file path is a valid extension
-            extension = getCanonicalFileExtension(obj.filePath);
+            extension = obj.getCanonicalFileExtension();
             isValid = ismember(extension, lower(validExtensions));
         end % fileHasValidExtension
         
         function hasExtension = hasExcelExtension(obj)
             % Returns true if the file path has a Excel extension
-            hasExtension = fileHasValidExtension(obj.filePath, ...
+            hasExtension = obj.fileHasValidExtension(...
                 obj.EXCEL_FILE_EXTENSIONS);
         end % hasExcelExtension
         
         function hasExtension = hasTsvExtension(obj)
             % Returns true if the file path has a TSV extension
-            hasExtension = fileHasValidExtension(obj.filePath, ...
+            hasExtension = obj.fileHasValidExtension(...
                 obj.TSV_FILE_EXTENSIONS);
         end % hasTsvExtension
     end % Public methods
