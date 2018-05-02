@@ -25,11 +25,13 @@ classdef HedFileExtension
     end % Instance properties
     
     properties(Constant)
+        FILE_EXTENSIONS = {'xls', 'xlsx', 'tsv', 'txt'};
         EXCEL_FILE_EXTENSIONS = {'xls', 'xlsx'};
         TSV_FILE_EXTENSIONS = {'tsv', 'txt'};
-    end % Constant properties 
+    end % Constant properties
     
     methods
+        
         function obj = HedFileExtension(filePath)
             obj.filePath = filePath;
         end
@@ -56,6 +58,12 @@ classdef HedFileExtension
             hasExtension = obj.fileHasValidExtension(...
                 obj.TSV_FILE_EXTENSIONS);
         end % hasTsvExtension
+        
+        function hasExtension = hasSpreadsheetExtension(obj)
+            % Returns true if the file path has a spreadsheet extension
+            hasExtension = obj.fileHasValidExtension(obj.FILE_EXTENSIONS);
+        end % hasSpreadsheetExtension
+        
     end % Public methods
     
 end % HedFileExtension
