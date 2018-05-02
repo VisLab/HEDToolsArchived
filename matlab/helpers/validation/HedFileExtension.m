@@ -1,0 +1,54 @@
+% This class contains utility functions that retrieve information related
+% to file extensions.
+%
+% Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
+% Kay Robbins, UTSA, kay.robbins@utsa.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+classdef HedFileExtension
+    
+    properties
+        EXCEL_FILE_EXTENSIONS = {'xls', 'xlsx'};
+        TSV_FILE_EXTENSIONS = {'tsv', 'txt'};
+    end
+    
+    methods(Static)
+        function extension = getCanonicalFileExtension(filePath)
+            % Gets the canonical file extension of the specified file path.
+            [~,~,extension] = fileparts(filePath);
+            extension = lower(strrep(extension, '.', ''));
+        end % getFileExtension
+        
+        function isValid = fileHasValidExtension(filePath, validExtensions)
+            % Returns true if the file path is a valid extension
+            extension = getCanonicalFileExtension(filePath);
+            isValid = ismember(extension, lower(validExtensions));
+        end % fileHasValidExtension
+        
+        function isExtension = hasExcelExtension(filePath)
+            % Returns true if the file path has a Excel extension
+            isExtension = fileHasValidExtension(filePath, ...
+                EXCEL_FILE_EXTENSIONS);
+        end % hasExcelExtension
+        
+        function isExtension = hasTsvExtension(filePath)
+            % Returns true if the file path has a TSV extension
+            isExtension = fileHasValidExtension(filePath, ...
+                TSV_FILE_EXTENSIONS);
+        end % hasTsvExtension
+    end
+    
+end % HedFileExtension
