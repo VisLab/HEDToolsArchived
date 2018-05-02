@@ -10,8 +10,8 @@
 %
 %   Required:
 %
-%   hedTagArray
-%                   A cell array of character vectors containing HED tags.
+%   rowsArray
+%                   A cell array containing the rows in a spreadsheet.
 %
 %   specificColumns
 %                   A scalar structure used to specify the specific tag
@@ -52,37 +52,49 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function hedTagArray = appendHedTagPrefixes(hedTagArray, specificColumns)
+function rowsArray = appendHedTagPrefixes(rowsArray, specificColumns)
 SPECIFIC_COLUMN_NAMES = {'long','description','label','category'};
 SPECIFIC_COLUMN_PREFIXES = {'Event/Long name/','Event/Description/', ...
     'Event/Label/','Event/Category/'};
-parseInputArguments(hedTagArray, specificColumns);
+parseInputArguments(rowsArray, specificColumns);
 tagPrefixMap = createTagPrefixMap(specificColumns);
-hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, tagPrefixMap);
+rowsArray = appendPrefixesToSpecificColumns(rowsArray, tagPrefixMap);
 
-    function hedTagArray = appendPrefixesToSpecificColumns(...
-            hedTagArray, tagPrefixMap)
+    function rowsArray = appendPrefixesToSpecificColumns(rowsArray, ...
+            tagPrefixMap)
         % Appends HED tag prefixes to specific columns that do not begin
         % with them.
-        numberOfColumns = length(hedTagArray);
-        for a = 1:numberOfColumns
-            if isKey(tagPrefixMap, a)
-                columnTags = hedTagArray{a};
+        numberOfColumns = length(rowsArray);
+        for columnIndex = 1:numberOfColumns
+            if columnNeedsPrefix(tagPrefixMap, columnIndex)
+                columnTags = rowsArray{columnIndex};
                 if ~isempty(columnTags)
-                    splitColumnTags = strsplit(columnTags, ',');
-                    numberOfColumnTags = length(splitColumnTags);
-                    for b = 1:numberOfColumnTags
-                        columnTag = splitColumnTags{b};
-                        prefix = tagPrefixMap(a);
-                        if ~strncmpi(columnTag, prefix, length(columnTag))
-                            splitColumnTags{b} = [prefix, columnTag];
-                        end
-                    end
-                    hedTagArray{a} = strjoin(splitColumnTags, ',');
+                    prefix = tagPrefixMap(columnIndex);
+                    splitColumnTags = appendPrefixToEveryColumnTag(...
+                        columnTags, prefix);
+                    rowsArray{columnIndex} = strjoin(splitColumnTags, ',');
                 end
             end
         end
     end % appendPrefixesToSpecificColumns
+
+    function needsPrefix = columnNeedsPrefix(tagPrefixMap, columnIndex)
+        % True if the column needs a prefix. False, if otherwise.
+        needsPrefix = isKey(tagPrefixMap, columnIndex);
+    end % columnNeedsPrefix
+
+    function splitColumnTags = appendPrefixToEveryColumnTag(columnTags, ...
+            prefix)
+        % Appends the tag prefix to every tag in a particular column
+        splitColumnTags = strsplit(columnTags, ',');
+        numberOfColumnTags = length(splitColumnTags);
+        for b = 1:numberOfColumnTags
+            columnTag = splitColumnTags{b};
+            if ~strncmpi(columnTag, prefix, length(columnTag))
+                splitColumnTags{b} = [prefix, columnTag];
+            end
+        end
+    end % appendPrefixToEveryColumnTag
 
     function tagPrefixMap = createTagPrefixMap(specificColumns)
         % Creates a dictionary containing a mapping of specific tag column
@@ -90,6 +102,12 @@ hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, tagPrefixMap);
         tagPrefixMap = containers.Map('KeyType', 'double', ...
             'ValueType', 'char');
         specificColumnNames = fieldnames(specificColumns);
+        populateTagPrefixMap(tagPrefixMap, specificColumnNames)
+    end % createTagPrefixMap
+
+    function tagPrefixMap = populateTagPrefixMap(tagPrefixMap, ...
+            specificColumnNames)
+        % Populates the tag prefix Map
         numberOfSepecificColumns = length(specificColumnNames);
         for a = 1:numberOfSepecificColumns
             specificColumnIndex = find(strcmpi(SPECIFIC_COLUMN_NAMES, ...
@@ -99,15 +117,15 @@ hedTagArray = appendPrefixesToSpecificColumns(hedTagArray, tagPrefixMap);
                     SPECIFIC_COLUMN_PREFIXES{specificColumnIndex};
             end
         end
-    end % createTagPrefixMap
+    end % populateTagPrefixMap
 
-    function parsedArguments = parseInputArguments(hedTagArray, ...
+    function parsedArguments = parseInputArguments(rowsArray, ...
             specificColumns)
         % Parses the input arguments and returns them in a structure
         parser = inputParser();
-        parser.addRequired('hedTagArray', @iscell);
+        parser.addRequired('rowsArray', @iscell);
         parser.addRequired('specificColumns', @isstruct);
-        parser.parse(hedTagArray, specificColumns);
+        parser.parse(rowsArray, specificColumns);
         parsedArguments = parser.Results;
     end % parseInputArguments
 
