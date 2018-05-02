@@ -102,11 +102,12 @@ rowsArray = appendPrefixesToSpecificColumns(rowsArray, tagPrefixMap);
         tagPrefixMap = containers.Map('KeyType', 'double', ...
             'ValueType', 'char');
         specificColumnNames = fieldnames(specificColumns);
-        populateTagPrefixMap(tagPrefixMap, specificColumnNames)
+        populateTagPrefixMap(tagPrefixMap, specificColumnNames, ...
+            specificColumns)
     end % createTagPrefixMap
 
     function tagPrefixMap = populateTagPrefixMap(tagPrefixMap, ...
-            specificColumnNames)
+            specificColumnNames, specificColumns)
         % Populates the tag prefix Map
         numberOfSepecificColumns = length(specificColumnNames);
         for a = 1:numberOfSepecificColumns
