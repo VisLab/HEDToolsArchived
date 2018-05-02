@@ -1,5 +1,4 @@
-% This function puts takes in a spreadsheet and puts the rows in a cell
-% array.
+% This function puts all the spreadsheet rows in a cell array.
 %
 % Usage:
 %
@@ -115,4 +114,4 @@ rowsArray = getRowsBasedOnFileExtension(inputArgs);
         end
     end % putNextRowInCellArray
 
-end % parsetags
+end % putSpreadSheetRowsInCellArray
