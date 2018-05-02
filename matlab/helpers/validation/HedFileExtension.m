@@ -51,9 +51,9 @@ classdef HedFileExtension
                 obj.EXCEL_FILE_EXTENSIONS);
         end % hasExcelExtension
         
-        function hasExtension = hasTsvExtension(filePath)
+        function hasExtension = hasTsvExtension(obj)
             % Returns true if the file path has a TSV extension
-            hasExtension = fileHasValidExtension(filePath, ...
+            hasExtension = fileHasValidExtension(obj.filePath, ...
                 obj.TSV_FILE_EXTENSIONS);
         end % hasTsvExtension
     end % Public methods
