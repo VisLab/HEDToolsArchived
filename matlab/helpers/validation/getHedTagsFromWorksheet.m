@@ -1,11 +1,10 @@
-% This function validates the HED tags in a Excel workbook worksheet
-% against a HED schema.
+% This function gets the HED tags in a Excel worksheet.
 %
 % Usage:
 %
-%   >>  issues = validateWorksheetHedTags(workbook)
+%   >>  issues = getHedTagsFromWorksheet(workbook)
 %
-%   >>  issues = validateWorksheetHedTags(workbook, varargin)
+%   >>  issues = getHedTagsFromWorksheet(workbook, varargin)
 %
 % Input:
 %
@@ -53,10 +52,9 @@
 %
 % Output:
 %
-%   issues
-%                   A cell array containing all of the issues found through
-%                   the validation. Each cell corresponds to the issues
-%                   found on a particular line.
+%   worksheetTags
+%                   A cell array containing the HED tags in the Excel
+%                   worksheet.
 %
 % Copyright (C) 2017
 % Jeremy Cockfield jeremy.cockfield@gmail.com
@@ -76,7 +74,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function worksheetTags = validateWorksheetHedTags(workbook, varargin)
+function worksheetTags = getHedTagsFromWorksheet(workbook, varargin)
 
 inputArgs = parseInputArguments(workbook, varargin{:});
 worksheetTags = reportValidationIssues(inputArgs);
