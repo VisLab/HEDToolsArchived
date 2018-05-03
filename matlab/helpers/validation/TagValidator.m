@@ -29,6 +29,7 @@ classdef TagValidator
         capExpression = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
         commaError = 'comma';
         groupBracketError = 'bracket';
+        requireChildError = 'requireChild';
     end % Instance properties
     
     methods
@@ -99,6 +100,18 @@ classdef TagValidator
                     'closingBracketCount', numberOfClosingBrackets);
             end
         end % checkgroupbrackets
+        
+        function errors = checkRequiredChildTags(obj, originalTag, ...
+                formattedTag)
+            % Checks if the tag requires a child
+            errors = '';
+            if obj.hedMaps.requireChild.isKey(lower(formattedTag))
+                errors = errorReporter(obj.requireChildError, 'tag', ...
+                    originalTag);
+            end
+        end % checkRequiredChildTags
+        
+        
         
     end % Public methods
     
