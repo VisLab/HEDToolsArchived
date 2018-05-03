@@ -2,17 +2,17 @@
 %
 % Usage:
 %
-%   >>  tagPrefixMap = combineCellHedTags(specificColumns)
+%   >>  hedString = concatHedTagsInCellArray(hedTagArray, tagColumns)
 
 % Input:
 %
 %   Required:
 %
 %   hedTagArray
-%                   A cell array of character vectors.
+%                   A cell array of character vectors containing HED tags.
 %
-%   hedTagColumns
-%                   A integer array containing the indices in the
+%   tagColumns
+%                   A integer vector containing the indices in the
 %                   hedTagArray that contains HED tags.
 %
 % Output:
@@ -39,19 +39,18 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function hedString = concatHedTagsInCellArray(hedTagArray, hedTagColumns)
-parseInputArguments(hedTagArray, hedTagColumns);
-nonEmptyTagIndices = hedTagColumns(ismember(hedTagColumns, ...
+function hedString = concatHedTagsInCellArray(hedTagArray, tagColumns)
+parseInputArguments(hedTagArray, tagColumns);
+nonEmptyTagIndices = tagColumns(ismember(tagColumns, ...
     find(~cellfun(@isempty, hedTagArray)))); 
 hedString = strjoin(hedTagArray(nonEmptyTagIndices), ',');
 
-    function parsedArguments = parseInputArguments(hedTagArray, ...
-            hedTagColumns)
+    function parsedArguments = parseInputArguments(hedTagArray, tagColumns)
         % Parses the input arguments and returns them in a structure
         parser = inputParser();
         parser.addRequired('hedTagArray', @iscellstr);
-        parser.addRequired('hedTagColumns', @isvector);
-        parser.parse(hedTagArray, hedTagColumns);
+        parser.addRequired('tagColumns', @isvector);
+        parser.parse(hedTagArray, tagColumns);
         parsedArguments = parser.Results;
     end % parseInputArguments
 
