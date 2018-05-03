@@ -1,5 +1,5 @@
-% This class contains utility functions that does the heavy lifting when
-% validating HED tags.
+% This class contains an interface for calling underlying validation
+% functions that do the heavy lifting. 
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -18,7 +18,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-classdef TagValidator
+classdef TagValidatorRunner
     
     properties
         hedMaps
@@ -26,7 +26,7 @@ classdef TagValidator
     
     methods
         
-        function obj = TagValidator(hedMaps)
+        function obj = TagValidatorRunner(hedMaps)
             % Constructor
             obj.hedMaps = hedMaps;
         end % TagValidator
