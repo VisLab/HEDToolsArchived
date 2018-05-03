@@ -28,6 +28,7 @@ classdef TagValidator
         capWarnings = 'cap';
         capExpression = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
         commaError = 'comma';
+        groupBracketError = 'bracket';
     end % Instance properties
     
     methods
@@ -87,128 +88,129 @@ classdef TagValidator
             end
         end % checkcommas
         
-        function errors = checkgroupbrackets(hedString)
-            errorType = 'bracket';
+        function errors = checkGroupBrackets(obj, hedString)
+            % Checks the number of group brackets in a HED string.
             errors = '';
             numberOfOpeningBrackets = length(strfind(hedString, '('));
             numberOfClosingBrackets = length(strfind(hedString, ')'));
             if numberOfOpeningBrackets ~= numberOfClosingBrackets
-                errors = generateerror(errorType, numberOfOpeningBrackets, ...
-                    numberOfClosingBrackets, [], []);
-            end % checkgroupbrackets
-        end
-            
-        end % Public methods
+                errors = errorReporter(obj.groupBracketError, ...
+                    'openingBracketCount', numberOfOpeningBrackets, ...
+                    'closingBracketCount', numberOfClosingBrackets);
+            end
+        end % checkgroupbrackets
         
-        methods(Access=private)
-            
-            function invalidCaps = invalidCapsFoundInTag(obj, tag)
-                % Returns true if invalid caps were found in a tag. False, if
-                % otherwise. The first letter of the tag is supposed to be
-                % capitalized and all subsequent words are supposed to be
-                % lowercase.
-                invalidCaps = ~isempty(regexp(tag, obj.capExpression, 'once'));
-            end % invalidCapsFoundInTag
-            
-            function takesValue = checkIfParentTagTakesValue(obj, tag)
-                % Returns true if the parent tag takes a value. False, if
-                % otherwise.
-                takesValue = false;
-                slashPositions = strfind(tag, '/');
-                if ~isempty(slashPositions)
-                    valueTag = [tag(1:slashPositions(end)) '#'];
-                    if obj.hedMaps.takesValue.isKey(lower(valueTag))
-                        takesValue = true;
-                    end
+    end % Public methods
+    
+    methods(Access=private)
+        
+        function invalidCaps = invalidCapsFoundInTag(obj, tag)
+            % Returns true if invalid caps were found in a tag. False, if
+            % otherwise. The first letter of the tag is supposed to be
+            % capitalized and all subsequent words are supposed to be
+            % lowercase.
+            invalidCaps = ~isempty(regexp(tag, obj.capExpression, 'once'));
+        end % invalidCapsFoundInTag
+        
+        function takesValue = checkIfParentTagTakesValue(obj, tag)
+            % Returns true if the parent tag takes a value. False, if
+            % otherwise.
+            takesValue = false;
+            slashPositions = strfind(tag, '/');
+            if ~isempty(slashPositions)
+                valueTag = [tag(1:slashPositions(end)) '#'];
+                if obj.hedMaps.takesValue.isKey(lower(valueTag))
+                    takesValue = true;
                 end
-            end % checkIfParentTagTakesValue
-            
-            
-            
-            
-            
-            
-            function tagIsValid = isValidTagWithParentheses(obj, hedString, ...
-                    currentTag, characterIndex)
-                % Checks to see if the current tag with the next set of
-                % parentheses in the HED string is valid.
-                currentTag = currentTag(1:end-1);
-                restOfHedString = hedString(characterIndex:end);
-                currentTagWithParentheses = ...
-                    obj.getNextSetOfParenthesesInHedString([currentTag ...
-                    restOfHedString]);
-                currentTagWithParentheses = lower(currentTagWithParentheses);
-                tagIsValid = obj.hedMaps.tags.isKey(currentTagWithParentheses);
-            end % isValidTagWithParentheses
-            
-            
-            function parenthesesLength = getIndexAtEndOfParentheses(...
-                    obj, hedString, currentTag, characterIndex)
-                % Checks to see if the current tag with the next set of
-                % parentheses in the HED string is valid. Some tags have
-                % parentheses and this function is implemented to avoid
-                % reporting a missing comma error.
-                currentTag = currentTag(1:end-1);
-                restOfHedString = hedString(characterIndex:end);
-                [~, parenthesesLength] = ...
-                    obj.getNextSetOfParenthesesInHedString(...
-                    [currentTag restOfHedString]);
-            end % getIndexAtEndOfParentheses
-            
-            function [setOfParentheses, parenthesesLength] = ...
-                    getNextSetOfParenthesesInHedString(obj, hedString) %#ok<INUSL>
-                % Gets the next set of parentheses in the provided HED string.
-                setOfParentheses = '';
-                openingParenthesisFound = false;
-                numberOfCharacters = length(hedString);
-                parenthesesLength = 0;
-                for parenthesesLength = 1:numberOfCharacters
-                    character = hedString(parenthesesLength);
-                    setOfParentheses = [setOfParentheses ...
-                        hedString(parenthesesLength)]; %#ok<AGROW>
-                    if character == '('
-                        openingParenthesisFound = true;
-                    elseif character == ')' && openingParenthesisFound
-                        return;
-                    end
+            end
+        end % checkIfParentTagTakesValue
+        
+        
+        
+        
+        
+        
+        function tagIsValid = isValidTagWithParentheses(obj, hedString, ...
+                currentTag, characterIndex)
+            % Checks to see if the current tag with the next set of
+            % parentheses in the HED string is valid.
+            currentTag = currentTag(1:end-1);
+            restOfHedString = hedString(characterIndex:end);
+            currentTagWithParentheses = ...
+                obj.getNextSetOfParenthesesInHedString([currentTag ...
+                restOfHedString]);
+            currentTagWithParentheses = lower(currentTagWithParentheses);
+            tagIsValid = obj.hedMaps.tags.isKey(currentTagWithParentheses);
+        end % isValidTagWithParentheses
+        
+        
+        function parenthesesLength = getIndexAtEndOfParentheses(...
+                obj, hedString, currentTag, characterIndex)
+            % Checks to see if the current tag with the next set of
+            % parentheses in the HED string is valid. Some tags have
+            % parentheses and this function is implemented to avoid
+            % reporting a missing comma error.
+            currentTag = currentTag(1:end-1);
+            restOfHedString = hedString(characterIndex:end);
+            [~, parenthesesLength] = ...
+                obj.getNextSetOfParenthesesInHedString(...
+                [currentTag restOfHedString]);
+        end % getIndexAtEndOfParentheses
+        
+        function [setOfParentheses, parenthesesLength] = ...
+                getNextSetOfParenthesesInHedString(obj, hedString) %#ok<INUSL>
+            % Gets the next set of parentheses in the provided HED string.
+            setOfParentheses = '';
+            openingParenthesisFound = false;
+            numberOfCharacters = length(hedString);
+            parenthesesLength = 0;
+            for parenthesesLength = 1:numberOfCharacters
+                character = hedString(parenthesesLength);
+                setOfParentheses = [setOfParentheses ...
+                    hedString(parenthesesLength)]; %#ok<AGROW>
+                if character == '('
+                    openingParenthesisFound = true;
+                elseif character == ')' && openingParenthesisFound
+                    return;
                 end
-            end % getNextSetOfParenthesesInHedString
-            
-            function commaMissing = commaIsMissingAfterClosingBracket(...
-                    obj, lastNonEmptyCharacter, currentCharacter)
-                % Returns true if a comma is missing after a closing bracket.
-                commaMissing = ~isempty(lastNonEmptyCharacter) && ...
-                    lastNonEmptyCharacter == ')' && ...
-                    ~obj.characterIsDelimiter(currentCharacter);
-            end % commaIsMissingAfterClosingBracket
-            
-            function commaMissing = commaMissingBeforeOpeningBracket(...
-                    obj, lastNonEmptyCharacter, currentCharacter)
-                % Returns true if a comma is missing before an opening bracket.
-                commaMissing = ~isempty(lastNonEmptyCharacter) && ...
-                    ~obj.characterIsDelimiter(lastNonEmptyCharacter) && ...
-                    currentCharacter == '(';
-            end % commaMissingBeforeOpeningBracket
-            
-        end % Private methods
+            end
+        end % getNextSetOfParenthesesInHedString
         
-        methods(Static)
-            function isWhitespace = characterIsWhitespace(character)
-                % Checks to see if the specified character is whitespace. Tab
-                % and newline characters are considered whitespace.
-                isWhitespace = ~isempty(regexp(character, '[\\n\\t ]', ...
-                    'once'));
-            end % characterIsWhitespace
-            
-            function isDelimiter = characterIsDelimiter(character)
-                % Checks to see if the specified character is a delimiter.
-                % Comma and tildes are considered delimiters.
-                isDelimiter = ~isempty(regexp(character, '[,~]', 'once'));
-            end % characterIsDelimiter
-            
-        end % Static methods
+        function commaMissing = commaIsMissingAfterClosingBracket(...
+                obj, lastNonEmptyCharacter, currentCharacter)
+            % Returns true if a comma is missing after a closing bracket.
+            commaMissing = ~isempty(lastNonEmptyCharacter) && ...
+                lastNonEmptyCharacter == ')' && ...
+                ~obj.characterIsDelimiter(currentCharacter);
+        end % commaIsMissingAfterClosingBracket
         
+        function commaMissing = commaMissingBeforeOpeningBracket(...
+                obj, lastNonEmptyCharacter, currentCharacter)
+            % Returns true if a comma is missing before an opening bracket.
+            commaMissing = ~isempty(lastNonEmptyCharacter) && ...
+                ~obj.characterIsDelimiter(lastNonEmptyCharacter) && ...
+                currentCharacter == '(';
+        end % commaMissingBeforeOpeningBracket
         
+    end % Private methods
+    
+    methods(Static)
+        function isWhitespace = characterIsWhitespace(character)
+            % Checks to see if the specified character is whitespace. Tab
+            % and newline characters are considered whitespace.
+            isWhitespace = ~isempty(regexp(character, '[\\n\\t ]', ...
+                'once'));
+        end % characterIsWhitespace
         
+        function isDelimiter = characterIsDelimiter(character)
+            % Checks to see if the specified character is a delimiter.
+            % Comma and tildes are considered delimiters.
+            isDelimiter = ~isempty(regexp(character, '[,~]', 'once'));
+        end % characterIsDelimiter
         
-    end % TagValidator
+    end % Static methods
+    
+    
+    
+    
+end % TagValidator
