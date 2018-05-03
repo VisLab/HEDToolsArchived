@@ -17,6 +17,8 @@ testCase.TestData.validGroupWithEqualBrackets = ...
     '(/This/is/a/tag, /This/is/another/tag)';
 testCase.TestData.validGroupWithUnequalBrackets = ...
     '(/This/is/a/tag, /This/is/another/tag';
+testCase.TestData.validRequireChildTag = 'Event/Label/This is a label';
+testCase.TestData.invalidRequireChildTag = 'Event/Label';
 end % setupOnce
 
 
@@ -48,6 +50,17 @@ errors = testCase.TestData.tagValidator.checkGroupBrackets(...
 testCase.verifyEmpty(errors);
 errors = testCase.TestData.tagValidator.checkGroupBrackets(...
     testCase.TestData.validGroupWithUnequalBrackets);
+testCase.verifyNotEmpty(errors);
+end
+
+function checkRequiredChildTagsTest(testCase)
+errors = testCase.TestData.tagValidator.checkRequiredChildTags(...
+    testCase.TestData.validRequireChildTag, ...
+    testCase.TestData.validRequireChildTag);
+testCase.verifyEmpty(errors);
+errors = testCase.TestData.tagValidator.checkRequiredChildTags(...
+    testCase.TestData.invalidRequireChildTag, ...
+    testCase.TestData.invalidRequireChildTag);
 testCase.verifyNotEmpty(errors);
 end
 
