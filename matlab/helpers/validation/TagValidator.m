@@ -30,6 +30,7 @@ classdef TagValidator
         commaError = 'comma';
         groupBracketError = 'bracket';
         requireChildError = 'requireChild';
+        requiredError = 'required';
     end % Instance properties
     
     methods
@@ -111,7 +112,23 @@ classdef TagValidator
             end
         end % checkRequiredChildTags
         
-        
+        function checkRequiredTags(obj, formattedTopLevelTags)
+            % Checks the tags that are required
+            requiredTags = obj.hedMaps.required.values();
+            numTags = length(requiredTags);
+            for a = requiredTagsIndex:numTags
+                requiredTagWithSlash = [requiredTags{requiredTagsIndex} ...
+                    '/'];
+                requiredTagWithSlashLength = ...
+                    length(requiredTags{requiredTagsIndex}) + 1;
+                requiredTagIndices = strncmpi(formattedTopLevelTags, ...
+                    requiredTagWithSlash, requiredTagWithSlashLength);
+                if sum(requiredTagIndices) == 0
+                    warningReporter(obj.requiredError, 'tagPrefix', ...
+                        requiredTagWithSlash);
+                end
+            end
+        end % checkRequiredTags
         
     end % Public methods
     
