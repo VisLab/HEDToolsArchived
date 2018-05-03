@@ -111,9 +111,9 @@ end
         p.addParamValue('unitClassUnits', '', @(x)  ~isempty(x) && ...
             ischar(x));
         p.addParamValue('openingBracketCount', 1, @(x) ~isempty(x) && ...
-            isdouble(x));
+            isa(x, 'double'));
         p.addParamValue('closingBracketCount', 1, @(x) ~isempty(x) && ...
-            isdouble(x));
+            isa(x, 'double'));
         p.parse(errorType, varargin{:});
         p = p.Results;
     end % parseArguments
