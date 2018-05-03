@@ -1,5 +1,5 @@
-% This class contains an interface for calling underlying validation
-% functions that do the heavy lifting.
+% This class contains the interface that does the actual validation and
+% return any issues found. 
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
