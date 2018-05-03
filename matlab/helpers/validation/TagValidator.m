@@ -24,7 +24,7 @@ classdef TagValidator
         hedMaps
     end
     
-    properties(Constant)
+    properties(Constant, Access=private)
         capWarnings = 'cap';
         capExpression = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
     end % Instance properties
@@ -47,6 +47,10 @@ classdef TagValidator
             end
         end % runHedStringValidator
         
+    end % Public methods
+    
+    methods(Access=private)
+        
         function invalidCaps = invalidCapsFoundInTag(obj, tag)
             % Returns true if invalid caps were found in a tag. False, if
             % otherwise. The first letter of the tag is supposed to be
@@ -67,9 +71,7 @@ classdef TagValidator
                 end
             end
         end % checkIfParentTagTakesValue
-        
-
-        
-    end % Public methods
+           
+    end % Private methods
     
 end % TagValidator
