@@ -42,7 +42,7 @@ classdef TagValidator
             if checkIfParentTagTakesValue(obj, originalTag)
                 return;
             elseif invalidCapsFoundInTag(obj, originalTag)
-                warnings = warningReporter(obj.capWarnings, 'tags', ...
+                warnings = warningReporter(obj.capWarnings, 'tag', ...
                     originalTag);
             end
         end % runHedStringValidator
