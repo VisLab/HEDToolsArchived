@@ -116,21 +116,17 @@ classdef TagValidator
             end
         end % checkRequiredChildTags
         
-        function checkRequiredTags(obj, formattedTopLevelTags)
+        function warnings = checkRequiredTags(obj, formattedTopLevelTags)
             % Checks the tags that are required
+            warnings = '';
             requiredTags = obj.hedMaps.required.values();
-            numTags = length(requiredTags);
-            for a = requiredTagsIndex:numTags
-                requiredTagWithSlash = [requiredTags{requiredTagsIndex} ...
-                    '/'];
-                requiredTagWithSlashLength = ...
-                    length(requiredTags{requiredTagsIndex}) + 1;
-                indicesFoundInTopLevel = strncmpi(...
-                    formattedTopLevelTags, requiredTagWithSlash, ...
-                    requiredTagWithSlashLength);
+            numRequiredTags = length(requiredTags);
+            for requiredTagIndex = 1:numRequiredTags
+                indicesFoundInTopLevel = findIndicesThatBeginWithPrefix(...
+                    formattedTopLevelTags, requiredTags{requiredTagIndex});
                 if sum(indicesFoundInTopLevel) == 0
-                    warningReporter(obj.requiredError, 'tagPrefix', ...
-                        requiredTagWithSlash);
+                    warnings = warningReporter(obj.requiredError, ...
+                        'tagPrefix', requiredTagWithSlash);
                 end
             end
         end % checkRequiredTags
@@ -138,6 +134,17 @@ classdef TagValidator
     end % Public methods
     
     methods(Access=private)
+        
+        function indicesFound = findIndicesThatBeginWithPrefix(tags, ...
+                prefix)
+            % Finds the indices in a cell array of tags that begin with a
+            % prefix.
+            if prefix(end) ~= '/'
+                prefix = [prefix '/'];
+            end
+            prefixLength = length(prefix);
+            indicesFound = strncmpi(tags, prefix, prefixLength);
+        end % findIndicesThatBeginWithPrefix
         
         function invalidCaps = invalidCapsFoundInTag(obj, tag)
             % Returns true if invalid caps were found in a tag. False, if
