@@ -141,17 +141,18 @@ classdef TagValidator
                 originalTag, formattedTag)
             % Checks for warnings in a unit class tag.
             warnings = '';
-            [isUnitClass, unitClassFormatTag] = isUnitClassTag(...
+            [isUnitClass, unitClassFormatTag] = obj.isUnitClassTag(...
                 formattedTag);
             if isUnitClass
                 unitClasses = strsplit(obj.hedMaps.unitClass(lower(...
                     unitClassFormatTag)), ',');
                 unitClassDefault = ...
                     obj.hedMaps.default(lower(unitClasses{1}));
-                numericalTagValue = getTagName(formattedTag);
-                if isValidNumericalString(numericalTagValue)
+                numericalTagValue = TagValidator.getTagName(formattedTag);
+                if TagValidator.isValidNumericalString(numericalTagValue)
                     warnings = warningReporter(obj.unitClassWarning, ...
-                        'defaultUnit', unitClassDefault, originalTag);
+                        'defaultUnit', unitClassDefault, 'tag', ...
+                        originalTag);
                 end
             end
         end % checkUnitClassTagForWarnings
@@ -186,6 +187,18 @@ classdef TagValidator
                 end
             end
         end % checkNumericalTag
+        
+        function units = getTagUnitClassUnits(obj, unitClassTag)
+            % Gets the units associated with a unit class tag. 
+            unitClasses = strsplit(obj.hedMaps.unitClass(lower(...
+                unitClassTag)), ',');
+            numUnitClasses = size(unitClasses{1});
+            units = obj.hedMaps.unitClasses(lower(unitClasses{1}));
+            for a = 2:numUnitClasses
+                units = [units, ',', ...
+                    obj.hedMaps.unitClasses(lower(unitClasses{a}))]; %#ok<AGROW>
+            end
+        end % getTagUnitClassUnits
         
     end % Public methods
     
@@ -291,29 +304,21 @@ classdef TagValidator
             end
         end % isNumericTag
         
-        function [isUnitClass, unitClassFormatTag] = isUnitClassTag(tag)
+        function [isUnitClass, unitClassFormatTag] = isUnitClassTag(...
+                obj, tag)
             % Returns true if the tag requires a unit class
             tag = lower(tag);
             isUnitClass = false;
             unitClassFormatTag = '';
             if ~obj.hedMaps.tags.isKey(tag)
-                unitClassFormatTag = convertToTakesValueTag(tag);
+                unitClassFormatTag = ...
+                    TagValidator.convertToTakesValueTag(tag);
                 isUnitClass = ...
                     obj.hedMaps.unitClass.isKey(unitClassFormatTag);
             end
         end % isUnitClassTag
         
-        function units = getTagUnitClassUnits(obj, unitClassTag)
-            % Gets the units associated with a unit class tag. 
-            unitClasses = strsplit(obj.hedMaps.unitClass(lower(...
-                unitClassTag)), ',');
-            numUnitClasses = size(unitClasses{1});
-            units = obj.hedMaps.unitClasses(lower(unitClasses{1}));
-            for a = 2:numUnitClasses
-                units = [units, ',', ...
-                    obj.hedMaps.unitClasses(lower(unitClasses{a}))]; %#ok<AGROW>
-            end
-        end % getTagUnitClassUnits
+
         
     end % Private methods
     
