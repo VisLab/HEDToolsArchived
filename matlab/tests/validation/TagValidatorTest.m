@@ -43,6 +43,10 @@ testCase.TestData.groupWithLessThanTwoTildes = ...
     {'a', '~', 'b', '~', 'c'};
 testCase.TestData.groupWithLessThanMoreThanTwoTildes = ...
     {'a', '~', 'b', '~', 'c', '~', 'd'};
+testCase.TestData.tagsWithOneUniquePrefix = ...
+    {'event/label/a', '~', 'b', '~', 'c'};
+testCase.TestData.tagsWithMultipleUniquePrefix = ...
+    {'event/label/a', '~', 'b', '~', 'event/label/c', '~', 'd'};
 
 end % setupOnce
 
@@ -136,6 +140,15 @@ errors = testCase.TestData.tagValidator.checkGroupTildes(...
 testCase.verifyEmpty(errors);
 errors = testCase.TestData.tagValidator.checkGroupTildes(...
     testCase.TestData.groupWithLessThanMoreThanTwoTildes);
+testCase.verifyNotEmpty(errors);
+end
+
+function checkUniqueTagsTest(testCase)
+errors = testCase.TestData.tagValidator.checkUniqueTags(...
+    testCase.TestData.tagsWithOneUniquePrefix);
+testCase.verifyEmpty(errors);
+errors = testCase.TestData.tagValidator.checkUniqueTags(...
+    testCase.TestData.tagsWithMultipleUniquePrefix);
 testCase.verifyNotEmpty(errors);
 end
 
