@@ -39,7 +39,10 @@ testCase.TestData.validUnitClassTagWithUnits = ...
     strrep(unitClassTags{1}, '#', ['1287128127 ' validUnit]);
 testCase.TestData.unitClassWithInvalidUnits = ...
     strrep(unitClassTags{1}, '#', '12871 ThisIsNotAValidUnit');
-
+testCase.TestData.groupWithLessThanTwoTildes = ...
+    {'a', '~', 'b', '~', 'c'};
+testCase.TestData.groupWithLessThanMoreThanTwoTildes = ...
+    {'a', '~', 'b', '~', 'c', '~', 'd'};
 
 end % setupOnce
 
@@ -124,6 +127,15 @@ testCase.verifyEmpty(errors);
 errors = testCase.TestData.tagValidator.checkUnitClassTagForErrors(...
     testCase.TestData.unitClassWithInvalidUnits, ...
     testCase.TestData.unitClassWithInvalidUnits);
+testCase.verifyNotEmpty(errors);
+end
+
+function checkGroupTildesTest(testCase)
+errors = testCase.TestData.tagValidator.checkGroupTildes(...
+    testCase.TestData.groupWithLessThanTwoTildes);
+testCase.verifyEmpty(errors);
+errors = testCase.TestData.tagValidator.checkGroupTildes(...
+    testCase.TestData.groupWithLessThanMoreThanTwoTildes);
 testCase.verifyNotEmpty(errors);
 end
 
