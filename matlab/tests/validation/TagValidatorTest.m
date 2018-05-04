@@ -4,6 +4,9 @@ end % errorReporterTest
 
 function setupOnce(testCase)
 load('hedMaps.mat');
+requiredTags = hedMaps.required.keys();
+numericTags = hedMaps.isNumeric.keys();
+unitClassTags = hedMaps.unitClass.keys();
 testCase.TestData.tagValidator = TagValidator(hedMaps);
 testCase.TestData.validCapsTag = 'This is/A/Valid tag';
 testCase.TestData.invalidCapsTag = 'This Is/A/invalid tag';
@@ -19,9 +22,16 @@ testCase.TestData.validGroupWithUnequalBrackets = ...
     '(/This/is/a/tag, /This/is/another/tag';
 testCase.TestData.validRequireChildTag = 'Event/Label/This is a label';
 testCase.TestData.invalidRequireChildTag = 'Event/Label';
-requiredTags = hedMaps.required.keys();
-testCase.TestData.formattedTopLevelTagsWithOneRequiredTag = requiredTags(1);
-testCase.TestData.formattedTopLevelTagsWithAllRequiredTags = cellfun(@(x) [x '/'], requiredTags, 'UniformOutput', false); ;
+
+testCase.TestData.formattedTopLevelTagsWithOneRequiredTag = ...
+    requiredTags(1);
+testCase.TestData.formattedTopLevelTagsWithAllRequiredTags = ...
+    cellfun(@(x) [x '/'], requiredTags, 'UniformOutput', false);
+testCase.TestData.validNumericTag = strrep(numericTags{1}, '#', ...
+    '1287128127');
+testCase.TestData.invalidNumericTag = strrep(numericTags{1}, '#', ...
+    'sdkljdskj');
+
 
 end % setupOnce
 
@@ -74,6 +84,16 @@ errors = testCase.TestData.tagValidator.checkRequiredTags(...
 testCase.verifyEmpty(errors);
 errors = testCase.TestData.tagValidator.checkRequiredTags(...
     testCase.TestData.formattedTopLevelTagsWithOneRequiredTag);
+testCase.verifyNotEmpty(errors);
+end
+
+function checkNumericalTagTest(testCase)
+errors = testCase.TestData.tagValidator.checkNumericalTag(...
+    testCase.TestData.validNumericTag, testCase.TestData.validNumericTag);
+testCase.verifyEmpty(errors);
+errors = testCase.TestData.tagValidator.checkNumericalTag(...
+    testCase.TestData.invalidNumericTag, ...
+    testCase.TestData.invalidNumericTag);
 testCase.verifyNotEmpty(errors);
 end
 
