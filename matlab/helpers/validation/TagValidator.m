@@ -122,11 +122,12 @@ classdef TagValidator
             requiredTags = obj.hedMaps.required.values();
             numRequiredTags = length(requiredTags);
             for requiredTagIndex = 1:numRequiredTags
-                indicesFoundInTopLevel = findIndicesThatBeginWithPrefix(...
+                indicesFoundInTopLevel = ...
+                    TagValidator.findIndicesThatBeginWithPrefix(...
                     formattedTopLevelTags, requiredTags{requiredTagIndex});
                 if sum(indicesFoundInTopLevel) == 0
                     warnings = warningReporter(obj.requiredError, ...
-                        'tagPrefix', requiredTagWithSlash);
+                        'tagPrefix', requiredTags{requiredTagIndex});
                 end
             end
         end % checkRequiredTags
@@ -135,16 +136,7 @@ classdef TagValidator
     
     methods(Access=private)
         
-        function indicesFound = findIndicesThatBeginWithPrefix(tags, ...
-                prefix)
-            % Finds the indices in a cell array of tags that begin with a
-            % prefix.
-            if prefix(end) ~= '/'
-                prefix = [prefix '/'];
-            end
-            prefixLength = length(prefix);
-            indicesFound = strncmpi(tags, prefix, prefixLength);
-        end % findIndicesThatBeginWithPrefix
+        
         
         function invalidCaps = invalidCapsFoundInTag(obj, tag)
             % Returns true if invalid caps were found in a tag. False, if
@@ -249,6 +241,17 @@ classdef TagValidator
             % Comma and tildes are considered delimiters.
             isDelimiter = ~isempty(regexp(character, '[,~]', 'once'));
         end % characterIsDelimiter
+        
+        function indicesFound = findIndicesThatBeginWithPrefix(tags, ...
+                prefix)
+            % Finds the indices in a cell array of tags that begin with a
+            % prefix.
+            if prefix(end) ~= '/'
+                prefix = [prefix '/'];
+            end
+            prefixLength = length(prefix);
+            indicesFound = strncmpi(tags, prefix, prefixLength);
+        end % findIndicesThatBeginWithPrefix
         
     end % Static methods
     
