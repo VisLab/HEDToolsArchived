@@ -19,6 +19,10 @@ testCase.TestData.validGroupWithUnequalBrackets = ...
     '(/This/is/a/tag, /This/is/another/tag';
 testCase.TestData.validRequireChildTag = 'Event/Label/This is a label';
 testCase.TestData.invalidRequireChildTag = 'Event/Label';
+requiredTags = hedMaps.required.keys();
+testCase.TestData.formattedTopLevelTagsWithOneRequiredTag = requiredTags(1);
+testCase.TestData.formattedTopLevelTagsWithAllRequiredTags = cellfun(@(x) [x '/'], requiredTags, 'UniformOutput', false); ;
+
 end % setupOnce
 
 
@@ -61,6 +65,15 @@ testCase.verifyEmpty(errors);
 errors = testCase.TestData.tagValidator.checkRequiredChildTags(...
     testCase.TestData.invalidRequireChildTag, ...
     testCase.TestData.invalidRequireChildTag);
+testCase.verifyNotEmpty(errors);
+end
+
+function checkRequiredTagsTest(testCase)
+errors = testCase.TestData.tagValidator.checkRequiredTags(...
+    testCase.TestData.formattedTopLevelTagsWithAllRequiredTags);
+testCase.verifyEmpty(errors);
+errors = testCase.TestData.tagValidator.checkRequiredTags(...
+    testCase.TestData.formattedTopLevelTagsWithOneRequiredTag);
 testCase.verifyNotEmpty(errors);
 end
 
