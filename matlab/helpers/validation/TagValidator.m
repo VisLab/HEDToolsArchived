@@ -29,8 +29,13 @@ classdef TagValidator
         capExpression = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
         commaError = 'comma';
         groupBracketError = 'bracket';
+        numericalExpression = '<>=.0123456789';
+        numericError = 'isNumeric';
         requireChildError = 'requireChild';
         requiredError = 'required';
+        unitClassWarning = 'unitClass';
+        unitClassError = 'unitClass';
+        timeExpression = '^([0-1]?[0-9]|2[0-3])(:[0-5][0-9])?$';
     end % Instance properties
     
     methods
@@ -42,7 +47,7 @@ classdef TagValidator
         
         function hedMaps = getHedMaps(obj)
             hedMaps = obj.hedMaps;
-        end
+        end % getHedMaps
         
         function warnings = checkCaps(obj, originalTag)
             % Returns true if the tag isn't correctly capitalized
@@ -131,6 +136,56 @@ classdef TagValidator
                 end
             end
         end % checkRequiredTags
+              
+        function warnings = checkUnitClassTagForWarnings(obj, ...
+                originalTag, formattedTag)
+            % Checks for warnings in a unit class tag.
+            warnings = '';
+            [isUnitClass, unitClassFormatTag] = isUnitClassTag(...
+                formattedTag);
+            if isUnitClass
+                unitClasses = strsplit(obj.hedMaps.unitClass(lower(...
+                    unitClassFormatTag)), ',');
+                unitClassDefault = ...
+                    obj.hedMaps.default(lower(unitClasses{1}));
+                numericalTagValue = getTagName(formattedTag);
+                if isValidNumericalString(numericalTagValue)
+                    warnings = warningReporter(obj.unitClassWarning, ...
+                        'defaultUnit', unitClassDefault, originalTag);
+                end
+            end
+        end % checkUnitClassTagForWarnings
+        
+        function errors = checkUnitClassTagForErrors(obj, originalTag, ...
+                formattedTag)
+            % Checks for errors in a unit class tag.
+            errors = '';
+            [isUnitClass, unitClassFormatTag] = isUnitClassTag(...
+                formattedTag);
+            if isUnitClass
+                unitClassTagValue = getTagName(formattedTag);
+                units = getTagUnitClassUnits(obj, unitClassFormatTag);
+                unitsRegexp = buildUnitsRegexp(unitClassUnits);
+                if isempty(regexpi(unitClassTagValue, unitsRegexp)) && ...
+                        ~isValidTimeString(unitClassTagValue)
+                    errors = errorReporter(obj.unitClassError, 'tag', ...
+                        originalTag,  'unitClassUnits', units);
+                end
+            end
+        end % checkUnitClassTagForErrors
+        
+        function errors = checkNumericalTag(obj, originalTag, formattedTag)
+            % Checks numerical tag for errors.
+            errors = '';
+            isNumeric = isNumericTag(obj, formattedTag);
+            if isNumeric
+                numericalTagValue = TagValidator.getTagName(formattedTag);
+                if ~TagValidator.isValidNumericalString(numericalTagValue)
+                    errors = errorReporter(obj.numericError, 'tag', ...
+                        originalTag);
+                end
+            end
+        end % checkNumericalTag
         
     end % Public methods
     
@@ -225,10 +280,45 @@ classdef TagValidator
                 ~obj.characterIsDelimiter(lastNonEmptyCharacter) && ...
                 currentCharacter == '(';
         end % commaMissingBeforeOpeningBracket
+               
+        function isNumeric = isNumericTag(obj, tag)
+            % Returns true if the tag is a numeric tag
+            isNumeric = false;
+            tag = lower(tag);
+            if ~obj.hedMaps.tags.isKey(tag)
+                numericTag = TagValidator.convertToTakesValueTag(tag);
+                isNumeric = obj.hedMaps.isNumeric.isKey(numericTag);
+            end
+        end % isNumericTag
+        
+        function [isUnitClass, unitClassFormatTag] = isUnitClassTag(tag)
+            % Returns true if the tag requires a unit class
+            tag = lower(tag);
+            isUnitClass = false;
+            unitClassFormatTag = '';
+            if ~obj.hedMaps.tags.isKey(tag)
+                unitClassFormatTag = convertToTakesValueTag(tag);
+                isUnitClass = ...
+                    obj.hedMaps.unitClass.isKey(unitClassFormatTag);
+            end
+        end % isUnitClassTag
+        
+        function units = getTagUnitClassUnits(obj, unitClassTag)
+            % Gets the units associated with a unit class tag. 
+            unitClasses = strsplit(obj.hedMaps.unitClass(lower(...
+                unitClassTag)), ',');
+            numUnitClasses = size(unitClasses{1});
+            units = obj.hedMaps.unitClasses(lower(unitClasses{1}));
+            for a = 2:numUnitClasses
+                units = [units, ',', ...
+                    obj.hedMaps.unitClasses(lower(unitClasses{a}))]; %#ok<AGROW>
+            end
+        end % getTagUnitClassUnits
         
     end % Private methods
     
     methods(Static)
+        
         function isWhitespace = characterIsWhitespace(character)
             % Checks to see if the specified character is whitespace. Tab
             % and newline characters are considered whitespace.
@@ -252,6 +342,35 @@ classdef TagValidator
             prefixLength = length(prefix);
             indicesFound = strncmpi(tags, prefix, prefixLength);
         end % findIndicesThatBeginWithPrefix
+        
+        function valueTag = convertToTakesValueTag(tag)
+            % Strips the tag name and replaces it with #
+            valueTag = tag;
+            slashPositions = strfind(tag, '/');
+            if ~isempty(slashPositions)
+                valueTag = [tag(1:slashPositions(end)) '#'];
+            end
+        end % convertToTakesValueTag
+        
+        function tagName = getTagName(tag)
+            % Get the tag name from the full tag path
+            splitTagPath = strsplit(tag, '/');
+            tagName = splitTagPath{end};
+        end % getTagName
+        
+        function validTimeString = isValidTimeString(timeString)
+            % Returns true if the string is a valid time string. False, if
+            % otherwise.
+            validTimeString = ~isempty(regexp(timeString, ...
+                TagValidator.timeExpression, 'once'));
+        end % isValidTimeString
+        
+        function validNumericalValue = isValidNumericalString(...
+                numericalString)
+            % Returns true if a valid numerical value. False, if otherwise.
+            validNumericalValue = all(ismember(numericalString, ...
+                TagValidator.numericalExpression));
+        end
         
     end % Static methods
     
