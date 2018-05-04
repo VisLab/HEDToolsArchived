@@ -40,6 +40,10 @@ classdef TagValidator
             obj.hedMaps = hedMaps;
         end % TagValidator
         
+        function hedMaps = getHedMaps(obj)
+            hedMaps = obj.hedMaps;
+        end
+        
         function warnings = checkCaps(obj, originalTag)
             % Returns true if the tag isn't correctly capitalized
             warnings = '';
@@ -121,9 +125,10 @@ classdef TagValidator
                     '/'];
                 requiredTagWithSlashLength = ...
                     length(requiredTags{requiredTagsIndex}) + 1;
-                requiredTagIndices = strncmpi(formattedTopLevelTags, ...
-                    requiredTagWithSlash, requiredTagWithSlashLength);
-                if sum(requiredTagIndices) == 0
+                indicesFoundInTopLevel = strncmpi(...
+                    formattedTopLevelTags, requiredTagWithSlash, ...
+                    requiredTagWithSlashLength);
+                if sum(indicesFoundInTopLevel) == 0
                     warningReporter(obj.requiredError, 'tagPrefix', ...
                         requiredTagWithSlash);
                 end
