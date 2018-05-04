@@ -136,7 +136,7 @@ classdef TagValidator
                 end
             end
         end % checkRequiredTags
-              
+        
         function warnings = checkUnitClassTagForWarnings(obj, ...
                 originalTag, formattedTag)
             % Checks for warnings in a unit class tag.
@@ -161,14 +161,14 @@ classdef TagValidator
                 formattedTag)
             % Checks for errors in a unit class tag.
             errors = '';
-            [isUnitClass, unitClassFormatTag] = isUnitClassTag(...
+            [isUnitClass, unitClassFormatTag] = obj.isUnitClassTag(...
                 formattedTag);
             if isUnitClass
-                unitClassTagValue = getTagName(formattedTag);
-                units = getTagUnitClassUnits(obj, unitClassFormatTag);
-                unitsRegexp = buildUnitsRegexp(unitClassUnits);
+                unitClassTagValue = TagValidator.getTagName(formattedTag);
+                units = obj.getTagUnitClassUnits(unitClassFormatTag);
+                unitsRegexp = TagValidator.buildUnitsRegexp(units);
                 if isempty(regexpi(unitClassTagValue, unitsRegexp)) && ...
-                        ~isValidTimeString(unitClassTagValue)
+                        ~TagValidator.isValidTimeString(unitClassTagValue)
                     errors = errorReporter(obj.unitClassError, 'tag', ...
                         originalTag,  'unitClassUnits', units);
                 end
@@ -189,7 +189,7 @@ classdef TagValidator
         end % checkNumericalTag
         
         function units = getTagUnitClassUnits(obj, unitClassTag)
-            % Gets the units associated with a unit class tag. 
+            % Gets the units associated with a unit class tag.
             unitClasses = strsplit(obj.hedMaps.unitClass(lower(...
                 unitClassTag)), ',');
             numUnitClasses = size(unitClasses{1});
@@ -203,7 +203,6 @@ classdef TagValidator
     end % Public methods
     
     methods(Access=private)
-        
         
         
         function invalidCaps = invalidCapsFoundInTag(obj, tag)
@@ -293,7 +292,7 @@ classdef TagValidator
                 ~obj.characterIsDelimiter(lastNonEmptyCharacter) && ...
                 currentCharacter == '(';
         end % commaMissingBeforeOpeningBracket
-               
+        
         function isNumeric = isNumericTag(obj, tag)
             % Returns true if the tag is a numeric tag
             isNumeric = false;
@@ -318,7 +317,7 @@ classdef TagValidator
             end
         end % isUnitClassTag
         
-
+        
         
     end % Private methods
     
@@ -376,6 +375,28 @@ classdef TagValidator
             validNumericalValue = all(ismember(numericalString, ...
                 TagValidator.numericalExpression));
         end
+        
+        function unitsRegexp = buildUnitsRegexp(units)
+            % Builds a regexp for unit class units
+            characterEscapes = {'.','\','+','*','?','[','^',']','$','(', ...
+                ')','{','}','=','!','<','>','|',':','-'};
+            splitUnits = strsplit(units, ',');
+            operators = '^(>|>=|<|<=)?\s*';
+            digits = '\d*\.?\d+\s*';
+            unitsGroup = '(';
+            for a = 1:length(splitUnits)
+                if any(strcmpi(characterEscapes, strtrim(splitUnits{a})))
+                    unitsGroup = [unitsGroup, ['\', ...
+                        strtrim(splitUnits{a})], '|']; %#ok<AGROW>
+                else
+                    unitsGroup = [unitsGroup, strtrim(splitUnits{a}), ...
+                        '|'];  %#ok<AGROW>
+                end
+            end
+            unitsGroup = regexprep(unitsGroup, '\|$', '');
+            unitsGroup = [unitsGroup,')?\s*'];
+            unitsRegexp = [operators,unitsGroup,digits, unitsGroup, '$'];
+        end % buildUnitsRegexp
         
     end % Static methods
     
