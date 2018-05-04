@@ -35,6 +35,7 @@ classdef TagValidator
         requiredError = 'required';
         unitClassWarning = 'unitClass';
         unitClassError = 'unitClass';
+        tildeError = 'tilde';
         timeExpression = '^([0-1]?[0-9]|2[0-3])(:[0-5][0-9])?$';
     end % Instance properties
     
@@ -137,6 +138,16 @@ classdef TagValidator
             end
         end % checkRequiredTags
         
+        function errors = checkGroupTildes(obj, originalGroupTags)
+            % Checks the number of tildes in a group
+            errors = '';
+            if sum(strncmp('~', originalGroupTags, 1)) > 2
+                groupTagString = vTagList.stringify(originalGroupTags);
+                errors = errorReporter(obj.tildeError, 'tag', ...
+                    groupTagString);
+            end
+        end % checkGroupTildes
+                   
         function warnings = checkUnitClassTagForWarnings(obj, ...
                 originalTag, formattedTag)
             % Checks for warnings in a unit class tag.
