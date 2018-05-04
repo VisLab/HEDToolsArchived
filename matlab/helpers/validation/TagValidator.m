@@ -37,6 +37,7 @@ classdef TagValidator
         unitClassError = 'unitClass';
         tildeError = 'tilde';
         timeExpression = '^([0-1]?[0-9]|2[0-3])(:[0-5][0-9])?$';
+        uniqueError = 'unique';
     end % Instance properties
     
     methods
@@ -147,6 +148,23 @@ classdef TagValidator
                     groupTagString);
             end
         end % checkGroupTildes
+        
+        function errors = checkUniqueTags(obj, formattedTags)
+            % Looks for two or more tags that are descendants of a unique
+            % tag
+            errors = '';
+            uniqueTags = obj.hedMaps.unique.values();
+            numUniqueTags = length(uniqueTags);
+            for uniqueTagsIndex = 1:numUniqueTags
+                foundIndexes = strncmpi(formattedTags, ...
+                    uniqueTags{uniqueTagsIndex}, ...
+                    length(uniqueTags{uniqueTagsIndex}));
+                if sum(foundIndexes) > 1
+                    errors = errorReporter(obj.uniqueError, ...
+                        'tagPrefix', uniqueTags{uniqueTagsIndex});
+                end
+            end
+        end % checkUniqueTags
                    
         function warnings = checkUnitClassTagForWarnings(obj, ...
                 originalTag, formattedTag)
