@@ -21,30 +21,32 @@
 classdef TagValidatorRunner
     
     properties
-        hedMaps
+        tagValidator
     end % Instance properties
     
     methods
         
         function obj = TagValidatorRunner(hedMaps)
             % Constructor
-            obj.hedMaps = hedMaps;
+            obj.tagValidator = TagValidator(hedMaps);
         end % TagValidator
         
         function errors = runHedStringValidator(obj, hedString)
-            errors = obj.checkgroupbrackets(hedString);
-            errors = [errors obj.checkcommas(hedString)];
+            errors = ...
+                obj.tagValidator.checkNumberOfGroupBrackets(hedString);
+            errors = ...
+                [errors obj.tagValidator.checkForMissingCommas(hedString)];
         end % runHedStringValidator
         
         function errors = runTagGroupValidators(obj, tagGroup)
-            errors = obj.checktildes(tagGroup);
+            errors = obj.tagValidator.checkNumberOfGroupTildes(tagGroup);
         end % runTagGroupValidators
         
         function errors = runTagLevelValidators(obj, originalTags, ...
                 formattedTags)
-            errors = obj.checkunique(obj.hedMaps, originalTags, ...
-                formattedTags);
-            errors = [errors obj.checkduplicate(obj.hedMaps, ...
+            errors = obj.tagValidator.checkForMultipleUniquePrefixes(...
+                obj.hedMaps, originalTags, formattedTags);
+            errors = [errors obj.tagValidator.checkduplicate(obj.hedMaps, ...
                 originalTags, formattedTags)];
         end % runTagLevelValidators
         
