@@ -53,7 +53,8 @@ testCase.TestData.validTag = tags{1};
 testCase.TestData.invalidTag = [tags{1} '/sdkfjdksfj'];
 testCase.TestData.validExtensionAllowedTag = ...
     [extensionAllowedTags{1} '/sdkfjdksfj'];
-
+testCase.TestData.noDuplicateTags = {'a','b','c','d'};
+testCase.TestData.duplicateTags = {'a','b','c','d', 'a'};
 end % setupOnce
 
 
@@ -168,6 +169,15 @@ errors = testCase.TestData.tagValidator.checkIfTagIsValid(...
 testCase.verifyEmpty(errors);
 errors = testCase.TestData.tagValidator.checkIfTagIsValid(...
     testCase.TestData.invalidTag, testCase.TestData.invalidTag);
+testCase.verifyNotEmpty(errors);
+end
+
+function checkForDuplicateTagsTest(testCase)
+errors = testCase.TestData.tagValidator.checkForDuplicateTags(...
+    testCase.TestData.noDuplicateTags, testCase.TestData.noDuplicateTags);
+testCase.verifyEmpty(errors);
+errors = testCase.TestData.tagValidator.checkForDuplicateTags(...
+    testCase.TestData.duplicateTags, testCase.TestData.duplicateTags);
 testCase.verifyNotEmpty(errors);
 end
 
