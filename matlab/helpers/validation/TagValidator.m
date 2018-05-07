@@ -28,6 +28,7 @@ classdef TagValidator
         capWarnings = 'cap';
         capExpression = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
         commaError = 'comma';
+        duplicateError = 'duplicate';
         groupBracketError = 'bracket';
         numericalExpression = '<>=.0123456789';
         numericError = 'isNumeric';
@@ -155,6 +156,20 @@ classdef TagValidator
                     groupTagString);
             end
         end % checkNumberOfGroupTildes
+        
+        function errors = checkForDuplicateTags(obj, originalTags, ...
+                formattedTags)
+            % Check for duplicate tags on the same level or group.
+            errors = '';
+            numOfTags = length(formattedTags);
+            for tagIndex = 1:numOfTags
+                if sum(ismember(formattedTags, ...
+                        formattedTags{tagIndex})) > 1
+                    errors = errorReporter(obj.duplicateError, 'tag', ...
+                        originalTags{tagIndex});
+                end
+            end
+        end % checkForDuplicateTags
         
         function errors = checkForMultipleUniquePrefixes(obj, ...
                 formattedTags)
