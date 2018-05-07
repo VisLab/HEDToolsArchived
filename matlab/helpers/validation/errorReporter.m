@@ -83,6 +83,9 @@ switch(errorType)
     case 'column'
         error = sprintf('Issues in row %s column %s:\n', ...
             num2str(p.errorRow), num2str(p.errorColumn));
+    case 'required'
+        error = sprintf(['\tERROR: Tag with prefix "%s" is' ...
+            ' required\n'], p.tagPrefix);
     case 'requireChild'
         error = sprintf('\tERROR: Descendant tag required - "%s"\n', ...
             p.tag);
