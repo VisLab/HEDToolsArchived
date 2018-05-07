@@ -54,20 +54,20 @@ classdef TagValidator
             hedMaps = obj.hedMaps;
         end % getHedMaps
         
-        function warnings = checkPathNameCaps(obj, originalTag)
+        function issues = checkPathNameCaps(obj, originalTag)
             % Returns true if the tag path isn't correctly capitalized
-            warnings = '';
+            issues = '';
             if checkIfParentTagTakesValue(obj, originalTag)
                 return;
             elseif invalidCapsFoundInTag(obj, originalTag)
-                warnings = warningReporter(obj.capWarnings, 'tag', ...
+                issues = warningReporter(obj.capWarnings, 'tag', ...
                     originalTag);
             end
         end % checkPathNameCaps
         
-        function errors = checkForMissingCommas(obj, hedString)
+        function issues = checkForMissingCommas(obj, hedString)
             % Checks for missing commas in a HED string.
-            errors = '';
+            issues = '';
             currentTag = '';
             lastNonEmptyCharacter = '';
             hedStringLength = length(hedString);
@@ -89,13 +89,13 @@ classdef TagValidator
                     elseif obj.commaMissingBeforeOpeningBracket(...
                             lastNonEmptyCharacter, character)
                         currentTag = strtrim(currentTag(1:end-1));
-                        errors = errorReporter(obj.commaError, 'tag', ...
+                        issues = errorReporter(obj.commaError, 'tag', ...
                             currentTag);
                         break;
                     elseif obj.commaIsMissingAfterClosingBracket(...
                             lastNonEmptyCharacter, character)
                         currentTag = strtrim(currentTag(1:end-1));
-                        errors = errorReporter(obj.commaError, 'tag', ...
+                        issues = errorReporter(obj.commaError, 'tag', ...
                             currentTag);
                         break;
                     end
@@ -105,34 +105,34 @@ classdef TagValidator
             end
         end % checkForMissingCommas
         
-        function errors = checkNumberOfGroupBrackets(obj, hedString)
+        function issues = checkNumberOfGroupBrackets(obj, hedString)
             % Checks the number of group brackets in a HED string are
             % equal.
-            errors = '';
+            issues = '';
             numberOfOpeningBrackets = length(strfind(hedString, '('));
             numberOfClosingBrackets = length(strfind(hedString, ')'));
             if numberOfOpeningBrackets ~= numberOfClosingBrackets
-                errors = errorReporter(obj.groupBracketError, ...
+                issues = errorReporter(obj.groupBracketError, ...
                     'openingBracketCount', numberOfOpeningBrackets, ...
                     'closingBracketCount', numberOfClosingBrackets);
             end
         end % checkNumberOfGroupBrackets
         
-        function errors = checkIfTagRequiresAChild(obj, originalTag, ...
+        function issues = checkIfTagRequiresAChild(obj, originalTag, ...
                 formattedTag)
             % Checks if the tag requires a child
-            errors = '';
+            issues = '';
             if obj.hedMaps.requireChild.isKey(lower(formattedTag))
-                errors = errorReporter(obj.requireChildError, 'tag', ...
+                issues = errorReporter(obj.requireChildError, 'tag', ...
                     originalTag);
             end
         end % checkIfTagRequiresAChild
         
-        function warnings = checkIfRequiredTagsPresent(obj, ...
-                formattedTopLevelTags)
+        function issues = checkIfRequiredTagsPresent(obj, ...
+                formattedTopLevelTags, missingRequiredTagsAreErrors)
             % Checks to see if the required tags are present at the
             % top-level.
-            warnings = '';
+            issues = '';
             requiredTags = obj.hedMaps.required.values();
             numRequiredTags = length(requiredTags);
             for requiredTagIndex = 1:numRequiredTags
@@ -140,42 +140,47 @@ classdef TagValidator
                     TagValidator.findIndicesThatBeginWithPrefix(...
                     formattedTopLevelTags, requiredTags{requiredTagIndex});
                 if sum(indicesFoundInTopLevel) == 0
-                    warnings = warningReporter(obj.requiredError, ...
-                        'tagPrefix', requiredTags{requiredTagIndex});
+                    if missingRequiredTagsAreErrors
+                        issues = errorReporter(obj.requiredError, ...
+                            'tagPrefix', requiredTags{requiredTagIndex});
+                    else
+                        issues = warningReporter(obj.requiredError, ...
+                            'tagPrefix', requiredTags{requiredTagIndex});
+                    end
                 end
             end
         end % checkIfRequiredTagsPresent
         
-        function errors = checkNumberOfGroupTildes(obj, originalGroupTags)
+        function issues = checkNumberOfGroupTildes(obj, originalGroupTags)
             % Checks the number of tildes in a group are less than or equal
             % to 2.
-            errors = '';
+            issues = '';
             if sum(strncmp('~', originalGroupTags, 1)) > 2
                 groupTagString = vTagList.stringify(originalGroupTags);
-                errors = errorReporter(obj.tildeError, 'tag', ...
+                issues = errorReporter(obj.tildeError, 'tag', ...
                     groupTagString);
             end
         end % checkNumberOfGroupTildes
         
-        function errors = checkForDuplicateTags(obj, originalTags, ...
+        function issues = checkForDuplicateTags(obj, originalTags, ...
                 formattedTags)
             % Check for duplicate tags on the same level or group.
-            errors = '';
+            issues = '';
             numOfTags = length(formattedTags);
             for tagIndex = 1:numOfTags
                 if sum(ismember(formattedTags, ...
                         formattedTags{tagIndex})) > 1
-                    errors = errorReporter(obj.duplicateError, 'tag', ...
+                    issues = errorReporter(obj.duplicateError, 'tag', ...
                         originalTags{tagIndex});
                 end
             end
         end % checkForDuplicateTags
         
-        function errors = checkForMultipleUniquePrefixes(obj, ...
+        function issues = checkForMultipleUniquePrefixes(obj, ...
                 formattedTags)
             % Looks for two or more tags that are descendants of a unique
             % tag
-            errors = '';
+            issues = '';
             uniqueTags = obj.hedMaps.unique.values();
             numUniqueTags = length(uniqueTags);
             for uniqueTagsIndex = 1:numUniqueTags
@@ -183,16 +188,16 @@ classdef TagValidator
                     uniqueTags{uniqueTagsIndex}, ...
                     length(uniqueTags{uniqueTagsIndex}));
                 if sum(foundIndexes) > 1
-                    errors = errorReporter(obj.uniqueError, ...
+                    issues = errorReporter(obj.uniqueError, ...
                         'tagPrefix', uniqueTags{uniqueTagsIndex});
                 end
             end
         end % checkForMultipleUniquePrefixes
         
-        function warnings = checkUnitClassTagForWarnings(obj, ...
+        function issues = checkUnitClassTagForWarnings(obj, ...
                 originalTag, formattedTag)
             % Checks for warnings in a unit class tag.
-            warnings = '';
+            issues = '';
             [isUnitClass, unitClassFormatTag] = obj.isUnitClassTag(...
                 formattedTag);
             if isUnitClass
@@ -202,17 +207,17 @@ classdef TagValidator
                     obj.hedMaps.default(lower(unitClasses{1}));
                 numericalTagValue = TagValidator.getTagName(formattedTag);
                 if TagValidator.isValidNumericalString(numericalTagValue)
-                    warnings = warningReporter(obj.unitClassWarning, ...
+                    issues = warningReporter(obj.unitClassWarning, ...
                         'defaultUnit', unitClassDefault, 'tag', ...
                         originalTag);
                 end
             end
         end % checkUnitClassTagForWarnings
         
-        function errors = checkUnitClassTagForErrors(obj, originalTag, ...
+        function issues = checkUnitClassTagForErrors(obj, originalTag, ...
                 formattedTag)
             % Checks for errors in a unit class tag.
-            errors = '';
+            issues = '';
             [isUnitClass, unitClassFormatTag] = obj.isUnitClassTag(...
                 formattedTag);
             if isUnitClass
@@ -221,34 +226,34 @@ classdef TagValidator
                 unitsRegexp = TagValidator.buildUnitsRegexp(units);
                 if isempty(regexpi(unitClassTagValue, unitsRegexp)) && ...
                         ~TagValidator.isValidTimeString(unitClassTagValue)
-                    errors = errorReporter(obj.unitClassError, 'tag', ...
+                    issues = errorReporter(obj.unitClassError, 'tag', ...
                         originalTag,  'unitClassUnits', units);
                 end
             end
         end % checkUnitClassTagForErrors
         
-        function errors = checkIfValidNumericalTag(obj, originalTag, ...
+        function issues = checkIfValidNumericalTag(obj, originalTag, ...
                 formattedTag)
             % Checks if the tag is valid if it has the isNumeric attribute.
-            errors = '';
+            issues = '';
             isNumeric = isNumericTag(obj, formattedTag);
             if isNumeric
                 numericalTagValue = TagValidator.getTagName(formattedTag);
                 if ~TagValidator.isValidNumericalString(numericalTagValue)
-                    errors = errorReporter(obj.numericError, 'tag', ...
+                    issues = errorReporter(obj.numericError, 'tag', ...
                         originalTag);
                 end
             end
         end % checkIfValidNumericalTag
         
-        function errors = checkIfTagIsValid(obj, originalTag, formattedTag)
+        function issues = checkIfTagIsValid(obj, originalTag, formattedTag)
             % Checks if the tag is valid.
-            errors = '';
+            issues = '';
             if ~obj.isTilde(formattedTag) && ...
                     ~obj.isAValidTag(formattedTag) && ...
                     ~obj.checkIfParentTagTakesValue(formattedTag) && ...
                     ~obj.isExtensionTag(formattedTag)
-                errors = errorReporter(obj.validError, 'tag', ...
+                issues = errorReporter(obj.validError, 'tag', ...
                     originalTag);
             end
         end % checkIfTagIsValid
