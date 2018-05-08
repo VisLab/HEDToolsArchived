@@ -141,11 +141,13 @@ classdef TagValidator
                     formattedTopLevelTags, requiredTags{requiredTagIndex});
                 if sum(indicesFoundInTopLevel) == 0
                     if missingRequiredTagsAreErrors
-                        issues = errorReporter(obj.requiredError, ...
-                            'tagPrefix', requiredTags{requiredTagIndex});
+                        issues = [issues ...
+                            errorReporter(obj.requiredError, ...
+                            'tagPrefix', requiredTags{requiredTagIndex})];
                     else
-                        issues = warningReporter(obj.requiredError, ...
-                            'tagPrefix', requiredTags{requiredTagIndex});
+                        issues = [issues ...
+                            warningReporter(obj.requiredError, ...
+                            'tagPrefix', requiredTags{requiredTagIndex})];
                     end
                 end
             end
@@ -194,9 +196,9 @@ classdef TagValidator
             end
         end % checkForMultipleUniquePrefixes
         
-        function issues = checkUnitClassTagForWarnings(obj, ...
+        function issues = checkUnitClassTagHasUnits(obj, ...
                 originalTag, formattedTag)
-            % Checks for warnings in a unit class tag.
+            % Checks to see if the unit class tags has units.
             issues = '';
             [isUnitClass, unitClassFormatTag] = obj.isUnitClassTag(...
                 formattedTag);
@@ -212,10 +214,10 @@ classdef TagValidator
                         originalTag);
                 end
             end
-        end % checkUnitClassTagForWarnings
+        end % checkUnitClassTagHasUnits
         
-        function issues = checkUnitClassTagForErrors(obj, originalTag, ...
-                formattedTag)
+        function issues = checkUnitClassTagHasValidUnits(obj, ...
+                originalTag, formattedTag)
             % Checks for errors in a unit class tag.
             issues = '';
             [isUnitClass, unitClassFormatTag] = obj.isUnitClassTag(...
