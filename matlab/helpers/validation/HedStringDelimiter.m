@@ -61,6 +61,10 @@ classdef HedStringDelimiter
         topLevelTags;
         groupTags;
         uniqueTags;
+        formattedTags;
+        formattedTopLevelTags;
+        formattedGroupTags;
+        formattedUniqueTags;
     end % Private properties
     
     methods
@@ -68,27 +72,75 @@ classdef HedStringDelimiter
         function obj = HedStringDelimiter(hedString)
             % HedStringDelimiter constructor
             obj.tags = hed2cell(hedString, false);
-            obj.topLevelTags = tags(cellfun(@ischar, tags));
-            obj.groupTags = getGroupTags({}, tags);
-            obj.uniqueTags = getUniqueTags(tags);
+            obj.topLevelTags = obj.tags(cellfun(@ischar, obj.tags));
+            obj.groupTags = obj.findGroupTags({}, obj.tags);
+            obj.uniqueTags = obj.findUniqueTags(obj.tags);
+            obj.formattedTags = hed2cell(hedString, true);
+            obj.formattedTopLevelTags = obj.tags(cellfun(@ischar, ...
+                obj.formattedTags));
+            obj.formattedGroupTags = obj.findGroupTags({}, ...
+                obj.formattedTags);
+            obj.formattedUniqueTags = obj.findUniqueTags(obj.formattedTags);
         end % HedStringDelimiter
+        
+        function tags = getTags(obj)
+            % Gets the tags
+            tags = obj.tags;
+        end % getTags
+        
+        function topLevelTags = getTopLevelTags(obj)
+            % Gets the top-level tags
+            topLevelTags = obj.topLevelTags;
+        end % getTopLevelTags
+        
+        function groupTags = getGroupTags(obj)
+            % Gets the group tags
+            groupTags = obj.groupTags;
+        end % groupTags
+        
+        function uniqueTags = getUniqueTags(obj)
+            % Gets the unique tags
+            uniqueTags = obj.uniqueTags;
+        end % getUniqueTags
+        
+        
+                function formattedTags = getFormattedTags(obj)
+            % Gets the formatted tags
+            formattedTags = obj.formattedTags;
+        end % getFormattedTags
+        
+        function formattedTopLevelTags = getFormattedTopLevelTags(obj)
+            % Gets the formatted top-level tags
+            formattedTopLevelTags = obj.formattedTopLevelTags;
+        end % getFormattedTopLevelTags
+        
+        function formattedGroupTags = getFormattedGroupTags(obj)
+            % Gets the formatted group tags
+            formattedGroupTags = obj.formattedGroupTags;
+        end % getFormattedGroupTags
+        
+        function formattedUniqueTags = getFormattedUniqueTags(obj)
+            % Gets the formattted unique tags
+            formattedUniqueTags = obj.formattedUniqueTags;
+        end % getFormattedUniqueTags
         
     end % Public methods
     
     methods(Access=private)
         
         
-        function uniqueTags = getUniqueTags(tags)
-            % Gets all unique tags in a cell array
-            [uniqueTags, nestedCellsPresent] = unNestGroupTags(tags);
+        function uniqueTags = findUniqueTags(obj, tags)
+            % Finds all unique tags in a cell array
+            [uniqueTags, nestedCellsPresent] = obj.unnestGroupTags(tags);
             while nestedCellsPresent
-                [uniqueTags, nestedCellsPresent] = unNestGroupTags(uniqueTags);
+                [uniqueTags, nestedCellsPresent] = ...
+                    unNestGroupTags(uniqueTags);
             end
             uniqueTags = unique(uniqueTags);
         end % getAllUniqueTags
         
-        function groups = getGroupTags(groups, tags)
-            % Gets all tag groups in cell array
+        function groups = findGroupTags(obj, groups, tags)
+            % Finds all tag groups in cell array
             numTags = length(tags);
             for tagIndex = 1:numTags
                 if iscellstr(tags{tagIndex})
@@ -100,7 +152,7 @@ classdef HedStringDelimiter
             end
         end % getAllGroups
         
-        function [tags, nestedCellsPresent] = unNestGroupTags(tags)
+        function [tags, nestedCellsPresent] = unnestGroupTags(obj, tags)
             % Unest group tags in cell array
             if ~iscellstr(tags)
                 tags = [tags{:}];
