@@ -44,12 +44,17 @@ function hedMaps = getHedMaps(varargin)
 inputArgs = parseInputArguments(varargin{:});
 hedMaps = loadHedMaps();
 mapVersion = hedMaps.version;
-if ~isempty(inputArgs.hedXml)
+if hedXmlFileExist(inputArgs.hedXml) 
     xmlVersion = getxmlversion(inputArgs.hedXml);
     if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion)
         hedMaps = mapattributes(p.HedXml);
     end
 end
+
+    function fileExist = hedXmlFileExist(hedXml)
+        % Returns true if the HED XML file exists. False, if otherwise.
+        fileExist = ~isempty(hedXml) && exist(hedXml, 'file') == 2;
+    end % hedXmlFileExist
 
     function hedMaps = loadHedMaps()
         % Loads a structure that contains Maps associated with the HED XML
@@ -61,7 +66,7 @@ end
     function inputArgs = parseInputArguments(varargin)
         % Parses the input arguments and returns them in a structure
         parser = inputParser();
-        parser.addOptional('hedXml',  '', @(x) ~isempty(x) && ischar(x));
+        parser.addOptional('hedXml',  '', @ischar);
         parser.parse(varargin{:});
         inputArgs = parser.Results;
     end % parseInputArguments
