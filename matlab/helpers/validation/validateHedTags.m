@@ -17,6 +17,11 @@
 %
 % Optional:
 %
+%   'missingRequiredTagsAreErrors'
+%                   If true, treat missing required tags as a warning. If
+%                   false (default). treat missing required tags as a
+%                   error.
+%
 %   'specificColumns'
 %                   A scalar structure used to specify the specific tag
 %                   columns. The fieldnames need to be category
@@ -76,23 +81,106 @@
 
 function issues = validateHedTags(hedTagsInput, varargin)
 inputArgs = parseInputArguments(hedTagsInput, varargin{:});
-hedFileExtension = HedFileExtension(inputArgs.spreadsheetPath);
+hedMaps = getHedMaps(inputArgs.hedXml);
+inputArgs.tagValidatorRunner = TagValidatorRunner(hedMaps);
+hedFileExtension = HedFileExtension(inputArgs.hedTagsInput);
 if hedFileExtension.hasSpreadsheetExtension
-    issues = validateHedTagsInSpreadsheet();
+    issues = validateHedTagsInSpreadsheet(inputArgs);
 else
-    issues = validateHedTagsInString();
+    issues = validateHedTagsInString(inputArgs);
 end
-hedTags = reportValidationIssues(inputArgs);
+
+    function validateRowHedTags(rowHedTags, rowNumber, tagColumns)
+        numTagColumns = length(tagColumns);
+        for tagColumnIndex = 1:numTagColumns
+            
+            
+        end
+    end
+
+    function validateRowColumnHedTags()
+        
+    end
+
 
     function issues = validateHedTagsInSpreadsheet(inputArgs)
         % Validates the HED tags in a spreadsheet
         rowsArray = putSpreadSheetRowsInCellArray(inputArgs.hedTagsInput, ...
-            inputArgs.worksheet)
+            inputArgs.worksheet);
+        rowCount = size(rowsArray, 1);
+        columnCount = size(rowsArray, 2);
+        tagColumns = getSpreadsheetTagColumns(inputArgs.otherColumns, ...
+            inputArgs.specificColumns, columnCount);
+        for rowIndex = 1:rowCount
+            
+        end
     end % validateHedTagsInSpreadsheet
 
-    function issues = validateHedTagsInString()
+    function tags = splitHedTagsIntoCellArraysByLevel(tags, hedString)
+        % Split the HED string tags into cell arrays containing the
+        % top-level tags, group tags, and all the tags within a structure
+        tags.allTags = hed2cell(lower(hedString), true);
+        tags.topLevelTags = tags.allTags(cellfun(@ischar, tags.allTags));
+        tags.groupTags = tags.allTags(cellfun(@iscell, tags.allTags));
+        if ~iscellstr(tags.allTags)
+            tags.allTags = [tags.allTags{:}];
+        end
+    end % splitHedTagsIntoCellsByLevel
+
+    function issues = validateHedTagsInString(inputArgs)
         % Validates the HED tags in a string
+        hedStringDelimiter = HedStringDelimiter(inputArgs.hedTagsInput);
+        issues = inputArgs.tagValidatorRunner.runHedStringValidator(...
+            inputArgs.hedTagsInput);
+        if isempty(issues)
+            issues = validateTopLevelTags(inputArgs, ...
+                hedStringDelimiter, issues);
+            issues = validateTagLevelTags(inputArgs, ...
+                hedStringDelimiter, issues);
+            issues = validateTagGroups(inputArgs, hedStringDelimiter, ...
+                issues);
+        end
     end % validateHedTagsInString
+
+    function issues = validateTopLevelTags(inputArgs, ...
+            hedStringDelimiter, issues)
+        % Validates the top-level tags
+        formattedTopLevelTags = ...
+            hedStringDelimiter.getFormattedTopLevelTags();
+        issues = [issues ...
+            inputArgs.tagValidatorRunner.runTopLevelValidators(...
+            formattedTopLevelTags, inputArgs.missingRequiredTagsAreErrors)];
+    end % validateTopLevelTags
+
+    function issues = validateTagGroups(inputArgs, hedStringDelimiter, issues)
+        % Validates the top-level tags
+        groupTags = hedStringDelimiter.getGroupTags();
+        issues = [issues ...
+            inputArgs.tagValidatorRunner.runTagGroupValidators(...
+            groupTags)];
+    end % validateTagGroups
+
+    function issues = validateTagLevelTags(inputArgs, ...
+            hedStringDelimiter, issues)
+        % Validates tags at each level
+        topLevelTags = ...
+            hedStringDelimiter.getTopLevelTags();
+        formattedTopLevelTags = ...
+            hedStringDelimiter.getFormattedTopLevelTags();
+        issues = [issues ...
+            inputArgs.tagValidatorRunner.runTagLevelValidators(...
+            topLevelTags, formattedTopLevelTags)];
+        groupTags = ...
+            hedStringDelimiter.getGroupTags();
+        formattedGroupTags = ...
+            hedStringDelimiter.getFormattedGroupTags();
+        numGroup = length(groupTags);
+        for groupIndex = 1:numGroup
+            issues = [issues ...
+                inputArgs.tagValidatorRunner.runTagLevelValidators(...
+                groupTags{groupIndex}, formattedGroupTags{groupIndex})];
+        end
+    end % validateTopLevelTags
 
     function inputArguments = parseInputArguments(hedtags, varargin)
         % Parses the input arguments and returns them in a structure
@@ -100,7 +188,10 @@ hedTags = reportValidationIssues(inputArgs);
         parser.addRequired('hedTagsInput', @ischar);
         parser.addParamValue('generateWarnings', false, @islogical);
         parser.addParamValue('hasHeaders', true, @islogical);
+        parser.addParamValue('hedXml',  '', @(x) ~isempty(x) && ischar(x));
         parser.addParamValue('otherColumns', [], @isnumeric);
+        parser.addParamValue('missingRequiredTagsAreErrors', false, ...
+            @islogical);
         parser.addParamValue('specificColumns', [], @isstruct);
         parser.addParamValue('worksheetName', '', @ischar);
         parser.parse(hedtags, varargin{:});
