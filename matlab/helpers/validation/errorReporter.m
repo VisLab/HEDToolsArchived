@@ -106,8 +106,10 @@ end
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('errorType',  @(x) ~isempty(x) && ischar(x));
-        p.addParamValue('errorRow', 1, @(x) ~isempty(x) && isdouble(x));
-        p.addParamValue('errorColumn', 1, @(x) ~isempty(x) && isdouble(x));
+        p.addParamValue('errorRow', 1, @(x) ~isempty(x) && isa(x, ...
+            'double'));
+        p.addParamValue('errorColumn', 1, @(x) ~isempty(x) && isa(x, ...
+            'double'));
         p.addParamValue('previousTag', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('tag', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('tagPrefix', '', @(x)  ~isempty(x) && ischar(x));
