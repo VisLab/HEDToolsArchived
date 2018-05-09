@@ -42,7 +42,7 @@
 %                   in the log file.
 %
 %   'hasHeaders'
-%                   True (default) if the workbook worksheet has headers.
+%                   True (default) if the spreadsheet has headers.
 %                   The first row will not be validated otherwise it will
 %                   and this can generate errors.
 %
@@ -90,47 +90,94 @@ else
     issues = validateHedTagsInString(inputArgs);
 end
 
-    function validateRowHedTags(rowHedTags, rowNumber, tagColumns)
-        numTagColumns = length(tagColumns);
-        for tagColumnIndex = 1:numTagColumns
-            
-            
+    function issues = validateRowHedTags(inputArgs, rowHedString, ...
+            rowNumber)
+        % Validates the HED tags in a spreadsheet row.
+        issues = '';
+        hedStringDelimiter = HedStringDelimiter(rowHedString);
+        issues = validateTopLevelTags(inputArgs, hedStringDelimiter, ...
+            issues);
+        issues = validateTagLevelTags(inputArgs, hedStringDelimiter, ...
+            issues);
+        if ~isempty(issues)
+            issues = generateRowIssueMessage(rowNumber, issues);
         end
-    end
+    end % validateRowHedTags
 
-    function generateRowIssueMessage()
+    function issues = validateRowColumnHedTags(inputArgs, ...
+            rowColumnHedString, rowNumber, columnNumber)
+        % Validates the HED tags in a spreadsheet row.
+        hedStringDelimiter = HedStringDelimiter(rowColumnHedString);
+        issues = inputArgs.tagValidatorRunner.runHedStringValidator(...
+            inputArgs.hedTagsInput);
+        if isempty(issues)
+            issues = validateIndividualTags(inputArgs, ...
+                hedStringDelimiter, issues);
+            issues = validateTagGroups(inputArgs, hedStringDelimiter, ...
+                issues);
+            if ~isempty(issues)
+                issues = generateRowColumnIssueMessage(rowNumber, ...
+                    columnNumber, issues);
+            end
+        end
+    end % validateRowHedTags
+
+    function issue = generateRowIssueMessage(rowNumber, issues)
         % Generates a row issue
-        
+        issue = [errorReporter('row', 'errorRow', rowNumber) issues];
     end % generateRowIssueMessage
 
-    function validateRowColumnHedTags()
-        
-    end
-
+    function issue = generateRowColumnIssueMessage(rowNumber, ...
+            columnNumber, issues)
+        % Generates a row issue
+        issue = [errorReporter('column', 'errorRow', rowNumber, ...
+            'errorColumn', columnNumber) issues];
+    end % generateRowIssueMessage
 
     function issues = validateHedTagsInSpreadsheet(inputArgs)
         % Validates the HED tags in a spreadsheet
-        rowsArray = putSpreadSheetRowsInCellArray(inputArgs.hedTagsInput, ...
-            inputArgs.worksheet);
-        rowCount = size(rowsArray, 1);
+        rowsArray = putSpreadSheetRowsInCellArray(...
+            inputArgs.hedTagsInput, 'worksheetName', ...
+            inputArgs.worksheetName);
+        rowsArray = appendHedTagPrefixes(rowsArray, ...
+            inputArgs.specificColumns);
         columnCount = size(rowsArray, 2);
         tagColumns = getSpreadsheetTagColumns(inputArgs.otherColumns, ...
             inputArgs.specificColumns, columnCount);
-        for rowIndex = 1:rowCount
-            
-        end
+        issues = validateHedTagsInSpreadsheetRows(inputArgs, rowsArray, ...
+            tagColumns);
     end % validateHedTagsInSpreadsheet
 
-    function tags = splitHedTagsIntoCellArraysByLevel(tags, hedString)
-        % Split the HED string tags into cell arrays containing the
-        % top-level tags, group tags, and all the tags within a structure
-        tags.allTags = hed2cell(lower(hedString), true);
-        tags.topLevelTags = tags.allTags(cellfun(@ischar, tags.allTags));
-        tags.groupTags = tags.allTags(cellfun(@iscell, tags.allTags));
-        if ~iscellstr(tags.allTags)
-            tags.allTags = [tags.allTags{:}];
+    function startingRow = getStartingRow(inputArgs)
+        % Gets the starting row number for validation. If headers are
+        % present then the validation skips the first row. 
+        startingRow = 1;
+        if inputArgs.hasHeaders
+          startingRow = 2;  
         end
-    end % splitHedTagsIntoCellsByLevel
+    end % getStartingRow
+
+    function issues = validateHedTagsInSpreadsheetRows(inputArgs, ...
+            rowsArray, tagColumns)
+        % Validates the HED tags in each row of the spreadsheet.
+        issues = '';
+        rowCount = size(rowsArray, 1);
+        tagColumnCount = length(tagColumns);
+        startingRow = getStartingRow(inputArgs);
+        for rowIndex = startingRow:rowCount
+            rowHedString = concatHedTagsInCellArray(...
+                rowsArray(rowIndex, :), tagColumns);
+            issues = [issues ...
+                validateRowHedTags(inputArgs, rowHedString, rowIndex)];
+            for tagColumnIndex = 1:tagColumnCount
+                rowColumnHedString = rowsArray{rowIndex, ...
+                    tagColumns(tagColumnIndex)};
+                issues = [issues validateRowColumnHedTags(inputArgs, ...
+                    rowColumnHedString, rowIndex, ...
+                    tagColumns(tagColumnIndex))];
+            end
+        end
+    end % validateHedTagsInSpreadsheetRows
 
     function issues = validateHedTagsInString(inputArgs)
         % Validates the HED tags in a string
@@ -160,7 +207,8 @@ end
             inputArgs.missingRequiredTagsAreErrors)];
     end % validateTopLevelTags
 
-    function issues = validateTagGroups(inputArgs, hedStringDelimiter, issues)
+    function issues = validateTagGroups(inputArgs, hedStringDelimiter, ...
+            issues)
         % Validates the top-level tags
         groupTags = hedStringDelimiter.getGroupTags();
         issues = [issues ...
@@ -214,7 +262,7 @@ end
         parser.addParamValue('otherColumns', [], @isnumeric);
         parser.addParamValue('missingRequiredTagsAreErrors', true, ...
             @islogical);
-        parser.addParamValue('specificColumns', [], @isstruct);
+        parser.addParamValue('specificColumns', struct, @isstruct);
         parser.addParamValue('worksheetName', '', @ischar);
         parser.parse(hedtags, varargin{:});
         inputArguments = parser.Results;
