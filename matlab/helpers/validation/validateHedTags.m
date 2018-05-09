@@ -98,6 +98,11 @@ end
         end
     end
 
+    function generateRowIssueMessage()
+        % Generates a row issue
+        
+    end % generateRowIssueMessage
+
     function validateRowColumnHedTags()
         
     end
@@ -139,6 +144,8 @@ end
                 hedStringDelimiter, issues);
             issues = validateTagGroups(inputArgs, hedStringDelimiter, ...
                 issues);
+            issues = validateIndividualTags(inputArgs, ...
+                hedStringDelimiter, issues);
         end
     end % validateHedTagsInString
 
@@ -149,7 +156,8 @@ end
             hedStringDelimiter.getFormattedTopLevelTags();
         issues = [issues ...
             inputArgs.tagValidatorRunner.runTopLevelValidators(...
-            formattedTopLevelTags, inputArgs.missingRequiredTagsAreErrors)];
+            formattedTopLevelTags, inputArgs.generateWarnings, ...
+            inputArgs.missingRequiredTagsAreErrors)];
     end % validateTopLevelTags
 
     function issues = validateTagGroups(inputArgs, hedStringDelimiter, issues)
@@ -158,6 +166,20 @@ end
         issues = [issues ...
             inputArgs.tagValidatorRunner.runTagGroupValidators(...
             groupTags)];
+    end % validateTagGroups
+
+    function issues = validateIndividualTags(inputArgs, ...
+            hedStringDelimiter, issues)
+        % Validates the top-level tags
+        tags = hedStringDelimiter.getTags();
+        formattedTags = hedStringDelimiter.getFormattedTags();
+        numTags = length(tags);
+        for tagIndex = 1:numTags
+            issues = [issues ...
+                inputArgs.tagValidatorRunner.runIndividualTagValidators(...
+                tags{tagIndex}, formattedTags{tagIndex}, ...
+                inputArgs.generateWarnings)];
+        end
     end % validateTagGroups
 
     function issues = validateTagLevelTags(inputArgs, ...
@@ -190,7 +212,7 @@ end
         parser.addParamValue('hasHeaders', true, @islogical);
         parser.addParamValue('hedXml',  '', @(x) ~isempty(x) && ischar(x));
         parser.addParamValue('otherColumns', [], @isnumeric);
-        parser.addParamValue('missingRequiredTagsAreErrors', false, ...
+        parser.addParamValue('missingRequiredTagsAreErrors', true, ...
             @islogical);
         parser.addParamValue('specificColumns', [], @isstruct);
         parser.addParamValue('worksheetName', '', @ischar);
