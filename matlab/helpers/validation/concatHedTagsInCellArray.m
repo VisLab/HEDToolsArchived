@@ -48,7 +48,7 @@ hedString = strjoin(hedTagArray(nonEmptyTagIndices), ',');
     function parsedArguments = parseInputArguments(hedTagArray, tagColumns)
         % Parses the input arguments and returns them in a structure
         parser = inputParser();
-        parser.addRequired('hedTagArray', @iscellstr);
+        parser.addRequired('hedTagArray', @iscell);
         parser.addRequired('tagColumns', @isvector);
         parser.parse(hedTagArray, tagColumns);
         parsedArguments = parser.Results;
