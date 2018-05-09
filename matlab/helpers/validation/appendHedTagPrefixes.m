@@ -27,6 +27,13 @@
 %                   specificColumns.description = 3;
 %                   specificColumns.label = 4;
 %
+% (Optional)
+%
+%   'hasHeaders'
+%                   True (default) if the spreadsheet has headers.
+%                   The first row will not be validated otherwise it will
+%                   and this can generate errors.
+%
 % Output:
 %
 %   hedTagArray
@@ -52,27 +59,34 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function rowsArray = appendHedTagPrefixes(rowsArray, specificColumns)
+function rowsArray = appendHedTagPrefixes(rowsArray, specificColumns, ...
+    varargin)
 SPECIFIC_COLUMN_NAMES = {'long','description','label','category'};
 SPECIFIC_COLUMN_PREFIXES = {'Event/Long name/','Event/Description/', ...
     'Event/Label/','Event/Category/'};
-parseInputArguments(rowsArray, specificColumns);
+inputArgs = parseInputArguments(rowsArray, specificColumns);
 tagPrefixMap = createTagPrefixMap(specificColumns);
-rowsArray = appendPrefixesToSpecificColumns(rowsArray, tagPrefixMap);
+rowsArray = appendPrefixesToSpecificColumns(inputArgs, rowsArray, ...
+    tagPrefixMap);
 
-    function rowsArray = appendPrefixesToSpecificColumns(rowsArray, ...
-            tagPrefixMap)
+    function rowsArray = appendPrefixesToSpecificColumns(inputArgs, ...
+            rowsArray, tagPrefixMap)
         % Appends HED tag prefixes to specific columns that do not begin
         % with them.
-        numberOfColumns = length(rowsArray);
-        for columnIndex = 1:numberOfColumns
-            if columnNeedsPrefix(tagPrefixMap, columnIndex)
-                columnTags = rowsArray{columnIndex};
-                if ~isempty(columnTags)
-                    prefix = tagPrefixMap(columnIndex);
-                    splitColumnTags = appendPrefixToEveryColumnTag(...
-                        columnTags, prefix);
-                    rowsArray{columnIndex} = strjoin(splitColumnTags, ',');
+        numRows = size(rowsArray, 1);
+        numColumns = size(rowsArray, 2);
+        startingRow = getStartingRow(inputArgs);
+        for rowIndex = startingRow:numRows
+            for columnIndex = 1:numColumns
+                if columnNeedsPrefix(tagPrefixMap, columnIndex)
+                    columnTags = rowsArray{rowIndex, columnIndex};
+                    if ~isempty(columnTags)
+                        prefix = tagPrefixMap(columnIndex);
+                        splitColumnTags = appendPrefixToEveryColumnTag(...
+                            columnTags, prefix);
+                        rowsArray{rowIndex, columnIndex} = ...
+                            strjoin(splitColumnTags, ',');
+                    end
                 end
             end
         end
@@ -120,13 +134,23 @@ rowsArray = appendPrefixesToSpecificColumns(rowsArray, tagPrefixMap);
         end
     end % populateTagPrefixMap
 
+    function startingRow = getStartingRow(inputArgs)
+        % Gets the starting row number for validation. If headers are
+        % present then the validation skips the first row. 
+        startingRow = 1;
+        if inputArgs.hasHeaders
+          startingRow = 2;  
+        end
+    end % getStartingRow
+
     function parsedArguments = parseInputArguments(rowsArray, ...
-            specificColumns)
+            specificColumns, varargin)
         % Parses the input arguments and returns them in a structure
         parser = inputParser();
         parser.addRequired('rowsArray', @iscell);
         parser.addRequired('specificColumns', @isstruct);
-        parser.parse(rowsArray, specificColumns);
+        parser.addParamValue('hasHeaders', true, @islogical);
+        parser.parse(rowsArray, specificColumns, varargin{:});
         parsedArguments = parser.Results;
     end % parseInputArguments
 
