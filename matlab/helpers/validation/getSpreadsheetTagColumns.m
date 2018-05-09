@@ -111,7 +111,8 @@ end
     function specified = tagColumnsAreSpecified(otherColumns, ...
             specificColumns)
         % Returns true if no columns are specified
-        specified = ~isempty(otherColumns) || ~isempty(specificColumns);
+        specified = ~isempty(otherColumns) || ...
+            ~isempty(fieldnames(specificColumns));
     end % tagColumnsAreSpecified
 
 end % getSpreadsheetTagColumns
