@@ -107,7 +107,7 @@ end
         p = inputParser();
         p.addRequired('errorType',  @(x) ~isempty(x) && ischar(x));
         p.addParamValue('errorRow', 1, @(x) ~isempty(x) && isdouble(x));
-        p.addParamValue('error_column', 1, @(x) ~isempty(x) && isdouble(x));
+        p.addParamValue('errorColumn', 1, @(x) ~isempty(x) && isdouble(x));
         p.addParamValue('previousTag', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('tag', '', @(x)  ~isempty(x) && ischar(x));
         p.addParamValue('tagPrefix', '', @(x)  ~isempty(x) && ischar(x));
