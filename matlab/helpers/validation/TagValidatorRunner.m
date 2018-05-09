@@ -1,5 +1,5 @@
 % This class contains an interface for calling underlying validation
-% functions that do the heavy lifting. 
+% functions that do the heavy lifting.
 %
 % Copyright (C) 2015 Jeremy Cockfield jeremy.cockfield@gmail.com and
 % Kay Robbins, UTSA, kay.robbins@utsa.edu
@@ -32,7 +32,7 @@ classdef TagValidatorRunner
         end % TagValidator
         
         function issues = runHedStringValidator(obj, hedString)
-            % Runs HED string validators. 
+            % Runs HED string validators.
             issues = ...
                 obj.tagValidator.checkNumberOfGroupBrackets(hedString);
             issues = ...
@@ -54,23 +54,23 @@ classdef TagValidatorRunner
                 obj.tagValidator.checkIfTagRequiresAChild(...
                 originalTag, formattedTag)];
             if generateWarnings
-            issues = [issues ...
-                obj.tagValidator.checkUnitClassTagHasUnits(...
-                originalTag, formattedTag)];   
-            issues = [issues ...
-                obj.tagValidator.checkPathNameCaps(originalTag)];               
+                issues = [issues ...
+                    obj.tagValidator.checkUnitClassTagHasUnits(...
+                    originalTag, formattedTag)];
+                issues = [issues ...
+                    obj.tagValidator.checkPathNameCaps(originalTag)];
                 
             end
         end % runIndividualTagValidators
         
         function issues = runTagGroupValidators(obj, tagGroup)
-            % Runs the tag group validators 
+            % Runs the tag group validators
             issues = obj.tagValidator.checkNumberOfGroupTildes(tagGroup);
         end % runTagGroupValidators
         
         function issues = runTagLevelValidators(obj, originalTags, ...
                 formattedTags)
-            % Runs the tag level validators. 
+            % Runs the tag level validators.
             issues = obj.tagValidator.checkForMultipleUniquePrefixes(...
                 formattedTags);
             issues = [issues ...
@@ -79,11 +79,16 @@ classdef TagValidatorRunner
         end % runTagLevelValidators
         
         function issues = runTopLevelValidators(obj, ...
-                formattedTopLevelTags, missingRequiredTagsAreErrors)
-            % Runs the top-level tag validators. 
-            issues = obj.tagValidator.checkIfRequiredTagsPresent(...
-                formattedTopLevelTags, ...
-                missingRequiredTagsAreErrors);
+                formattedTopLevelTags, generateWarnings, ...
+                missingRequiredTagsAreErrors)
+            % Runs the top-level tag validators.
+            if ~generateWarnings && ~missingRequiredTagsAreErrors
+                issues = '';
+            else
+                issues = obj.tagValidator.checkIfRequiredTagsPresent(...
+                    formattedTopLevelTags, ...
+                    missingRequiredTagsAreErrors);
+            end
         end % runTopLevelValidators
         
     end % Public methods
