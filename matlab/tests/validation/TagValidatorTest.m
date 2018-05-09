@@ -66,7 +66,7 @@ testCase.verifyEmpty(warnings);
 warnings = testCase.TestData.tagValidator.checkPathNameCaps(...
     testCase.TestData.invalidCapsTag);
 testCase.verifyNotEmpty(warnings);
-end % checkCapsTest
+end % checkPathNameCapsTest
 
 function checkForMissingCommasTest(testCase)
 issues = testCase.TestData.tagValidator.checkForMissingCommas(...
@@ -78,7 +78,7 @@ testCase.verifyNotEmpty(issues);
 issues = testCase.TestData.tagValidator.checkForMissingCommas(...
     testCase.TestData.commaMissingAfterClosingParenthesis);
 testCase.verifyNotEmpty(issues);
-end
+end % checkForMissingCommasTest
 
 function checkNumberOfGroupBracketsTest(testCase)
 issues = testCase.TestData.tagValidator.checkNumberOfGroupBrackets(...
@@ -87,7 +87,7 @@ testCase.verifyEmpty(issues);
 issues = testCase.TestData.tagValidator.checkNumberOfGroupBrackets(...
     testCase.TestData.validGroupWithUnequalBrackets);
 testCase.verifyNotEmpty(issues);
-end
+end % checkNumberOfGroupBracketsTest
 
 function checkIfTagRequiresAChildTest(testCase)
 issues = testCase.TestData.tagValidator.checkIfTagRequiresAChild(...
@@ -98,7 +98,7 @@ issues = testCase.TestData.tagValidator.checkIfTagRequiresAChild(...
     testCase.TestData.invalidRequireChildTag, ...
     testCase.TestData.invalidRequireChildTag);
 testCase.verifyNotEmpty(issues);
-end
+end % checkIfTagRequiresAChildTest
 
 function checkIfRequiredTagsPresentTest(testCase)
 issues = testCase.TestData.tagValidator.checkIfRequiredTagsPresent(...
@@ -107,7 +107,7 @@ testCase.verifyEmpty(issues);
 issues = testCase.TestData.tagValidator.checkIfRequiredTagsPresent(...
     testCase.TestData.formattedTopLevelTagsWithOneRequiredTag, false);
 testCase.verifyNotEmpty(issues);
-end
+end % checkIfRequiredTagsPresentTest
 
 function checkIfValidNumericalTagTest(testCase)
 issues = testCase.TestData.tagValidator.checkIfValidNumericalTag(...
@@ -117,7 +117,7 @@ issues = testCase.TestData.tagValidator.checkIfValidNumericalTag(...
     testCase.TestData.invalidNumericTag, ...
     testCase.TestData.invalidNumericTag);
 testCase.verifyNotEmpty(issues);
-end
+end % checkIfValidNumericalTagTest
 
 function checkUnitClassTagHasUnitsTest(testCase)
 warnings = testCase.TestData.tagValidator.checkUnitClassTagHasUnits(...
@@ -128,7 +128,7 @@ warnings = testCase.TestData.tagValidator.checkUnitClassTagHasUnits(...
     testCase.TestData.validUnitClassTagWithNoUnits, ...
     testCase.TestData.validUnitClassTagWithNoUnits);
 testCase.verifyNotEmpty(warnings);
-end
+end % checkUnitClassTagHasUnitsTest
 
 function checkUnitClassTagHasValidUnitsTest(testCase)
 issues = testCase.TestData.tagValidator.checkUnitClassTagHasValidUnits(...
@@ -139,7 +139,7 @@ issues = testCase.TestData.tagValidator.checkUnitClassTagHasValidUnits(...
     testCase.TestData.unitClassWithInvalidUnits, ...
     testCase.TestData.unitClassWithInvalidUnits);
 testCase.verifyNotEmpty(issues);
-end
+end % checkUnitClassTagHasValidUnitsTest
 
 function checkNumberOfGroupTildesTest(testCase)
 issues = testCase.TestData.tagValidator.checkNumberOfGroupTildes(...
@@ -148,7 +148,7 @@ testCase.verifyEmpty(issues);
 issues = testCase.TestData.tagValidator.checkNumberOfGroupTildes(...
     testCase.TestData.groupWithLessThanMoreThanTwoTildes);
 testCase.verifyNotEmpty(issues);
-end
+end % checkNumberOfGroupTildesTest
 
 function checkForMultipleUniquePrefixesTest(testCase)
 issues = testCase.TestData.tagValidator.checkForMultipleUniquePrefixes(...
@@ -157,7 +157,7 @@ testCase.verifyEmpty(issues);
 issues = testCase.TestData.tagValidator.checkForMultipleUniquePrefixes(...
     testCase.TestData.tagsWithMultipleUniquePrefix);
 testCase.verifyNotEmpty(issues);
-end
+end % checkForMultipleUniquePrefixesTest
 
 function checkIfTagIsValidTest(testCase)
 issues = testCase.TestData.tagValidator.checkIfTagIsValid(...
@@ -170,7 +170,7 @@ testCase.verifyEmpty(issues);
 issues = testCase.TestData.tagValidator.checkIfTagIsValid(...
     testCase.TestData.invalidTag, testCase.TestData.invalidTag);
 testCase.verifyNotEmpty(issues);
-end
+end % checkIfTagIsValidTest
 
 function checkForDuplicateTagsTest(testCase)
 issues = testCase.TestData.tagValidator.checkForDuplicateTags(...
@@ -179,5 +179,5 @@ testCase.verifyEmpty(issues);
 issues = testCase.TestData.tagValidator.checkForDuplicateTags(...
     testCase.TestData.duplicateTags, testCase.TestData.duplicateTags);
 testCase.verifyNotEmpty(issues);
-end
+end % checkForDuplicateTagsTest
 

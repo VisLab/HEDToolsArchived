@@ -11,4 +11,4 @@ end % setupOnce
 function testBasicInput(testCase)
 hedMaps = getHedMaps();
 testCase.assertInstanceOf(hedMaps, 'struct');
-end % testErrorReporter
+end % testBasicInput
