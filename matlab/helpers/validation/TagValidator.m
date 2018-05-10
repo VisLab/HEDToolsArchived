@@ -168,6 +168,8 @@ classdef TagValidator
                 formattedTags)
             % Check for duplicate tags on the same level or group.
             issues = '';
+            formattedTags = ...
+                HedStringDelimiter.removedTildesFromGroup(formattedTags);
             numOfTags = length(formattedTags);
             for tagIndex = 1:numOfTags
                 if sum(ismember(formattedTags, ...
