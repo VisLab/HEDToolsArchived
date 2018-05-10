@@ -219,8 +219,8 @@ end
     function issues = validateIndividualTags(inputArgs, ...
             hedStringDelimiter, issues)
         % Validates the top-level tags
-        tags = hedStringDelimiter.getTags();
-        formattedTags = hedStringDelimiter.getFormattedTags();
+        tags = hedStringDelimiter.getUniqueTags();
+        formattedTags = hedStringDelimiter.getFormattedUniqueTags();
         numTags = length(tags);
         for tagIndex = 1:numTags
             issues = [issues ...
