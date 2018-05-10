@@ -347,11 +347,6 @@ classdef TagValidator
             end
         end % checkIfParentTagTakesValue
         
-        
-        
-        
-        
-        
         function tagIsValid = isValidTagWithParentheses(obj, hedString, ...
                 currentTag, characterIndex)
             % Checks to see if the current tag with the next set of
