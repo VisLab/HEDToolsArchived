@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HED version="6.0.5">
+<HED version="7.0.1">
    <node>
       <name>Event</name>
       <node position="1" predicateType="passThrough" requireChild="true" required="true">
@@ -3042,10 +3042,10 @@
          <name>Backward masking</name>
       </node>
       <node>
-         <name>Balloon analogue risk task</name>
+         <name>Balloon analogue risk task - BART</name>
       </node>
       <node>
-         <name>Behavioral investment allocation strategy</name>
+         <name>Behavioral investment allocation strategy - BIAS</name>
       </node>
       <node>
          <name>Behavioral rating inventory of executive function</name>
@@ -3580,6 +3580,9 @@
          <name>Pseudoword naming task</name>
       </node>
       <node>
+         <name>Psychomotor vigilance task</name>
+      </node>
+      <node>
          <name>Pursuit rotor task</name>
       </node>
       <node>
@@ -3592,10 +3595,10 @@
          <name>Rapid serial object transformation</name>
       </node>
       <node>
-         <name>Reading (Covert)</name>
+         <name>Reading - Covert</name>
       </node>
       <node>
-         <name>Reading (Overt)</name>
+         <name>Reading - Overt</name>
       </node>
       <node>
          <name>Reading paradigm</name>
@@ -3610,10 +3613,10 @@
          <name>Reading span task</name>
       </node>
       <node>
-         <name>Recitation-repetition (Covert)</name>
+         <name>Recitation-repetition - Covert</name>
       </node>
       <node>
-         <name>Recitation-repetition (Overt)</name>
+         <name>Recitation-repetition - Overt</name>
       </node>
       <node>
          <name>Remember-know task</name>
