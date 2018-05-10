@@ -28,6 +28,7 @@ classdef TagValidator
         capWarnings = 'cap';
         capExpression = '^[a-z]|/[a-z]|[^|]\s+[A-Z]';
         commaError = 'comma';
+        commaValidError = 'commaValid';
         duplicateError = 'duplicate';
         groupBracketError = 'bracket';
         numericalExpression = '<>=.0123456789';
@@ -250,15 +251,20 @@ classdef TagValidator
             end
         end % checkIfValidNumericalTag
         
-        function issues = checkIfTagIsValid(obj, originalTag, formattedTag)
+        function issues = checkIfTagIsValid(obj, originalTag, ...
+                formattedTag, previousOriginalTag, previousFormattedTag)
             % Checks if the tag is valid.
             issues = '';
-            if ~obj.isTilde(formattedTag) && ...
-                    ~obj.isAValidTag(formattedTag) && ...
-                    ~obj.checkIfParentTagTakesValue(formattedTag) && ...
-                    ~obj.isExtensionTag(formattedTag)
-                issues = errorReporter(obj.validError, 'tag', ...
-                    originalTag);
+            tagInSchema = obj.tagInSchema(formattedTag);
+            if  ~tagInSchema
+                if obj.previousTagParentTakesValue(previousFormattedTag)
+                    issues = errorReporter(obj.commaValidError, ...
+                        'previousTag', previousOriginalTag, 'tag', ...
+                        originalTag);
+                else
+                    issues = errorReporter(obj.validError, 'tag', ...
+                        originalTag);
+                end
             end
         end % checkIfTagIsValid
         
@@ -277,6 +283,19 @@ classdef TagValidator
     end % Public methods
     
     methods(Access=private)
+        
+        function inSchema = tagInSchema(obj, tag)
+            % Returns true if the tag is in the schema.
+            inSchema = obj.isAValidTag(tag) || obj.isTilde(tag) || ...
+                obj.checkIfParentTagTakesValue(tag) || ...
+                obj.isExtensionTag(tag);
+        end % tagInSchema
+        
+        function takesValue = previousTagParentTakesValue(obj, previousTag)
+            % Returns true if the previous tag parent takes a value.
+            takesValue = ~isempty(previousTag) && ...
+                obj.checkIfParentTagTakesValue(previousTag);
+        end % previousTagParentTakesValue
         
         function isValid = isAValidTag(obj, tag)
             % Returns true if the tag is valid.
@@ -501,8 +520,5 @@ classdef TagValidator
         end % buildUnitsRegexp
         
     end % Static methods
-    
-    
-    
     
 end % TagValidator
