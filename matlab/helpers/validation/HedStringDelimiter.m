@@ -75,12 +75,14 @@ classdef HedStringDelimiter
             obj.topLevelTags = obj.tags(cellfun(@ischar, obj.tags));
             obj.groupTags = obj.findGroupTags({}, obj.tags);
             obj.uniqueTags = obj.findUniqueTags(obj.tags);
-            obj.formattedTags = hed2cell(hedString, true);
-            obj.formattedTopLevelTags = obj.tags(cellfun(@ischar, ...
-                obj.formattedTags));
-            obj.formattedGroupTags = obj.findGroupTags({}, ...
-                obj.formattedTags);
-            obj.formattedUniqueTags = obj.findUniqueTags(obj.formattedTags);
+            obj.formattedTags = ...
+                HedStringDelimiter.putInCanonicalForm(obj.tags);
+            obj.formattedTopLevelTags = ...
+                HedStringDelimiter.putInCanonicalForm(obj.topLevelTags);
+            obj.formattedGroupTags = ...
+                HedStringDelimiter.putInCanonicalForm(obj.groupTags);
+            obj.formattedUniqueTags = ...
+                HedStringDelimiter.putInCanonicalForm(obj.uniqueTags);
         end % HedStringDelimiter
         
         function tags = getTags(obj)
@@ -104,7 +106,7 @@ classdef HedStringDelimiter
         end % getUniqueTags
         
         
-                function formattedTags = getFormattedTags(obj)
+        function formattedTags = getFormattedTags(obj)
             % Gets the formatted tags
             formattedTags = obj.formattedTags;
         end % getFormattedTags
@@ -137,6 +139,8 @@ classdef HedStringDelimiter
                     unNestGroupTags(uniqueTags);
             end
             uniqueTags = unique(uniqueTags);
+            uniqueTags = ...
+                HedStringDelimiter.removedTildesFromGroup(uniqueTags);
         end % getAllUniqueTags
         
         function groups = findGroupTags(obj, groups, tags)
@@ -161,5 +165,27 @@ classdef HedStringDelimiter
         end % unNestGroupTags
         
     end % Private methods
+    
+    methods(Static)
+        
+        function tags = putInCanonicalForm(tags)
+            % Removes slashes and double quotes
+            numTags = length(tags);
+            for a = 1:numTags
+                if iscell(tags{a})
+                    tags{a} = ...
+                        HedStringDelimiter.putInCanonicalForm(tags{a});
+                else
+                    tags{a} = vTagList.getUnsortedCanonical(tags{a});
+                end
+            end
+        end % putInCanonicalForm
+        
+        function group = removedTildesFromGroup(group)
+            % Removes tildes from a group.
+            group = group(~cellfun(@(x) strcmp(x, '~'), group));
+        end % removedTildesFromGroup
+        
+    end % Static methods
     
 end % HedStringDelimiter
