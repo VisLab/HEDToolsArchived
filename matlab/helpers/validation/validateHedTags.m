@@ -223,12 +223,23 @@ end
         formattedTags = hedStringDelimiter.getFormattedUniqueTags();
         numTags = length(tags);
         for tagIndex = 1:numTags
+            previousOriginalTag = getPreviousTag(tags, tagIndex);
+            previousFormattedTag = getPreviousTag(formattedTags, tagIndex);
             issues = [issues ...
                 inputArgs.tagValidatorRunner.runIndividualTagValidators(...
                 tags{tagIndex}, formattedTags{tagIndex}, ...
+                previousOriginalTag, previousFormattedTag, ...
                 inputArgs.generateWarnings)];
         end
     end % validateTagGroups
+
+    function previousTag = getPreviousTag(tags, currentIndex)
+        % Gets the previous tag. 
+        previousTag = '';
+        if currentIndex > 1
+            previousTag = tags{currentIndex-1};
+        end       
+    end % getPreviousTag
 
     function issues = validateTagLevelTags(inputArgs, ...
             hedStringDelimiter, issues)
