@@ -15,5 +15,10 @@ hedTagArray = appendHedTagPrefixes(testCase.TestData.hedTagArray, ...
     testCase.TestData.specificColumns);
 testCase.verifyClass(hedTagArray, 'cell');
 expected = {[testCase.TestData.labelPrefix 'a'],'b','c'};
+testCase.verifyNotEqual(hedTagArray,expected)
+hedTagArray = appendHedTagPrefixes(testCase.TestData.hedTagArray, ...
+    testCase.TestData.specificColumns, 'hasHeaders', false);
+testCase.verifyClass(hedTagArray, 'cell');
+expected = {[testCase.TestData.labelPrefix 'a'],'b','c'};
 testCase.verifyEqual(hedTagArray,expected)
 end % basicInputTest
