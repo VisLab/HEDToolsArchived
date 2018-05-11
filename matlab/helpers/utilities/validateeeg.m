@@ -70,7 +70,7 @@ issues = validate(p);
             p.issues = parseeeg(p.hedXml, p.EEG.event, p.generateWarnings);
             issues = p.issues;
             if p.writeOutputToFile
-                writeOutputFiles(p);
+                writeOutputFile(p);
             end
         else
             issues = '';
@@ -94,7 +94,7 @@ issues = validate(p);
         p = p.Results;
     end % parseArguments
 
-    function writeOutputFiles(p)
+    function writeOutputFile(p)
         % Writes the issues to the log file
         p.dir = p.outputFileDirectory;
         if ~isempty(p.EEG.filename)
@@ -103,7 +103,6 @@ issues = validate(p);
         [~, p.file] = fileparts(p.EEG.setname);    
         end
         p.ext = '.txt';
-        p.mapExt = '.tsv';
         try
             if ~isempty(p.issues)
                 createLogFile(p, false);
@@ -119,7 +118,7 @@ issues = validate(p);
     function createLogFile(p, empty)
         % Creates a log file containing any issues
         numErrors = length(p.issues);
-        errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
+        errorFile = fullfile(p.dir, ['validated_' p.file p.ext]);
         fileId = fopen(errorFile,'w');
         if ~empty
         fprintf(fileId, '%s', p.issues{1});
