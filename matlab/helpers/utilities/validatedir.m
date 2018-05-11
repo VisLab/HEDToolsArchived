@@ -20,17 +20,17 @@
 %                   searched. If false, only the inDir directory is
 %                   searched.
 %
-%   'GenerateWarnings'
+%   'generateWarnings'
 %                   If true, include warnings in the log file in addition
 %                   to errors. If false (default), only errors are included
 %                   in the log file.
 %
-%   'HedXml'
+%   'hedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'OutputFileDirectory'
+%   'outputFileDirectory'
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each directory
 %                   dataset validated. The default directory will be the
@@ -58,20 +58,8 @@ function fPaths = validatedir(inDir, varargin)
 p = parseArguments(inDir, varargin{:});
 fPaths = validate(p);
 
-    function hedMaps = getHEDMaps(p)
-        % Gets a structure that contains Maps associated with the HED XML
-        % tags
-        hedMaps = loadHEDMaps();
-        mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.HedXml);
-        if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion);
-            hedMaps = mapattributes(p.HedXml);
-        end
-    end % getHEDMaps
-
     function fPaths = validate(p)
         % Validates all .set files in the input directory
-        p.hedMaps = getHEDMaps(p);
         fPaths = getfilelist(p.inDir, '.set', p.DoSubDirs);
         numFiles = length(fPaths);
         nonTaggedSets = {};
@@ -81,9 +69,9 @@ fPaths = validate(p);
             p.fPath = fPaths{a};
             if isfield(p.EEG.event, 'usertags') || ...
                     isfield(p.EEG.event, 'hedtags')
-                [p.issues, p.replaceTags] = ...
-                    parseeeg(p.hedMaps, p.EEG.event, p.GenerateWarnings);
-                writeOutputFiles(p);
+                p.issues = ...
+                    parseeeg(p.hedXml, p.EEG.event, p.generateWarnings);
+                writeOutputFile(p);
             else
                 if ~isempty(p.EEG.filename)
                     nonTaggedSets{nonTagedIndex} = ...
@@ -110,31 +98,24 @@ fPaths = validate(p);
         warning('Please tag the following dataset(s):\n%s', datasets);
     end % printNonTaggedDatasets
 
-    function hedMaps = loadHEDMaps()
-        % Loads a structure that contains Maps associated with the HED XML
-        % tags
-        Maps = load('hedMaps.mat');
-        hedMaps = Maps.hedMaps;
-    end % loadHEDMap
-
     function p = parseArguments(inDir, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('inDir', @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('DoSubDirs', true, @islogical);
-        p.addParamValue('GenerateWarnings', false, ...
+        p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('HedXml', 'HED.xml', ...
+        p.addParamValue('hedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('OutputFileDirectory', pwd, ...
+        p.addParamValue('outputFileDirectory', pwd, ...
             @(x) ischar(x));
         p.parse(inDir, varargin{:});
         p = p.Results;
     end % parseArguments
 
-    function writeOutputFiles(p)
+    function writeOutputFile(p)
         % Writes the issues found to a log file
-        p.dir = p.OutputFileDirectory;
+        p.dir = p.outputFileDirectory;
         fPathLeftOver = strrep(p.fPath, p.inDir, '');
         leftOverDir = fileparts(fPathLeftOver);
         if length(leftOverDir) > 1
@@ -146,7 +127,6 @@ fPaths = validate(p);
             [~, p.file] = fileparts(p.EEG.setname);
         end
         p.ext = '.txt';
-        p.mapExt = '.tsv';
         try
             if ~isempty(p.issues)
                 createLogFile(p, false);
@@ -163,7 +143,7 @@ fPaths = validate(p);
         % Creates a log file containing any issues found through the
         % validation
         numErrors = length(p.issues);
-        errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
+        errorFile = fullfile(p.dir, ['validated_' p.file p.ext]);
         if ~exist(p.dir, 'dir')
             mkdir(p.dir);
         end
