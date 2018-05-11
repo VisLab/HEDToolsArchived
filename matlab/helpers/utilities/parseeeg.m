@@ -64,35 +64,21 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [issues, replaceTags] = parseeeg(hedMaps, events, ...
-    generateWarnings)
-p = parseArguments(hedMaps, events, generateWarnings);
-[issues, replaceTags] = readStructTags(p);
-
-    function p = findErrors(p)
-        % Finds errors in a given structure
-        [p.structErrors, structReplaceTags] = checkerrors(p.hedMaps, ...
-            p.cellTags, p.formattedCellTags);
-        p.replaceTags = union(p.replaceTags, structReplaceTags);
-    end % findErrors
-
-    function p = findWarnings(p)
-        % Find warnings in a given structure
-        p.structWarnings = checkwarnings(p.hedMaps, p.cellTags, ...
-            p.formattedCellTags);
-    end % findWarnings
+function issues = parseeeg(hedXml, events, generateWarnings)
+p = parseArguments(hedXml, events, generateWarnings);
+issues = readStructTags(p);
 
     function p = parseArguments(hedMaps, events, generateWarnings)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
-        parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
+        parser.addRequired('hedXml', @(x) (~isempty(x) && ischar(x)));
         parser.addRequired('events', @(x) (~isempty(x) && isstruct(x)));
         parser.addRequired('generateWarnings', @islogical);
         parser.parse(hedMaps, events, generateWarnings);
         p = parser.Results;
     end % parseArguments
 
-    function [issues, replaceTags] = readStructTags(p)
+    function issues = readStructTags(p)
         % Extract the HED tags in a structure array and validate them
         p.issues = {};
         p.replaceTags = {};
@@ -103,36 +89,20 @@ p = parseArguments(hedMaps, events, generateWarnings);
                 p.structNumber = a;
                 p.hedString = concattags(p.events(a));
                 if ~isempty(p.hedString)
-                    p.cellTags = hed2cell(p.hedString, false);
-                    p.formattedCellTags = hed2cell(p.hedString, true);
                     p = validateStructTags(p);
                 end
             end
             issues = p.issues;
-            replaceTags = p.replaceTags;
         catch
             throw(MException('parseeeg:cannotRead', ...
                 'Unable to read event %d', a));
         end
     end % readStructTags
 
-    function issues = validateHEDString(hedString)
-        % Validate the entire HED string
-        issues = checkgroupbrackets(hedString);
-        issues = [issues checkcommas(hedString)];
-    end % validateHEDString
-
     function p = validateStructTags(p)
         % Validates the HED tags in a structure
-        p.structIssues = validateHEDString(p.hedString);
-        if isempty(p.structIssues)
-            p = findErrors(p);
-            p.structIssues = p.structErrors;
-            if(p.generateWarnings)
-                p = findWarnings(p);
-                p.structIssues = [p.structErrors p.structWarnings];
-            end
-        end
+        p.structIssues = validateHedTags(p.hedString, ...
+            'hedXml', p.hedXml, 'generateWarnings', p.generateWarnings);
         if ~isempty(p.structIssues)
             p.issues{p.issueCount} = ...
                 [sprintf('Issues in event %d:\n', p.structNumber), ...

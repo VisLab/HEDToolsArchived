@@ -24,12 +24,12 @@
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'OutputFileDirectory'
+%   'outputFileDirectory'
 %                   The directory where the validation output is written 
 %                   to. There will be a log file generated for each study
 %                   dataset validated.
 %
-%   'WriteOutputToFile'
+%   'writeOutputToFile'
 %                   If true, write the validation issues to a
 %                   log file in addition to the workspace. If false,
 %                   (default) only write the issues to the workspace. 
@@ -65,13 +65,11 @@ issues = validate(p);
 
     function issues = validate(p)
         % Validates the eeg structure
-        p.hedMaps = getHEDMaps(p);
         if isfield(p.EEG.event, 'usertags') || ...
                 isfield(p.EEG.event, 'hedtags')
-            [p.issues, p.replaceTags] = parseeeg(p.hedMaps, ...
-                p.EEG.event, p.GenerateWarnings);
+            p.issues = parseeeg(p.hedXml, p.EEG.event, p.generateWarnings);
             issues = p.issues;
-            if p.WriteOutputToFile
+            if p.writeOutputToFile
                 writeOutputFiles(p);
             end
         else
@@ -82,41 +80,23 @@ issues = validate(p);
         end
     end % validate
 
-    function hedMaps = getHEDMaps(p)
-        % Gets a structure that contains Maps associated with the HED XML
-        % tags
-        hedMaps = loadHEDMap();
-        mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.HedXml);
-        if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion)
-            hedMaps = mapattributes(p.HedXml);
-        end
-    end % getHEDMaps
-
-    function hedMaps = loadHEDMap()
-        % Loads a structure that contains Maps associated with the HED XML
-        % tags
-        Maps = load('hedMaps.mat');
-        hedMaps = Maps.hedMaps;
-    end % loadHEDMap
-
     function p = parseArguments(EEG, varargin)
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) (~isempty(x) && isstruct(x)));
-        p.addParamValue('GenerateWarnings', false, ...
+        p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('HedXml', 'HED.xml', ...
+        p.addParamValue('hedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('OutputFileDirectory', pwd, @ischar);
-        p.addParamValue('WriteOutputToFile', false, @islogical);
+        p.addParamValue('outputFileDirectory', pwd, @ischar);
+        p.addParamValue('writeOutputToFile', false, @islogical);
         p.parse(EEG, varargin{:});
         p = p.Results;
     end % parseArguments
 
     function writeOutputFiles(p)
         % Writes the issues to the log file
-        p.dir = p.OutputFileDirectory;
+        p.dir = p.outputFileDirectory;
         if ~isempty(p.EEG.filename)
         [~, p.file] = fileparts(p.EEG.filename);
         else
