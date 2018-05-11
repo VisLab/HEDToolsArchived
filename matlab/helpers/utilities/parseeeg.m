@@ -10,18 +10,10 @@
 %
 % Input:
 %
-%       hedMaps
-%                   A structure that contains Maps associated with the HED
-%                   XML tags. There is a map that contains all of the HED
-%                   tags, a map that contains all of the unit class units,
-%                   a map that contains the tags that take in units, a map
-%                   that contains the default unit used for each unit
-%                   class, a map that contains the tags that take in
-%                   values, a map that contains the tags that are numeric,
-%                   a map that contains the required tags, a map that
-%                   contains the tags that require children, a map that
-%                   contains the tags that are extension allowed, and map
-%                   that contains the tags are are unique.
+%       hedXml
+%                   The full path to a HED XML file containing all of the
+%                   tags. This by default will be the HED.xml file
+%                   found in the hed directory.
 %
 %       events
 %                   The EEG event structure containing the HED tags
