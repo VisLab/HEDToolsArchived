@@ -52,7 +52,7 @@ p = parseArguments(warningType, varargin{:});
 switch(warningType)
     case 'cap'
         warning = sprintf(['\tWARNING: First word not capitalized or' ...
-            ' camel case - "%s"'], p.tag);
+            ' camel case - "%s"\n'], p.tag);
     case 'required'
         warning = sprintf(['\tWARNING: Tag with prefix "%s" is' ...
             ' required\n'], p.tagPrefix);
