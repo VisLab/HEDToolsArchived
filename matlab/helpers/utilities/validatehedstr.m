@@ -50,31 +50,7 @@
 
 function issues = validatehedstr(hedString, varargin)
 p = parseArguments(hedString, varargin{:});
-issues = validate(p);
-
-    function issues = validate(p)
-        % Validates a cellstr
-        p.hedMaps = getHEDMaps(p);
-        issues = parsehedstr(p.hedMaps, p.hedString, p.generateWarnings);
-    end % validate
-
-    function hedMaps = getHEDMaps(p)
-        % Gets a structure that contains Maps associated with the HED XML
-        % tags
-        hedMaps = loadHEDMap();
-        mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.hedXML);
-        if ~strcmp(mapVersion, xmlVersion);
-            hedMaps = mapattributes(p.hedXML);
-        end
-    end % getHEDMaps
-
-    function hedMaps = loadHEDMap()
-        % Loads a structure that contains Maps associated with the HED XML
-        % tags
-        Maps = load('HEDMaps.mat');
-        hedMaps = Maps.hedMaps;
-    end % loadHEDMap
+issues = validateHedTags(hedString, varargin{:});
 
     function p = parseArguments(str, varargin)
         % Parses the arguements passed in and returns the results
