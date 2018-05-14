@@ -37,6 +37,11 @@ N. Bigdely-Shamlo, J. Cockfield, S. Makeig, T. Rognon, C. LaValle, M. Miyakoshi,
 N. Bigdely-Shamlo, S. Makeig, and K. Robbins (2016). Preparing laboratory and real-world EEG data for large-scale analysis: A containerized approach, Frontiers in Neuroinformatics 1 08 March 2016 | http://dx.doi.org/10.3389/fninf.2016.00007. PMID: 27014048, PMCID: PMC4782059.
 
 ### Releases
+Version 2.3.0 Released 5/14/2018
+* HEDTools is distributed with HED schema 7.0.1.
+* HEDTools validation checks for duplicate tags and comma errors.
+* Refactored validation code. 
+
 Version 2.2.0 Released 1/18/2018
 * HEDTools validation functions accept time unit class tags.
 * Tags with parentheses no longer report a missing comma error.
@@ -46,21 +51,21 @@ Version 2.1.0 Released 1/4/2018
 * HEDTools validation functions report missing commas and unequal number of tag group parentheses.
 
 Version 2.0.5 Released 11/10/2017
-* HEDTools is compatible with jsonlab version 1.5
+* HEDTools is compatible with jsonlab version 1.5.
 
 Version 2.0.4 Released 11/9/2017
-* HED tag validation messages for groups only print out the tag that raised an issue
-* Renamed validatestr function to validatehedstr  
+* HED tag validation messages for groups only print out the tag that raised an issue.
+* Renamed validatestr function to validatehedstr.  
 
 Version 2.0.3 Released 10/31/2017
-* Fixed tsvhed2map prefix issue 
+* Fixed tsvhed2map prefix issue. 
 
 Version 2.0.2 Released 9/11/2017
-* HEDTools is distributed with HED schema 6.0.4
-* findhedevents function is more robust
+* HEDTools is distributed with HED schema 6.0.4.
+* findhedevents function is more robust.
 
 Version 2.0.1 Released 7/22/2017
-* HEDTools is distributed with HED schema 6.0.3
+* HEDTools is distributed with HED schema 6.0.3.
 
 Version 2.0.0 Released 7/16/2017
 * epochhed and findhedtags search functionality has been re-implemented. Added exclusive tags feature and removed boolean search functionality. 
@@ -68,10 +73,10 @@ Version 2.0.0 Released 7/16/2017
 
 Version 1.0.4 Released 4/17/2017 
 
-* Nested groups are validated 
-* Added pop_updatehed function
-* Added validatestr function 
-* Restructured top-level directory
+* Nested groups are validated. 
+* Added pop_updatehed function.
+* Added validatestr function.
+* Restructured top-level directory.
 
 Version 1.0.3 Released 2/22/2017
 
