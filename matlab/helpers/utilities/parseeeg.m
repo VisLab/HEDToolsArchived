@@ -5,8 +5,8 @@
 %
 % Usage:
 %
-%   >>  [issues, replaceTags, success] = parseeeg(hedMaps, events, ...
-%       generateWarnings)
+%   >>  [issues, replaceTags, success] = parseeeg(hedXml, events, ...
+%        generateWarnings)
 %
 % Input:
 %
