@@ -14,17 +14,17 @@
 %
 %   Optional:
 %
-%   'GenerateWarnings'
+%   'generateWarnings'
 %                   True to include warnings in the log file in addition
 %                   to errors. If false (default) only errors are included
 %                   in the log file.
 %
-%   'HedXml'
+%   'hedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
 %
-%   'OutputFileDirectory'
+%   'outputFileDirectory'
 %                   The directory where the log files are written to.
 %                   There will be a log file generated for each study
 %                   dataset validated. The default directory will be the
@@ -57,9 +57,9 @@ fPaths = validate(p);
         % tags
         hedMaps = loadHEDMaps();
         mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.HedXml);
+        xmlVersion = getxmlversion(p.hedXml);
         if ~isempty(xmlVersion) && ~strcmp(mapVersion, xmlVersion);
-            hedMaps = mapattributes(p.HedXml);
+            hedMaps = mapattributes(p.hedXml);
         end
     end % getHEDMaps
 
@@ -75,8 +75,8 @@ fPaths = validate(p);
             p.fPath = fPaths{a};
             if isfield(p.EEG.event, 'usertags') || ...
                     isfield(p.EEG.event, 'hedtags')
-                [p.issues, p.replaceTags] = parseeeg(p.hedMaps, ...
-                    p.EEG.event, p.GenerateWarnings);
+                p.issues = parseeeg(p.hedXml, ...
+                    p.EEG.event, p.generateWarnings);
                 writeOutputFiles(p);
             else
                 if ~isempty(p.EEG.filename)
@@ -152,11 +152,11 @@ fPaths = validate(p);
         % Parses the arguements passed in and returns the results
         p = inputParser();
         p.addRequired('studyFile', @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('GenerateWarnings', false, ...
+        p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('HedXml', 'HED.xml', ...
+        p.addParamValue('hedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
-        p.addParamValue('OutputFileDirectory', pwd, ...
+        p.addParamValue('outputFileDirectory', pwd, ...
             @(x) ischar(x));
         p.parse(studyFile, varargin{:});
         p = p.Results;
@@ -165,14 +165,13 @@ fPaths = validate(p);
     function writeOutputFiles(p)
         % Writes the issues and replace tags found to a log file and a
         % replace file
-        p.dir = p.OutputFileDirectory;
+        p.dir = p.outputFileDirectory;
         if ~isempty(p.EEG.filename)
             [~, p.file] = fileparts(p.EEG.filename);
         else
             [~, p.file] = fileparts(p.EEG.setname);
         end
         p.ext = '.txt';
-        p.mapExt = '.tsv';
         try
             if ~isempty(p.issues)
                 createLogFile(p, false);
@@ -189,7 +188,7 @@ fPaths = validate(p);
         % Creates a log file containing any issues found through the
         % validation
         numErrors = length(p.issues);
-        errorFile = fullfile(p.dir, [p.file '_log' p.ext]);
+        errorFile = fullfile(p.dir, ['validated_' p.file p.ext]);
         fileId = fopen(errorFile,'w');
         if ~empty
             fprintf(fileId, '%s', p.issues{1});
