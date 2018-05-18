@@ -445,6 +445,8 @@ def _generate_input_arguments_from_validation_form(form_request_object, spreadsh
         form_request_object, 'has-column-names', 'boolean');
     validation_input_arguments['check_for_warnings'] = _get_optional_validation_form_field(
         form_request_object, 'generate-warnings', 'boolean');
+    validation_input_arguments['leaf_extensions'] = _get_optional_validation_form_field(
+        form_request_object, 'leaf-extensions', 'boolean');
     return validation_input_arguments;
 
 
@@ -658,7 +660,8 @@ def validate_spreadsheet(validation_arguments):
                           required_tag_columns=validation_arguments['required_tag_columns'],
                           worksheet_name=validation_arguments['worksheet'],
                           check_for_warnings=validation_arguments['check_for_warnings'],
-                          hed_xml_file=validation_arguments['hed_path']);
+                          hed_xml_file=validation_arguments['hed_path'],
+                          leaf_extensions=validation_arguments['leaf_extensions']);
 
 
 def spreadsheet_present_in_form(validation_form_request_object):

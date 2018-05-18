@@ -60,10 +60,18 @@
         <div class="form-group">
             <label>6) Specify additional options:</label><br>
             <div class="checkbox-group">
-                <input type="checkbox" name="has-column-names" id="has-column-names">
-                <label for="has-column-names">Spreadsheet has column names</label>
-                <input type="checkbox" name="generate-warnings" id="generate-warnings">
-                <label for="generate-warnings">Include warnings in output file</label>
+                <div class="inline-field">
+                    <input type="checkbox" name="has-column-names" id="has-column-names">
+                    <label for="has-column-names">Spreadsheet has column names</label>
+                </div>
+                <div class="inline-field">
+                    <input type="checkbox" name="generate-warnings" id="generate-warnings">
+                    <label for="generate-warnings">Include warnings in output file</label>
+                </div>
+                <div class="inline-field">
+                    <input type="checkbox" name="leaf-extensions" id="leaf-extensions">
+                    <label for="leaf-extensions">Extension allowed at leaf nodes only </label>
+                </div>
             </div>
         </div>
 

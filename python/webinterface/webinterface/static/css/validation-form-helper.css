@@ -1,3 +1,9 @@
+.inline-field input, .inline-field label {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
 .form-group input[type="file"] {
     margin-top: -2.35rem;
     opacity: 0;
@@ -39,7 +45,7 @@
     width: 4rem;
 }
 
-.textbox-group label:not(:first-child), .checkbox-group input[type="checkbox"]:not(:first-child){
+.textbox-group label:not(:first-child), .checkbox-group input[type="checkbox"]:not(:first-child) {
     margin-left: 1.2rem;
 }
 
