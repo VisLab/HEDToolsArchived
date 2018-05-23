@@ -4,9 +4,9 @@
 %
 % Usage:
 %
-%   >> EEG = epochhed(EEG, queryString)
+%   >> EEG = epochhed(EEG, tagstring, timelimits)
 %
-%   >> EEG = epochhed(EEG, queryString, varargin)
+%   >> EEG = epochhed(EEG, tagstring, timelimits, varargin)
 %
 % Inputs:
 %
@@ -58,7 +58,10 @@
 %   EEG
 %                Output dataset that has extracted data epochs.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+%   indices
+%                The event indices found in the data epochs.  
+%
+% Copyright (C) 2012-2018 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -206,7 +209,7 @@ EEG = parsedArguments.EEG;
             'eventconsistency');
     end % modifyEvents
 
-    function p = parseArguments(EEG, queryString, timelimits, varargin)
+    function p = parseArguments(EEG, tagstring, timelimits, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
@@ -226,7 +229,7 @@ EEG = parsedArguments.EEG;
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.addParamValue('verbose', 'on', ...
             @(x) any(strcmpi({'on', 'off'}, x)));  %#ok<NVREPL>
-        p.parse(EEG, queryString, timelimits, varargin{:});
+        p.parse(EEG, tagstring, timelimits, varargin{:});
         p = p.Results;
     end % parseArguments
 
