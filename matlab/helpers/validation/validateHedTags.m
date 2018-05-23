@@ -273,6 +273,7 @@ end
         parser.addParamValue('generateWarnings', false, @islogical);
         parser.addParamValue('hasHeaders', true, @islogical);
         parser.addParamValue('hedXml',  '', @(x) ~isempty(x) && ischar(x));
+        parser.addParamValue('leafExtensions', false, @islogical);
         parser.addParamValue('otherColumns', [], @isnumeric);
         parser.addParamValue('missingRequiredTagsAreErrors', true, ...
             @islogical);
