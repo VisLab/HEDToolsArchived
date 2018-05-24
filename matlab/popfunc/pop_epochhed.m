@@ -4,34 +4,40 @@
 %
 %   >>  [EEG, indices, com] = pop_epochhed(EEG);
 %
-%   >>  [EEG, indices, com] = pop_epochhed(EEG, events, timelimits);
+%   >>  [EEG, indices, com] = pop_epochhed(EEG, tagstring, timelimits);
 %
-%   >>  [EEG, indices, com] = pop_epochhed(EEG, events, timelimits, ...
+%   >>  [EEG, indices, com] = pop_epochhed(EEG, tagstring, timelimits, ...
 %                             'key1', value1 ...);
 %
-%   Graphic interface:
+% Menu Options:
 %
-%   "Time-locking HED tag(s)"
-%                [edit box] Select 'Edit > Event values'
-%                to see a list of event.type values; else use the push
-%                button. To use event types containing spaces, enter in
-%                single-quotes. epoch() function command line equivalent:
-%                'typerange'
+%   Time-locking HED tag(s)
+%                A comma separated list of HED tags that you want to search
+%                for. All tags in the list must be present in the HED
+%                string.
 %
-%   "..."
-%                [push button] Input HED tag(s) using search bar.
+%   ...
+%                Brings up search bar for specifiying Time-locking HED
+%                tag(s).
 %
-%   "Epoch limits"
-%                [edit box] epoch latency range [start, end] in seconds
-%                relative to the time-locking events. epoch() function
-%                equivalent: 'timelim'
+%   Exclusive HED tag(s)
+%                A comma-separated list of tags that nullify matches to
+%                other tags. If these tags are present in both the EEG
+%                dataset event tags and the tag string then a match will be
+%                returned. The default is 
+%                'Attribute/Intended effect', 'Attribute/Offset'.
 %
-%   "Name for the new dataset"
-%                [edit box] epoch() function equivalent: 'newname'
+%   Epoch limits
+%                Epoch latency limits [start end] in seconds relative to
+%                the time-locking event. The default is [-1 2].
 %
-%   "Out-of-bounds EEG ..."
-%                [edit box] Rejection limits ([min max], []=none). epoch()
-%                function equivalent: 'valuelim'
+%   Name for the new dataset
+%                [edit box] epochhed() function equivalent: 'newname'
+%
+%   Out-of-bounds EEG limits if any
+%                [min max] data limits. If one positive value is given,            
+%                the opposite value is used for lower bound. For example,
+%                use [-50 50].
 %
 % Inputs:
 %
@@ -39,23 +45,13 @@
 %                Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
 %
-%   tags         
-%                A search string consisting of tags to extract data epochs.
-%                The tag search uses boolean operators (AND, OR, AND NOT)
-%                to widen or narrow the search. Two tags separated by a
-%                comma use the AND operator by default which will only
-%                return events that contain both of the tags. The OR
-%                operator looks for events that include either one or both
-%                tags being specified. The AND NOT operator looks for
-%                events that contain the first tag but not the second tag.
-%                To nest or organize the search statements use square
-%                brackets. Nesting will change the order in which the
-%                search statements are evaluated. For example,
-%                "/attribute/visual/color/green AND
-%                [/item/2d shape/rectangle/square OR
-%                /item/2d shape/ellipse/circle]".
+%   tagstring
+%                A comma separated list of HED tags that you want to search
+%                for. All tags in the list must be present in the HED
+%                string.
 %
-%   timelim      Epoch latency limits [start end] in seconds relative to
+%   timelim      
+%                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event {default: [-1 2]}
 %
 % Optional inputs:
@@ -100,7 +96,7 @@
 %              A command string that calls the underlying epochhed
 %              function.
 %
-% Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
+% Copyright (C) 2012-2018 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
 % Kay Robbins kay.robbins@utsa.edu
 %
@@ -118,7 +114,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [EEG, indices, com] = pop_epochhed(EEG, tags, timelim, varargin)
+function [EEG, indices, com] = pop_epochhed(EEG, tagstring, timelim, ...
+    varargin)
 indices = [];
 com = '';
 % Display help if inappropriate number of arguments
@@ -131,30 +128,31 @@ end;
 if nargin < 3
     % Find all the unique tags in the events    
     if ~exist('tags','var')
-        tags = '';
+        tagstring = '';
     end
     uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
     % Get input arguments from GUI
-    [canceled, tags, newName, timelim, valueLim] = ...
-        epochhed_input(EEG.setname, tags, uniquetags);
+    [canceled, tagstring, exclusiveTags, newName, timelim, valueLim] = ...
+        epochhed_input(EEG.setname, tagstring, uniquetags);
     if canceled
         return;
     end
-    [EEG, indices] = epochhed(EEG, tags, timelim, 'newname', newName, ...
-        'valuelim', valueLim);
+    [EEG, indices] = epochhed(EEG, tagstring, timelim, 'exclusivetags', ...
+        exclusiveTags, 'newname', newName, 'valuelim', valueLim);
     com = char(['epochhed(EEG, ' ...
-        '''' tags ''', ', ...
+        '''' tagstring ''', ', ...
         vector2str(timelim) ', ' ...
+        '''exclusivetags'', ''' cellstr2str(exclusiveTags) ''', ' ...
         '''newname'', ''' newName ''', ' ...
         '''valuelim'', ' vector2str(valueLim) ')']);
     return;
 end
 
-[EEG, indices] = epochhed(EEG, tags, timelim, varargin{:});
+[EEG, indices] = epochhed(EEG, tagstring, timelim, varargin{:});
 com = char(['pop_epochhed(EEG, ' ...
-    '''' tags ''', ', ...
+    '''' tagstring ''', ', ...
     vector2str(timelim) ', '...
     keyvalue2str(varargin{:})]);
 
-end % pop_hedepoch
+end % pop_epochhed
