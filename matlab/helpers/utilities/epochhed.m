@@ -59,7 +59,11 @@
 %                Output dataset that has extracted data epochs.
 %
 %   indices
-%                The event indices found in the data epochs.  
+%                The indices of accepted events.  
+%
+%   epochHedStrings
+%                A cell array of HED strings associated with the
+%                time-locking event for each epoch.
 %
 % Copyright (C) 2012-2018 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
@@ -80,20 +84,27 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [EEG, indices] = epochhed(EEG, tagstring, timelimits, varargin)
+function [EEG, indices, epochHedStrings] = epochhed(EEG, tagstring, ...
+    timelimits, varargin)
 parsedArguments = parseArguments(EEG, tagstring, timelimits, varargin{:});
 hedStringsArray = arrayfun(@concattags, parsedArguments.EEG.event, ...
     'UniformOutput', false);
-indices = cellfun(@(x) findhedevents(x, tagstring, 'exclusivetags', ...
-    parsedArguments.exclusivetags), hedStringsArray);
+hedStringMatchIndices = cellfun(@(x) findhedevents(x, tagstring, ...
+    'exclusivetags', parsedArguments.exclusivetags), hedStringsArray);
 parsedArguments.allLatencies = [parsedArguments.EEG.event.latency];
-parsedArguments.matchedLatencies = parsedArguments.allLatencies(indices);
+parsedArguments.matchedLatencies = ...
+    parsedArguments.allLatencies(hedStringMatchIndices);
 parsedArguments = epochData(parsedArguments);
 parsedArguments = updateFields(parsedArguments);
 parsedArguments = duplicateEvents(parsedArguments);
 parsedArguments = modifyEvents(parsedArguments);
 parsedArguments = checkBoundaryEvents(parsedArguments);
 EEG = parsedArguments.EEG;
+indices = parsedArguments.acceptedEventIndecies;
+hedStringMatchPositions = find(hedStringMatchIndices);
+hedStringAcceptedIndices= hedStringMatchPositions(indices);
+epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
+
 
     function parsedArguments = checkBoundaryEvents(parsedArguments)
         % Check for boundary events
