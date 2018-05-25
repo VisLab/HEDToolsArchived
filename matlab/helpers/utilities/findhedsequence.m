@@ -1,9 +1,9 @@
 % This function finds the previous string based on the cursor position in
-% the tag search bar.
+% the HED tag search bar.
 %
 % Usage:
 %
-%   >> [sequence, start, finish] = findsequence(text, pos)
+%   >> [sequence, start, finish] = findhedsequence(text, pos)
 %
 % Inputs:
 %
@@ -37,11 +37,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [sequence, start, finish] = findsequence(text, pos)
+function [sequence, start, finish] = findhedsequence(text, pos)
 start = findFirstPos(text, pos);
 finish = findLastPos(text, pos);
-if ~isDelimitingChar(text(pos)) && ~isOperator(text(start:finish)) && ...
-        ~isHEDTag(text(start:finish));
+% if ~isDelimitingChar(text(pos)) && ~isOperator(text(start:finish)) && ...
+%         ~isHEDTag(text(start:finish));
+if ~isDelimitingChar(text(pos)) && ~isHEDTag(text(start:finish))
     [~, start, ~, startMatch, startMatchFinish] = ...
         findSequenceStart(text, start);
     if startMatch
@@ -159,7 +160,8 @@ sequence = strtrim(text(start:finish));
         % Returns true if string is a tag, delimiting character, or
         % operator
         isTag = false;
-        if isDelimitingChar(str) || isOperator(str) 
+%         if isDelimitingChar(str) || isOperator(str) 
+        if isDelimitingChar(str)
             isTag = true;
         end
     end % checkForTag
@@ -217,7 +219,8 @@ sequence = strtrim(text(start:finish));
 
     function [isDelimiting, endDelimiter] = isDelimitingChar(character)
         % Returns true if the character is a delimiting character
-        specialChars = {'(',')',','};
+%         specialChars = {'(',')',','};
+        specialChars = {','};
         isDelimiting =  any(strcmp(specialChars, character));
         endDelimiter = character == ')';
     end % isDelimitingChar
@@ -253,4 +256,4 @@ sequence = strtrim(text(start:finish));
         end
     end % isHEDTag
 
-end % findsequence
+end % findhedsequence

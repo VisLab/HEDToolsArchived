@@ -125,11 +125,16 @@ if nargin < 1
 end;
 
 
-if nargin < 3
+if nargin < 2
     % Find all the unique tags in the events    
-    if ~exist('tags','var')
+    if ~exist('tagstring','var')
         tagstring = '';
     end
+    
+%     if ~exist('timelim','var')
+%         timelim = [-1, 2];
+%     end
+    
     uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
     % Get input arguments from GUI
