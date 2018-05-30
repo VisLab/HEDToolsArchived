@@ -881,7 +881,7 @@ button to return to the main epoching menu.
 
 **Name**|**Type**|**Description**
 EEG|Required|Input dataset. Data may already be epoched; in this case, extract (shorter) subepochs time locked to epoch events.
-tagstring|Required if no GUI||A search string consisting of tags to use for extracting data epochs. The string uses commas to narrow the search. Two tags separated by a comma is equivalent to the AND operator in general searches and the search only returns events that contain both of the tags. For example, “/Attribute/Visual/Color/Green, /Item/2d shape/Rectangle/Square” find epochs with green squares.
+tagstring|Required if no GUI|A search string consisting of tags to use for extracting data epochs. The string uses commas to narrow the search. Two tags separated by a comma is equivalent to the AND operator in general searches and the search only returns events that contain both of the tags. For example, “/Attribute/Visual/Color/Green, /Item/2d shape/Rectangle/Square” find epochs with green squares.
 timelimits|Required if no GUI|Epoch latency limits \[start end\] in seconds relative to the time-locking event {default: \[-1 2\]}.
 'exclusivetags'|Name-Value| A cell array of tags that nullify matches to other tags. If these tags are present in both the EEG dataset event tags and the tag string then a match will be returned. {default: 'Attribute/Intended effect', 'Attribute/Offset'}.
 'epochinfo'|Name-Value|Propagate event information into the new epoch structure {default: 'yes'}.
