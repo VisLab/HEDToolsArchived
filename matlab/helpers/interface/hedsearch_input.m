@@ -9,29 +9,22 @@
 %
 %    "Search for"
 %
-%                A search string consisting of tags to extract data epochs.
-%                The tag search uses boolean operators (AND, OR, NOT) to
-%                widen or narrow the search. Two tags separated by a comma
-%                use the AND operator by default which will only return
-%                events that contain both of the tags. The OR operator
-%                looks for events that include either one or both tags
-%                being specified. The NOT operator looks for events that
-%                contain the first tag but not the second tag. To nest or
-%                organize the search statements use square brackets.
-%                Nesting will change the order in which the search
-%                statements are evaluated. For example,
-%                "/attribute/visual/color/green AND 
-%                [/item/2d shape/rectangle/square OR
-%                /item/2d shape/ellipse/circle]" will look for events that
-%                have a green square or a green circle. When using the
-%                search bar and typing in something there will be a listbox
-%                below the search bar containing possible matches. Pressing
-%                the "up" and "down" arrows on the keyboard while the
-%                cursor is in the search bar will move to the next or
-%                previous tag in the listbox. Pressing "Enter" will select
-%                the current tag in the listbox and it will be added to the
-%                search bar. When done click the "Ok" button and it will
-%                take you back to the main epoching menu.
+%                A search string consisting of tags to use for extracting
+%                data epochs. The string uses commas to narrow the search.
+%                Two tags separated by a comma is equivalent to the AND
+%                operator in general searches and the search only returns
+%                events that contain both of the tags. For example,
+%                “/Attribute/Visual/Color/Green,
+%                /Item/2d shape/Rectangle/Square” find epochs with green
+%                squares. When using the search bar and typing in something
+%                there will be a listbox below the search bar containing
+%                possible matches. Pressing the "up" and "down" arrows on
+%                the keyboard while the cursor is in the search bar will
+%                move to the next or previous tag in the listbox. Pressing
+%                "Enter" will select the current tag in the listbox and it
+%                will be added to the search bar. When done click the "Ok"
+%                button and it will take you back to the main epoching
+%                menu.
 %
 % Input:
 %
@@ -89,7 +82,7 @@ end
 
     function [matches, sequence] = findMatchingTags(src)
         % Looks for matching tags 
-        sequence = findsequence(char(src.getText()), ...
+        sequence = findhedsequence(char(src.getText()), ...
             src.getCaretPosition());
         indexes = ~cellfun(@isempty, regexpi(uniquetags, sequence));
         matches = uniquetags(indexes);
@@ -167,7 +160,7 @@ end
         items = get(src, 'String');
         text = char(editbox.getText());
         item = items{get(src, 'Value')};
-        [~, start, finish] = findsequence(char(editbox.getText()), ...
+        [~, start, finish] = findhedsequence(char(editbox.getText()), ...
             editbox.getCaretPosition());
         text = [text(1:start-1) item text(finish+1:end)];
         editbox.setText(text);
