@@ -268,7 +268,8 @@ end
         parser.addRequired('hedString', @ischar);
         parser.addRequired('queryString', @ischar);
         parser.addOptional('exclusiveTags', ...
-            {'Attribute/Intended effect', 'Attribute/Offset'}, @iscellstr);
+            {'Attribute/Intended effect', 'Attribute/Offset', ...
+            'Attribute/Participant indication'}, @iscellstr);
         parser.parse(hedString, queryString, varargin{:});
         inputArguments = parser.Results;
     end % parseInputArguments

@@ -32,7 +32,8 @@
 %                If these tags are present in both the EEG dataset event
 %                tags and the tag string then a match will be returned.
 %                By default, this argument is set to
-%                {'Attribute/Intended effect', 'Attribute/Offset'}.
+%                {'Attribute/Intended effect', 'Attribute/Offset', 
+%                Attribute/Participant indication}.
 %
 %   'newname'
 %                New dataset name. The default is "[old_dataset] epochs"
