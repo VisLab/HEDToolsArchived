@@ -24,7 +24,8 @@
 %                If these tags are present in both the query string and the
 %                HED string then a match will be returned.
 %                By default, this argument is set to
-%                {'Attribute/Intended effect', 'Attribute/Offset'}.
+%                {'Attribute/Intended effect', 'Attribute/Offset', 
+%                'Attribute/Participant indication'}.
 %
 % Output:
 %

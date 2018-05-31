@@ -25,7 +25,8 @@
 %                other tags. If these tags are present in both the EEG
 %                dataset event tags and the tag string then a match will be
 %                returned. The default is 
-%                'Attribute/Intended effect', 'Attribute/Offset'.
+%                Attribute/Intended effect, Attribute/Offset, 
+%                Attribute/Participant indication.
 %
 %   Epoch limits
 %                Epoch latency limits [start end] in seconds relative to
