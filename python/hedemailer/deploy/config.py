@@ -10,7 +10,6 @@ import socket
 
 class Config(object):
     EMAIL_LIST = '/path/to/email/list';
-    REPOSITORY_NAME_TO_EMAIL_LIST = {'HED-schema': 'hed.txt'};
     SENDER = 'github-notifications@' + socket.getfqdn();
     HED_WIKI_PAGE = 'HED Schema';
     TO = 'github-mailing-list@' + socket.getfqdn();
