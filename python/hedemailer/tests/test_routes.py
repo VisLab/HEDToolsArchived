@@ -10,7 +10,7 @@ class Test(unittest.TestCase):
             app.register_blueprint(route_blueprint);
             self.app = app.test_client();
 
-    def test_render_home_page(self):
+    def test_empty_payload(self):
         response = self.app.post('/');
         self.assertEqual(response.status_code, 200);
 
