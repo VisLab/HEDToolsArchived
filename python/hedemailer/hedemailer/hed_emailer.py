@@ -7,7 +7,7 @@ Created on Mar 8, 2017
 import smtplib;
 import os;
 import json;
-from hedconversion.wiki2xml import convert_hed_wiki_2_xml, delete_file_if_exist;
+from hedconversion import wiki2xml;
 from email.mime.multipart import MIMEMultipart;
 from email.mime.text import MIMEText;
 from flask import request;
@@ -81,7 +81,7 @@ def create_hed_schema_email(msg, main_body_text):
     hed_info_dictionary = {'hed_wiki_file_location': '', 'hed_xml_file_location': ''};
     hed_xml_file = None;
     try:
-        hed_info_dictionary = convert_hed_wiki_2_xml();
+        hed_info_dictionary = wiki2xml.convert_hed_wiki_2_xml();
         main_body_text = add_hed_xml_attachment_text(main_body_text, hed_info_dictionary);
         main_body = MIMEText(main_body_text);
         msg.attach(main_body);
@@ -96,8 +96,8 @@ def create_hed_schema_email(msg, main_body_text):
 def cleanup_resources(hed_xml_file, hed_info_dictionary):
     if hed_xml_file:
         hed_xml_file.close();
-    delete_file_if_exist(hed_info_dictionary['hed_wiki_file_location']);
-    delete_file_if_exist(hed_info_dictionary['hed_xml_file_location']);
+    wiki2xml.delete_file_if_exist(hed_info_dictionary['hed_wiki_file_location']);
+    wiki2xml.delete_file_if_exist(hed_info_dictionary['hed_xml_file_location']);
 
 
 # Returns true if the wiki page is the HED schema 
