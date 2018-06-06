@@ -7,9 +7,25 @@ Created on Mar 14, 2017
 
 import socket
 
+
 class Config(object):
-    EMAIL_LIST_DIRECTORY = '/path/to/email/directory'
-    REPOSITORY_NAME_TO_EMAIL_LIST = {'HED-schema':'hed.txt', 'HEDTools':'hedtools.txt'}
-    SENDER = 'github-notifications@' + socket.getfqdn()
-    HED_WIKI_PAGE = 'HED Schema'
-    TO = 'github-mailing-list@' + socket.getfqdn()
+    EMAIL_LIST_DIRECTORY = '/path/to/email/directory';
+    REPOSITORY_NAME_TO_EMAIL_LIST = {'HED-schema': 'hed.txt'};
+    SENDER = 'github-notifications@' + socket.getfqdn();
+    HED_WIKI_PAGE = 'HED Schema';
+    TO = 'github-mailing-list@' + socket.getfqdn();
+
+
+class DevelopmentConfig(Config):
+    TESTING = False;
+    DEBUG = False;
+
+
+class TestConfig(Config):
+    TESTING = True;
+    DEBUG = False;
+
+
+class DebugConfig(Config):
+    TESTING = False;
+    DEBUG = True;
