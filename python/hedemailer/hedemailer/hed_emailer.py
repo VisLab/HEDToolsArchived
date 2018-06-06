@@ -5,40 +5,27 @@ Created on Mar 8, 2017
 @author: Jeremy Cockfield
 '''
 import smtplib;
-import os;
 import json;
 from hedconversion import wiki2xml;
 from email.mime.multipart import MIMEMultipart;
 from email.mime.text import MIMEText;
-from flask import request;
 from flask.app import Flask;
-import codecs;
 
 app = Flask(__name__);
 app.config.from_object('config.Config');
 
-EMAIL_LIST_DIRECTORY = app.config['EMAIL_LIST_DIRECTORY'];
+EMAIL_LIST = app.config['EMAIL_LIST'];
 REPOSITORY_NAME_TO_EMAIL_LIST = app.config['REPOSITORY_NAME_TO_EMAIL_LIST'];
 SENDER = app.config['SENDER'];
 TO = app.config['TO'];
 HED_WIKI_PAGE = app.config['HED_WIKI_PAGE'];
 
 
-@app.route('/', methods=['POST'])
-def process_gollum_event():
-    try:
-        if request_is_github_gollum_event(request):
-            send_gollum_email(request);
-    except Exception as ex:
-        return json.dumps({'success': False, 'message': ex.message}), 500, {'ContentType': 'application/json'};
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'};
-
-
 # Send gollum event related email
 def send_gollum_email(request):
-    github_payload_string = request.data;
+    github_payload_string = request.data.decode('utf-8');
     github_payload_dictionary = json.loads(github_payload_string);
-    repository_email_list = get_repository_email_list(github_payload_dictionary['repository']['name']);
+    repository_email_list = get_email_list(EMAIL_LIST);
     msg, email_info_dictionary = create_email(github_payload_dictionary, repository_email_list);
     send_email_from_smtp_server(msg, repository_email_list);
     return email_info_dictionary;
@@ -121,31 +108,17 @@ def add_hed_xml_attachment_text(main_body_text, hed_info_dictionary):
 
 # Create HED XML attachment file
 def create_hed_xml_attachment(hed_xml_file_location):
-    hed_xml_file = codecs.open(hed_xml_file_location, 'r', 'utf-8');
-    hed_xml_string = hed_xml_file.read();
-    hed_xml_attachment = MIMEText(hed_xml_string, 'plain', 'utf-8');
-    hed_xml_attachment.add_header('Content-Disposition', 'attachment', filename="HED.xml");
+    with open(hed_xml_file_location, 'r') as hed_xml_file:
+        hed_xml_string = hed_xml_file.read();
+        hed_xml_attachment = MIMEText(hed_xml_string, 'plain', 'utf-8');
+        hed_xml_attachment.add_header('Content-Disposition', 'attachment', filename="HED.xml");
     return hed_xml_attachment, hed_xml_file;
 
 
 # Get email list from a repository name
-def get_repository_email_list(organizational_repository, email__list_directory=EMAIL_LIST_DIRECTORY,
-                              repository_name_to_email_list=REPOSITORY_NAME_TO_EMAIL_LIST):
-    email_file_path = '';
-    email_list = [];
-    email_file = None;
-    try:
-        repository_names = repository_name_to_email_list.keys();
-        for repository_name in repository_names:
-            if organizational_repository.endswith(repository_name):
-                email_file_path = os.path.join(email__list_directory,
-                                               repository_name_to_email_list.get(repository_name));
-        if email_file_path:
-            email_file = open(email_file_path, 'r');
-            email_list = [x.strip() for x in email_file.readlines()];
-    finally:
-        if email_file:
-            email_file.close();
+def get_email_list(email_file_path):
+    with open(email_file_path, 'r') as opened_email_file:
+        email_list = [x.strip() for x in opened_email_file.readlines()];
     return email_list;
 
 
