@@ -14,6 +14,8 @@ NO_EMAILS_SENT_RESPONSE = json.dumps({'success': True, 'message': NO_EMAILS_SENT
     'ContentType': 'application/json'};
 HEADER_EVENT_TYPE = 'X-GitHub-Event';
 HEADER_CONTENT_TYPE = 'content-type';
+CONTENT_DISPOSITION_HEADER = 'Content-Disposition';
+ATTACHMENT_CONTENT_DISPOSITION_HEADER = 'attachment';
 JSON_CONTENT_TYPE = 'application/json';
 HED_XML_LOCATION_KEY = 'hed_xml_file_location';
 HED_WIKI_LOCATION_KEY = 'hed_wiki_file_location';
