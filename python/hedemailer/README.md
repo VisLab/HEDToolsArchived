@@ -12,7 +12,7 @@ For the HED schema please visit: <https://github.com/BigEEGConsortium/HED-schema
 
 ### Screenshots
 
-![Email example](hedemailer-email.png)
+![Email example](screenshots/hedemailer-email.png)
 
 ### Notes
 * The webhook has been implemented to ONLY accept JSON content type and Wiki page updates (gollum) events. 
