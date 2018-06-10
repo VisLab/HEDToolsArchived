@@ -11,7 +11,7 @@ For the HED schema please visit: <https://github.com/BigEEGConsortium/HED-schema
 * [hedconversion](../hedconversion)
 
 ### Screenshots
-![alt text](http://url/to/img.png)
+![alt text](hedemailer-email.png
 
 ### Notes
 * The webhook has been implemented to ONLY accept JSON content type and Wiki page updates (gollum) events. 
