@@ -18,8 +18,9 @@ def send_email(request):
     github_payload_string = str(request.data, 'utf-8');
     github_payload_dictionary = json.loads(github_payload_string);
     email_list = utils.get_email_list_from_file(app_config['EMAIL_LIST']);
-    msg, email_info_dictionary = create_email(github_payload_dictionary, app_config['EMAIL_LIST']);
-    send_email_from_smtp_server(msg, email_list);
+    if email_list:
+        msg, email_info_dictionary = create_email(github_payload_dictionary, app_config['EMAIL_LIST']);
+        send_email_from_smtp_server(msg, email_list);
     return email_info_dictionary;
 
 

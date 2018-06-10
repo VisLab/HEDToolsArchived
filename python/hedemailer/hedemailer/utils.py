@@ -62,8 +62,10 @@ def create_hed_xml_attachment(hed_xml_file_location):
 
 # Get email list from a repository name
 def get_email_list_from_file(email_file_path):
-    with open(email_file_path, 'r') as opened_email_file:
-        email_list = [x.strip() for x in opened_email_file.readlines()];
+    email_list = [];
+    with open(email_file_path, 'r') as email_file:
+        for email_address in email_file:
+            email_list.append(email_address.strip());
     return email_list;
 
 
