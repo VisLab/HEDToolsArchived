@@ -11,7 +11,8 @@ For the HED schema please visit: <https://github.com/BigEEGConsortium/HED-schema
 * [hedconversion](../hedconversion)
 
 ### Screenshots
-What an email looks like
+What a typical email looks like 
+
 ![Email example](hedemailer-email.png)
 
 ### Notes
