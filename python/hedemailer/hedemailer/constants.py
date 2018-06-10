@@ -8,5 +8,5 @@ NO_EMAILS_SENT_RESPONSE = json.dumps({'success': True, 'message': constants.NO_E
     'ContentType': 'application/json'};
 
 
-def generate_exeption_response(ex):
+def generate_exception_response(ex):
     return json.dumps({'success': False, 'message': ex}), 500, {'ContentType': 'application/json'};
