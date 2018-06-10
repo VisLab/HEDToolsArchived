@@ -11,4 +11,5 @@ For the HED schema please visit: <https://github.com/BigEEGConsortium/HED-schema
 * [hedconversion](../hedconversion)
 
 ### Notes
-hedemailer has been implemented to ONLY accept JSON content type and Wiki page updates (gollum) events. Emails may potentially be blocked without a fully-qualified domain name.  
+* The webhook has been implemented to ONLY accept JSON content type and Wiki page updates (gollum) events. 
+* Emails may potentially be blocked without a fully-qualified domain name.  
