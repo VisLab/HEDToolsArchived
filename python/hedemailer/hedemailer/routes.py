@@ -8,6 +8,16 @@ route_blueprint = Blueprint('route_blueprint', __name__);
 
 @route_blueprint.route('/', methods=['POST'])
 def process_hed_payload():
+    """Send a email with the latest HED schema.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    string
+        A JSON response.
+    """
     try:
         if not utils.request_is_github_gollum_event(request):
             return constants.NO_EMAILS_SENT_RESPONSE;

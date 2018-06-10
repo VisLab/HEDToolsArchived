@@ -3,6 +3,9 @@ import json;
 EMAILS_SENT = 'Email(s) correctly sent';
 EMAIL_SUBJECT_KEY = 'Subject';
 EMAIL_FROM_KEY = 'From';
+CONFIG_EMAIL_FROM_KEY = 'FROM';
+CONFIG_EMAIL_LIST = 'EMAIL_LIST';
+CONFIG_EMAIL_TO_KEY = 'TO';
 EMAIL_TO_KEY = 'To';
 EMAIL_BCC_KEY = 'Bcc';
 EMAIL_LIST_DELIMITER = ', ';
@@ -32,6 +35,8 @@ HED_VERSION_TEXT = '\n\nVersion\n';
 CHANGE_LOG_TEXT = '\n\nChange log\n';
 HED_XML_ATTACHMENT_NAME = 'HED.xml';
 WIKI_PAGES_KEY = 'pages';
+CONFIG_HED_WIKI_PAGE_KEY = 'HED_WIKI_PAGE';
+LOCALHOST = 'localhost';
 HELLO_WIKI_TEXT = 'Hello,\nThe wiki page ';
 WIKI_TITLE_KEY = 'title';
 HAS_BEEN_TEXT = ' has been ';
@@ -39,6 +44,7 @@ CHECK_OUT_CHANGES_TEXT = '. Please checkout the changes at ';
 WIKI_HTML_URL_KEY = 'html_url';
 PERIOD_TEXT = '.';
 WIKI_ACTION_KEY = 'action';
+
 
 def generate_exception_response(ex):
     return json.dumps({'success': False, 'message': ex}), 500, {'ContentType': 'application/json'};

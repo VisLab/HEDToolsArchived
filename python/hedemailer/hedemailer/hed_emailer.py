@@ -1,5 +1,6 @@
 '''
-This module receives a post request from a github repository and emails a notification to a group of recipients associated with the repository. 
+This module is a webhook implementation that sends out an email whenever there is an update to the Wiki HED schema.
+
 Created on Mar 8, 2017
 
 @author: Jeremy Cockfield
@@ -8,36 +9,72 @@ import smtplib;
 import json;
 from email.mime.text import MIMEText;
 from flask import current_app;
-from hedemailer import utils;
+from hedemailer import utils, constants;
 
 app_config = current_app.config;
 
 
-# Send gollum event related email
 def send_email(request):
+    """Send a email with the latest HED schema.
+
+    Parameters
+    ----------
+    request: Request object
+        A Request object containing a Github payload.
+
+    Returns
+    -------
+    dictionary
+        A dictionary containing information about the HED
+    """
     github_payload_string = str(request.data, 'utf-8');
     github_payload_dictionary = json.loads(github_payload_string);
-    email_list = utils.get_email_list_from_file(app_config['EMAIL_LIST']);
+    email_list = utils.get_email_list_from_file(app_config[constants.CONFIG_EMAIL_LIST]);
     if email_list:
-        msg, email_info_dictionary = create_email(github_payload_dictionary, app_config['EMAIL_LIST']);
-        send_email_from_smtp_server(msg, email_list);
-    return email_info_dictionary;
+        mime_email, hed_resource_dictionary = create_email(github_payload_dictionary,
+                                                           app_config[constants.CONFIG_EMAIL_LIST]);
+        send_email_from_smtp_server(mime_email, email_list);
+    return hed_resource_dictionary;
 
 
-# Create gollum event related email
 def create_email(github_payload_dictionary, email_list):
-    email_info_dictionary = {};
-    msg, main_body_text = utils.create_standard_email(github_payload_dictionary, email_list);
+    """Creates a email with the latest HED schema.
+
+    Parameters
+    ----------
+    github_payload_dictionary: dictionary
+        A dictionary containing a Github payload.
+    email_list: string
+        A list containing the emails from a file.
+
+    Returns
+    -------
+    tuple
+        A tuple containing a MIMEBase object used to create the email and a dictionary containing resources used to
+        create the email.
+    """
+    hed_resource_dictionary = {};
+    mime_email, main_body_text = utils.create_standard_email(github_payload_dictionary, email_list);
     if utils.wiki_page_is_hed_schema(github_payload_dictionary):
-        email_info_dictionary = utils.create_hed_schema_email(msg, main_body_text);
+        hed_resource_dictionary = utils.create_hed_schema_email(mime_email, main_body_text);
     else:
         main_body = MIMEText(main_body_text);
-        msg.attach(main_body);
-    return msg, email_info_dictionary;
+        mime_email.attach(main_body);
+    return mime_email, hed_resource_dictionary;
 
 
-# Send the message via our own SMTP server
-def send_email_from_smtp_server(msg, email_list):
-    smtp_server = smtplib.SMTP('localhost');
-    smtp_server.sendmail(app_config['SENDER'], email_list, msg.as_string());
+#
+def send_email_from_smtp_server(mime_email, email_list):
+    """Send the message via our own SMTP server.
+
+    Parameters
+    ----------
+    mime_email: Request object
+        A dictionary containing a Github payload.
+    Returns
+    -------
+
+    """
+    smtp_server = smtplib.SMTP(constants.LOCALHOST);
+    smtp_server.sendmail(app_config[constants.CONFIG_EMAIL_FROM_KEY], email_list, mime_email.as_string());
     smtp_server.quit();

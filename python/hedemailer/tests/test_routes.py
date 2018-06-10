@@ -1,6 +1,7 @@
 import unittest;
 import json;
 from hedemailer.app_factory import AppFactory;
+from hedemailer import constants;
 
 
 class Test(unittest.TestCase):
@@ -30,8 +31,9 @@ class Test(unittest.TestCase):
 
     def test_good_hed_payload(self):
         self.app.application.config['EMAIL_LIST'] = 'data/emails.txt';
-        response = self.app.post('/', data=self.hed_payload_string, headers={'content-type': 'application/json',
-                                                                             'X-GitHub-Event': 'gollum'});
+        response = self.app.post('/', data=self.hed_payload_string,
+                                 headers={constants.HEADER_CONTENT_TYPE: constants.JSON_CONTENT_TYPE,
+                                          'X-GitHub-Event': 'gollum'});
         self.assertEqual(response.status_code, 200);
 
 
