@@ -5,7 +5,7 @@ hedemailer is a Python 3 package that sends out an email whenever there is an up
 For the HED schema please visit: <https://github.com/BigEEGConsortium/HED-schema/wiki/HED-Schema>
 
 ### Dependencies
-1) Python 3 (https://www.python.org/downloads/)
+1) [Python 3](https://www.python.org/downloads/)
 2) SMTP server
-3) hedconversion ([I'm an inline-style link])
+3) [hedconversion](hedconversion)
 
