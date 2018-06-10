@@ -6,7 +6,6 @@ For the HED schema please visit: <https://github.com/BigEEGConsortium/HED-schema
 
 ### Dependencies
 
-[Python 3](https://www.python.org/downloads/)
-SMTP server
-[hedconversion](../hedconversion)
-
+* [Python 3](https://www.python.org/downloads/)
+* SMTP server
+* [hedconversion](../hedconversion)
