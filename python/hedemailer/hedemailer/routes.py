@@ -9,8 +9,7 @@ route_blueprint = Blueprint('route_blueprint', __name__);
 @route_blueprint.route('/', methods=['POST'])
 def process_hed_payload():
     try:
-        if utils.request_is_github_gollum_event(request):
-            hed_emailer.send_email(request);
+        if utils.request_is_github_gollum_event(request) and hed_emailer.send_email(request):
             return json.dumps({'success': True, 'message': 'Email(s) correctly sent'}), 200, {
                 'ContentType': 'application/json'};
     except Exception as ex:

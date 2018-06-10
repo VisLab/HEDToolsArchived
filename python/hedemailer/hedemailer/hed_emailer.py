@@ -15,7 +15,7 @@ app_config = current_app.config;
 
 # Send gollum event related email
 def send_email(request):
-    github_payload_string = request.data.decode('utf-8');
+    github_payload_string = str(request.data, 'utf-8');
     github_payload_dictionary = json.loads(github_payload_string);
     email_list = utils.get_email_list_from_file(app_config['EMAIL_LIST']);
     msg, email_info_dictionary = create_email(github_payload_dictionary, app_config['EMAIL_LIST']);

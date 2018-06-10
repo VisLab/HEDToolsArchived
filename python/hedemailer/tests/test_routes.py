@@ -24,9 +24,9 @@ class Test(unittest.TestCase):
             app.register_blueprint(route_blueprint);
             cls.app = app.test_client();
 
-    # def test_no_hed_payload(self):
-    #     response = self.app.post('/');
-    #     self.assertEqual(response.status_code, 200);
+    def test_no_hed_payload(self):
+        response = self.app.post('/');
+        self.assertEqual(response.status_code, 200);
 
     def test_good_hed_payload(self):
         self.app.application.config['EMAIL_LIST'] = 'data/emails.txt';
