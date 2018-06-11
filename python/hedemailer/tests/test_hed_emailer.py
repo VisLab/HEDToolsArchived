@@ -1,5 +1,6 @@
 import unittest;
 import json;
+from hedemailer import constants;
 from hedemailer.app_factory import AppFactory;
 
 
@@ -23,6 +24,17 @@ class Test(unittest.TestCase):
             from hedemailer.routes import route_blueprint;
             app.register_blueprint(route_blueprint);
             cls.app = app.test_client();
+
+    def test_send_email_no_hed_payload(self):
+        response = self.app.post('/');
+        self.assertEqual(response.status_code, 200);
+
+    def test__send_email_good_hed_payload(self):
+        self.app.application.config['EMAIL_LIST'] = 'data/emails.txt';
+        response = self.app.post('/', data=self.hed_payload_string,
+                                 headers={constants.HEADER_CONTENT_TYPE: constants.JSON_CONTENT_TYPE,
+                                          'X-GitHub-Event': 'gollum'});
+        self.assertEqual(response.status_code, 200);
 
 
 if __name__ == "__main__":
