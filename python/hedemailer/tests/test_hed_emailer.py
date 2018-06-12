@@ -2,6 +2,7 @@ import unittest;
 import json;
 from hedemailer import constants;
 from hedemailer.app_factory import AppFactory;
+from flask import request;
 
 
 class Test(unittest.TestCase):
