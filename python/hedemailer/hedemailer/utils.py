@@ -77,8 +77,11 @@ def clean_up_hed_resources(hed_resource_dictionary):
     Returns
     -------
     """
-    delete_file_if_exist(hed_resource_dictionary[constants.HED_XML_LOCATION_KEY]);
-    delete_file_if_exist(hed_resource_dictionary[constants.HED_WIKI_LOCATION_KEY]);
+    if hed_resource_dictionary:
+        if constants.HED_XML_LOCATION_KEY in hed_resource_dictionary:
+            delete_file_if_exist(hed_resource_dictionary[constants.HED_XML_LOCATION_KEY]);
+        if constants.HED_WIKI_LOCATION_KEY in hed_resource_dictionary:
+            delete_file_if_exist(hed_resource_dictionary[constants.HED_WIKI_LOCATION_KEY]);
 
 
 def wiki_page_is_hed_schema(github_payload_dictionary):
@@ -94,7 +97,7 @@ def wiki_page_is_hed_schema(github_payload_dictionary):
     boolean
         True if the WIKI page is a HED schema WIKI page.
     """
-    return app_config[constants.CONFIG_HED_WIKI_PAGE_KEY] == \
+    return github_payload_dictionary and app_config[constants.CONFIG_HED_WIKI_PAGE_KEY] == \
            github_payload_dictionary[constants.WIKI_PAGES_KEY][0][constants.WIKI_TITLE_KEY];
 
 

@@ -31,13 +31,13 @@ def send_email(request):
     github_payload_dictionary = json.loads(github_payload_string);
     email_list = utils.get_email_list_from_file(app_config[constants.CONFIG_EMAIL_LIST]);
     if email_list:
-        mime_email, hed_resource_dictionary = create_email(github_payload_dictionary,
-                                                           app_config[constants.CONFIG_EMAIL_LIST]);
-        send_email_from_smtp_server(mime_email, email_list);
+        mime_email, hed_resource_dictionary = _create_email(github_payload_dictionary,
+                                                            app_config[constants.CONFIG_EMAIL_LIST]);
+        _send_email_from_smtp_server(mime_email, email_list);
     return hed_resource_dictionary;
 
 
-def create_email(github_payload_dictionary, email_list):
+def _create_email(github_payload_dictionary, email_list):
     """Creates a email with the latest HED schema.
 
     Parameters
@@ -64,13 +64,15 @@ def create_email(github_payload_dictionary, email_list):
 
 
 #
-def send_email_from_smtp_server(mime_email, email_list):
+def _send_email_from_smtp_server(mime_email, email_list):
     """Send the message via our own SMTP server.
 
     Parameters
     ----------
-    mime_email: Request object
-        A dictionary containing a Github payload.
+    mime_email: MIMEBase object
+        A MIMEBase object used to create the email
+    email_list: string
+        A list containing the emails from a file.
     Returns
     -------
 
