@@ -104,7 +104,7 @@ def get_hed_version_in_file():
     return json.dumps(hed_info);
 
 
-@route_blueprint.route('/get-major-hedversions', methods=['GET'])
+@route_blueprint.route('/get-major-hed-versions', methods=['GET'])
 def get_major_hed_versions():
     """Gets information related to the spreadsheet columns.
 
