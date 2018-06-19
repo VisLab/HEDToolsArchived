@@ -1,7 +1,6 @@
 from flask import Flask;
 from flask_wtf.csrf import CSRFProtect;
 import importlib;
-import jinja2;
 
 STATIC_URL_PATH_ATTRIBUTE_NAME = 'STATIC_URL_PATH';
 
