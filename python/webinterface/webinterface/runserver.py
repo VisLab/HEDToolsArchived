@@ -17,6 +17,10 @@ def setup_logging():
 
 
 def configure_app():
+    """Configures the current application. Checks to see if a environment variable exist and if it doesn't then it
+       defaults to another configuration.
+
+    """
     if CONFIG_ENVIRON_NAME in os.environ:
         return AppFactory.create_app(os.environ.get(CONFIG_ENVIRON_NAME));
     else:
