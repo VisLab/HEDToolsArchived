@@ -2,7 +2,8 @@ from flask import render_template, Response, request, Blueprint, current_app;
 import os;
 import json;
 from webinterface import utils;
-from webinterface.constants import route_constants, page_constants, error_constants, blueprint_constants;
+from webinterface.constants.error import error_constants
+from webinterface.constants.routing import page_constants, route_constants, blueprint_constants
 import traceback;
 
 app_config = current_app.config;
@@ -43,12 +44,12 @@ def render_common_error_page():
 
 @route_blueprint.route(route_constants.DELETE_FILE_ROUTE, strict_slashes=False, methods=['GET'])
 def delete_file_in_upload_directory(filename):
-    """Deletes the specified file from the upload file.
+    """Deletes the specified other from the upload other.
 
     Parameters
     ----------
     filename: string
-        The name of the file to delete from the upload file.
+        The name of the other to delete from the upload other.
 
     Returns
     -------
@@ -62,17 +63,17 @@ def delete_file_in_upload_directory(filename):
 
 @route_blueprint.route(route_constants.DOWNLOAD_FILE_ROUTE, strict_slashes=False, methods=['GET'])
 def download_file_in_upload_directory(filename):
-    """Downloads the specified file from the upload file.
+    """Downloads the specified other from the upload other.
 
     Parameters
     ----------
     filename: string
-        The name of the file to download from the upload file.
+        The name of the other to download from the upload other.
 
     Returns
     -------
     File
-        The contents of a file in the upload directory to send to the client.
+        The contents of a other in the upload directory to send to the client.
 
     """
     download_response = utils.generate_download_file_response(filename);
@@ -206,7 +207,7 @@ def render_additional_examples_page():
 
 @route_blueprint.route(route_constants.SUBMIT_ROUTE, strict_slashes=False, methods=['POST'])
 def get_validation_results():
-    """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
+    """Validate the spreadsheet in the form after submission and return an attachment other containing the output.
 
     Parameters
     ----------
