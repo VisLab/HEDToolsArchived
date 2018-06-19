@@ -2,17 +2,14 @@ from flask import render_template, Response, request, Blueprint, current_app;
 import os;
 import json;
 from webinterface import utils;
+from webinterface.constants import route_constants, page_constants, error_constants, blueprint_constants;
 import traceback;
 
-INTERNAL_SERVER_ERROR = 500;
-NOT_FOUND_ERROR = 404;
-NO_CONTENT_SUCCESS = 204;
-
 app_config = current_app.config;
-route_blueprint = Blueprint('route_blueprint', __name__);
+route_blueprint = Blueprint(blueprint_constants.ROUTE_BLUEPRINT, __name__);
 
 
-@route_blueprint.route('/', strict_slashes=False, methods=['GET'])
+@route_blueprint.route(route_constants.HOME_ROUTE, strict_slashes=False, methods=['GET'])
 def render_home_page():
     """Handles the home page.
 
@@ -25,9 +22,10 @@ def render_home_page():
         A rendered template for the home page.
 
     """
-    return render_template('home.html');
+    return render_template(page_constants.HOME_PAGE);
 
-@route_blueprint.route('/common-errors', strict_slashes=False, methods=['GET'])
+
+@route_blueprint.route(route_constants.COMMON_ERRORS_ROUTE, strict_slashes=False, methods=['GET'])
 def render_common_error_page():
     """Handles the common errors page.
 
@@ -40,10 +38,10 @@ def render_common_error_page():
         A rendered template for the home page.
 
     """
-    return render_template('common-errors.html');
+    return render_template(page_constants.COMMON_ERRORS);
 
 
-@route_blueprint.route('/delete/<filename>', strict_slashes=False, methods=['GET'])
+@route_blueprint.route(route_constants.DELETE_FILE_ROUTE, strict_slashes=False, methods=['GET'])
 def delete_file_in_upload_directory(filename):
     """Deletes the specified file from the upload file.
 
@@ -57,12 +55,12 @@ def delete_file_in_upload_directory(filename):
 
     """
     if utils.delete_file_if_it_exist(os.path.join(app_config['UPLOAD_FOLDER'], filename)):
-        return Response(status=NO_CONTENT_SUCCESS);
+        return Response(status=error_constants.NO_CONTENT_SUCCESS);
     else:
-        return utils.handle_http_error(NOT_FOUND_ERROR, "File doesn't exist");
+        return utils.handle_http_error(error_constants.NOT_FOUND_ERROR, error_constants.FILE_DOES_NOT_EXIST);
 
 
-@route_blueprint.route('/download/<filename>', strict_slashes=False, methods=['GET'])
+@route_blueprint.route(route_constants.DOWNLOAD_FILE_ROUTE, strict_slashes=False, methods=['GET'])
 def download_file_in_upload_directory(filename):
     """Downloads the specified file from the upload file.
 
@@ -79,11 +77,11 @@ def download_file_in_upload_directory(filename):
     """
     download_response = utils.generate_download_file_response(filename);
     if isinstance(download_response, str):
-        utils.handle_http_error(NOT_FOUND_ERROR, download_response);
+        utils.handle_http_error(error_constants.NOT_FOUND_ERROR, download_response);
     return download_response;
 
 
-@route_blueprint.route('/get-hed-version', methods=['POST'])
+@route_blueprint.route(route_constants.HED_VERSION_ROUTE, methods=['POST'])
 def get_hed_version_in_file():
     """Gets information related to the spreadsheet columns.
 
@@ -99,12 +97,12 @@ def get_hed_version_in_file():
 
     """
     hed_info = utils.find_hed_version_in_file(request);
-    if 'error' in hed_info:
-        return utils.handle_http_error(INTERNAL_SERVER_ERROR, hed_info['error']);
+    if error_constants.ERROR_KEY in hed_info:
+        return utils.handle_http_error(error_constants.INTERNAL_SERVER_ERROR, hed_info[error_constants.ERROR_KEY]);
     return json.dumps(hed_info);
 
 
-@route_blueprint.route('/get-major-hed-versions', methods=['GET'])
+@route_blueprint.route(route_constants.MAJOR_HED_VERSION_ROUTE, methods=['GET'])
 def get_major_hed_versions():
     """Gets information related to the spreadsheet columns.
 
@@ -120,12 +118,12 @@ def get_major_hed_versions():
 
     """
     hed_info = utils.find_major_hed_versions();
-    if 'error' in hed_info:
-        return utils.handle_http_error(INTERNAL_SERVER_ERROR, hed_info['error']);
+    if error_constants.ERROR_KEY in hed_info:
+        return utils.handle_http_error(error_constants.INTERNAL_SERVER_ERROR, hed_info[error_constants.ERROR_KEY]);
     return json.dumps(hed_info);
 
 
-@route_blueprint.route('/get-spreadsheet-columns-info', methods=['POST'])
+@route_blueprint.route(route_constants.SPREADSHEET_COLUMN_INFO_ROUTE, methods=['POST'])
 def get_spreadsheet_columns_info():
     """Gets information related to the spreadsheet columns.
 
@@ -141,12 +139,13 @@ def get_spreadsheet_columns_info():
 
     """
     spreadsheet_columns_info = utils.find_spreadsheet_columns_info(request);
-    if 'error' in spreadsheet_columns_info:
-        return utils.handle_http_error(INTERNAL_SERVER_ERROR, spreadsheet_columns_info['error']);
+    if error_constants.ERROR_KEY in spreadsheet_columns_info:
+        return utils.handle_http_error(error_constants.INTERNAL_SERVER_ERROR,
+                                       spreadsheet_columns_info[error_constants.ERROR_KEY]);
     return json.dumps(spreadsheet_columns_info);
 
 
-@route_blueprint.route('/get-worksheets-info', methods=['POST'])
+@route_blueprint.route(route_constants.WORKSHEET_COLUMN_INFO, methods=['POST'])
 def get_worksheets_info():
     """Gets information related to the Excel worksheets.
 
@@ -165,14 +164,15 @@ def get_worksheets_info():
     worksheets_info = {};
     try:
         worksheets_info = utils.find_worksheets_info(request);
-        if 'error' in worksheets_info:
-            return utils.handle_http_error(INTERNAL_SERVER_ERROR, worksheets_info['error']);
+        if error_constants.ERROR_KEY in worksheets_info:
+            return utils.handle_http_error(error_constants.INTERNAL_SERVER_ERROR,
+                                           worksheets_info[error_constants.ERROR_KEY]);
     except:
-        worksheets_info['error'] = traceback.format_exc();
+        worksheets_info[error_constants.ERROR_KEY] = traceback.format_exc();
     return json.dumps(worksheets_info);
 
 
-@route_blueprint.route('/help', strict_slashes=False, methods=['GET'])
+@route_blueprint.route(route_constants.HELP_ROUTE, strict_slashes=False, methods=['GET'])
 def render_help_page():
     """Handles the site help page.
 
@@ -185,10 +185,10 @@ def render_help_page():
         A rendered template for the help page.
 
     """
-    return render_template('help.html');
+    return render_template(page_constants.HELP_PAGE);
 
 
-@route_blueprint.route('/additional-examples', strict_slashes=False, methods=['GET'])
+@route_blueprint.route(route_constants.ADDITIONAL_EXAMPLES_ROUTE, strict_slashes=False, methods=['GET'])
 def render_additional_examples_page():
     """Handles the site additional examples page.
 
@@ -201,10 +201,10 @@ def render_additional_examples_page():
         A rendered template for the additional examples page.
 
     """
-    return render_template('additional-examples.html');
+    return render_template(page_constants.ADDITIONAL_EXAMPLES_PAGE);
 
 
-@route_blueprint.route('/submit', strict_slashes=False, methods=['POST'])
+@route_blueprint.route(route_constants.SUBMIT_ROUTE, strict_slashes=False, methods=['POST'])
 def get_validation_results():
     """Validate the spreadsheet in the form after submission and return an attachment file containing the output.
 
@@ -218,12 +218,13 @@ def get_validation_results():
         500 error message is returned.
     """
     validation_status = utils.report_spreadsheet_validation_status(request);
-    if 'error' in validation_status:
-        return utils.handle_http_error(INTERNAL_SERVER_ERROR, validation_status['error']);
+    if error_constants.ERROR_KEY in validation_status:
+        return utils.handle_http_error(error_constants.INTERNAL_SERVER_ERROR,
+                                       validation_status[error_constants.ERROR_KEY]);
     return json.dumps(validation_status);
 
 
-@route_blueprint.route('/validation', strict_slashes=False, methods=['GET'])
+@route_blueprint.route(route_constants.VALIDATION_ROUTE, strict_slashes=False, methods=['GET'])
 def render_validation_form():
     """Handles the site root and Validation tab functionality.
 
@@ -237,4 +238,4 @@ def render_validation_form():
         displayed. If the HTTP method is a POST then the validation form is submitted.
 
     """
-    return render_template('validation.html');
+    return render_template(page_constants.VALIDATION_PAGE);
