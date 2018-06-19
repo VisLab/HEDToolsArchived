@@ -10,24 +10,25 @@ import tempfile;
 
 
 class Config(object):
-    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
-    SECRET_KEY = os.urandom(24);
-    URL_PREFIX = None;
-    STATIC_URL_PATH = None;
     LOG_DIRECTORY = '/var/log/hedtools';
     LOG_FILE = os.path.join(LOG_DIRECTORY, 'error.log');
+    SECRET_KEY = os.urandom(24);
+    STATIC_URL_PATH = None;
+    STATIC_URL_PATH_ATTRIBUTE_NAME = 'STATIC_URL_PATH';
+    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'hedtools_uploads');
+    URL_PREFIX = None;
 
 
 class DevelopmentConfig(Config):
-    TESTING = False;
     DEBUG = False;
+    TESTING = False;
 
 
 class TestConfig(Config):
-    TESTING = True;
     DEBUG = False;
+    TESTING = True;
 
 
 class DebugConfig(Config):
-    TESTING = False;
     DEBUG = True;
+    TESTING = False;
