@@ -208,6 +208,13 @@ classdef HedStringDelimiter
             end
         end % hedString2Cell
         
+        function cellArray = hedString2FormattedCell(hedString)
+            % Converts a HED string into a formatted cell array. Groups
+            % will be nested cells.
+            cellArray = HedStringDelimiter.hedString2Cell(hedString);
+            cellArray = HedStringDelimiter.putInCanonicalForm(cellArray);
+        end % hedString2Cell
+        
     end % Static public methods
     
     
@@ -231,6 +238,7 @@ classdef HedStringDelimiter
             % Formats the tag by converting it to lower case, removing
             % slashes in the beginning and end, and trimming space.
             tag = strtrim(tag);
+            tag = lower(tag);
             if strcmp(tag(1), '/')
                 tag = tag(2:end);
             end
