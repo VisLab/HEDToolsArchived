@@ -428,7 +428,7 @@ classdef HedStringDelimiter
                 if hedString(index) == HedStringDelimiter.closingBracket
                     numClosingBrackets =  numClosingBrackets + 1;
                 end
-                group = strcat(group, hedString(index));
+                group = [group hedString(index)]; %#ok<AGROW>
             end
         end % getNextTagGroup
         
