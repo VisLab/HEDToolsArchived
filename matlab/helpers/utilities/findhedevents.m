@@ -24,7 +24,7 @@
 %                If these tags are present in both the query string and the
 %                HED string then a match will be returned.
 %                By default, this argument is set to
-%                {'Attribute/Intended effect', 'Attribute/Offset', 
+%                {'Attribute/Intended effect', 'Attribute/Offset',
 %                'Attribute/Participant indication'}.
 %
 % Output:
@@ -100,7 +100,7 @@ end
         % Looks for a match, first at the top-level and then in the groups
         if topLevelMatchFound(tags)
             matchFound = true;
-        elseif noAttributeOrExclusiveTagsFound(tags)         
+        elseif noAttributeOrExclusiveTagsFound(tags)
             matchFound = matchFoundAnywhere(tags);
         elseif ~isempty(tags.groupTags)
             matchFound = findMatchInGroup(tags);
@@ -127,7 +127,7 @@ end
         % Finds a match in the HED string groups
         matchFound = matchFoundInAllGroups(tags);
     end % findMatchInGroup
-    
+
     function matchFound = noQueryAttributesAndExclusiveTagsFound(tags)
         % Returns true if no attributes tags are found in the query string
         % and no exclusive tags are found in the HED string
@@ -139,15 +139,15 @@ end
         % Returns true if no non-onset attributes tags are found in the
         % HED string and no exclusive tags are found in the HED string
         matchFound = ~nonOnsetAttributeTagsFound(tags) && ...
-                ~exclusiveTagsFound(tags);       
+            ~exclusiveTagsFound(tags);
     end % noNonOnsetAttributesOrExclusiveTagsFound
 
     function noAttributesFound = noAttributeOrExclusiveTagsFound(tags)
         % Returns true if no attributes are found in query string and no
-        % attributes or exclusive tags are found in HED string 
-         noAttributesFound = ...
-             noQueryAttributesAndExclusiveTagsFound(tags) || ...
-                noNonOnsetAttributesAndExclusiveTagsFound(tags);
+        % attributes or exclusive tags are found in HED string
+        noAttributesFound = ...
+            noQueryAttributesAndExclusiveTagsFound(tags) || ...
+            noNonOnsetAttributesAndExclusiveTagsFound(tags);
     end % noAttributeOrExclusiveTagsFound
 
     function matchFound = matchFoundInAllGroups(tags)
@@ -239,14 +239,14 @@ end
 
     function matchFound = topLevelExactOrPrefixMatchFound(tags)
         % Returns true if there is an exact or prefix match found in
-        % top-level tags 
+        % top-level tags
         matchFound = all(exactTopLevelMatchIndices(tags) | ...
             prefixTopLevelMatchIndices(tags));
     end % topLevelExactOrPartialMatchFound
 
     function matchFound = sameExclusiveTagsFoundInTopLevelAndQuery(tags)
-       % Returns true if all exclusive tags found at the top-level are also
-       % found in the query tags 
+        % Returns true if all exclusive tags found at the top-level are also
+        % found in the query tags
         matchFound = anyFoundInAndB(tags.topLevelTags, tags.queryTags, ...
             tags.exclusiveTags);
     end % topLevelExclusiveTagsFoundInQuery
@@ -291,19 +291,18 @@ end
     function tags = splitHedTagsIntoCellArraysByLevel(tags, hedString)
         % Split the HED string tags into cell arrays containing the
         % top-level tags, group tags, and all the tags within a structure
-        tags.allTags = hed2cell(lower(hedString), true);
-        tags.topLevelTags = tags.allTags(cellfun(@ischar, tags.allTags));
-        tags.groupTags = tags.allTags(cellfun(@iscell, tags.allTags));
-        if ~iscellstr(tags.allTags)
-            tags.allTags = [tags.allTags{:}];
-        end
+        hedStringDelimiter = HedStringDelimiter(hedString);
+        tags.allTags = hedStringDelimiter.getFormattedUniqueTags();
+        tags.topLevelTags = hedStringDelimiter.getFormattedTopLevelTags();
+        tags.groupTags = hedStringDelimiter.getFormattedGroupTags();
     end % splitHedTagsIntoCellsByLevel
 
     function tags = splitQueryTagsIntoCellArraysWithPrefix(tags, ...
             queryString)
         % Put the query string tags inside cell arrays containing the
         % tags and the prefix version of them within a structure
-        tags.queryTags = hed2cell(lower(queryString), true);
+        tags.queryTags = ...
+            HedStringDelimiter.hedString2FormattedCell(queryString);
         tags.prefixQueryTags = strcat(tags.queryTags, '/');
     end % splitQueryTagsIntoCellArraysWithPrefix
 
