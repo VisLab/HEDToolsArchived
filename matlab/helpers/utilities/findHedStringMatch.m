@@ -5,7 +5,9 @@
 %
 % Usage:
 %
-%   >>  matchMask = findHedStringMatch(hedStrings, queryHedString
+%   >>  matchMask = findHedStringMatch(hedStrings, queryString)
+%
+%   >>  matchMask = findHedStringMatch(hedStrings, queryString, varargin)
 %
 % Input:
 %
@@ -13,7 +15,7 @@
 %                 A HED string or a cell array of HED strings. This
 %                 function will check whether they match a query string.
 %
-% queryHedString  
+% queryString  
 %                A query string consisting of tags that you want to search
 %                for. Two tags separated by a comma use the AND operator
 %                by default, meaning that it will only return a true match
@@ -38,6 +40,7 @@
 % Example
 %
 % >> matchMask = match_hed({'a' 'a/b/c' 'b/d/d'}, 'b')
+%
 % >> matchMask =
 %
 %      0
@@ -63,9 +66,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function matchMask = findHedStringMatch(hedStrings, queryHedString, ...
+function matchMask = findHedStringMatch(hedStrings, queryString, ...
     varargin)
-inputArguments = parseInputArguments(hedStrings, queryHedString, ...
+inputArguments = parseInputArguments(hedStrings, queryString, ...
     varargin{:});
 exlcusiveTagsArgument = 'exclusiveTags';
 orOperator = '||';
@@ -75,16 +78,16 @@ end
 [uniuqeHedStrings, ~, ids] = unique(hedStrings);
 matchMask = false(length(hedStrings), 1);
 for i = 1:length(uniuqeHedStrings)
-    if strcmp(strtrim(uniuqeHedStrings{i}), strtrim(queryHedString))
+    if strcmp(strtrim(uniuqeHedStrings{i}), strtrim(queryString))
         matchMask(ids == i) = true;
         break;
     end
-    if isempty(strfind(lower(queryHedString), orOperator))
+    if isempty(strfind(lower(queryString), orOperator))
         matchMask(ids == i) =  findhedevents(uniuqeHedStrings{i}, ...
-            queryHedString, exlcusiveTagsArgument, ...
+            queryString, exlcusiveTagsArgument, ...
             inputArguments.exclusiveTags);
     else
-        queryParts  = strsplit(lower(queryHedString), orOperator);
+        queryParts  = strsplit(lower(queryString), orOperator);
         matchMask(ids == i) = false;
         for j=1:length(queryParts)
             matchMask(ids == i) = matchMask(ids == i) | ...
