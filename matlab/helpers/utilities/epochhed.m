@@ -4,9 +4,9 @@
 %
 % Usage:
 %
-%   >> EEG = epochhed(EEG, tagstring, timelimits)
+%   >> EEG = epochhed(EEG, querystring, timelimits)
 %
-%   >> EEG = epochhed(EEG, tagstring, timelimits, varargin)
+%   >> EEG = epochhed(EEG, querystring, timelimits, varargin)
 %
 % Inputs:
 %
@@ -16,10 +16,12 @@
 %                The dataset is assumed to be tagged and has a .usertags
 %                and/or .hedtags fields in the .event structure.
 %
-%   tagstring
-%                A comma separated list of HED tags that you want to search
-%                for. All tags in the list must be present in the HED
-%                string.
+%   querystring  
+%                A query string consisting of tags that you want to search
+%                for. Two tags separated by a comma use the AND operator
+%                by default, meaning that it will only return a true match
+%                if both the tags are found. The OR (||) operator returns
+%                a true match if either one or both tags are found.
 %
 %   timelimits
 %                Epoch latency limits [start end] in seconds relative to
@@ -85,12 +87,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [EEG, indices, epochHedStrings] = epochhed(EEG, tagstring, ...
+function [EEG, indices, epochHedStrings] = epochhed(EEG, querystring, ...
     timelimits, varargin)
-parsedArguments = parseArguments(EEG, tagstring, timelimits, varargin{:});
+parsedArguments = parseArguments(EEG, querystring, timelimits, varargin{:});
 hedStringsArray = arrayfun(@concattags, parsedArguments.EEG.event, ...
     'UniformOutput', false);
-hedStringMatchIndices = cellfun(@(x) findhedevents(x, tagstring, ...
+hedStringMatchIndices = cellfun(@(x) findHedStringMatch(x, querystring, ...
     'exclusivetags', parsedArguments.exclusivetags), hedStringsArray);
 parsedArguments.allLatencies = [parsedArguments.EEG.event.latency];
 parsedArguments.matchedLatencies = ...
@@ -221,11 +223,11 @@ epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
             'eventconsistency');
     end % modifyEvents
 
-    function p = parseArguments(EEG, tagstring, timelimits, varargin)
+    function p = parseArguments(EEG, querystring, timelimits, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
-        p.addRequired('tagstring', @(x) ischar(x));
+        p.addRequired('querystring', @(x) ischar(x));
         p.addRequired('timelimits', @(x) isnumeric(x) && ...
             numel(x) == 2);
         p.addParamValue('eventindices', 1:length(EEG.event), ...
@@ -241,7 +243,7 @@ epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.addParamValue('verbose', 'on', ...
             @(x) any(strcmpi({'on', 'off'}, x)));  %#ok<NVREPL>
-        p.parse(EEG, tagstring, timelimits, varargin{:});
+        p.parse(EEG, querystring, timelimits, varargin{:});
         p = p.Results;
     end % parseArguments
 
