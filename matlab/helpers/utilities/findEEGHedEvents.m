@@ -64,8 +64,7 @@ function [matchMask, tags] = findEEGHedEvents(EEG, queryString, varargin)
 parsedArguments = parseInputArguments(EEG, queryString, varargin{:});
 hedStringsArray = arrayfun(@concattags, parsedArguments.EEG.event, ...
     'UniformOutput', false);
-matchMask = cellfun(@(x) findHedStringMatch(x, queryString, ...
-    'exclusivetags', parsedArguments.exclusivetags), hedStringsArray);
+matchMask = findHedStringMatch(hedStringsArray, queryString);
 tags = hedStringsArray(matchMask);
 
 
