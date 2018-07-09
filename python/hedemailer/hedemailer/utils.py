@@ -54,6 +54,7 @@ def create_hed_schema_email(mime_email, main_body_text):
     dictionary
         A dictionary containing resources used to create the email.
     """
+    hed_resource_dictionary = {};
     try:
         hed_resource_dictionary = wiki2xml.convert_hed_wiki_2_xml();
         main_body_text = add_hed_xml_attachment_text(main_body_text, hed_resource_dictionary);
