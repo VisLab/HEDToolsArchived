@@ -1,6 +1,5 @@
 from flask import Blueprint, current_app, request;
 from hedemailer import hed_emailer, utils, constants;
-import json;
 
 app_config = current_app.config;
 route_blueprint = Blueprint('route_blueprint', __name__);
