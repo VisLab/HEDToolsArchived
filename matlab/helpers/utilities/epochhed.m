@@ -92,11 +92,15 @@ function [EEG, indices, epochHedStrings] = epochhed(EEG, querystring, ...
 parsedArguments = parseArguments(EEG, querystring, timelimits, varargin{:});
 hedStringsArray = arrayfun(@concattags, parsedArguments.EEG.event, ...
     'UniformOutput', false);
-hedStringMatchIndices = cellfun(@(x) findHedStringMatch(x, querystring, ...
-    'exclusivetags', parsedArguments.exclusivetags), hedStringsArray);
+if isempty(parsedArguments.mask)
+matchMask = parsedArguments.mask;
+else
+matchMask = cellfun(@(x) findHedStringMatch(x, querystring, ...
+    'exclusivetags', parsedArguments.exclusivetags), hedStringsArray);    
+end
 parsedArguments.allLatencies = [parsedArguments.EEG.event.latency];
 parsedArguments.matchedLatencies = ...
-    parsedArguments.allLatencies(hedStringMatchIndices);
+    parsedArguments.allLatencies(matchMask);
 parsedArguments = epochData(parsedArguments);
 parsedArguments = updateFields(parsedArguments);
 parsedArguments = duplicateEvents(parsedArguments);
@@ -104,7 +108,7 @@ parsedArguments = modifyEvents(parsedArguments);
 parsedArguments = checkBoundaryEvents(parsedArguments);
 EEG = parsedArguments.EEG;
 indices = parsedArguments.acceptedEventIndecies;
-hedStringMatchPositions = find(hedStringMatchIndices);
+hedStringMatchPositions = find(matchMask);
 hedStringAcceptedIndices= hedStringMatchPositions(indices);
 epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
 
@@ -235,6 +239,8 @@ epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
         p.addParamValue('exclusivetags', ...
             {'Attribute/Intended effect', 'Attribute/Offset'}, ...
             @iscellstr); %#ok<NVREPL>
+        p.addParamValue('mask', [], ...
+            @islogical); %#ok<NVREPL>
         p.addParamValue('newname', [EEG.setname ' epochs'], ...
             @(x) ischar(x)); %#ok<NVREPL>
         p.addParamValue('timeunit', 'points', ...
