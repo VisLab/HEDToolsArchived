@@ -4,9 +4,9 @@
 %
 % Usage:
 %
-%   >> EEG = epochhed(EEG, querystring, timelimits)
+%   >> EEG = epochhed(EEG, querystring)
 %
-%   >> EEG = epochhed(EEG, querystring, timelimits, varargin)
+%   >> EEG = epochhed(EEG, querystring, varargin)
 %
 % Inputs:
 %
@@ -22,10 +22,6 @@
 %                by default, meaning that it will only return a true match
 %                if both the tags are found. The OR (||) operator returns
 %                a true match if either one or both tags are found.
-%
-%   timelimits
-%                Epoch latency limits [start end] in seconds relative to
-%                the time-locking event. The default is [-1 2].
 %
 % Optional inputs (key/value):
 %
@@ -88,16 +84,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 function [EEG, indices, epochHedStrings] = epochhed(EEG, querystring, ...
-    timelimits, varargin)
-parsedArguments = parseArguments(EEG, querystring, timelimits, varargin{:});
+    varargin)
+parsedArguments = parseArguments(EEG, querystring, varargin{:});
 hedStringsArray = arrayfun(@concattags, parsedArguments.EEG.event, ...
     'UniformOutput', false);
-if isempty(parsedArguments.mask)
-matchMask = parsedArguments.mask;
-else
-matchMask = cellfun(@(x) findHedStringMatch(x, querystring, ...
-    'exclusivetags', parsedArguments.exclusivetags), hedStringsArray);    
-end
+matchMask = getMatchMask(parsedArguments, hedStringsArray);
 parsedArguments.allLatencies = [parsedArguments.EEG.event.latency];
 parsedArguments.matchedLatencies = ...
     parsedArguments.allLatencies(matchMask);
@@ -111,6 +102,18 @@ indices = parsedArguments.acceptedEventIndecies;
 hedStringMatchPositions = find(matchMask);
 hedStringAcceptedIndices= hedStringMatchPositions(indices);
 epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
+
+    function matchMask = getMatchMask(parsedArguments, hedStringsArray)
+        % Gets the match mask from the arguments if passed in. If not
+        % passed in it is computed. 
+        if ~isempty(parsedArguments.mask)
+            matchMask = parsedArguments.mask;
+        else
+            matchMask = cellfun(@(x) findHedStringMatch(x, ...
+                parsedArguments.querystring, 'exclusivetags', ...
+                parsedArguments.exclusivetags), hedStringsArray);
+        end       
+    end % getMatchMask
 
 
     function parsedArguments = checkBoundaryEvents(parsedArguments)
@@ -227,12 +230,12 @@ epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
             'eventconsistency');
     end % modifyEvents
 
-    function p = parseArguments(EEG, querystring, timelimits, varargin)
+    function p = parseArguments(EEG, querystring, varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
         p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
         p.addRequired('querystring', @(x) ischar(x));
-        p.addRequired('timelimits', @(x) isnumeric(x) && ...
+        p.addParamValue('timelimits', [-1 2], @(x) isnumeric(x) && ...
             numel(x) == 2);
         p.addParamValue('eventindices', 1:length(EEG.event), ...
             @isnumeric); %#ok<NVREPL>
@@ -249,7 +252,7 @@ epochHedStrings = hedStringsArray(hedStringAcceptedIndices);
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.addParamValue('verbose', 'on', ...
             @(x) any(strcmpi({'on', 'off'}, x)));  %#ok<NVREPL>
-        p.parse(EEG, querystring, timelimits, varargin{:});
+        p.parse(EEG, querystring, varargin{:});
         p = p.Results;
     end % parseArguments
 
