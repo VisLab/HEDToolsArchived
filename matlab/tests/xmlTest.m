@@ -1,24 +1,26 @@
-function test_suite = test_xml %#ok<STOUT>
-initTestSuite;
+function tests = xmlTest
+tests = functiontests(localfunctions);
+end % xmlTest
 
-function values = setup %#ok<DEFNU>
+
+function setupOnce(testCase)
 latestHed = 'HED.xml';
-values.HedXml = fileread(latestHed);
+testCase.TestData.HedXml = fileread(latestHed);
 hPath = fileparts(which(latestHed));
-values.SchemaFile = [hPath filesep 'HED.xsd'];
-values.Schema = fileread(values.SchemaFile);
-function teardown(values) %#ok<INUSD,DEFNU>
-% Function executed after each test
+testCase.TestData.SchemaFile = [hPath filesep 'HED.xsd'];
+testCase.TestData.Schema = fileread(testCase.TestData.SchemaFile);
+end
 
-function testValidWithSchema(values) %#ok<DEFNU>
+function testValidWithSchema(testCase)
 % Unit test for eventTags constructor valid JSON
 fprintf('\nUnit tests for XML validation using Java libraries\n');
 fprintf(['It should correctly validate the default HED hierarchy when' ...
     ' a schema is given\n']);
-try 
+try
     fieldMap.validateXml(values.HedXml, values.Schema);
     isValid = true;
 catch ex %#ok<NASGU>
     isValid = false;
 end
- assertTrue(isValid);
+testCase.verifyFalse(isValid);
+end
