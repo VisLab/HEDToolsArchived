@@ -1,46 +1,46 @@
-function test_suite = test_validatehedstr%#ok<STOUT>
-initTestSuite;
+function tests = validatehedstrTest
+tests = functiontests(localfunctions);
+end % validatehedstrTest
 
-function values = setup %#ok<DEFNU>
-values.EmptyString = '';
-values.HEDString1 = ['Event/Label/Test1,' ...
+function setupOnce(testCase) 
+testCase.TestData.EmptyString = '';
+testCase.TestData.HEDString1 = ['Event/Label/Test1,' ...
     'Event/Category/Participant response,' ...
     'Event/Description/This is a test,' ...
     '(Participant ~ ' ...
     'Action/Control vehicle/Drive/Collide ~ ' ...
     'Item/Object/Vehicle/Car)'];
-values.HEDString2 = ['Event/Label/Test1,' ...
+testCase.TestData.HEDString2 = ['Event/Label/Test1,' ...
     'Event/Category/Participant response,' ...
     'Event/Description/This is a test (Participant ~ ' ...
     'Action/Control vehicle/Drive/Collide ~ ' ...
     'Item/Object/Vehicle/Car)'];
-values.HEDString3 = ['(Participant ~ ' ...
+testCase.TestData.HEDString3 = ['(Participant ~ ' ...
     'Action/Control vehicle/Drive/Collide ~ ' ...
     'Item/Object/Vehicle/Car),' ...
     'Event/Label/Test1,' ...
     'Event/Category/Participant response,'];
+end
 
-function teardown(values) %#ok<INUSD,DEFNU>
-% Function executed after each test
-
-function testValidateHedStr(values)  %#ok<DEFNU>
+function testValidateHedStr(testCase)
 % Unit test for editmaps
 fprintf('\nUnit tests for checkgroupbrackets\n');
 
-fprintf('\nIt should return no errors when there is a empty HED string');
-errors = validatehedstr(values.EmptyString);
-assertTrue(isempty(errors));
+fprintf('\nIt should return errors when there is a empty HED string');
+errors = validatehedstr(testCase.TestData.EmptyString);
+testCase.verifyFalse(isempty(errors));
 
 fprintf('\nIt should return no errors when the HED string is valid');
-errors = validatehedstr(values.HEDString1);
-assertTrue(isempty(errors));
+errors = validatehedstr(testCase.TestData.HEDString1);
+testCase.verifyTrue(isempty(errors));
 
 fprintf(['\nIt should return errors when there is a missing comma' ...
     ' before a group']);
-errors = validatehedstr(values.HEDString2);
-assertFalse(isempty(errors));
+errors = validatehedstr(testCase.TestData.HEDString2);
+testCase.verifyFalse(isempty(errors));
 
 fprintf(['\nIt should return errors when there is a required tag' ...
     ' missing']);
-errors = validatehedstr(values.HEDString3);
-assertFalse(isempty(errors));
+errors = validatehedstr(testCase.TestData.HEDString3);
+testCase.verifyFalse(isempty(errors));
+end
