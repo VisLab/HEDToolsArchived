@@ -1,7 +1,8 @@
-function test_suite = test_pop_tagdir%#ok<STOUT>
-initTestSuite;
+function tests = pop_tagdirTest
+tests = functiontests(localfunctions);
+end % pop_tagdirTest
 
-function test_valid()  %#ok<DEFNU>
+function test_valid(testCase)
 % Unit test for cTagger tageeg_input 
 fprintf('Testing pop_tagdir....REQUIRES USER INPUT\n');
 fprintf(['\nIt should not return anything when the cancel button' ...
@@ -9,19 +10,19 @@ fprintf(['\nIt should not return anything when the cancel button' ...
 fprintf('DO NOT CLICK OR SET ANYTHING\n');
 fprintf('PRESS THE CANCEL BUTTON\n');
 [dTags, fPaths, com] = pop_tagdir();
-assertTrue(isempty(dTags));
-assertTrue(isempty(fPaths));
-assertTrue(isempty(com));
+testCase.verifyTrue(isempty(dTags));
+testCase.verifyTrue(isempty(fPaths));
+testCase.verifyTrue(isempty(com));
 
 fprintf(['\nIt should return directory and paths when okay button' ...
     ' is pressed\n']);
 fprintf(['SET DIRECTORY PATH TO DIRECTORY CONTAINING .SET FILES TO' ...
     ' BE TAGGED\n']);
-fprintf('UNCLICK SAVE TO DIRECTORY DATASET FILES\n');
 fprintf('PRESS THE OKAY BUTTON\n');
-fprintf('EXCLUDE ALL FIELDS\n');
+fprintf('REMOVE ALL FIELDS FROM TAGGING\n');
 fprintf('PRESS THE OKAY BUTTON\n');
 [dTags, fPaths, com] = pop_tagdir();
-assertTrue(~isempty(dTags));
-assertTrue(~isempty(fPaths));
-assertTrue(~isempty(com));
+testCase.verifyTrue(~isempty(dTags));
+testCase.verifyTrue(~isempty(fPaths));
+testCase.verifyTrue(~isempty(com));
+end
