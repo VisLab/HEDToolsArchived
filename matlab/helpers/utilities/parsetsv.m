@@ -10,18 +10,10 @@
 %
 % Input:
 %
-%   hedMaps
-%                   A structure that contains Maps associated with the HED
-%                   XML tags. There is a map that contains all of the HED
-%                   tags, a map that contains all of the unit class units,
-%                   a map that contains the tags that take in units, a map
-%                   that contains the default unit used for each unit
-%                   class, a map that contains the tags that take in
-%                   values, a map that contains the tags that are numeric,
-%                   a map that contains the required tags, a map that
-%                   contains the tags that require children, a map that
-%                   contains the tags that are extension allowed, and map
-%                   that contains the tags are are unique.
+%   'hedXml'
+%                   The full path to a HED XML file containing all of the
+%                   tags. This by default will be the HED.xml file
+%                   found in the hed directory.
 %
 %   tsvFile
 %                   The name or the path of a tab-separated file
@@ -71,9 +63,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-function [issues, replaceTags] = parsetsv(hedMaps, tsvFile, ...
+function [issues, replaceTags] = parsetsv(hedXml, tsvFile, ...
     tagColumns, hasHeader, generateWarnings)
-p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
+p = parseArguments(hedXml, tsvFile, tagColumns, hasHeader, ...
     generateWarnings);
 [issues, replaceTags] = readLines(p);
 
@@ -100,17 +92,17 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
             p.formattedCellTags);
     end % findWarnings
 
-    function p = parseArguments(hedMaps, file, tagColumns, hasHeader, ...
+    function p = parseArguments(hedXml, file, tagColumns, hasHeader, ...
             generateWarnings)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
-        parser.addRequired('hedMaps', @(x) (~isempty(x) && isstruct(x)));
+        parser.addRequired('hedXml', @(x) (~isempty(x) && ischar(x)));
         parser.addRequired('tsvFile', @(x) (~isempty(x) && ischar(x)));
         parser.addRequired('tagColumns', @(x) (~isempty(x) && ...
             isa(x,'double') && length(x) >= 1));
         parser.addRequired('hasHeader', @islogical);
         parser.addRequired('generateWarnings', @islogical);
-        parser.parse(hedMaps, file, tagColumns, hasHeader, ...
+        parser.parse(hedXml, file, tagColumns, hasHeader, ...
             generateWarnings);
         p = parser.Results;
     end % parseArguments
@@ -163,17 +155,17 @@ p = parseArguments(hedMaps, tsvFile, tagColumns, hasHeader, ...
         end
     end % getLineTags
 
-    function issues = validateHEDString(hedString)
+    function issues = validateHEDString(p)
         % Validate the entire HED string
-        issues = checkgroupbrackets(hedString);
-        issues = [issues checkcommas(hedString)];
+        issues = validateHedTags(p.hedString, ...
+            'hedXml', p.hedXml, 'generateWarnings', p.generateWarnings);
     end % validateHEDString
 
     function p = validateLineTags(p)
         % This function validates the tags on a line in a tab-delimited
         % file
-        p.structIssues = validateHEDString(p.hedString);
-        if isempty(p.structIssues)
+        p.lineIssues = validateHEDString(p);
+        if isempty(p.lineIssues)
             p = findErrors(p);
             p.lineIssues = p.lineErrors;
             if(p.generateWarnings)
