@@ -1,6 +1,6 @@
 function tests = tagdir_inputTest
 tests = functiontests(localfunctions);
-end % tageegTest
+end % tagdir_inputTest
 
 function test_valid(testCase)
 % Unit test for pop_tagdir_input
