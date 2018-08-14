@@ -3,7 +3,7 @@ tests = functiontests(localfunctions);
 end % errorReporterTest
 
 function setupOnce(testCase)
-load('hedMaps.mat');
+load('HEDMaps.mat');
 requiredTags = hedMaps.required.keys();
 numericTags = hedMaps.isNumeric.keys();
 unitClassTags = hedMaps.unitClass.keys();
