@@ -177,6 +177,11 @@ classdef HedStringDelimiter
     
     methods(Static)
         
+        function group = removedTildesFromGroup(group)
+            % Removes tildes from a group.
+            group = group(~cellfun(@(x) strcmp(x, '~'), group));
+        end % removedTildesFromGroup
+        
         function cellArray = hedString2Cell(hedString)
             % Converts a HED string into a cell array. Groups will be
             % nested cells.
@@ -246,11 +251,6 @@ classdef HedStringDelimiter
                 tag = tag(1:end-1);
             end
         end % formatTag
-        
-        function group = removedTildesFromGroup(group)
-            % Removes tildes from a group.
-            group = group(~cellfun(@(x) strcmp(x, '~'), group));
-        end % removedTildesFromGroup
         
         function removeEmptyTags(tags)
             % Removes the empty tags in a HED string
