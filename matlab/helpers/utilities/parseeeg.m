@@ -60,13 +60,13 @@ function issues = parseeeg(hedXml, events, generateWarnings)
 p = parseArguments(hedXml, events, generateWarnings);
 issues = readStructTags(p);
 
-    function p = parseArguments(hedMaps, events, generateWarnings)
+    function p = parseArguments(hedXml, events, generateWarnings)
         % Parses the arguements passed in and returns the results
         parser = inputParser;
         parser.addRequired('hedXml', @(x) (~isempty(x) && ischar(x)));
         parser.addRequired('events', @(x) (~isempty(x) && isstruct(x)));
         parser.addRequired('generateWarnings', @islogical);
-        parser.parse(hedMaps, events, generateWarnings);
+        parser.parse(hedXml, events, generateWarnings);
         p = parser.Results;
     end % parseArguments
 
