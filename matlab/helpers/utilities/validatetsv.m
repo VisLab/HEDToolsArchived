@@ -32,7 +32,7 @@
 %                   a header. The first row will not be validated otherwise
 %                   it will and this can generate issues.
 %
-%   'hedXML'
+%   'hedXml'
 %                   The full path to a HED XML file containing all of the
 %                   tags. This by default will be the HED.xml file
 %                   found in the hed directory.
@@ -114,16 +114,16 @@ issues = validate(p);
         % their attributes
         hedMaps = loadHEDMap();
         mapVersion = hedMaps.version;
-        xmlVersion = getxmlversion(p.hedXML);
+        xmlVersion = getxmlversion(p.hedXml);
         if ~strcmp(mapVersion, xmlVersion);
-            hedMaps = mapattributes(p.hedXML);
+            hedMaps = mapattributes(p.hedXml);
         end
     end % getHEDMaps
 
     function hedMaps = loadHEDMap()
         % Loads a structure full of Maps containings all of the HED tags
         % and their attributes
-        Maps = load('hedMaps.mat');
+        Maps = load('HEDMaps.mat');
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
@@ -135,7 +135,7 @@ issues = validate(p);
             isa(x,'double') && length(x) >= 1));
         p.addParamValue('generateWarnings', false, ...
             @(x) validateattributes(x, {'logical'}, {}));
-        p.addParamValue('hedXML', 'HED.xml', ...
+        p.addParamValue('hedXml', 'HED.xml', ...
             @(x) (~isempty(x) && ischar(x)));
         p.addParamValue('hasHeader', true, @islogical);
         p.addParamValue('replaceFile', '', @(x) (~isempty(x) && ...
