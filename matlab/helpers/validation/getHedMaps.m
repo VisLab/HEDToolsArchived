@@ -59,7 +59,7 @@ end
     function hedMaps = loadHedMaps()
         % Loads a structure that contains Maps associated with the HED XML
         % tags
-        Maps = load('hedMaps.mat');
+        Maps = load('HEDMaps.mat');
         hedMaps = Maps.hedMaps;
     end % loadHEDMap
 
