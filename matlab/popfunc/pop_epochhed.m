@@ -129,7 +129,7 @@ if nargin < 1
     return;
 end;
 
-
+p = parseArguments(EEG, querystring, varargin);
 if nargin < 2
     % Find all the unique tags in the events
     if ~exist('tagstring','var')
@@ -156,10 +156,36 @@ if nargin < 2
     return;
 end
 
-[EEG, indices] = epochhed(EEG, querystring, timelim, varargin{:});
+[EEG, indices] = epochhed(EEG, querystring, varargin{:});
 com = char(['pop_epochhed(EEG, ' ...
     '''' querystring ''', ', ...
     '''timelim'', ''', vector2str(timelim) ', '...
     keyvalue2str(varargin{:})]);
+
+    function p = parseArguments(EEG, querystring, varargin)
+        % Parses the arguments passed in and returns the results
+        p = inputParser();
+        p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
+        p.addRequired('querystring', @(x) ischar(x));
+        p.addParamValue('timelimits', [-1 2], @(x) isnumeric(x) && ...
+            numel(x) == 2);
+        p.addParamValue('eventindices', 1:length(EEG.event), ...
+            @isnumeric); %#ok<NVREPL>
+        p.addParamValue('exclusivetags', ...
+            {'Attribute/Intended effect', 'Attribute/Offset', ...
+            'Attribute/Participant indication'}, @iscellstr); %#ok<NVREPL>
+        p.addParamValue('mask', [], ...
+            @islogical); %#ok<NVREPL>
+        p.addParamValue('newname', [EEG.setname ' epochs'], ...
+            @(x) ischar(x)); %#ok<NVREPL>
+        p.addParamValue('timeunit', 'points', ...
+            @(x) any(strcmpi({'points', 'seconds'}, x))); %#ok<NVREPL>
+        p.addParamValue('valuelim', [-inf inf], ...
+            @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
+        p.addParamValue('verbose', 'on', ...
+            @(x) any(strcmpi({'on', 'off'}, x)));  %#ok<NVREPL>
+        p.parse(EEG, querystring, varargin{:});
+        p = p.Results;
+    end % parseArguments
 
 end % pop_epochhed
