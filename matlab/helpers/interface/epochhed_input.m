@@ -83,26 +83,26 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, tagstring, exclusiveTags, newName, timeLim, ...
-    valueLim] = epochhed_input(newName, tagstring, uniquetags)
+function [canceled, querystring, exclusiveTags, newName, timeLim, ...
+    valueLim] = epochhed_input(varargin)
 
     function searchCallback(src, event) %#ok<INUSD>
-        [searchCanceled, tagstring] = hedsearch_input(uniquetags, ...
-            tagstring); ...
+        [searchCanceled, querystring] = hedsearch_input(uniquetags, ...
+            querystring); ...
             if ~searchCanceled
             tagsObj = findobj('tag', 'tagstring');
-            set(tagsObj, 'string', tagstring);
+            set(tagsObj, 'string', querystring);
             end
     end
 
     function tagsEditBoxCallback(src, ~)
         % Callback for user directly editing the HED XML editbox
-        tagstring = get(src, 'String');
+        querystring = get(src, 'String');
     end % hedEditBoxCallback
 
 geometry = { [2 5 0.5] [2 5 0.5] [5 2 0.5] [4 3 0.5] [5 2 0.5] };
 uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
-    { 'style' 'edit'       'string' tagstring 'tag' 'tagstring' 'callback', ...
+    { 'style' 'edit'       'string' querystring 'tag' 'tagstring' 'callback', ...
     @tagsEditBoxCallback} ...
     { 'style' 'pushbutton' 'string' '...' 'callback' @searchCallback } ...
     { 'style' 'text'       ...
@@ -124,7 +124,7 @@ uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
 result = inputgui( geometry, uilist, 'pophelp(''epochhed_input'')', ...
     'Extract data epochs - pop_epochhed()');
 if isempty(result)
-    tagstring = '';
+    querystring = '';
     exclusiveTags = '';
     timeLim = '';
     newName = '';
@@ -133,7 +133,7 @@ if isempty(result)
     return;
 end
 canceled = false;
-tagstring = result{1};
+querystring = result{1};
 exclusiveTags = strsplit(result{2}, ',');
 if isempty(result{3})
     timeLim = [-1 2];
