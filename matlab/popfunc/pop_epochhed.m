@@ -130,10 +130,6 @@ end;
 
 p = parseArguments(EEG, varargin{:});
 if nargin < 2
-    % Find all the unique tags in the events
-    if ~exist('tagstring','var')
-        querystring = '';
-    end
     
     uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
