@@ -147,4 +147,21 @@ else
     valueLim = str2num(result{5});  %#ok<ST2NM>
 end
 
+    function p = parseArguments(varargin)
+        % Parses the arguments passed in and returns the results
+        p = inputParser();
+        p.addParamValue('exclusivetags', ...
+            {'Attribute/Intended effect', 'Attribute/Offset', ...
+            'Attribute/Participant indication'}, @iscellstr); %#ok<NVREPL>
+        p.addParamValue('newname', [EEG.setname ' epochs'], ...
+            @(x) ischar(x)); %#ok<NVREPL>
+        p.addParamValue('querystring', '', @(x) ischar(x));
+        p.addParamValue('timelimits', [-1 2], @(x) isnumeric(x) && ...
+            numel(x) == 2);
+        p.addParamValue('valuelim', [-inf inf], ...
+            @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
+        p.parse(varargin{:});
+        p = p.Results;
+    end % parseArguments
+
 end % epochhed_input
