@@ -4,17 +4,19 @@
 %
 %   >>  [EEG, indices, com] = pop_epochhed(EEG);
 %
-%   >>  [EEG, indices, com] = pop_epochhed(EEG, tagstring, timelimits);
+%   >>  [EEG, indices, com] = pop_epochhed(EEG, querystring, timelimits);
 %
-%   >>  [EEG, indices, com] = pop_epochhed(EEG, tagstring, timelimits, ...
+%   >>  [EEG, indices, com] = pop_epochhed(EEG, querystring, timelimits, ...
 %                             'key1', value1 ...);
 %
 % Menu Options:
 %
 %   Time-locking HED tag(s)
-%                A comma separated list of HED tags that you want to search
-%                for. All tags in the list must be present in the HED
-%                string.
+%                A query string consisting of tags that you want to search
+%                for. Two tags separated by a comma use the AND operator
+%                by default, meaning that it will only return a true match
+%                if both the tags are found. The OR (||) operator returns
+%                a true match if either one or both tags are found.
 %
 %   ...
 %                Brings up search bar for specifiying Time-locking HED
@@ -46,10 +48,12 @@
 %                Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
 %
-%   tagstring
-%                A comma separated list of HED tags that you want to search
-%                for. All tags in the list must be present in the HED
-%                string.
+%   querystring
+%                A query string consisting of tags that you want to search
+%                for. Two tags separated by a comma use the AND operator
+%                by default, meaning that it will only return a true match
+%                if both the tags are found. The OR (||) operator returns
+%                a true match if either one or both tags are found.
 %
 %   timelim
 %                Epoch latency limits [start end] in seconds relative to
@@ -115,7 +119,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [EEG, indices, com] = pop_epochhed(EEG, tagstring, timelim, ...
+function [EEG, indices, com] = pop_epochhed(EEG, querystring, timelim, ...
     varargin)
 indices = [];
 com = '';
@@ -129,22 +133,22 @@ end;
 if nargin < 2
     % Find all the unique tags in the events
     if ~exist('tagstring','var')
-        tagstring = '';
+        querystring = '';
     end
     
     uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
     % Get input arguments from GUI
-    [canceled, tagstring, exclusiveTags, newName, timelim, valueLim] = ...
-        epochhed_input(EEG.setname, tagstring, uniquetags);
+    [canceled, querystring, exclusiveTags, newName, timelim, valueLim] = ...
+        epochhed_input(EEG.setname, querystring, uniquetags);
     if canceled
         return;
     end
-    [EEG, indices] = epochhed(EEG, tagstring, 'timelim', timelim, ...
+    [EEG, indices] = epochhed(EEG, querystring, 'timelim', timelim, ...
         'exclusivetags', exclusiveTags, 'newname', newName, 'valuelim', ...
         valueLim);
     com = char(['epochhed(EEG, ' ...
-        '''' tagstring ''', ', ...
+        '''' querystring ''', ', ...
         vector2str(timelim) ', ' ...
         '''exclusivetags'', ''' cellstr2str(exclusiveTags) ''', ' ...
         '''newname'', ''' newName ''', ' ...
@@ -152,9 +156,9 @@ if nargin < 2
     return;
 end
 
-[EEG, indices] = epochhed(EEG, tagstring, timelim, varargin{:});
+[EEG, indices] = epochhed(EEG, querystring, timelim, varargin{:});
 com = char(['pop_epochhed(EEG, ' ...
-    '''' tagstring ''', ', ...
+    '''' querystring ''', ', ...
     vector2str(timelim) ', '...
     keyvalue2str(varargin{:})]);
 
