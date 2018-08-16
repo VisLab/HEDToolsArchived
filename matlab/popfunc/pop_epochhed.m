@@ -24,8 +24,8 @@
 %                A comma-separated list of tags that nullify matches to
 %                other tags. If these tags are present in both the EEG
 %                dataset event tags and the tag string then a match will be
-%                returned. The default is 
-%                Attribute/Intended effect, Attribute/Offset, 
+%                returned. The default is
+%                Attribute/Intended effect, Attribute/Offset,
 %                Attribute/Participant indication.
 %
 %   Epoch limits
@@ -36,7 +36,7 @@
 %                [edit box] epochhed() function equivalent: 'newname'
 %
 %   Out-of-bounds EEG limits if any
-%                [min max] data limits. If one positive value is given,            
+%                [min max] data limits. If one positive value is given,
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50].
 %
@@ -51,7 +51,7 @@
 %                for. All tags in the list must be present in the HED
 %                string.
 %
-%   timelim      
+%   timelim
 %                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event {default: [-1 2]}
 %
@@ -127,14 +127,10 @@ end;
 
 
 if nargin < 2
-    % Find all the unique tags in the events    
+    % Find all the unique tags in the events
     if ~exist('tagstring','var')
         tagstring = '';
     end
-    
-%     if ~exist('timelim','var')
-%         timelim = [-1, 2];
-%     end
     
     uniquetags = finduniquetags(arrayfun(@concattags, EEG.event, ...
         'UniformOutput', false));
