@@ -38,10 +38,12 @@
 %   canceled
 %                True if cancel was pressed in the menu.
 %
-%   tagstring
-%                A comma separated list of HED tags that you want to search
-%                for. All tags in the list must be present in the HED
-%                string.
+%   querystring
+%                A query string consisting of tags that you want to search
+%                for. Two tags separated by a comma use the AND operator
+%                by default, meaning that it will only return a true match
+%                if both the tags are found. The OR (||) operator returns
+%                a true match if either one or both tags are found.
 %
 %   exclusiveTags
 %                A comma-separated list of tags that nullify matches to
