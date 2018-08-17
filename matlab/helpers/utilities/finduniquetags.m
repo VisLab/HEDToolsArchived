@@ -11,8 +11,7 @@
 %   Required:
 %
 %   tags
-%                    The structure that will be tagged. The
-%                    dataset will need to have a .event field.
+%                    A cell array containing HED tags. 
 %
 % Output:
 %
