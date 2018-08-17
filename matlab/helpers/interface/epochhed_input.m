@@ -120,13 +120,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 function [canceled, querystring, exclusiveTags, newName, timelim, ...
-    valueLim] = epochhed_input(EEG, varargin)
-p = parseArguments(EEG, varargin);
+    valuelim] = epochhed_input(varargin)
+p = parseArguments(varargin{:});
     function searchCallback(src, event) %#ok<INUSD>
-        [searchCanceled, querystring] = hedsearch_input(uniquetags, ...
-            querystring); ...
+        [searchCanceled, querystring] = hedsearch_input(p.uniquetags, ...
+            p.querystring); ...
             if ~searchCanceled
-            tagsObj = findobj('tag', 'tagstring');
+            tagsObj = findobj('tag', 'querystring');
             set(tagsObj, 'string', querystring);
             end
     end
@@ -138,7 +138,7 @@ p = parseArguments(EEG, varargin);
 
 geometry = { [2 5 0.5] [2 5 0.5] [5 2 0.5] [4 3 0.5] [5 2 0.5] };
 uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
-    { 'style' 'edit'       'string' p.querystring 'tag' 'tagstring' ...
+    { 'style' 'edit'       'string' p.querystring 'tag' 'querystring' ...
     'callback', @tagsEditBoxCallback} ...
     { 'style' 'pushbutton' 'string' '...' 'callback' @searchCallback } ...
     { 'style' 'text'       ...
@@ -164,7 +164,7 @@ if isempty(result)
     exclusiveTags = '';
     timelim = '';
     newName = '';
-    valueLim = '';
+    valuelim = '';
     canceled = true;
     return;
 end
@@ -178,27 +178,25 @@ else
 end
 newName = result{4};
 if isempty(result{5})
-    valueLim = [-Inf Inf];
+    valuelim = [-Inf Inf];
 else
-    valueLim = str2num(result{5});  %#ok<ST2NM>
+    valuelim = str2num(result{5});  %#ok<ST2NM>
 end
 
-    function p = parseArguments(EEG, varargin)
+    function p = parseArguments(varargin)
         % Parses the arguments passed in and returns the results
         p = inputParser();
-        p.addRequired('EEG', @(x) ~isempty(x) && isstruct(x));
         p.addParamValue('exclusivetags', ...
             {'Attribute/Intended effect', 'Attribute/Offset', ...
             'Attribute/Participant indication'}, @iscellstr); %#ok<NVREPL>
-        p.addParamValue('newname', [EEG.setname ' epochs'], ...
-            @(x) ischar(x)); %#ok<NVREPL>
+        p.addParamValue('newname', '', @(x) ischar(x)); %#ok<NVREPL>
         p.addParamValue('querystring', '', @(x) ischar(x));
         p.addParamValue('timelim', [-1 2], @(x) isnumeric(x) && ...
             numel(x) == 2);
         p.addParamValue('uniquetags', '', @(x) iscellstr(x));
         p.addParamValue('valuelim', [-inf inf], ...
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
-        p.parse(EEG, varargin{:});
+        p.parse(varargin{:});
         p = p.Results;
     end % parseArguments
 
