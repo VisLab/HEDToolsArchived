@@ -16,8 +16,8 @@
 % Output:
 %
 %   uniquetags
-%                    A cell string containing the unique HED tags in a EEG
-%                    strucuture.
+%                    A cell string containing the unique HED tags in the 
+%                    tags input argument. 
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
