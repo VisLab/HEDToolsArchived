@@ -17,8 +17,8 @@
 % Output:
 %
 %   uniquetags
-%                    The structure that will be tagged. The
-%                    dataset will need to have a .event field.
+%                    A cell string containing the unique HED tags in a EEG
+%                    strucuture.
 %
 % Copyright (C) 2012-2016 Thomas Rognon tcrognon@gmail.com,
 % Jeremy Cockfield jeremy.cockfield@gmail.com, and
