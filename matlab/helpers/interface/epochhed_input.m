@@ -55,7 +55,7 @@
 %                if both the tags are found. The OR (||) operator returns
 %                a true match if either one or both tags are found.
 %
-%   timeLim
+%   timelimits
 %                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event {default: [-1 2]}
 %
