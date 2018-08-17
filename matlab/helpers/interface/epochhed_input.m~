@@ -33,41 +33,10 @@
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50].
 %
-% Inputs:
-%
-%   canceled
-%                True if cancel was pressed in the menu.
-%
-%   exclusiveTags
-%                A comma-separated list of tags that nullify matches to
-%                other tags. If these tags are present in both the EEG
-%                dataset event tags and the tag string then a match will be
-%                returned. The default is
-%                'Attribute/Intended effect', 'Attribute/Offset'.
-%
-%   newName
-%                The new dataset name.
-%
-%   querystring
-%                A query string consisting of tags that you want to search
-%                for. Two tags separated by a comma use the AND operator
-%                by default, meaning that it will only return a true match
-%                if both the tags are found. The OR (||) operator returns
-%                a true match if either one or both tags are found.
-%
-%   timelim
-%                Epoch latency limits [start end] in seconds relative to
-%                the time-locking event {default: [-1 2]}
 %
 %   uniquetags
 %                    A cell string containing the unique HED tags in the 
 %                    tags input argument.
-%
-%   valuelim
-%                Lower and upper bound latencies for trial data. Else if
-%                one positive value is given, use its negative as the lower
-%                bound. The given values are also considered outliers
-%               (min max).
 %
 % Outputs:
 %
@@ -84,18 +53,11 @@
 %   newName
 %                The new dataset name.
 %
-%   querystring
-%                A query string consisting of tags that you want to search
-%                for. Two tags separated by a comma use the AND operator
-%                by default, meaning that it will only return a true match
-%                if both the tags are found. The OR (||) operator returns
-%                a true match if either one or both tags are found.
-%
-%   timelim
+%   timeLim
 %                Epoch latency limits [start end] in seconds relative to
 %                the time-locking event {default: [-1 2]}
 %
-%   valuelim
+%   valueLim
 %                Lower and upper bound latencies for trial data. Else if
 %                one positive value is given, use its negative as the lower
 %                bound. The given values are also considered outliers
@@ -119,7 +81,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-function [canceled, querystring, exclusiveTags, newName, timelim, ...
+function [canceled, querystring, exclusiveTags, newName, timeLim, ...
     valueLim] = epochhed_input(EEG, varargin)
 p = parseArguments(EEG, varargin);
     function searchCallback(src, event) %#ok<INUSD>
@@ -148,7 +110,7 @@ uilist = { { 'style' 'text'       'string' 'Time-locking HED tag(s)' } ...
     { } ...
     { 'style' 'text'       ...
     'string' 'Epoch limits [start, end] in seconds' } ...
-    { 'style' 'edit'       'string' num2str(p.timelim) } ...
+    { 'style' 'edit'       'string' num2str(p.timelimits) } ...
     { } ...
     { 'style' 'text'       'string' 'Name for the new dataset' } ...
     { 'style' 'edit'       ...
@@ -162,7 +124,7 @@ result = inputgui( geometry, uilist, 'pophelp(''epochhed_input'')', ...
 if isempty(result)
     querystring = '';
     exclusiveTags = '';
-    timelim = '';
+    timeLim = '';
     newName = '';
     valueLim = '';
     canceled = true;
@@ -172,9 +134,9 @@ canceled = false;
 querystring = result{1};
 exclusiveTags = strsplit(result{2}, ',');
 if isempty(result{3})
-    timelim = [-1 2];
+    timeLim = [-1 2];
 else
-    timelim = str2num(result{3});  %#ok<ST2NM>
+    timeLim = str2num(result{3});  %#ok<ST2NM>
 end
 newName = result{4};
 if isempty(result{5})
@@ -193,9 +155,9 @@ end
         p.addParamValue('newname', [EEG.setname ' epochs'], ...
             @(x) ischar(x)); %#ok<NVREPL>
         p.addParamValue('querystring', '', @(x) ischar(x));
-        p.addParamValue('timelim', [-1 2], @(x) isnumeric(x) && ...
+        p.addParamValue('timelimits', [-1 2], @(x) isnumeric(x) && ...
             numel(x) == 2);
-        p.addParamValue('uniquetags', '', @(x) iscellstr(x));
+        p.addParamValue('querystring', '', @(x) iscellstr(x));
         p.addParamValue('valuelim', [-inf inf], ...
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.parse(EEG, varargin{:});
