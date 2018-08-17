@@ -1,6 +1,4 @@
-% Writes tags to a structure from the fieldMap information. The tags in the
-% dataset structure are written to the .etc field and in each individual
-% event in the .event field.
+% Finds the unique HED tags in a cell array of tags.  
 %
 % Usage:
 %
