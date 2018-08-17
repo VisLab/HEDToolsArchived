@@ -63,7 +63,7 @@
 %                    A cell string containing the unique HED tags in the 
 %                    tags input argument.
 %
-%   valueLim
+%   valuelim
 %                Lower and upper bound latencies for trial data. Else if
 %                one positive value is given, use its negative as the lower
 %                bound. The given values are also considered outliers
