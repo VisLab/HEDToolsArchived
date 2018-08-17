@@ -33,17 +33,10 @@
 %                the opposite value is used for lower bound. For example,
 %                use [-50 50].
 %
-% Outputs:
+% Inputs:
 %
 %   canceled
 %                True if cancel was pressed in the menu.
-%
-%   querystring
-%                A query string consisting of tags that you want to search
-%                for. Two tags separated by a comma use the AND operator
-%                by default, meaning that it will only return a true match
-%                if both the tags are found. The OR (||) operator returns
-%                a true match if either one or both tags are found.
 %
 %   exclusiveTags
 %                A comma-separated list of tags that nullify matches to
@@ -54,6 +47,49 @@
 %
 %   newName
 %                The new dataset name.
+%
+%   querystring
+%                A query string consisting of tags that you want to search
+%                for. Two tags separated by a comma use the AND operator
+%                by default, meaning that it will only return a true match
+%                if both the tags are found. The OR (||) operator returns
+%                a true match if either one or both tags are found.
+%
+%   timeLim
+%                Epoch latency limits [start end] in seconds relative to
+%                the time-locking event {default: [-1 2]}
+%
+%   uniquetags
+%                    A cell string containing the unique HED tags in the 
+%                    tags input argument.
+%
+%   valueLim
+%                Lower and upper bound latencies for trial data. Else if
+%                one positive value is given, use its negative as the lower
+%                bound. The given values are also considered outliers
+%               (min max).
+%
+% Outputs:
+%
+%   canceled
+%                True if cancel was pressed in the menu.
+%
+%   exclusiveTags
+%                A comma-separated list of tags that nullify matches to
+%                other tags. If these tags are present in both the EEG
+%                dataset event tags and the tag string then a match will be
+%                returned. The default is
+%                'Attribute/Intended effect', 'Attribute/Offset'.
+%
+%   newName
+%                The new dataset name.
+%
+%   querystring
+%                A query string consisting of tags that you want to search
+%                for. Two tags separated by a comma use the AND operator
+%                by default, meaning that it will only return a true match
+%                if both the tags are found. The OR (||) operator returns
+%                a true match if either one or both tags are found.
 %
 %   timeLim
 %                Epoch latency limits [start end] in seconds relative to
@@ -159,6 +195,7 @@ end
         p.addParamValue('querystring', '', @(x) ischar(x));
         p.addParamValue('timelimits', [-1 2], @(x) isnumeric(x) && ...
             numel(x) == 2);
+        p.addParamValue('uniquetags', '', @(x) iscellstr(x));
         p.addParamValue('valuelim', [-inf inf], ...
             @(x) isnumeric(x) && any(numel(x) == [1 2])) %#ok<NVREPL>
         p.parse(EEG, varargin{:});
