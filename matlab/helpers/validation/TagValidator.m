@@ -177,6 +177,7 @@ classdef TagValidator
                         formattedTags{tagIndex})) > 1
                     issues = errorReporter(obj.duplicateError, 'tag', ...
                         originalTags{tagIndex});
+                    return;
                 end
             end
         end % checkForDuplicateTags
