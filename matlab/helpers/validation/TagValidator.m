@@ -242,8 +242,9 @@ classdef TagValidator
                 formattedTag)
             % Checks if the tag is valid if it has the isNumeric attribute.
             issues = '';
-            isNumeric = isNumericTag(obj, formattedTag);
-            if isNumeric
+            isNumeric = obj.isNumericTag(formattedTag);
+            isUnitClass = obj.isUnitClassTag(formattedTag);
+            if isNumeric && ~isUnitClass
                 numericalTagValue = TagValidator.getTagName(formattedTag);
                 if ~TagValidator.isValidNumericalString(numericalTagValue)
                     issues = errorReporter(obj.numericError, 'tag', ...
