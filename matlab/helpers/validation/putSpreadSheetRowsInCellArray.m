@@ -77,7 +77,7 @@ rowsArray = getRowsBasedOnFileExtension(inputArgs);
             fileId = fopen(inputArgs.spreadsheetPath);
             currentRow = getNextRow(fileId);
             while ~isempty(currentRow)
-                rowsArray(rowNumber+1,:) = currentRow;  %#ok<AGROW>
+                rowsArray(rowNumber,:) = currentRow;  %#ok<AGROW>
                 currentRow = getNextRow(fileId);
                 rowNumber = rowNumber + 1;
             end
