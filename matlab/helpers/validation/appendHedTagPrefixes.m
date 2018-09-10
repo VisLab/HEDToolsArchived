@@ -100,6 +100,12 @@ rowsArray = appendPrefixesToSpecificColumns(inputArgs, rowsArray, ...
     function splitColumnTags = appendPrefixToEveryColumnTag(columnTags, ...
             prefix)
         % Appends the tag prefix to every tag in a particular column
+        hedMaps = getHedMaps();
+        prefixWithoutEndingPound = lower([prefix, '#']);
+        if hedMaps.takesValue.isKey(prefixWithoutEndingPound)
+            splitColumnTags{1} = [prefix, columnTags];
+            return;
+        end
         splitColumnTags = strsplit(columnTags, ',');
         numberOfColumnTags = length(splitColumnTags);
         for b = 1:numberOfColumnTags
