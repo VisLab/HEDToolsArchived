@@ -155,7 +155,7 @@ def create_hed_xml_attachment(hed_xml_file_path):
     MIMEText object
         A MIMEText object containing the HED XML attachment.
     """
-    with open(hed_xml_file_path, 'r') as hed_xml_file:
+    with open(hed_xml_file_path, 'r', encoding='utf-8') as hed_xml_file:
         hed_xml_string = hed_xml_file.read();
         hed_xml_attachment = MIMEText(hed_xml_string, 'plain', 'utf-8');
         hed_xml_attachment.add_header(constants.CONTENT_DISPOSITION_HEADER,
@@ -199,7 +199,7 @@ def url_to_file(resource_url, file_path):
     """
     url_request = urllib.request.urlopen(resource_url);
     url_data = str(url_request.read(), 'utf-8');
-    with open(file_path, 'w') as opened_file:
+    with open(file_path, 'w', encoding='utf-8') as opened_file:
         opened_file.write(url_data);
 
 

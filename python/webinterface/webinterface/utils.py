@@ -232,10 +232,11 @@ def generate_download_file_response(download_file_name):
     """
     try:
         def generate():
-            with open(os.path.join(app_config[UPLOAD_DIRECTORY_KEY], download_file_name)) as download_file:
+            full_filename = os.path.join(app_config[UPLOAD_DIRECTORY_KEY], download_file_name)
+            with open(full_filename, 'r', encoding='utf-8') as download_file:
                 for line in download_file:
                     yield line;
-            delete_file_if_it_exist(os.path.join(app_config[UPLOAD_DIRECTORY_KEY], download_file_name));
+            delete_file_if_it_exist(full_filename);
 
         return Response(generate(), mimetype='text/plain; charset=utf-8',
                         headers={'Content-Disposition': "attachment; filename=%s" % download_file_name});
@@ -342,7 +343,7 @@ def _save_validation_issues_to_file_in_upload_folder(spreadsheet_filename, valid
     """
     validation_issues_filename = _generate_spreadsheet_validation_filename(spreadsheet_filename, worksheet_name);
     validation_issues_file_path = os.path.join(current_app.config[UPLOAD_DIRECTORY_KEY], validation_issues_filename);
-    with open(validation_issues_file_path, 'w') as validation_issues_file:
+    with open(validation_issues_file_path, 'w', encoding='utf-8') as validation_issues_file:
         validation_issues_file.write(validation_issues);
     return validation_issues_filename;
 
@@ -825,7 +826,7 @@ def _get_text_file_column_names(text_file_path, column_delimiter):
         The spreadsheet column delimiter based on the other extension.
 
     """
-    with open(text_file_path, 'r') as opened_text_file:
+    with open(text_file_path, 'r', encoding='utf-8') as opened_text_file:
         first_line = opened_text_file.readline();
         text_file_columns = first_line.split(column_delimiter);
     return text_file_columns;

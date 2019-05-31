@@ -16,7 +16,7 @@ class Test(unittest.TestCase):
 
     @classmethod
     def get_payload_from_file(cls, hed_payload_file):
-        with open(hed_payload_file) as opened_hed_payload_file:
+        with open(hed_payload_file, 'r', encoding='utf-8') as opened_hed_payload_file:
             cls.hed_payload_string = json.dumps(json.load(opened_hed_payload_file));
 
     @classmethod
@@ -28,7 +28,7 @@ class Test(unittest.TestCase):
             cls.app = app.test_client();
 
     def create_file_in_data_dir(self, file_path):
-        with open(file_path, 'w') as file:
+        with open(file_path, 'w', encoding='utf-8') as file:
             print(file_path + ' created');
 
     def test_wiki_page_is_hed_schema(self):
