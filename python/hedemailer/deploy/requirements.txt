@@ -4,4 +4,3 @@ itsdangerous==0.24
 Jinja2==2.10.1
 MarkupSafe==1.0
 Werkzeug==0.12.2
-mod_wsgi==4.6.4
